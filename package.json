@@ -1,0 +1,13 @@
+{
+  "name": "react-native-electrode-bridge",
+  "version": "0.0.1",
+  "description": "Low level communication bridge between reaact native js and native",
+  "main": "js/index.js",
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "react": "^15.2.1",
+    "react-native": "^0.31.0"
+  }
+}

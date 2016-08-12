@@ -1,0 +1,19 @@
+# OSX
+#
+.DS_Store
+
+# Android
+#
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+/build
+/captures
+.externalNativeBuild
+
+# node.js
+#
+node_modules/
+npm-debug.log

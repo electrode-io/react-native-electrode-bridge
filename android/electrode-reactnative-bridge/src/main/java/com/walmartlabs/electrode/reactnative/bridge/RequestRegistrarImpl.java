@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultRequestRegistrar<T> implements RequestRegistrar<T> {
+public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
 
     private final ConcurrentHashMap<UUID, String> mRequestTypeByUUID = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, T> mRequestHandlerByRequestType = new ConcurrentHashMap<>();
@@ -19,6 +19,7 @@ public class DefaultRequestRegistrar<T> implements RequestRegistrar<T> {
      * @return UUID to provide when calling unregisterRequestHandler
      */
     @SuppressWarnings("unused")
+    @NonNull
     public UUID registerRequestHandler(@NonNull String type, @NonNull T requestHandler)
             throws ExistingHandlerException {
         if (mRequestHandlerByRequestType.containsKey(type)) {
@@ -53,7 +54,7 @@ public class DefaultRequestRegistrar<T> implements RequestRegistrar<T> {
      * request handler was registered
      */
     @Nullable
-    public T getRequestHandler(String type) {
+    public T getRequestHandler(@NonNull String type) {
         return mRequestHandlerByRequestType.get(type);
     }
 }

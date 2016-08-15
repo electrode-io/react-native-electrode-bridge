@@ -34,6 +34,6 @@ public interface EventRegistrar<T> {
      * event listeners are currently registered for this event type
      */
     @NonNull
-    List<T> getEventListeners(String type);
+    List<T> getEventListeners(@NonNull String type);
 
 }

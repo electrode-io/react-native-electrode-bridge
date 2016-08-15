@@ -14,6 +14,7 @@ public interface RequestRegistrar<T> {
      * @param requestHandler The request handler instance
      * @return UUID to provide when calling unregisterRequestHandler
      */
+    @NonNull
     UUID registerRequestHandler(@NonNull String type, @NonNull T requestHandler)
             throws ExistingHandlerException;
 
@@ -33,5 +34,5 @@ public interface RequestRegistrar<T> {
      * request handler was registered
      */
     @Nullable
-    T getRequestHandler(String type);
+    T getRequestHandler(@NonNull String type);
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultEventRegistrar<T> implements EventRegistrar<T> {
+public class EventRegistrarImpl<T> implements EventRegistrar<T> {
     private final ConcurrentHashMap<UUID, T> mEventListenerByUUID = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<T>> mEventListenersByEventType = new ConcurrentHashMap<>();
 
@@ -61,7 +61,7 @@ public class DefaultEventRegistrar<T> implements EventRegistrar<T> {
      */
     @NonNull
     @Override
-    public List<T> getEventListeners(String type) {
+    public List<T> getEventListeners(@NonNull String type) {
         if (!mEventListenersByEventType.containsKey(type)) {
             return Collections.emptyList();
         }

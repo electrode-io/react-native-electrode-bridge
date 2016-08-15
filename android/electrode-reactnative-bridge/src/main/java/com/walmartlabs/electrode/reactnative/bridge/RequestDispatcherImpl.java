@@ -8,15 +8,15 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 
 @SuppressWarnings("unused")
-public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatcher {
+public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher {
     private final RequestRegistrar<RequestHandler> mRequestRegistrar;
 
     /**
-     * Initialize a new DefaultRequestDispatcher instance
+     * Initialize a new RequestDispatcherImpl instance
      *
      * @param requestRegistrar The request registrar to use for this dispatcher
      */
-    public DefaultRequestDispatcher(RequestRegistrar<RequestHandler> requestRegistrar) {
+    public RequestDispatcherImpl(RequestRegistrar<RequestHandler> requestRegistrar) {
         mRequestRegistrar = requestRegistrar;
     }
 
@@ -37,7 +37,7 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
          *
          * @param bundle A bundle containing the response data
          */
-        void success(Bundle bundle);
+        void success(@NonNull Bundle bundle);
 
         /**
          * Successful response

@@ -7,12 +7,12 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 
 @SuppressWarnings("unused")
-public class DefaultEventDispatcher implements ElectrodeBridge.EventDispatcher {
+public class EventDispatcherImpl implements ElectrodeBridge.EventDispatcher {
 
     private final EventRegistrar<EventListener> mEventRegistrar;
     private static final Bundle EMPTY_BUNDLE = new Bundle();
 
-    public DefaultEventDispatcher(EventRegistrar<EventListener> eventRegistrar) {
+    public EventDispatcherImpl(EventRegistrar<EventListener> eventRegistrar) {
         mEventRegistrar = eventRegistrar;
     }
 

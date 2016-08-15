@@ -37,8 +37,8 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private final RequestDispatcher mRequestDispatcher;
 
     private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
-    private final EventRegistrar<DefaultEventDispatcher.EventListener> mEventRegistrar = new DefaultEventRegistrar<>();
-    private final RequestRegistrar<DefaultRequestDispatcher.RequestHandler> mRequestRegistrar = new DefaultRequestRegistrar<>();
+    private final EventRegistrar<EventDispatcherImpl.EventListener> mEventRegistrar = new EventRegistrarImpl<>();
+    private final RequestRegistrar<RequestDispatcherImpl.RequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     /**
      * Initializes a new instance of ElectrodeBridge
@@ -47,8 +47,8 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     public ElectrodeBridge(@NonNull ReactApplicationContext reactContext) {
         super(reactContext);
         mReactContext = reactContext;
-        mEventDispatcher = new DefaultEventDispatcher(mEventRegistrar);
-        mRequestDispatcher = new DefaultRequestDispatcher(mRequestRegistrar);
+        mEventDispatcher = new EventDispatcherImpl(mEventRegistrar);
+        mRequestDispatcher = new RequestDispatcherImpl(mRequestRegistrar);
     }
 
     /**
@@ -168,13 +168,21 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Emits an event to the JS react native side
+     * Emits an event without any payload to the JS react native side
+     * @param type The type of the event
+     */
+    public void emitEventToJs(@NonNull String type) {
+        emitEventToJs(type, Bundle.EMPTY);
+    }
+
+    /**
+     * Emits an event with some payload to the JS react native side
      *
      * @param type The type of the event
      * @param payload The event payload
      */
     @SuppressWarnings("unused")
-    public void emitEventToJs(String type, Bundle payload) {
+    public void emitEventToJs(@NonNull String type, @NonNull Bundle payload) {
         String id = getUUID();
         WritableMap message = buildMessage(id, type, Arguments.fromBundle(payload));
 
@@ -186,7 +194,18 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Sends a request to the JS react native side
+     * Sends a request without any payload the JS react native side
+     *
+     * @param type The type of the request
+     * @param requestCompletionListener A RequestCompletionListener to be informed of request
+     *  completion success or failure
+     */
+    public void sendRequestToJs(String type, RequestCompletionListener requestCompletionListener) {
+        sendRequestToJs(type, Bundle.EMPTY, requestCompletionListener);
+    }
+
+    /**
+     * Sends a request with some payload to the JS react native side
      *
      * @param type The type of the request
      * @param payload The request payload
@@ -222,11 +241,17 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                 .emit(BRIDE_REQUEST, message);
     }
 
-    public RequestRegistrar<DefaultRequestDispatcher.RequestHandler> requestRegistrar() {
+    /**
+     * @return The request handler registrar
+     */
+    public RequestRegistrar<RequestDispatcherImpl.RequestHandler> requestRegistrar() {
         return mRequestRegistrar;
     }
 
-    public EventRegistrar<DefaultEventDispatcher.EventListener> eventRegistrar() {
+    /**
+     * @return The event listener register
+     */
+    public EventRegistrar<EventDispatcherImpl.EventListener> eventRegistrar() {
         return mEventRegistrar;
     }
 

@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 
-import com.walmartlabs.electrode.reactnative.bridge.DefaultEventDispatcher;
-import com.walmartlabs.electrode.reactnative.bridge.DefaultRequestDispatcher;
+import com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl;
+import com.walmartlabs.electrode.reactnative.bridge.RequestDispatcherImpl;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridge;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ExistingHandlerException;
@@ -49,7 +49,7 @@ public class NativeFragment extends Fragment {
                 electrodeBridge
                         .eventRegistrar()
                         .registerEventListener(REACT_NATIVE_SEEKBAR_VALUE_UPDATE_EVENT_TYPE,
-                                new DefaultEventDispatcher.EventListener() {
+                                new EventDispatcherImpl.EventListener() {
                     @Override
                     public void onEvent(final Bundle payload) {
                         getActivity().runOnUiThread(new Runnable() {
@@ -67,10 +67,10 @@ public class NativeFragment extends Fragment {
                     electrodeBridge
                             .requestRegistrar()
                             .registerRequestHandler(REACT_NATIVE_REQUEST_EXAMPLE_TYPE,
-                                    new DefaultRequestDispatcher.RequestHandler() {
+                                    new RequestDispatcherImpl.RequestHandler() {
                         @Override
                         public void onRequest(Bundle payload,
-                                              DefaultRequestDispatcher.RequestCompletioner requestCompletioner) {
+                                              RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
                             showRequestCompletionButtons(requestCompletioner);
                         }
                     });
@@ -91,7 +91,7 @@ public class NativeFragment extends Fragment {
         });
     }
 
-    private void showRequestCompletionButtons(final DefaultRequestDispatcher.RequestCompletioner requestCompletioner) {
+    private void showRequestCompletionButtons(final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

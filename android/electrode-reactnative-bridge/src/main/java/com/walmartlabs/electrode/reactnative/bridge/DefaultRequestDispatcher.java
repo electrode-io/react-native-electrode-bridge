@@ -10,8 +10,6 @@ import com.facebook.react.bridge.WritableMap;
 
 @SuppressWarnings("unused")
 public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatcher {
-    private static final WritableMap EMPTY_WRITABLE_MAP = Arguments.createMap();
-
     private final RequestRegistrar<RequestHandler> mRequestRegistrar;
 
     /**
@@ -30,9 +28,10 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
         /**
          * Error response
          *
+         * @param code The error code
          * @param message The error message
          */
-        void error(@NonNull String message);
+        void error(@NonNull String code, @NonNull String message);
 
         /**
          * Successful response
@@ -76,8 +75,8 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
         Bundle payloadBundle = Arguments.toBundle(payload);
         mRequestRegistrar.getRequestHandler(type).onRequest(payloadBundle, new RequestCompletion() {
             @Override
-            public void error(@NonNull String message) {
-                promise.reject(message);
+            public void error(@NonNull String code, @NonNull String message) {
+                promise.reject(code, message);
             }
 
             @Override
@@ -87,7 +86,7 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
 
             @Override
             public void success() {
-                promise.resolve(EMPTY_WRITABLE_MAP);
+                promise.resolve(Arguments.createMap());
             }
         });
     }

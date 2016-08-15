@@ -71,7 +71,7 @@ class ElectrodeBridge extends EventEmitter {
         this.emitEventToNative("electrode.bridge.response", { id, data });
       })
       .catch((err) => {
-        const error = {name: err.name, message: err.message};
+        const error = { code: err.code, message: err.message };
         this.emitEventToNative("electrode.bridge.response", { id, error });
       });
   }

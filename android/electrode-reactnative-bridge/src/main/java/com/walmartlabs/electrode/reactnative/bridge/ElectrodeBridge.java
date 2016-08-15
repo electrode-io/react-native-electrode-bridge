@@ -1,5 +1,6 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -23,6 +24,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private static final String BRIDE_REQUEST = "electrode.bridge.request";
     private static final String BRIDGE_RESPONSE = "electrode.bridge.response";
     private static final String BRIDGE_RESPONSE_ERROR = "error";
+    private static final String BRDIGE_RESPONSE_ERROR_NAME = "name";
     private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
     private static final String BRIDGE_MSG_DATA = "data";
     private static final String BRIDGE_MSG_TYPE = "type";
@@ -32,15 +34,28 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private final EventDispatcher mEventDispatcher;
     private final RequestDispatcher mRequestDispatcher;
 
-    private final ConcurrentHashMap<String, Promise> promiseToFullfilByRequestId = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
+    private final EventRegistrar<DefaultEventDispatcher.EventListener> mEventRegistrar = new DefaultEventRegistrar<>();
+    private final RequestRegistrar<DefaultRequestDispatcher.RequestHandler> mRequestRegistrar = new DefaultRequestRegistrar<>();
 
-    public ElectrodeBridge(@NonNull ReactApplicationContext reactContext,
-                           @NonNull EventDispatcher eventDispatcher,
-                           @NonNull RequestDispatcher requestDispatcher) {
+    /**
+     * Initializes a new instance of ElectrodeBridge
+     * @param reactContext The react application context
+     */
+    public ElectrodeBridge(@NonNull ReactApplicationContext reactContext) {
         super(reactContext);
         mReactContext = reactContext;
-        mEventDispatcher = eventDispatcher;
-        mRequestDispatcher = requestDispatcher;
+        mEventDispatcher = new DefaultEventDispatcher(mEventRegistrar);
+        mRequestDispatcher = new DefaultRequestDispatcher(mRequestRegistrar);
+    }
+
+    /**
+     * @return the name of this module. This will be the name used to {@code require()} this module
+     * from javascript.
+     */
+    @Override
+    public String getName() {
+        return "ElectrodeBridge";
     }
 
     /**
@@ -54,7 +69,9 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
          * @param type The type of the event to dispatch
          * @param payload The payload of the event as a ReadableMap
          */
-        void dispatchEvent(@NonNull String id, @NonNull String type, @NonNull ReadableMap payload);
+        void dispatchEvent(@NonNull String id,
+                           @NonNull String type,
+                           @NonNull ReadableMap payload);
     }
 
     /**
@@ -75,11 +92,6 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                              @NonNull Promise promise);
     }
 
-    @Override
-    public String getName() {
-        return "ElectrodeBridge";
-    }
-
     /**
      * Dispatch an event on the native side
      *
@@ -95,11 +107,21 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         if (type.equals(BRIDGE_RESPONSE)) {
             String parentRequestId = payload.getString(BRIDGE_MSG_ID);
             Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
-            Promise promise = promiseToFullfilByRequestId.remove(parentRequestId);
+            Promise promise = pendingPromiseByRequestId.remove(parentRequestId);
             if (payload.hasKey(BRIDGE_RESPONSE_ERROR)) {
-                String errorMessage = payload.getMap(BRIDGE_RESPONSE_ERROR)
+                String errorMessage = payload
+                        .getMap(BRIDGE_RESPONSE_ERROR)
                         .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
-                promise.reject(BRIDGE_RESPONSE_ERROR, errorMessage);
+
+                String errorName = "EUNKNOWN";
+                if (payload
+                        .getMap(BRIDGE_RESPONSE_ERROR)
+                        .hasKey(BRDIGE_RESPONSE_ERROR_NAME)) {
+                    errorName = payload
+                            .getMap(BRIDGE_RESPONSE_ERROR)
+                            .getString(BRDIGE_RESPONSE_ERROR_NAME);
+                }
+                promise.reject(errorName, errorMessage);
             } else if (payload.hasKey(BRIDGE_MSG_DATA)) {
                 promise.resolve(payload.getMap(BRIDGE_MSG_DATA));
             } else {
@@ -132,9 +154,9 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
      * @param payload The event payload
      */
     @SuppressWarnings("unused")
-    public void emitEventToJs(String type, WritableMap payload) {
+    public void emitEventToJs(String type, Bundle payload) {
         String id = getUUID();
-        WritableMap message = buildMessage(id, type, payload);
+        WritableMap message = buildMessage(id, type, Arguments.fromBundle(payload));
 
         Log.d(TAG, String.format("Emitting event[type:%s id:%s]", type, id));
 
@@ -149,19 +171,27 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
      * @param type The type of the request
      * @param payload The request payload
      * @param promise The promise that will either get resolved or rejected
-     */
+    */
     @SuppressWarnings("unused")
-    public void sendRequestToJs(String type, WritableMap payload, Promise promise) {
+    public void sendRequestToJs(String type, Bundle payload, Promise promise) {
         String id = getUUID();
-        WritableMap message = buildMessage(id, type, payload);
+        WritableMap message = buildMessage(id, type, Arguments.fromBundle(payload));
 
-        promiseToFullfilByRequestId.put(id, promise);
+        pendingPromiseByRequestId.put(id, promise);
 
         Log.d(TAG, String.format("Sending request[type:%s id:%s]", type, id));
 
         mReactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(BRIDE_REQUEST, message);
+    }
+
+    public RequestRegistrar<DefaultRequestDispatcher.RequestHandler> requestRegistrar() {
+        return mRequestRegistrar;
+    }
+
+    public EventRegistrar<DefaultEventDispatcher.EventListener> eventRegistrar() {
+        return mEventRegistrar;
     }
 
     private String getUUID() {

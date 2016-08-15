@@ -1,0 +1,2 @@
+include ':app', ':electrode-reactnative-bridge'
+project(':electrode-reactnative-bridge').projectDir = new File(rootProject.projectDir, '../../android/electrode-reactnative-bridge')

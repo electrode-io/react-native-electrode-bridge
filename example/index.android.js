@@ -17,10 +17,11 @@ import {
 } from 'react-native';
 import { electrodeBridge } from 'react-native-electrode-bridge';
 
-class ModuleTesting extends Component {
+class ElectrodeBridgeExample extends Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       bgColor: 'rgb(0,0,0)',
       pendingRequest: false,
@@ -30,8 +31,11 @@ class ModuleTesting extends Component {
   }
 
   componentDidMount() {
-    electrodeBridge.addListener("native.seekbar.value.update", this._updateColor.bind(this));
-    electrodeBridge.registerRequestHandler("coremodule.request", this._receivedRequest.bind(this));
+    electrodeBridge.addListener("native.seekbar.value.update",
+      this._updateColor.bind(this));
+
+    electrodeBridge.registerRequestHandler("native.bridge.requestexample",
+      this._receivedRequest.bind(this));
   }
 
   _receivedRequest(data) {
@@ -44,19 +48,19 @@ class ModuleTesting extends Component {
     });
   }
 
-  _updateColor(data) {
-    this.setState({bgColor: `rgb(0, 0, ${data.value})`});
-  }
-
   render() {
     return (
       <View style={styles.container} backgroundColor={this.state.bgColor}>
-        <TouchableOpacity onPress={this._sendRequest}>
+        <TouchableOpacity onPress={this._sendExampleRequestToNative}>
           <Text style={styles.button}>
             Send Request
           </Text>
         </TouchableOpacity>
-        <Slider style={styles.slider} maximumValue={255} step={1} onValueChange={this._sliderValueChanged}/>
+        <Slider style={styles.slider}
+                maximumValue={255}
+                step={1}
+                onValueChange={this._emitSliderValueUpdateEventToNative}/>
+
         {this._renderRequestCompletionButtons()}
       </View>
     );
@@ -85,8 +89,19 @@ class ModuleTesting extends Component {
     return (component);
   }
 
+  _sendExampleRequestToNative() {
+    electrodeBridge.sendRequestToNative(
+      "reactnative.bridge.requestexample", { "hello": "world" })
+    .then(resp => { console.log("Response received"); })
+    .catch(error => { console.log(`Error received [code:${error.code} message:${error.message}]`); });
+  }
+
+  _emitSliderValueUpdateEventToNative(value) {
+    electrodeBridge.emitEventToNative("reactnative.seekbar.value.update", {value});
+  }
+
   _resolvePendingRequest() {
-    this.state.pendingRequestPromiseResolve({hello: "world"});
+    this.state.pendingRequestPromiseResolve({ hello: "world" });
     this._cleanPendingRequestState();
   }
 
@@ -103,20 +118,8 @@ class ModuleTesting extends Component {
     });
   }
 
-  _sendRequest() {
-    electrodeBridge.sendRequestToNative("coremodule.request", {"hello": "world"})
-    .then(
-      resp => {
-        console.log("Response received");
-      }
-    )
-    .catch(error => {
-      console.log("Error received");
-    });
-  }
-
-  _sliderValueChanged(value) {
-    electrodeBridge.emitEventToNative("reactnative.seekbar.value.update", {value:value});
+  _updateColor(data) {
+    this.setState({bgColor: `rgb(0, 0, ${data.value})`});
   }
 }
 
@@ -136,4 +139,4 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent('ModuleTesting', () => ModuleTesting);
+AppRegistry.registerComponent('ElectrodeBridgeExample', () => ElectrodeBridgeExample);

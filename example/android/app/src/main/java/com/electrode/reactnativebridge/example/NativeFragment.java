@@ -3,6 +3,7 @@ package com.electrode.reactnativebridge.example;
 import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,17 +12,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.PromiseImpl;
 import com.walmartlabs.electrode.reactnative.bridge.DefaultEventDispatcher;
 import com.walmartlabs.electrode.reactnative.bridge.DefaultRequestDispatcher;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridge;
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInstanceHolder;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ExistingHandlerException;
 
 public class NativeFragment extends Fragment {
 
     private static final String TAG = NativeFragment.class.getSimpleName();
+
+    // Inbound event and request types
+    static final String REACT_NATIVE_SEEKBAR_VALUE_UPDATE_EVENT_TYPE = "reactnative.seekbar.value.update";
+    static final String REACT_NATIVE_REQUEST_EXAMPLE_TYPE = "reactnative.bridge.requestexample";
+
+    // Outbound event and request types
+    static final String NATIVE_REQUEST_EXAMPLE_TYPE = "native.bridge.requestexample";
+    static final String NATIVE_SEEKBAR_VALUE_UPDATE_EVENT_TYPE = "native.seekbar.value.update";
 
     private Button mSendRequestButton;
     private Button mResolveRequestButton;
@@ -33,18 +40,23 @@ public class NativeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ElectrodeBridgeInstanceHolder.setOnBridgeReadyListener(new ElectrodeBridgeInstanceHolder.OnBridgeReadyListener() {
+        ElectrodeBridgeHolder.setOnBridgeReadyListener(
+                new ElectrodeBridgeHolder.OnBridgeReadyListener() {
             @Override
             public void onBridgeReady(ElectrodeBridge electrodeBridge) {
                 mElectrodeBridge = electrodeBridge;
 
-                electrodeBridge.eventRegistrar().registerEventListener("reactnative.seekbar.value.update", new DefaultEventDispatcher.EventListener() {
+                electrodeBridge
+                        .eventRegistrar()
+                        .registerEventListener(REACT_NATIVE_SEEKBAR_VALUE_UPDATE_EVENT_TYPE,
+                                new DefaultEventDispatcher.EventListener() {
                     @Override
                     public void onEvent(final Bundle payload) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                getView().setBackgroundColor(Color.rgb(0, (int)payload.getDouble("value"), 0));
+                                getView().setBackgroundColor(
+                                        Color.rgb(0, (int)payload.getDouble("value"), 0));
                             }
                         });
 
@@ -52,10 +64,14 @@ public class NativeFragment extends Fragment {
                 });
 
                 try {
-                    electrodeBridge.requestRegistrar().registerRequestHandler("coremodule.request", new DefaultRequestDispatcher.RequestHandler() {
+                    electrodeBridge
+                            .requestRegistrar()
+                            .registerRequestHandler(REACT_NATIVE_REQUEST_EXAMPLE_TYPE,
+                                    new DefaultRequestDispatcher.RequestHandler() {
                         @Override
-                        public void onRequest(Bundle payload, DefaultRequestDispatcher.RequestCompletion requestCompletion) {
-                            showRequestCompletionButtons(requestCompletion);
+                        public void onRequest(Bundle payload,
+                                              DefaultRequestDispatcher.RequestCompletioner requestCompletioner) {
+                            showRequestCompletionButtons(requestCompletioner);
                         }
                     });
                 } catch (ExistingHandlerException e) {
@@ -75,7 +91,7 @@ public class NativeFragment extends Fragment {
         });
     }
 
-    private void showRequestCompletionButtons(final DefaultRequestDispatcher.RequestCompletion requestCompletion) {
+    private void showRequestCompletionButtons(final DefaultRequestDispatcher.RequestCompletioner requestCompletioner) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -85,7 +101,7 @@ public class NativeFragment extends Fragment {
                 mResolveRequestButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        requestCompletion.success();
+                        requestCompletioner.success();
                         hideRequestCompletionButtons();
                     }
                 });
@@ -93,7 +109,7 @@ public class NativeFragment extends Fragment {
                 mRejectRequestButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        requestCompletion.error("Code", "Error");
+                        requestCompletioner.error("ErrorCode", "ErrorMessage");
                         hideRequestCompletionButtons();
                     }
                 });
@@ -127,19 +143,22 @@ public class NativeFragment extends Fragment {
                 if (mElectrodeBridge != null) {
                     mSendRequestButton.setEnabled(false);
 
-                    mElectrodeBridge.sendRequestToJs("coremodule.request", new Bundle(), new PromiseImpl(new Callback() {
+                    mElectrodeBridge.sendRequestToJs(
+                            NATIVE_REQUEST_EXAMPLE_TYPE,
+                            new Bundle(),
+                            new ElectrodeBridge.RequestCompletionListener() {
                         @Override
-                        public void invoke(Object... args) {
-                            Log.d(TAG, "SUCCESS RESOLVE");
+                        public void onSuccess(@NonNull Bundle payload) {
+                            Log.d(TAG, "Request was succesful");
                             enableSendRequestButton();
                         }
-                    }, new Callback() {
+
                         @Override
-                        public void invoke(Object... args) {
-                            Log.d(TAG, "FAILURE REJECT");
+                        public void onError(@NonNull String code, @NonNull String message) {
+                            Log.d(TAG, String.format("Request was rejected {code:%s,message:%s}", code, message));
                             enableSendRequestButton();
                         }
-                    }));
+                    });
                 }
             }
         });
@@ -152,18 +171,16 @@ public class NativeFragment extends Fragment {
                 map.putInt("value", progress);
 
                 if (mElectrodeBridge != null) {
-                    mElectrodeBridge.emitEventToJs("native.seekbar.value.update", map);
+                    mElectrodeBridge.emitEventToJs(NATIVE_SEEKBAR_VALUE_UPDATE_EVENT_TYPE, map);
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
 

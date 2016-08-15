@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 
 @SuppressWarnings("unused")
 public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatcher {
@@ -24,7 +23,7 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
     /**
      * Provide methods to report request completion
      */
-    public interface RequestCompletion {
+    public interface RequestCompletioner {
         /**
          * Error response
          *
@@ -54,9 +53,9 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
          * Called whenever a request matching this handler is received
          *
          * @param payload The payload of the request as a Bundle
-         * @param requestCompletion An instance of RequestCompletion
+         * @param requestCompletioner An instance of RequestCompletioner
          */
-        void onRequest(@NonNull Bundle payload, @NonNull RequestCompletion requestCompletion);
+        void onRequest(@NonNull Bundle payload, @NonNull RequestCompletioner requestCompletioner);
     }
 
     /**
@@ -73,7 +72,7 @@ public class DefaultRequestDispatcher implements ElectrodeBridge.RequestDispatch
                                 @NonNull ReadableMap payload,
                                 @NonNull final Promise promise) {
         Bundle payloadBundle = Arguments.toBundle(payload);
-        mRequestRegistrar.getRequestHandler(type).onRequest(payloadBundle, new RequestCompletion() {
+        mRequestRegistrar.getRequestHandler(type).onRequest(payloadBundle, new RequestCompletioner() {
             @Override
             public void error(@NonNull String code, @NonNull String message) {
                 promise.reject(code, message);

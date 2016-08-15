@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="8630aa5d-f256-4665-9944-fe28789811b4" name="Default" comment="" />
     <ignored path="android.iws" />
@@ -35,28 +38,18 @@
     <splitter split-orientation="horizontal" split-proportion="0.4901316">
       <split-first>
         <leaf>
-          <file leaf-file-name="NativeModule.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/bridge/NativeModule.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="232">
-                  <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="ElectrodeBridgePackage.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgePackage.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="150">
-                  <caret line="18" column="23" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+                <state relative-caret-position="360">
+                  <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ElectrodeBridgeInstanceHolder.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgeInstanceHolder.java">
+          <file leaf-file-name="ElectrodeBridgeHolder.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgeHolder.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="135">
                   <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
@@ -71,14 +64,14 @@
             <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/DefaultRequestDispatcher.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="-150">
-                  <caret line="11" column="37" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="37" />
+                  <caret line="10" column="37" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="37" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#304#331#0" expanded="true" />
-                    <element signature="e#2600#2601#0" expanded="true" />
-                    <element signature="e#2661#2662#0" expanded="true" />
-                    <element signature="e#2878#2879#0" expanded="true" />
-                    <element signature="e#2948#2949#0" expanded="true" />
+                    <element signature="e#258#285#0" expanded="true" />
+                    <element signature="e#2566#2567#0" expanded="true" />
+                    <element signature="e#2627#2628#0" expanded="true" />
+                    <element signature="e#2844#2845#0" expanded="true" />
+                    <element signature="e#2914#2915#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -168,84 +161,15 @@
             <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridge.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="495">
-                  <caret line="49" column="5" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
+                  <caret line="51" column="5" selection-start-line="51" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#6045#6072#0" expanded="true" />
+                    <element signature="e#6728#6755#0" expanded="true" />
+                    <element signature="e#7774#7980#0" expanded="true" />
+                    <element signature="e#7979#7980#0" expanded="true" />
+                    <element signature="e#7982#8322#0" expanded="true" />
+                    <element signature="e#8321#8322#0" expanded="true" />
                   </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="XReactInstanceManagerImpl.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/XReactInstanceManagerImpl.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="8655">
-                  <caret line="693" column="0" selection-start-line="693" selection-start-column="0" selection-end-line="693" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="CatalystInstance.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/bridge/CatalystInstance.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="195">
-                  <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="CatalystInstanceImpl.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/cxxbridge/CatalystInstanceImpl.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="301">
-                  <caret line="167" column="11" selection-start-line="167" selection-start-column="11" selection-end-line="167" selection-end-column="11" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="JSBundleLoader.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/cxxbridge/JSBundleLoader.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="680">
-                  <caret line="109" column="23" selection-start-line="109" selection-start-column="23" selection-end-line="109" selection-end-column="23" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="UnpackingJSBundleLoader.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/cxxbridge/UnpackingJSBundleLoader.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="301">
-                  <caret line="149" column="23" selection-start-line="149" selection-start-column="23" selection-end-line="149" selection-end-column="23" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ReactApplicationContext.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/bridge/ReactApplicationContext.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="270">
-                  <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#895#896#0" expanded="true" />
-                    <element signature="e#943#944#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ReactContext.java" pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/../node_modules/react-native/android/com/facebook/react/react-native/0.31.0/react-native-0.31.0-sources.jar!/com/facebook/react/bridge/ReactContext.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="60">
-                  <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-                  <folding />
                 </state>
               </provider>
             </entry>
@@ -253,8 +177,8 @@
           <file leaf-file-name="DefaultRequestDispatcher.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/DefaultRequestDispatcher.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="345">
-                  <caret line="23" column="7" selection-start-line="23" selection-start-column="7" selection-end-line="23" selection-end-column="7" />
+                <state relative-caret-position="330">
+                  <caret line="22" column="7" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -2723,9 +2647,9 @@
         <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/EventRegistrar.java" />
         <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/CoreElectrodeBridge.java" />
         <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgeImpl.java" />
-        <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridge.java" />
         <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgeInstanceHolder.java" />
         <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgePackage.java" />
+        <option value="$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridge.java" />
       </list>
     </option>
   </component>
@@ -3176,13 +3100,13 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="23" width="1920" height="1127" extended-state="1" />
+    <frame x="1" y="23" width="1920" height="1127" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32937685" sideWeight="0.5021299" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32937685" sideWeight="0.4978701" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -3199,8 +3123,8 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32938856" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19755058" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16913946" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19755058" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16913946" sideWeight="0.4978701" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
@@ -3416,7 +3340,7 @@
         <state relative-caret-position="180">
           <caret line="12" column="21" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3459,14 +3383,14 @@
     <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/DefaultRequestDispatcher.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-150">
-          <caret line="11" column="37" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="37" />
+          <caret line="10" column="37" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#304#331#0" expanded="true" />
-            <element signature="e#2600#2601#0" expanded="true" />
-            <element signature="e#2661#2662#0" expanded="true" />
-            <element signature="e#2878#2879#0" expanded="true" />
-            <element signature="e#2948#2949#0" expanded="true" />
+            <element signature="e#258#285#0" expanded="true" />
+            <element signature="e#2566#2567#0" expanded="true" />
+            <element signature="e#2627#2628#0" expanded="true" />
+            <element signature="e#2844#2845#0" expanded="true" />
+            <element signature="e#2914#2915#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3477,7 +3401,11 @@
           <caret line="43" column="76" selection-start-line="43" selection-start-column="76" selection-end-line="43" selection-end-column="76" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6045#6072#0" expanded="true" />
+            <element signature="e#6728#6755#0" expanded="true" />
+            <element signature="e#7774#7980#0" expanded="true" />
+            <element signature="e#7979#7980#0" expanded="true" />
+            <element signature="e#7982#8322#0" expanded="true" />
+            <element signature="e#8321#8322#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3502,10 +3430,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding>
-            <element signature="e#895#896#0" expanded="true" />
-            <element signature="e#943#944#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -3567,18 +3492,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridge.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="49" column="5" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#6045#6072#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgeInstanceHolder.java">
+    <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgeHolder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
@@ -3588,10 +3502,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridge.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="51" column="5" selection-start-line="51" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#6728#6755#0" expanded="true" />
+            <element signature="e#7774#7980#0" expanded="true" />
+            <element signature="e#7979#7980#0" expanded="true" />
+            <element signature="e#7982#8322#0" expanded="true" />
+            <element signature="e#8321#8322#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/electrode-reactnative-bridge/src/main/java/com/walmartlabs/electrode/reactnative/bridge/ElectrodeBridgePackage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="18" column="23" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+        <state relative-caret-position="360">
+          <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
           <folding />
         </state>
       </provider>

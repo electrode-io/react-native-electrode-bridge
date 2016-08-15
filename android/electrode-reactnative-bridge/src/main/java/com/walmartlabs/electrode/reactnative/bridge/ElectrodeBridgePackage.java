@@ -15,7 +15,7 @@ public class ElectrodeBridgePackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(ElectrodeBridgeInstanceHolder.createElectrodeBridge(reactContext));
+        modules.add(ElectrodeBridgeHolder.createElectrodeBridge(reactContext));
         return modules;
     }
 

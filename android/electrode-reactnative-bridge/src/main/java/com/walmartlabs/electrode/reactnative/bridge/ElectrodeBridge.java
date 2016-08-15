@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -93,6 +95,24 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
+     * Provides methods to be informed of a request completion state
+     */
+    public interface RequestCompletionListener {
+        /**
+         * Called if request was successful
+         * @param payload The response payload as a bundle (empty bundle if no data)
+         */
+        void onSuccess(@NonNull Bundle payload);
+
+        /**
+         * Called if request failed
+         * @param code The error code ("EUNKNOWN" if no error code was set)
+         * @param message The error message
+         */
+        void onError(@NonNull  String code, @NonNull String message);
+    }
+
+    /**
      * Dispatch an event on the native side
      *
      * @param type The type of the event
@@ -170,12 +190,28 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
      *
      * @param type The type of the request
      * @param payload The request payload
-     * @param promise The promise that will either get resolved or rejected
+     * @param requestCompletionListener A RequestCompletionListener to be informed of request
+     *  completion success or failure
     */
     @SuppressWarnings("unused")
-    public void sendRequestToJs(String type, Bundle payload, Promise promise) {
+    public void sendRequestToJs(String type, Bundle payload, final RequestCompletionListener requestCompletionListener) {
         String id = getUUID();
         WritableMap message = buildMessage(id, type, Arguments.fromBundle(payload));
+
+        Promise promise = new PromiseImpl(new Callback() {
+            @Override
+            public void invoke(Object... args) {
+                requestCompletionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
+            }
+        }, new Callback() {
+            @Override
+            public void invoke(Object... args) {
+                WritableMap writableMap = (WritableMap)args[0];
+                requestCompletionListener.onError(
+                        writableMap.getString("code"),
+                        writableMap.getString("message"));
+            }
+        });
 
         pendingPromiseByRequestId.put(id, promise);
 

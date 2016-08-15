@@ -6,13 +6,13 @@ import com.facebook.react.bridge.ReactApplicationContext;
 
 import java.util.ArrayList;
 
-public class ElectrodeBridgeInstanceHolder {
+public class ElectrodeBridgeHolder {
 
     private static ElectrodeBridge sElectrodeBridge = null;
     private static ArrayList<OnBridgeReadyListener> onBridgeReadyListeners = new ArrayList<>();
 
     public static ElectrodeBridge createElectrodeBridge(ReactApplicationContext reactApplicationContext) {
-        synchronized (ElectrodeBridgeInstanceHolder.class) {
+        synchronized (ElectrodeBridgeHolder.class) {
             if (sElectrodeBridge == null) {
                 sElectrodeBridge = new ElectrodeBridge(reactApplicationContext);
                 for (OnBridgeReadyListener listener : onBridgeReadyListeners) {

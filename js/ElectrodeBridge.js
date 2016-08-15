@@ -16,7 +16,15 @@ class ElectrodeBridge extends EventEmitter {
   }
 
   /**
-   * Emits an event to the native side
+   * Emits an event without any payload to the native side
+   * @param {string} type - The type of the request
+   */
+  emitEventToNative(type: string) {
+    NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), {});
+  }
+
+  /**
+   * Emits an event with some payload to the native side
    * @param {string} type - The type of the event
    * @param {Object} payload - The event payload
    */
@@ -25,7 +33,15 @@ class ElectrodeBridge extends EventEmitter {
   }
 
   /**
-   * Sends a request to the native side
+   * Sends a request without any payload to the native side
+   * @param {string} type - The type of the request
+   */
+  sendRequestToNative(type: string) {
+    return NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), {});
+  }
+
+  /**
+   * Sends a request with some payload to the native side
    * @param {string} type - The type of the request
    * @param {Object} payload - The request payload
    */

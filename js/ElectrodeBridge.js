@@ -4,23 +4,22 @@ import { NativeModules, DeviceEventEmitter} from "react-native";
 import uuid from "uuid";
 const EventEmitter = require("EventEmitter");
 
+const ELECTRODE_BRIDGE_EVENT_EVENT_TYPE = "electrode.bridge.event";
+const ELECTRODE_BRIDGE_REQUEST_EVENT_TYPE = "electrode.bridge.request";
+const ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE = "electrode.bridge.response";
+const DEFAULT_REQUEST_TIMEOUT_IN_MS = 5000;
+
 class ElectrodeBridge extends EventEmitter {
 
   constructor() {
     super();
 
-    DeviceEventEmitter.addListener("electrode.bridge.event", this._onEventFromNative.bind(this));
-    DeviceEventEmitter.addListener("electrode.bridge.request", this._onRequestFromNative.bind(this));
+    DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_EVENT_EVENT_TYPE,
+      this._onEventFromNative.bind(this));
+    DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_REQUEST_EVENT_TYPE,
+    this._onRequestFromNative.bind(this));
 
     this.requestHandlerByRequestType = {};
-  }
-
-  /**
-   * Emits an event without any payload to the native side
-   * @param {string} type - The type of the request
-   */
-  emitEventToNative(type: string) {
-    NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), {});
   }
 
   /**
@@ -28,25 +27,30 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} type - The type of the event
    * @param {Object} payload - The event payload
    */
-  emitEventToNative(type: string, payload: Object) {
+  emitEventToNative(type: string, payload: Object = {}) {
     NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), payload);
   }
 
   /**
    * Sends a request without any payload to the native side
    * @param {string} type - The type of the request
+   * @param {Object} payload - The request payload [Default: {}]
+   * @param {number} timeout - Request timeout delay in milliseconds [Default: 5000]
    */
-  sendRequestToNative(type: string) {
-    return NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), {});
-  }
+  sendRequestToNative(type: string,
+                      payload: Object = {},
+                      timeout: number = DEFAULT_REQUEST_TIMEOUT_IN_MS) {
+    const requestPromise = NativeModules.ElectrodeBridge
+      .dispatchRequest(type, uuid.v4(), payload);
 
-  /**
-   * Sends a request with some payload to the native side
-   * @param {string} type - The type of the request
-   * @param {Object} payload - The request payload
-   */
-  sendRequestToNative(type: string, payload: Object) {
-    return NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), payload);
+    const timeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(reject, timeout, {
+        code: "EREQUESTIMEOUT",
+        message: "Request timeout"
+      });
+    });
+
+    return Promise.race([requestPromise, timeoutPromise]);
   }
 
   /**
@@ -84,20 +88,24 @@ class ElectrodeBridge extends EventEmitter {
   dispatchRequest(type: string, id: string, payload: Object) {
     this.requestHandlerByRequestType[type](payload)
       .then((data) => {
-        this.emitEventToNative("electrode.bridge.response", { id, data });
+        this.emitEventToNative(ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE, { id, data });
       })
       .catch((err) => {
         const error = { code: err.code, message: err.message };
-        this.emitEventToNative("electrode.bridge.response", { id, error });
+        this.emitEventToNative(ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE, { id, error });
       });
   }
 
   /**
    * Registers a request handler for a given request type
    * @param {string} type - The type of request associated to the handler
-   * @param {Function} handler - The handler
+   * @param {Function} handler - The handler function
    */
   registerRequestHandler(type: string, handler: Function) {
+    if (this.requestHandlerByRequestType[type]) {
+      throw new Error(`A handler is already registered for type ${type}`);
+    }
+
     this.requestHandlerByRequestType[type] = handler;
   }
 }

@@ -72,7 +72,7 @@ public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher 
                                 @NonNull ReadableMap payload,
                                 @NonNull final Promise promise) {
         Bundle payloadBundle = Arguments.toBundle(payload);
-        mRequestRegistrar.getRequestHandler(type).onRequest(payloadBundle, new RequestCompletioner() {
+        mRequestRegistrar.getRequestHandler(type).onRequest((payloadBundle == null ? payloadBundle : Bundle.EMPTY), new RequestCompletioner() {
             @Override
             public void error(@NonNull String code, @NonNull String message) {
                 promise.reject(code, message);

@@ -1,6 +1,8 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -95,24 +97,6 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Provides methods to be informed of a request completion state
-     */
-    public interface RequestCompletionListener {
-        /**
-         * Called if request was successful
-         * @param payload The response payload as a bundle (empty bundle if no data)
-         */
-        void onSuccess(@NonNull Bundle payload);
-
-        /**
-         * Called if request failed
-         * @param code The error code ("EUNKNOWN" if no error code was set)
-         * @param message The error message
-         */
-        void onError(@NonNull  String code, @NonNull String message);
-    }
-
-    /**
      * Dispatch an event on the native side
      *
      * @param type The type of the event
@@ -168,25 +152,16 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Emits an event without any payload to the JS react native side
-     * @param type The type of the event
-     */
-    public void emitEventToJs(@NonNull String type) {
-        emitEventToJs(type, Bundle.EMPTY);
-    }
-
-    /**
      * Emits an event with some payload to the JS react native side
      *
-     * @param type The type of the event
-     * @param payload The event payload
+     * @param event The event to emit
      */
     @SuppressWarnings("unused")
-    public void emitEventToJs(@NonNull String type, @NonNull Bundle payload) {
+    public void emitEventToJs(@NonNull ElectrodeBridgeEvent event) {
         String id = getUUID();
-        WritableMap message = buildMessage(id, type, Arguments.fromBundle(payload));
+        WritableMap message = buildMessage(id, event.getType(), Arguments.fromBundle(event.getPayload()));
 
-        Log.d(TAG, String.format("Emitting event[type:%s id:%s]", type, id));
+        Log.d(TAG, String.format("Emitting event[type:%s id:%s]", event.getType(), id));
 
         mReactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
@@ -194,47 +169,45 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Sends a request without any payload the JS react native side
-     *
-     * @param type The type of the request
-     * @param requestCompletionListener A RequestCompletionListener to be informed of request
-     *  completion success or failure
-     */
-    public void sendRequestToJs(String type, RequestCompletionListener requestCompletionListener) {
-        sendRequestToJs(type, Bundle.EMPTY, requestCompletionListener);
-    }
-
-    /**
      * Sends a request with some payload to the JS react native side
      *
-     * @param type The type of the request
-     * @param payload The request payload
-     * @param requestCompletionListener A RequestCompletionListener to be informed of request
-     *  completion success or failure
+     * @param request The request to send
     */
     @SuppressWarnings("unused")
-    public void sendRequestToJs(String type, Bundle payload, final RequestCompletionListener requestCompletionListener) {
-        String id = getUUID();
-        WritableMap message = buildMessage(id, type, Arguments.fromBundle(payload));
+    public void sendRequestToJs(@NonNull ElectrodeBridgeRequest request) {
+        final String id = getUUID();
+        WritableMap message = buildMessage(
+                id, request.getType(), Arguments.fromBundle(request.getPayload()));
 
-        Promise promise = new PromiseImpl(new Callback() {
+        final RequestCompletionListener completionListener = request.getRequestCompletionListener();
+        final Promise promise = new PromiseImpl(new Callback() {
             @Override
             public void invoke(Object... args) {
-                requestCompletionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
+                completionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
             }
         }, new Callback() {
             @Override
             public void invoke(Object... args) {
                 WritableMap writableMap = (WritableMap)args[0];
-                requestCompletionListener.onError(
+                completionListener.onError(
                         writableMap.getString("code"),
                         writableMap.getString("message"));
             }
         });
 
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                Promise promise = pendingPromiseByRequestId.remove(id);
+                if (promise != null) {
+                    promise.reject("EREQUESTTIMEOUT", "Request timeout");
+                }
+            }
+        }, request.getTimeoutMs());
+
         pendingPromiseByRequestId.put(id, promise);
 
-        Log.d(TAG, String.format("Sending request[type:%s id:%s]", type, id));
+        Log.d(TAG, String.format("Sending request[type:%s id:%s]", request.getType(), id));
 
         mReactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)

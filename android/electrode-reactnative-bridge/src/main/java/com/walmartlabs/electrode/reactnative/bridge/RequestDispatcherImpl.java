@@ -9,6 +9,8 @@ import com.facebook.react.bridge.ReadableMap;
 
 @SuppressWarnings("unused")
 public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher {
+    private static final Bundle EMPTY_BUNDLE = new Bundle();
+
     private final RequestRegistrar<RequestHandler> mRequestRegistrar;
 
     /**
@@ -72,7 +74,16 @@ public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher 
                                 @NonNull ReadableMap payload,
                                 @NonNull final Promise promise) {
         Bundle payloadBundle = Arguments.toBundle(payload);
-        mRequestRegistrar.getRequestHandler(type).onRequest((payloadBundle == null ? payloadBundle : Bundle.EMPTY), new RequestCompletioner() {
+
+        RequestHandler requestHandler = mRequestRegistrar.getRequestHandler(type);
+
+        if (requestHandler == null) {
+            promise.reject("ENOHANDLER", "No registered request handler for type " + type);
+            return;
+        }
+
+        requestHandler.onRequest((payloadBundle != null ? payloadBundle : EMPTY_BUNDLE),
+                new RequestCompletioner() {
             @Override
             public void error(@NonNull String code, @NonNull String message) {
                 promise.reject(code, message);

@@ -1,6 +1,6 @@
 // @flow
 
-import { NativeModules, DeviceEventEmitter} from "react-native";
+import { NativeModules, DeviceEventEmitter } from "react-native";
 import uuid from "uuid";
 const EventEmitter = require("EventEmitter");
 
@@ -27,7 +27,8 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} type - The type of the event
    * @param {Object} payload - The event payload
    */
-  emitEventToNative(type: string, payload: Object = {}) {
+  emitEventToNative(type: string,
+                    payload: Object = {}) {
     NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), payload);
   }
 
@@ -86,6 +87,12 @@ class ElectrodeBridge extends EventEmitter {
    * @param {Object} payload - The payload of the request
    */
   dispatchRequest(type: string, id: string, payload: Object) {
+    if (!this.requestHandlerByRequestType[type]) {
+      const error = { code:"ENOHANDLER", message: `No registered request handler for type ${type}` };
+      this.emitEventToNative(ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE, { id, error });
+      return;
+    }
+
     this.requestHandlerByRequestType[type](payload)
       .then((data) => {
         this.emitEventToNative(ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE, { id, data });
@@ -109,5 +116,11 @@ class ElectrodeBridge extends EventEmitter {
     this.requestHandlerByRequestType[type] = handler;
   }
 }
+
+export const EventDispatchMode = {
+  JS_WITH_NATIVE_FALLBACK: 1,
+  NATIVE_WITH_JS_FALLBACK: 2,
+  GLOBAL: 3,
+};
 
 export const electrodeBridge = new ElectrodeBridge();

@@ -21,64 +21,59 @@ class ElectrodeBridge extends EventEmitter {
 
     this.requestHandlerByRequestType = {};
   }
-
+  /**
+   * Emits an event
+   *
+   * @param {string} type - The type of the event to emit
+   * @param {Object} obj - Options
+   * @param {Object} obj.data - The data of this event [DEFAULT : {}]
+   * @param {number} obj.dispatchMode - The dispatch mode [DEFAULT: DispatchMode.NATIVE]
+   */
   emitEvent(
-      type: string, {
-      payload = {},
-      dispatchMode = EventDispatchMode.NATIVE_WITH_JS_FALLBACK
-    }) {
+      type /*: string */, {
+      data = {},
+      dispatchMode = DispatchMode.NATIVE
+    } /*: Object */) {
     const id = uuid.v4();
     switch (dispatchMode) {
-      case EventDispatchMode.NATIVE_WITH_JS_FALLBACK:
-        NativeModules.ElectrodeBridge
-          .canHandleEventType(type)
-          .then((canHandleEventOnNativeSide) => {
-            if (canHandleEventOnNativeSide) {
-              NativeModules.ElectrodeBridge.dispatchEvent(type, id, payload);
-            } else {
-              this.emit(type, payload);
-            }
-          });
+      case DispatchMode.NATIVE:
+        NativeModules.ElectrodeBridge.dispatchEvent(type, id, data);
         break;
-      case EventDispatchMode.JS_WITH_NATIVE_FALLBACK:
-        if (this.listeners(type).length > 0) {
-          this.emit(type, payload);
-        } else {
-          NativeModules.ElectrodeBridge.dispatchEvent(type, id, payload);
-        }
+      case DispatchMode.JS:
+        this.emit(type, data);
         break;
-      case EventDispatchMode.GLOBAL:
-        this.emit(type, payload);
-        NativeModules.ElectrodeBridge.dispatchEvent(type, id, payload);
+      case DispatchMode.GLOBAL:
+        NativeModules.ElectrodeBridge.dispatchEvent(type, id, data);
+        this.emit(type, data);
         break;
     }
   }
 
+  /**
+   * Sends a request
+   *
+   * @param {string} type - The type of the request to send
+   * @param {Object} obj - Options
+   * @param {Object} obj.data - The data of this request [DEFAULT: {}]
+   * @param {number} obj.timeout - The timeout of the request in ms [DEFAULT:5000]
+   * @param {number} obj.dispatchMode - The dispatch mode [DEFAULT : DispatchMode.NATIVE]
+   */
   sendRequest(
-      type: string, {
-      payload = {},
-      timeout= DEFAULT_REQUEST_TIMEOUT_IN_MS,
-      dispatchMode = RequestDispatchMode.NATIVE_WITH_JS_FALLBACK
-    }) {
+      type /*: string */, {
+      data = {},
+      timeout = 5000,
+      dispatchMode = DispatchMode.NATIVE
+    } /*: Object */) /*: Promise<*> */ {
     let requestPromise;
-
     switch (dispatchMode) {
-      case RequestDispatchMode.NATIVE_WITH_JS_FALLBACK:
-        requestPromise = NativeModules.ElectrodeBridge
-          .canHandleRequestType(type)
-          .then((canHandleRequestOnNativeSide) => {
-            if (canHandleRequestOnNativeSide) {
-              return NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), payload);
-            } else {
-              return this.requestHandlerByRequestType[type](payload);
-            }
-          });
+      case DispatchMode.NATIVE:
+        requestPromise = NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), data);
         break;
-      case RequestDispatchMode.JS_WITH_NATIVE_FALLBACK:
-        requestPromise = this.requestHandlerByRequestType[type] ?
-          this.requestHandlerByRequestType[type](payload) :
-          NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), payload);
+      case DispatchMode.JS:
+        requestPromise = this._dispatchJsOriginatingRequest(type, uuid.v4(), data);
         break;
+      default:
+        throw new Error(`Unknown dispatchMode : ${dispatchMode}`);
     }
 
     const timeoutPromise = new Promise((resolve, reject) => {
@@ -96,7 +91,9 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} type - The type of request associated to the handler
    * @param {Function} handler - The handler promise
    */
-  registerRequestHandler(type: string, handler: Function) {
+  registerRequestHandler(
+    type /*: string */,
+    handler /*: Promise<*> */) {
     if (this.requestHandlerByRequestType[type]) {
       throw new Error(`A handler is already registered for type ${type}`);
     }
@@ -106,75 +103,118 @@ class ElectrodeBridge extends EventEmitter {
 
   /**
    * Called whenever an event from the native side has been received
+   *
    * @param {Object} event - The raw event received
    */
-  _onEventFromNative(event: Object) {
+  _onEventFromNative(event /*: ElectrodeBridgeMessage */) {
     this.emit(event.type, event.data);
   }
 
   /**
    * Called whenever a request from the native side has been received
+   *
    * @param {Object} request - The raw request received
    */
-  _onRequestFromNative(request: Object) {
+  _onRequestFromNative(request /*: ElectrodeBridgeMessage */) {
     this._dispatchNativeOriginatingRequest(request.type, request.id, request.data);
   }
 
   /**
-   * Dispatch a request to the react native JS side
+   * Dispatch a request originating from the native side
+   *
    * @param {string} type - The type of the request
    * @param {string} id - The request id
-   * @param {Object} payload - The payload of the request
+   * @param {Object} data - The data associated to the request
    */
-  _dispatchNativeOriginatingRequest(type: string, id: string, payload: Object) {
+  _dispatchNativeOriginatingRequest(
+    type /*: string */,
+    id /*: string */,
+    data /*: Object */) {
     if (!this.requestHandlerByRequestType[type]) {
-      this._sendErrorResponseToNative(
-        "ENOHANDLER", `No registered request handler for type ${type}` );
+      this._sendErrorResponseToNative(id, {
+        code: "ENOHANDLER",
+        message: `No registered request handler for type ${type}`
+      });
       return;
     }
 
-    this.requestHandlerByRequestType[type](payload)
+    this.requestHandlerByRequestType[type](data)
       .then((data) => {
         this._sendSuccessResponseToNative(id, data)
       })
       .catch((err) => {
-        this._sendErrorResponseToNative(err.code, err.message);
+        this._sendErrorResponseToNative(id, {
+          code: err.code,
+          message: err.message
+        });
       });
   }
 
-  _sendSuccessResponseToNative(requestId, payload) {
-    NativeModules.ElectrodeBridge.dispatchEvent(
-      ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE,
-      uuid.v4(),
-      { id: requestId, data: payload});
-  }
-
-  _sendErrorResponseToNative(requestId, code, message) {
-    NativeModules.ElectrodeBridge.dispatchEvent(
-      ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE,
-      uuid.v4(),
-      { id, error: { code, message} });
-  }
-
-  _dispatchJsOriginatingRequest(type: string, id: string, payload: Object) {
+  /**
+   * Dispatch a request originating from the JS side
+   *
+   * @param {string} type - The type of the request
+   * @param {string} id - The request id
+   * @param {Object} data - The data associated to the request
+   */
+  _dispatchJsOriginatingRequest(
+    type /* : string */,
+    id /*: string */,
+    data /*: Object */) {
     if (!this.requestHandlerByRequestType[type]) {
       throw {
         code:"ENOHANDLER",
         message: `No registered request handler for type ${type}`
       };
     }
-    return this.requestHandlerByRequestType[type](payload);
+    return this.requestHandlerByRequestType[type](data);
+  }
+
+  /**
+   * Sends a success response to the native side for a given request
+   *
+   * @param {string} requestId - The id of the request associated to this response
+   * @param {Object} data - The response data
+   */
+  _sendSuccessResponseToNative(
+    requestId /*: string */,
+    data /*: Object*/) {
+    NativeModules.ElectrodeBridge.dispatchEvent(
+      ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE,
+      uuid.v4(),
+      { requestId, data });
+  }
+
+  /**
+   * Sends an error response to the native for a given request
+   *
+   * @param {string} requestId - The id of the request associated to this response
+   * @param {Object} error - The response error
+   */
+  _sendErrorResponseToNative(
+    requestId /*: string */,
+    error /*: ElectrodeBridgeError */) {
+    NativeModules.ElectrodeBridge.dispatchEvent(
+      ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE,
+      uuid.v4(),
+      { requestId, error });
   }
 }
 
-export const RequestDispatchMode = {
-  NATIVE_WITH_JS_FALLBACK: 0,
-  JS_WITH_NATIVE_FALLBACK: 1
+type ElectrodeBridgeMessage = {
+  id: string;
+  type: string;
+  data: Object;
 };
 
-export const EventDispatchMode = {
-  NATIVE_WITH_JS_FALLBACK: 0,
-  JS_WITH_NATIVE_FALLBACK: 1,
+type ElectrodeBridgeError = {
+  code: string;
+  message: string;
+};
+
+export const DispatchMode = {
+  NATIVE: 0,
+  JS: 1,
   GLOBAL: 2
 };
 

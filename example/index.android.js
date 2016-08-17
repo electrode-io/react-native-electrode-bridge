@@ -17,8 +17,7 @@ import {
 } from 'react-native';
 import {
   electrodeBridge,
-  RequestDispatchMode,
-  EventDispatchMode
+  DispatchMode
 } from 'react-native-electrode-bridge';
 import RadioForm, {
   RadioButton,
@@ -27,11 +26,8 @@ import RadioForm, {
 } from 'react-native-simple-radio-button';
 
 // Inbound event/request types
-const NATIVE_REQUEST_EXAMPLE_TYPE = "native.request.example";
+const REQUEST_EXAMPLE_TYPE = "request.example";
 const EVENT_EXAMPLE_TYPE = "event.example";
-
-// Outbound event/request types
-const REACTNATIVE_REQUEST_EXAMPLE_TYPE = "reactnative.request.example";
 
 class ElectrodeBridgeExample extends Component {
 
@@ -41,8 +37,8 @@ class ElectrodeBridgeExample extends Component {
     this.state = {
       pendingInboundRequest: null,
       logText: ">>>",
-      eventDispatchMode: EventDispatchMode.NATIVE_WITH_JS_FALLBACK,
-      requestDispatchType: RequestDispatchMode.NATIVE_WITH_JS_FALLBACK
+      eventDispatchMode: DispatchMode.NATIVE,
+      requestDispatchType: DispatchMode.NATIVE
     };
   }
 
@@ -50,32 +46,19 @@ class ElectrodeBridgeExample extends Component {
     electrodeBridge.addListener(EVENT_EXAMPLE_TYPE,
     this._logIncomingEvent.bind(this));
 
-    electrodeBridge.registerRequestHandler(NATIVE_REQUEST_EXAMPLE_TYPE,
+    electrodeBridge.registerRequestHandler(REQUEST_EXAMPLE_TYPE,
       this._receivedRequest.bind(this));
-
-    electrodeBridge.registerRequestHandler(REACTNATIVE_REQUEST_EXAMPLE_TYPE,
-        this._receivedRequest.bind(this));
-  }
-
-  _receivedRequest(data) {
-    this._setLoggerText(`Request received. Payload : ${JSON.stringify(data)}`);
-    return new Promise((resolve,reject) => {
-        this.setState({
-          pendingInboundRequest: { reject, resolve }
-        });
-    });
   }
 
   render() {
-    let radio_props_event_dispatch_modes = [
-      { label: 'Native=>JS  ', value: EventDispatchMode.NATIVE_WITH_JS_FALLBACK },
-      { label: 'JS=>Native  ', value: EventDispatchMode.JS_WITH_NATIVE_FALLBACK, },
-      { label: 'Global  ', value: EventDispatchMode.GLOBAL }
+    let radio_props_request_dispatch_modes = [
+      { label: 'Native  ', value: DispatchMode.NATIVE },
+      { label: 'JS  ', value: DispatchMode.JS, }
     ];
 
-    let radio_props_request_dispatch_modes = [
-      { label: 'Native=>JS  ', value: EventDispatchMode.NATIVE_WITH_JS_FALLBACK },
-      { label: 'JS=>Native  ', value: EventDispatchMode.JS_WITH_NATIVE_FALLBACK }
+    let radio_props_event_dispatch_modes = [
+      ...radio_props_request_dispatch_modes,
+      { label: 'Global  ', value: DispatchMode.GLOBAL }
     ];
 
     return (
@@ -88,10 +71,10 @@ class ElectrodeBridgeExample extends Component {
           <View style={{flexDirection:'column'}}>
             <View style={{flexDirection:'row'}}>
               {this._renderButtonGroupTitle('Send request', 'gold')}
-              {this._renderButton('with payload', 'royalblue',
-                this._sendRequestWithPayload.bind(this))}
-              {this._renderButton('w/o payload', 'royalblue',
-                this._sendRequestWithoutPayload.bind(this))}
+              {this._renderButton('with data', 'royalblue',
+                this._sendRequestWithData.bind(this))}
+              {this._renderButton('w/o data', 'royalblue',
+                this._sendRequestWithoutData.bind(this))}
             </View>
             <RadioForm
                 radio_props={radio_props_request_dispatch_modes}
@@ -107,10 +90,10 @@ class ElectrodeBridgeExample extends Component {
           <View style={{flexDirection:'column'}}>
             <View style={{flexDirection:'row'}}>
               {this._renderButtonGroupTitle('Emit event', 'gold')}
-              {this._renderButton('with payload', 'royalblue',
-                this._emitEventWithPayload.bind(this))}
-              {this._renderButton('w/o payload', 'royalblue',
-                this._emitEventWithoutPayload.bind(this))}
+              {this._renderButton('with data', 'royalblue',
+                this._emitEventWithData.bind(this))}
+              {this._renderButton('w/o data', 'royalblue',
+                this._emitEventWithoutData.bind(this))}
             </View>
             <RadioForm
                 radio_props={radio_props_event_dispatch_modes}
@@ -128,30 +111,44 @@ class ElectrodeBridgeExample extends Component {
     );
   }
 
-  _sendRequestWithPayload() {
+  _receivedRequest(data) {
+    this._setLoggerText(`Request received. Data : ${JSON.stringify(data)}`);
+    return new Promise((resolve,reject) => {
+        this.setState({
+          pendingInboundRequest: { reject, resolve }
+        });
+    });
+  }
+
+  _sendRequestWithData() {
     electrodeBridge
-      .sendRequest(REACTNATIVE_REQUEST_EXAMPLE_TYPE, { hello: "world" }, this.state.requestDispatchType)
+      .sendRequest(REQUEST_EXAMPLE_TYPE, {
+        data: { randFloat: Math.random() },
+        dispatchMode: this.state.requestDispatchType
+      })
       .then(resp => { this._logIncomingSuccessResponse(resp); })
       .catch(err => { this._logIncomingFailureResponse(err); });
   }
 
-  _sendRequestWithoutPayload() {
+  _sendRequestWithoutData() {
     electrodeBridge
-      .sendRequest(REACTNATIVE_REQUEST_EXAMPLE_TYPE, {}, this.state.requestDispatchType)
+      .sendRequest(REQUEST_EXAMPLE_TYPE, {
+         dispatchMode: this.state.requestDispatchType
+       })
       .then(resp => { this._logIncomingSuccessResponse(resp); })
       .catch(err => { this._logIncomingFailureResponse(err); });
   }
 
-  _emitEventWithPayload() {
+  _emitEventWithData() {
     electrodeBridge
       .emitEvent(
         EVENT_EXAMPLE_TYPE, {
-          payload: { randFloat: Math.random() },
+          data: { randFloat: Math.random() },
           dispatchMode: this.state.eventDispatchType
         });
   }
 
-  _emitEventWithoutPayload() {
+  _emitEventWithoutData() {
     electrodeBridge
       .emitEvent(
         EVENT_EXAMPLE_TYPE, {
@@ -160,15 +157,15 @@ class ElectrodeBridgeExample extends Component {
   }
 
   _logIncomingEvent(evt) {
-    this._setLoggerText(`Event Received. Payload : ${JSON.stringify(evt)}`);
+    this._setLoggerText(`Event Received. Data : ${JSON.stringify(evt)}`);
   }
 
   _logIncomingSuccessResponse(resp) {
-    this._setLoggerText(`Response success. Payload : ${JSON.stringify(resp)}`)
+    this._setLoggerText(`Response success. Data : ${JSON.stringify(resp)}`)
   }
 
   _logIncomingFailureResponse(resp) {
-    this._setLoggerText(`Response failure. Payload : ${JSON.stringify(resp)}`)
+    this._setLoggerText(`Response failure. Data : ${JSON.stringify(resp)}`)
   }
 
   _setLoggerText(text) {
@@ -182,14 +179,14 @@ class ElectrodeBridgeExample extends Component {
       <View style={styles.buttonGroupIncomingRequest}>
         <View style={{flexDirection:'row'}}>
           {this._renderButtonGroupTitle('Resolve request', 'cornsilk')}
-          {this._renderButton('with payload', 'green',
-            this._resolveInboundRequestWithPayload.bind(this))}
-          {this._renderButton('w/o payload', 'green',
-            this._resolveInboundRequestWithoutPayload.bind(this))}
+          {this._renderButton('with Data', 'green',
+            this._resolveInboundRequestWithData.bind(this))}
+          {this._renderButton('w/o Data', 'green',
+            this._resolveInboundRequestWithoutData.bind(this))}
         </View>
         <View style={{flexDirection:'row'}}>
           {this._renderButtonGroupTitle('Reject request', 'cornsilk')}
-          {this._renderButton('w/o payload', 'red',
+          {this._renderButton('w/o Data', 'red',
             this._rejectInboundRequest.bind(this))}
         </View>
       </View>
@@ -199,18 +196,18 @@ class ElectrodeBridgeExample extends Component {
     return component;
   }
 
-  _resolveInboundRequestWithPayload() {
-    this.state.pendingInboundRequest.resolve({ hello: "world" });
+  _resolveInboundRequestWithData() {
+    this.state.pendingInboundRequest.resolve({ randFloat: Math.random() });
     this._cleanpendingInboundRequestState();
   }
 
-  _resolveInboundRequestWithoutPayload() {
+  _resolveInboundRequestWithoutData() {
     this.state.pendingInboundRequest.resolve({});
     this._cleanpendingInboundRequestState();
   }
 
   _rejectInboundRequest() {
-    this.state.pendingInboundRequest.reject(new Error("boum"));
+    this.state.pendingInboundRequest.reject({code: "ERRORCODE", message: "boum"});
     this._cleanpendingInboundRequestState();
   }
 
@@ -282,7 +279,6 @@ const styles = StyleSheet.create({
     fontSize: 12
   },
   radioForm: {
-    justifyContent: 'space-between',
     margin: 5
   }
 });

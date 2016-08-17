@@ -4,11 +4,11 @@ import android.os.Bundle;
 
 public class ElectrodeBridgeEvent {
     private final String mType;
-    private final Bundle mPayload;
+    private final Bundle mData;
 
     private ElectrodeBridgeEvent(Builder eventBuilder) {
         mType = eventBuilder.mType;
-        mPayload = eventBuilder.mPayload;
+        mData = eventBuilder.mData;
     }
 
     /**
@@ -19,15 +19,15 @@ public class ElectrodeBridgeEvent {
     }
 
     /**
-     * @return The payload of this event
+     * @return The data of this event
      */
-    public Bundle getPayload() {
-        return mPayload;
+    public Bundle getData() {
+        return mData;
     }
 
     public static class Builder {
         private final String mType;
-        private Bundle mPayload;
+        private Bundle mData;
 
         /**
          * Initializes a new event builder
@@ -36,17 +36,17 @@ public class ElectrodeBridgeEvent {
          */
         public Builder(String type) {
             this.mType = type;
-            this.mPayload = Bundle.EMPTY;
+            this.mData = Bundle.EMPTY;
         }
 
         /**
-         * Specifies the event payload
+         * Specifies the event data
          *
-         * @param payload The payload
+         * @param data The data
          * @return Current builder instance for chaining
          */
-        public Builder withPayload(Bundle payload) {
-            this.mPayload = payload;
+        public Builder withData(Bundle data) {
+            this.mData = data;
             return this;
         }
 

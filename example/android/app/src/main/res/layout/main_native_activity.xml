@@ -29,15 +29,15 @@
             android:textSize="18sp" />
 
         <Button
-            android:text="with payload"
+            android:text="with data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button_send_request_with_payload" />
+            android:id="@+id/button_send_request_with_data" />
         <Button
-            android:text="w/o payload"
+            android:text="w/o data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button_send_request_wo_payload" />
+            android:id="@+id/button_send_request_wo_data" />
     </LinearLayout>
 
     <LinearLayout
@@ -57,15 +57,15 @@
             android:textSize="18sp" />
 
         <Button
-            android:text="with payload"
+            android:text="with data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button_send_event_with_payload" />
+            android:id="@+id/button_send_event_with_data" />
         <Button
-            android:text="w/o payload"
+            android:text="w/o data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button_send_event_wo_payload" />
+            android:id="@+id/button_send_event_wo_data" />
     </LinearLayout>
 
     <Button

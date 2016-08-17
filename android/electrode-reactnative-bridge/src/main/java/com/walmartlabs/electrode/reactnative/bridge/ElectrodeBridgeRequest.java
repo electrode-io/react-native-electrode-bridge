@@ -6,13 +6,13 @@ public class ElectrodeBridgeRequest {
     private static final int DEFAULT_REQUEST_TIMEOUT = 5000;
 
     private final String mType;
-    private final Bundle mPayload;
+    private final Bundle mData;
     private final int mTimeoutMs;
     private final RequestCompletionListener mCompletionListener;
 
     private ElectrodeBridgeRequest(Builder requestBuilder) {
         mType = requestBuilder.mType;
-        mPayload = requestBuilder.mPayload;
+        mData = requestBuilder.mData;
         mTimeoutMs = requestBuilder.mTimeoutMs;
         mCompletionListener = requestBuilder.mCompletionListener;
     }
@@ -32,10 +32,10 @@ public class ElectrodeBridgeRequest {
     }
 
     /**
-     * @return The payload of this request
+     * @return The data of this request
      */
-    public Bundle getPayload() {
-        return this.mPayload;
+    public Bundle getData() {
+        return this.mData;
     }
 
     /**
@@ -48,7 +48,7 @@ public class ElectrodeBridgeRequest {
     public static class Builder {
         private final String mType;
         private final RequestCompletionListener mCompletionListener;
-        private Bundle mPayload;
+        private Bundle mData;
         private int mTimeoutMs;
 
         /**
@@ -61,7 +61,7 @@ public class ElectrodeBridgeRequest {
             mType = type;
             mCompletionListener = completionListener;
             mTimeoutMs = DEFAULT_REQUEST_TIMEOUT;
-            mPayload = Bundle.EMPTY;
+            mData = Bundle.EMPTY;
         }
 
         /**
@@ -76,13 +76,13 @@ public class ElectrodeBridgeRequest {
         }
 
         /**
-         * Specifies the request payload
+         * Specifies the request data
          *
-         * @param payload The payload
+         * @param data The data
          * @return Current builder instance for chaining
          */
-        public Builder withPayload(Bundle payload) {
-            this.mPayload = payload;
+        public Builder withData(Bundle data) {
+            this.mData = data;
             return this;
         }
 

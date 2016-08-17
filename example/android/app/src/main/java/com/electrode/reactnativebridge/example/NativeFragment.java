@@ -25,21 +25,17 @@ public class NativeFragment extends Fragment {
 
     private static final String TAG = NativeFragment.class.getSimpleName();
 
-    // Inbound event and request types
     static final String EVENT_EXAMPLE_TYPE = "event.example";
-    static final String REACT_NATIVE_REQUEST_EXAMPLE_TYPE = "reactnative.request.example";
-
-    // Outbound event and request types
-    static final String NATIVE_REQUEST_EXAMPLE_TYPE = "native.request.example";
+    static final String REQUEST_EXAMPLE_TYPE = "request.example";
 
     static final int SAMPLE_REQUEST_TIMEOUT_IN_MS = 8000;
 
     final RequestCompletionListener mCompletionListener = new ExampleRequestCompletionListener();
 
-    private Button mSendRequestWithPayloadButton;
-    private Button mSendRequestWithoutPayloadButton;
-    private Button mSendEventWithPayloadButton;
-    private Button mSendEventWithoutPayloadButton;
+    private Button mSendRequestWithDataButton;
+    private Button mSendRequestWithoutDataButton;
+    private Button mSendEventWithDataButton;
+    private Button mSendEventWithoutDataButton;
     private Button mResolveRequestButton;
     private Button mRejectRequestButton;
     private TextView mLoggerTextView;
@@ -61,20 +57,20 @@ public class NativeFragment extends Fragment {
                         .registerEventListener(EVENT_EXAMPLE_TYPE,
                                 new EventDispatcherImpl.EventListener() {
                     @Override
-                    public void onEvent(final Bundle payload) {
-                        setLoggerText("Event received. Payload : " + payload.toString());
+                    public void onEvent(final Bundle data) {
+                        setLoggerText(String.format("Event received. %s", data.toString()));
                     }
                 });
 
                 try {
                     electrodeBridge
                             .requestRegistrar()
-                            .registerRequestHandler(REACT_NATIVE_REQUEST_EXAMPLE_TYPE,
+                            .registerRequestHandler(REQUEST_EXAMPLE_TYPE,
                                     new RequestDispatcherImpl.RequestHandler() {
                         @Override
-                        public void onRequest(Bundle payload,
+                        public void onRequest(Bundle data,
                                               RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
-                            setLoggerText("Request received. Payload : " + payload.toString());
+                            setLoggerText(String.format("Request received. %s", data.toString()));
                             showRequestCompletionButtons(requestCompletioner);
                         }
                     });
@@ -89,7 +85,7 @@ public class NativeFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mLoggerTextView.setText(">>> " + text);
+                mLoggerTextView.setText(String.format(">>> %s", text));
             }
         });
     }
@@ -135,28 +131,28 @@ public class NativeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.main_native_activity, container, false);
 
-        mSendRequestWithPayloadButton = (Button)v.findViewById(R.id.button_send_request_with_payload);
-        mSendRequestWithoutPayloadButton = (Button)v.findViewById(R.id.button_send_request_wo_payload);
-        mSendEventWithPayloadButton = (Button)v.findViewById(R.id.button_send_event_with_payload);
-        mSendEventWithoutPayloadButton = (Button)v.findViewById(R.id.button_send_event_wo_payload);
+        mSendRequestWithDataButton = (Button)v.findViewById(R.id.button_send_request_with_data);
+        mSendRequestWithoutDataButton = (Button)v.findViewById(R.id.button_send_request_wo_data);
+        mSendEventWithDataButton = (Button)v.findViewById(R.id.button_send_event_with_data);
+        mSendEventWithoutDataButton = (Button)v.findViewById(R.id.button_send_event_wo_data);
         mLoggerTextView = (TextView)v.findViewById(R.id.tv_logger);
 
         mResolveRequestButton = (Button)v.findViewById(R.id.button_resolve_request);
         mRejectRequestButton = (Button)v.findViewById(R.id.button_reject_request);
 
-        mSendRequestWithPayloadButton.setOnClickListener(new View.OnClickListener() {
+        mSendRequestWithDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mElectrodeBridge != null) {
                     setRequestButtonsEnabled(false);
-                    Bundle payload = new Bundle();
-                    payload.putString("Hello", "World");
+                    Bundle data = new Bundle();
+                    data.putInt("randInt", mRand.nextInt());
 
                     ElectrodeBridgeRequest request =
                         new ElectrodeBridgeRequest.Builder(
-                                NATIVE_REQUEST_EXAMPLE_TYPE,
+                                REQUEST_EXAMPLE_TYPE,
                                 mCompletionListener)
-                                .withPayload(payload)
+                                .withData(data)
                                 .withTimeout(SAMPLE_REQUEST_TIMEOUT_IN_MS)
                                 .build();
 
@@ -165,13 +161,13 @@ public class NativeFragment extends Fragment {
             }
         });
 
-        mSendRequestWithoutPayloadButton.setOnClickListener(new View.OnClickListener() {
+        mSendRequestWithoutDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mElectrodeBridge != null) {
                     ElectrodeBridgeRequest request =
                             new ElectrodeBridgeRequest.Builder(
-                                    NATIVE_REQUEST_EXAMPLE_TYPE,
+                                    REQUEST_EXAMPLE_TYPE,
                                     mCompletionListener)
                                     .withTimeout(SAMPLE_REQUEST_TIMEOUT_IN_MS)
                                     .build();
@@ -181,16 +177,16 @@ public class NativeFragment extends Fragment {
             }
         });
 
-        mSendEventWithPayloadButton.setOnClickListener(new View.OnClickListener() {
+        mSendEventWithDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mElectrodeBridge != null) {
-                    Bundle payload = new Bundle();
-                    payload.putInt("randint", mRand.nextInt());
+                    Bundle data = new Bundle();
+                    data.putInt("randint", mRand.nextInt());
 
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
                             EVENT_EXAMPLE_TYPE)
-                            .withPayload(payload)
+                            .withData(data)
                             .build();
 
                     mElectrodeBridge.emitEventToJs(event);
@@ -198,7 +194,7 @@ public class NativeFragment extends Fragment {
             }
         });
 
-        mSendEventWithoutPayloadButton.setOnClickListener(new View.OnClickListener() {
+        mSendEventWithoutDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mElectrodeBridge != null) {
@@ -216,8 +212,8 @@ public class NativeFragment extends Fragment {
 
     private class ExampleRequestCompletionListener implements RequestCompletionListener {
         @Override
-        public void onSuccess(@NonNull Bundle payload) {
-            setLoggerText("Response success. Payload : " + payload.toString());
+        public void onSuccess(@NonNull Bundle data) {
+            setLoggerText("Response success. Data : " + data.toString());
             setRequestButtonsEnabled(true);
         }
 
@@ -232,8 +228,8 @@ public class NativeFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mSendRequestWithoutPayloadButton.setEnabled(enabled);
-                mSendRequestWithPayloadButton.setEnabled(enabled);
+                mSendRequestWithoutDataButton.setEnabled(enabled);
+                mSendRequestWithDataButton.setEnabled(enabled);
             }
         });
     }

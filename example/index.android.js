@@ -13,18 +13,17 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Slider
+  Slide
 } from 'react-native';
 import { electrodeBridge } from 'react-native-electrode-bridge';
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 
 // Inbound event/request types
 const NATIVE_REQUEST_EXAMPLE_TYPE = "native.request.example";
-const NATIVE_EVENT_EXAMPLE_TYPE = "native.event.example";
+const EVENT_EXAMPLE_TYPE = "event.example";
 
 // Outbound event/request types
 const REACTNATIVE_REQUEST_EXAMPLE_TYPE = "reactnative.request.example";
-const REACTNATIVE_EVENT_EXAMPLE_TYPE = "reactnative.event.example";
-
 
 class ElectrodeBridgeExample extends Component {
 
@@ -36,16 +35,21 @@ class ElectrodeBridgeExample extends Component {
       pendingInboundRequest: false,
       pendingInboundRequestPromiseResolve: null,
       pendingInboundRequestPromiseReject: null,
-      logText: ">>>"
+      logText: ">>>",
+      eventDispatchType: 0,
+      requestDispatchType: 0
     };
   }
 
   componentDidMount() {
-    electrodeBridge.addListener(NATIVE_EVENT_EXAMPLE_TYPE,
+    electrodeBridge.addListener(EVENT_EXAMPLE_TYPE,
     this._logIncomingEvent.bind(this));
 
     electrodeBridge.registerRequestHandler(NATIVE_REQUEST_EXAMPLE_TYPE,
       this._receivedRequest.bind(this));
+
+    electrodeBridge.registerRequestHandler(REACTNATIVE_REQUEST_EXAMPLE_TYPE,
+        this._receivedRequest.bind(this));
   }
 
   _receivedRequest(data) {
@@ -60,6 +64,17 @@ class ElectrodeBridgeExample extends Component {
   }
 
   render() {
+    let radio_props_event_dispatch_mode = [
+      { label: 'Native=>JS  ', value: 0 },
+      { label: 'JS=>Native  ', value: 1 },
+      { label: 'Global  ', value: 2 }
+    ];
+
+    let radio_props_request_dispatch_mode = [
+      { label: 'Native=>JS  ', value: 0 },
+      { label: 'JS=>Native  ', value: 1 }
+    ];
+
     return (
       <View style={styles.container} backgroundColor={this.state.bgColor}>
         <View style={{flexDirection:'column', justifyContent: 'space-between'}}>
@@ -67,21 +82,41 @@ class ElectrodeBridgeExample extends Component {
           {this.state.logText}
         </Text>
         <View style={styles.buttonGroup}>
-          <View style={{flexDirection:'row'}}>
-            {this._renderButtonGroupTitle('Send request', 'gold')}
-            {this._renderButton('with payload', 'royalblue',
-              this._sendRequestWithPayload.bind(this))}
-            {this._renderButton('w/o payload', 'royalblue',
-              this._sendRequestWithoutPayload.bind(this))}
+          <View style={{flexDirection:'column'}}>
+            <View style={{flexDirection:'row'}}>
+              {this._renderButtonGroupTitle('Send request', 'gold')}
+              {this._renderButton('with payload', 'royalblue',
+                this._sendRequestWithPayload.bind(this))}
+              {this._renderButton('w/o payload', 'royalblue',
+                this._sendRequestWithoutPayload.bind(this))}
+            </View>
+            <RadioForm
+                radio_props={radio_props_request_dispatch_mode}
+                initial={this.state.requestDispatchType}
+                formHorizontal={true}
+                onPress={(val,idx) => { this.setState({requestDispatchType:idx}) }}
+                buttonSize={5}
+                labelColor={'white'}
+                style={styles.radioForm}/>
           </View>
         </View>
         <View style={styles.buttonGroup}>
-          <View style={{flexDirection:'row'}}>
-            {this._renderButtonGroupTitle('Emit event', 'gold')}
-            {this._renderButton('with payload', 'royalblue',
-              this._emitEventWithPayload.bind(this))}
-            {this._renderButton('w/o payload', 'royalblue',
-              this._emitEventWithoutPayload.bind(this))}
+          <View style={{flexDirection:'column'}}>
+            <View style={{flexDirection:'row'}}>
+              {this._renderButtonGroupTitle('Emit event', 'gold')}
+              {this._renderButton('with payload', 'royalblue',
+                this._emitEventWithPayload.bind(this))}
+              {this._renderButton('w/o payload', 'royalblue',
+                this._emitEventWithoutPayload.bind(this))}
+            </View>
+            <RadioForm
+                radio_props={radio_props_event_dispatch_mode}
+                initial={this.state.eventDispatchType}
+                formHorizontal={true}
+                onPress={(val,idx) => { this.setState({eventDispatchType:idx}) }}
+                buttonSize={5}
+                labelColor={'white'}
+                style={styles.radioForm}/>
           </View>
         </View>
         {this._renderIncomingRequestButtonGroup()}
@@ -92,26 +127,32 @@ class ElectrodeBridgeExample extends Component {
 
   _sendRequestWithPayload() {
     electrodeBridge
-      .sendRequestToNative(REACTNATIVE_REQUEST_EXAMPLE_TYPE, { hello: "world" })
+      .sendRequest(REACTNATIVE_REQUEST_EXAMPLE_TYPE, { hello: "world" }, this.state.requestDispatchType)
       .then(resp => { this._logIncomingSuccessResponse(resp); })
       .catch(err => { this._logIncomingFailureResponse(err); });
   }
 
   _sendRequestWithoutPayload() {
     electrodeBridge
-      .sendRequestToNative(REACTNATIVE_REQUEST_EXAMPLE_TYPE)
+      .sendRequest(REACTNATIVE_REQUEST_EXAMPLE_TYPE, {}, this.state.requestDispatchType)
       .then(resp => { this._logIncomingSuccessResponse(resp); })
       .catch(err => { this._logIncomingFailureResponse(err); });
   }
 
   _emitEventWithPayload() {
     electrodeBridge
-      .emitEventToNative(REACTNATIVE_EVENT_EXAMPLE_TYPE, { randFloat: Math.random()});
+      .emitEvent(
+        EVENT_EXAMPLE_TYPE,
+        { randFloat: Math.random() },
+        this.state.eventDispatchType);
   }
 
   _emitEventWithoutPayload() {
     electrodeBridge
-      .emitEventToNative(REACTNATIVE_EVENT_EXAMPLE_TYPE);
+      .emitEvent(
+        EVENT_EXAMPLE_TYPE,
+        {},
+        this.state.eventDispatchType);
   }
 
   _logIncomingEvent(evt) {
@@ -236,6 +277,10 @@ const styles = StyleSheet.create({
   logger: {
     margin: 10,
     fontSize: 12
+  },
+  radioForm: {
+    justifyContent: 'space-between',
+    margin: 5
   }
 });
 

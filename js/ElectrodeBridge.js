@@ -17,7 +17,9 @@ class ElectrodeBridge extends EventEmitter {
     DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_EVENT_EVENT_TYPE,
       this._onEventFromNative.bind(this));
     DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_REQUEST_EVENT_TYPE,
-    this._onRequestFromNative.bind(this));
+      this._onRequestFromNative.bind(this));
+
+    this.emitEventToNative("hello", {});
 
     this.requestHandlerByRequestType = {};
   }
@@ -118,9 +120,9 @@ class ElectrodeBridge extends EventEmitter {
 }
 
 export const EventDispatchMode = {
+  NATIVE_WITH_JS_FALLBACK: 0,
   JS_WITH_NATIVE_FALLBACK: 1,
-  NATIVE_WITH_JS_FALLBACK: 2,
-  GLOBAL: 3,
+  GLOBAL: 2
 };
 
 export const electrodeBridge = new ElectrodeBridge();

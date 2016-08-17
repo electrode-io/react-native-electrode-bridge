@@ -26,12 +26,11 @@ public class NativeFragment extends Fragment {
     private static final String TAG = NativeFragment.class.getSimpleName();
 
     // Inbound event and request types
-    static final String REACT_NATIVE_EVENT_EXAMPLE_TYPE = "reactnative.event.example";
+    static final String EVENT_EXAMPLE_TYPE = "event.example";
     static final String REACT_NATIVE_REQUEST_EXAMPLE_TYPE = "reactnative.request.example";
 
     // Outbound event and request types
     static final String NATIVE_REQUEST_EXAMPLE_TYPE = "native.request.example";
-    static final String NATIVE_EVENT_EXAMPLE_TYPE = "native.event.example";
 
     static final int SAMPLE_REQUEST_TIMEOUT_IN_MS = 8000;
 
@@ -59,7 +58,7 @@ public class NativeFragment extends Fragment {
 
                 electrodeBridge
                         .eventRegistrar()
-                        .registerEventListener(REACT_NATIVE_EVENT_EXAMPLE_TYPE,
+                        .registerEventListener(EVENT_EXAMPLE_TYPE,
                                 new EventDispatcherImpl.EventListener() {
                     @Override
                     public void onEvent(final Bundle payload) {
@@ -190,7 +189,7 @@ public class NativeFragment extends Fragment {
                     payload.putInt("randint", mRand.nextInt());
 
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
-                            NATIVE_EVENT_EXAMPLE_TYPE)
+                            EVENT_EXAMPLE_TYPE)
                             .withPayload(payload)
                             .build();
 
@@ -204,7 +203,7 @@ public class NativeFragment extends Fragment {
             public void onClick(View v) {
                 if (mElectrodeBridge != null) {
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
-                            NATIVE_EVENT_EXAMPLE_TYPE)
+                            EVENT_EXAMPLE_TYPE)
                             .build();
 
                     mElectrodeBridge.emitEventToJs(event);

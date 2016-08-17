@@ -150,6 +150,16 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         mRequestDispatcher.dispatchRequest(type, id, payload, promise);
     }
 
+    @ReactMethod
+    public void canHandleEventType(String type, Promise promise) {
+        promise.resolve(!mEventRegistrar.getEventListeners(type).isEmpty());
+    }
+
+    @ReactMethod
+    public void canHandleRequestType(String type, Promise promise) {
+        promise.resolve(mRequestRegistrar.getRequestHandler(type) != null);
+    }
+
     /**
      * Emits an event with some payload to the JS react native side
      *

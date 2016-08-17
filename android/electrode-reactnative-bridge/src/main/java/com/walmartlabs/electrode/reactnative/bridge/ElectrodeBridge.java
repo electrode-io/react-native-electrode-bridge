@@ -27,7 +27,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private static final String BRIDE_REQUEST = "electrode.bridge.request";
     private static final String BRIDGE_RESPONSE = "electrode.bridge.response";
     private static final String BRIDGE_RESPONSE_ERROR = "error";
-    private static final String BRDIGE_RESPONSE_ERROR_NAME = "name";
+    private static final String BRDIGE_RESPONSE_ERROR_CODE = "code";
     private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
     private static final String BRIDGE_MSG_DATA = "data";
     private static final String BRIDGE_MSG_TYPE = "type";
@@ -119,10 +119,10 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                 String errorName = "EUNKNOWN";
                 if (payload
                         .getMap(BRIDGE_RESPONSE_ERROR)
-                        .hasKey(BRDIGE_RESPONSE_ERROR_NAME)) {
+                        .hasKey(BRDIGE_RESPONSE_ERROR_CODE)) {
                     errorName = payload
                             .getMap(BRIDGE_RESPONSE_ERROR)
-                            .getString(BRDIGE_RESPONSE_ERROR_NAME);
+                            .getString(BRDIGE_RESPONSE_ERROR_CODE);
                 }
                 promise.reject(errorName, errorMessage);
             } else if (payload.hasKey(BRIDGE_MSG_DATA)) {

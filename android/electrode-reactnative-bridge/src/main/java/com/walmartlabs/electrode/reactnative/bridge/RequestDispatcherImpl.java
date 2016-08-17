@@ -27,6 +27,7 @@ public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher 
      */
     public interface RequestCompletioner {
         /**
+         *
          * Error response
          *
          * @param code The error code

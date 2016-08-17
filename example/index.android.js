@@ -15,8 +15,16 @@ import {
   TouchableOpacity,
   Slide
 } from 'react-native';
-import { electrodeBridge } from 'react-native-electrode-bridge';
-import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import {
+  electrodeBridge,
+  RequestDispatchMode,
+  EventDispatchMode
+} from 'react-native-electrode-bridge';
+import RadioForm, {
+  RadioButton,
+  RadioButtonInput,
+  RadioButtonLabel
+} from 'react-native-simple-radio-button';
 
 // Inbound event/request types
 const NATIVE_REQUEST_EXAMPLE_TYPE = "native.request.example";
@@ -31,13 +39,10 @@ class ElectrodeBridgeExample extends Component {
     super(props);
 
     this.state = {
-      bgColor: 'rgb(0,0,0)',
-      pendingInboundRequest: false,
-      pendingInboundRequestPromiseResolve: null,
-      pendingInboundRequestPromiseReject: null,
+      pendingInboundRequest: null,
       logText: ">>>",
-      eventDispatchType: 0,
-      requestDispatchType: 0
+      eventDispatchMode: EventDispatchMode.NATIVE_WITH_JS_FALLBACK,
+      requestDispatchType: RequestDispatchMode.NATIVE_WITH_JS_FALLBACK
     };
   }
 
@@ -56,27 +61,25 @@ class ElectrodeBridgeExample extends Component {
     this._setLoggerText(`Request received. Payload : ${JSON.stringify(data)}`);
     return new Promise((resolve,reject) => {
         this.setState({
-          pendingInboundRequest: true,
-          pendingInboundRequestPromiseReject: reject,
-          pendingInboundRequestPromiseResolve: resolve
+          pendingInboundRequest: { reject, resolve }
         });
     });
   }
 
   render() {
-    let radio_props_event_dispatch_mode = [
-      { label: 'Native=>JS  ', value: 0 },
-      { label: 'JS=>Native  ', value: 1 },
-      { label: 'Global  ', value: 2 }
+    let radio_props_event_dispatch_modes = [
+      { label: 'Native=>JS  ', value: EventDispatchMode.NATIVE_WITH_JS_FALLBACK },
+      { label: 'JS=>Native  ', value: EventDispatchMode.JS_WITH_NATIVE_FALLBACK, },
+      { label: 'Global  ', value: EventDispatchMode.GLOBAL }
     ];
 
-    let radio_props_request_dispatch_mode = [
-      { label: 'Native=>JS  ', value: 0 },
-      { label: 'JS=>Native  ', value: 1 }
+    let radio_props_request_dispatch_modes = [
+      { label: 'Native=>JS  ', value: EventDispatchMode.NATIVE_WITH_JS_FALLBACK },
+      { label: 'JS=>Native  ', value: EventDispatchMode.JS_WITH_NATIVE_FALLBACK }
     ];
 
     return (
-      <View style={styles.container} backgroundColor={this.state.bgColor}>
+      <View style={styles.container}>
         <View style={{flexDirection:'column', justifyContent: 'space-between'}}>
         <Text style={styles.logger}>
           {this.state.logText}
@@ -91,7 +94,7 @@ class ElectrodeBridgeExample extends Component {
                 this._sendRequestWithoutPayload.bind(this))}
             </View>
             <RadioForm
-                radio_props={radio_props_request_dispatch_mode}
+                radio_props={radio_props_request_dispatch_modes}
                 initial={this.state.requestDispatchType}
                 formHorizontal={true}
                 onPress={(val,idx) => { this.setState({requestDispatchType:idx}) }}
@@ -110,7 +113,7 @@ class ElectrodeBridgeExample extends Component {
                 this._emitEventWithoutPayload.bind(this))}
             </View>
             <RadioForm
-                radio_props={radio_props_event_dispatch_mode}
+                radio_props={radio_props_event_dispatch_modes}
                 initial={this.state.eventDispatchType}
                 formHorizontal={true}
                 onPress={(val,idx) => { this.setState({eventDispatchType:idx}) }}
@@ -142,17 +145,18 @@ class ElectrodeBridgeExample extends Component {
   _emitEventWithPayload() {
     electrodeBridge
       .emitEvent(
-        EVENT_EXAMPLE_TYPE,
-        { randFloat: Math.random() },
-        this.state.eventDispatchType);
+        EVENT_EXAMPLE_TYPE, {
+          payload: { randFloat: Math.random() },
+          dispatchMode: this.state.eventDispatchType
+        });
   }
 
   _emitEventWithoutPayload() {
     electrodeBridge
       .emitEvent(
-        EVENT_EXAMPLE_TYPE,
-        {},
-        this.state.eventDispatchType);
+        EVENT_EXAMPLE_TYPE, {
+          dispatchMode: this.state.eventDispatchType
+        });
   }
 
   _logIncomingEvent(evt) {
@@ -173,7 +177,7 @@ class ElectrodeBridgeExample extends Component {
 
   _renderIncomingRequestButtonGroup() {
     let component;
-    if (this.state.pendingInboundRequest === true) {
+    if (this.state.pendingInboundRequest !== null) {
       component =
       <View style={styles.buttonGroupIncomingRequest}>
         <View style={{flexDirection:'row'}}>
@@ -196,17 +200,17 @@ class ElectrodeBridgeExample extends Component {
   }
 
   _resolveInboundRequestWithPayload() {
-    this.state.pendingInboundRequestPromiseResolve({ hello: "world" });
+    this.state.pendingInboundRequest.resolve({ hello: "world" });
     this._cleanpendingInboundRequestState();
   }
 
   _resolveInboundRequestWithoutPayload() {
-    this.state.pendingInboundRequestPromiseResolve({});
+    this.state.pendingInboundRequest.resolve({});
     this._cleanpendingInboundRequestState();
   }
 
   _rejectInboundRequest() {
-    this.state.pendingInboundRequestPromiseReject(new Error("boum"));
+    this.state.pendingInboundRequest.reject(new Error("boum"));
     this._cleanpendingInboundRequestState();
   }
 
@@ -228,9 +232,7 @@ class ElectrodeBridgeExample extends Component {
 
   _cleanpendingInboundRequestState() {
     this.setState({
-      pendingInboundRequest: false,
-      pendingInboundRequestPromiseReject: null,
-      pendingInboundRequestPromiseResolve: null
+      pendingInboundRequest: null
     });
   }
 }
@@ -240,6 +242,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+    backgroundColor: 'black'
   },
   buttonGroup: {
     backgroundColor: 'dimgrey',

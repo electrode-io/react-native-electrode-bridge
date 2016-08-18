@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridge;
@@ -36,10 +38,14 @@ public class NativeFragment extends Fragment {
     private Button mSendRequestWithoutDataButton;
     private Button mSendEventWithDataButton;
     private Button mSendEventWithoutDataButton;
-    private Button mResolveRequestButton;
+    private Button mResolveRequestWithoutDataButton;
+    private Button mResolveRequestWithDataButton;
     private Button mRejectRequestButton;
     private TextView mLoggerTextView;
     private ElectrodeBridge mElectrodeBridge;
+    private LinearLayout mLayoutRequestCompletion;
+    private RadioGroup mRadioGroupRequest;
+    private RadioGroup mRadioGroupEvent;
     private Random mRand = new Random();
 
     @Override
@@ -85,7 +91,7 @@ public class NativeFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mLoggerTextView.setText(String.format(">>> %s", text));
+                mLoggerTextView.setText(String.format("[NATIVE] >>> %s", text));
             }
         });
     }
@@ -94,8 +100,7 @@ public class NativeFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mResolveRequestButton.setVisibility(View.GONE);
-                mRejectRequestButton.setVisibility(View.GONE);
+                mLayoutRequestCompletion.setVisibility(View.GONE);
             }
         });
     }
@@ -104,13 +109,22 @@ public class NativeFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mResolveRequestButton.setVisibility(View.VISIBLE);
-                mRejectRequestButton.setVisibility(View.VISIBLE);
+                mLayoutRequestCompletion.setVisibility(View.VISIBLE);
 
-                mResolveRequestButton.setOnClickListener(new View.OnClickListener() {
+                mResolveRequestWithoutDataButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         requestCompletioner.success();
+                        hideRequestCompletionButtons();
+                    }
+                });
+
+                mResolveRequestWithDataButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Bundle data = new Bundle();
+                        data.putInt("randInt", mRand.nextInt(1000));
+                        requestCompletioner.success(data);
                         hideRequestCompletionButtons();
                     }
                 });
@@ -122,6 +136,8 @@ public class NativeFragment extends Fragment {
                         hideRequestCompletionButtons();
                     }
                 });
+
+
             }
         });
     }
@@ -137,8 +153,14 @@ public class NativeFragment extends Fragment {
         mSendEventWithoutDataButton = (Button)v.findViewById(R.id.button_send_event_wo_data);
         mLoggerTextView = (TextView)v.findViewById(R.id.tv_logger);
 
-        mResolveRequestButton = (Button)v.findViewById(R.id.button_resolve_request);
+        mResolveRequestWithoutDataButton = (Button)v.findViewById(R.id.button_resolve_request_without_data);
+        mResolveRequestWithDataButton = (Button)v.findViewById(R.id.button_resolve_request_with_data);
         mRejectRequestButton = (Button)v.findViewById(R.id.button_reject_request);
+
+        mRadioGroupRequest = (RadioGroup)v.findViewById(R.id.radio_group_request);
+        mRadioGroupEvent = (RadioGroup)v.findViewById(R.id.radio_group_event);
+
+        mLayoutRequestCompletion = (LinearLayout)v.findViewById(R.id.layout_request_completion);
 
         mSendRequestWithDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,13 +172,13 @@ public class NativeFragment extends Fragment {
 
                     ElectrodeBridgeRequest request =
                         new ElectrodeBridgeRequest.Builder(
-                                REQUEST_EXAMPLE_TYPE,
-                                mCompletionListener)
+                                REQUEST_EXAMPLE_TYPE)
                                 .withData(data)
                                 .withTimeout(SAMPLE_REQUEST_TIMEOUT_IN_MS)
+                                .withDispatchMode(getCurrentRequestDispatchMode())
                                 .build();
 
-                    mElectrodeBridge.sendRequestToJs(request);
+                    mElectrodeBridge.sendRequest(request, mCompletionListener);
                 }
             }
         });
@@ -167,12 +189,12 @@ public class NativeFragment extends Fragment {
                 if (mElectrodeBridge != null) {
                     ElectrodeBridgeRequest request =
                             new ElectrodeBridgeRequest.Builder(
-                                    REQUEST_EXAMPLE_TYPE,
-                                    mCompletionListener)
+                                    REQUEST_EXAMPLE_TYPE)
                                     .withTimeout(SAMPLE_REQUEST_TIMEOUT_IN_MS)
+                                    .withDispatchMode(getCurrentRequestDispatchMode())
                                     .build();
 
-                    mElectrodeBridge.sendRequestToJs(request);
+                    mElectrodeBridge.sendRequest(request, mCompletionListener);
                 }
             }
         });
@@ -187,9 +209,10 @@ public class NativeFragment extends Fragment {
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
                             EVENT_EXAMPLE_TYPE)
                             .withData(data)
+                            .withDispatchMode(getCurrentEventDispatchMode())
                             .build();
 
-                    mElectrodeBridge.emitEventToJs(event);
+                    mElectrodeBridge.emitEvent(event);
                 }
             }
         });
@@ -200,14 +223,33 @@ public class NativeFragment extends Fragment {
                 if (mElectrodeBridge != null) {
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
                             EVENT_EXAMPLE_TYPE)
+                            .withDispatchMode(getCurrentEventDispatchMode())
                             .build();
 
-                    mElectrodeBridge.emitEventToJs(event);
+                    mElectrodeBridge.emitEvent(event);
                 }
             }
         });
 
         return v;
+    }
+
+    private ElectrodeBridgeRequest.DispatchMode getCurrentRequestDispatchMode() {
+        if (mRadioGroupRequest.getCheckedRadioButtonId() == R.id.radio_button_request_js) {
+            return ElectrodeBridgeRequest.DispatchMode.JS;
+        } else {
+            return ElectrodeBridgeRequest.DispatchMode.NATIVE;
+        }
+    }
+
+    private ElectrodeBridgeEvent.DispatchMode getCurrentEventDispatchMode() {
+        if (mRadioGroupEvent.getCheckedRadioButtonId() == R.id.radio_button_event_js) {
+            return ElectrodeBridgeEvent.DispatchMode.JS;
+        } else if (mRadioGroupEvent.getCheckedRadioButtonId() == R.id.radio_button_event_native) {
+            return ElectrodeBridgeEvent.DispatchMode.NATIVE;
+        } else {
+            return ElectrodeBridgeEvent.DispatchMode.GLOBAL;
+        }
     }
 
     private class ExampleRequestCompletionListener implements RequestCompletionListener {

@@ -1,84 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent" android:background="#000000"
     android:gravity="top">
     <TextView
         android:id="@+id/tv_logger"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=">>>"
+        android:text="[NATIVE] >>>"
         android:layout_marginLeft="15dp"
         android:layout_marginBottom="15dp"
         android:textColor="@android:color/white"
         android:textSize="12sp" />
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Send request"
-            android:textColor="@android:color/white"
-            android:textAlignment="viewStart"
-            android:gravity="center_vertical"
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="15dp"
-            android:textSize="18sp" />
+        android:layout_height="wrap_content"
+        android:background="#5c5c5c"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="5dp">
 
-        <Button
-            android:text="with data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_send_request_with_data" />
-        <Button
-            android:text="w/o data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_send_request_wo_data" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            >
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:text="Send request"
+                android:textColor="@android:color/holo_orange_light"
+                android:textAlignment="viewStart"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:textSize="15sp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:text="with data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_send_request_with_data"
+                android:layout_weight="1"/>
+
+            <Button
+                android:text="w/o data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_send_request_wo_data"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:orientation="horizontal"
+                android:id="@+id/radio_group_request">
+
+                <RadioButton
+                    android:text="JS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radio_button_request_js"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:textColorLink="@android:color/holo_orange_dark"
+                    style="@style/Widget.AppCompat.CompoundButton.RadioButton"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"/>
+
+                <RadioButton
+                    android:text="Native"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radio_button_request_native"
+                    android:layout_weight="1"
+                    android:textSize="12sp"/>
+
+            </RadioGroup>
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#5c5c5c">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Emit event"
-            android:textColor="@android:color/white"
-            android:textAlignment="viewStart"
-            android:gravity="center_vertical"
-            android:layout_marginRight="32dp"
-            android:layout_marginLeft="15dp"
-            android:textSize="18sp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
 
-        <Button
-            android:text="with data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_send_event_with_data" />
-        <Button
-            android:text="w/o data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_send_event_wo_data" />
+            <TextView
+                android:layout_height="match_parent"
+                android:text="Emit event"
+                android:textColor="@android:color/holo_orange_light"
+                android:textAlignment="viewStart"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:textSize="15sp"
+                android:layout_width="150dp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:text="with data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_send_event_with_data"
+                android:layout_weight="1"/>
+
+            <Button
+                android:text="w/o data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_send_event_wo_data"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:id="@+id/radio_group_event">
+
+                <RadioButton
+                    android:text="JS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radio_button_event_js"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:textSize="12sp"/>
+
+                <RadioButton
+                    android:text="Native"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radio_button_event_native"
+                    android:layout_weight="1"
+                    android:textSize="12sp"/>
+
+                <RadioButton
+                    android:text="Global"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radio_button_event_global"
+                    android:layout_weight="1"/>
+            </RadioGroup>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <Button
-        android:text="Resolve Request"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button_resolve_request"
-        android:visibility="gone"/>
-    <Button
-        android:text="Reject Request"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button_reject_request"
-        android:visibility="gone"/>
+        android:id="@+id/layout_request_completion"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        android:background="#5a697a"
+        android:visibility="gone">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_height="match_parent"
+                android:text="Resolve request"
+                android:textColor="@android:color/holo_orange_light"
+                android:textAlignment="viewStart"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:textSize="15sp"
+                android:layout_width="150dp"/>
+            <Button
+                android:text="with data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_resolve_request_with_data"/>
+            <Button
+                android:text="w/o data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_resolve_request_without_data"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_height="match_parent"
+                android:text="Reject request"
+                android:textColor="@android:color/holo_orange_light"
+                android:textAlignment="viewStart"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:textSize="15sp"
+                android:layout_width="150dp"/>
+
+            <Button
+                android:text="w/o data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_reject_request"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

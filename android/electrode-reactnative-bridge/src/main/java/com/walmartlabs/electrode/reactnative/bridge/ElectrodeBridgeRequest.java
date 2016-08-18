@@ -8,13 +8,17 @@ public class ElectrodeBridgeRequest {
     private final String mType;
     private final Bundle mData;
     private final int mTimeoutMs;
-    private final RequestCompletionListener mCompletionListener;
+    private DispatchMode mDispatchMode;
+
+    public enum DispatchMode {
+        JS, NATIVE, GLOBAL
+    }
 
     private ElectrodeBridgeRequest(Builder requestBuilder) {
         mType = requestBuilder.mType;
         mData = requestBuilder.mData;
         mTimeoutMs = requestBuilder.mTimeoutMs;
-        mCompletionListener = requestBuilder.mCompletionListener;
+        mDispatchMode = requestBuilder.mDispatchMode;
     }
 
     /**
@@ -22,13 +26,6 @@ public class ElectrodeBridgeRequest {
      */
     public String getType() {
         return this.mType;
-    }
-
-    /**
-     * @return The completion listener instance associated to this request
-     */
-    public RequestCompletionListener getRequestCompletionListener() {
-        return this.mCompletionListener;
     }
 
     /**
@@ -45,23 +42,29 @@ public class ElectrodeBridgeRequest {
         return this.mTimeoutMs;
     }
 
+    /**
+     * @return The dispatch mode of this request
+     */
+    public DispatchMode getDispatchMode() {
+        return this.mDispatchMode;
+    }
+
     public static class Builder {
         private final String mType;
-        private final RequestCompletionListener mCompletionListener;
         private Bundle mData;
         private int mTimeoutMs;
+        private DispatchMode mDispatchMode;
 
         /**
          * Initializes a new request builder
          *
          * @param type The type of the request to build
-         * @param completionListener The completion listener to associate to the request to build
          */
-        public Builder(String type, RequestCompletionListener completionListener) {
+        public Builder(String type) {
             mType = type;
-            mCompletionListener = completionListener;
             mTimeoutMs = DEFAULT_REQUEST_TIMEOUT;
             mData = Bundle.EMPTY;
+            mDispatchMode = DispatchMode.JS;
         }
 
         /**
@@ -83,6 +86,17 @@ public class ElectrodeBridgeRequest {
          */
         public Builder withData(Bundle data) {
             this.mData = data;
+            return this;
+        }
+
+        /**
+         * Specifies the dispatch mode
+         *
+         * @param dispatchMode The dispatch mode to use
+         * @return Current builder instance for chaining
+         */
+        public Builder withDispatchMode(DispatchMode dispatchMode) {
+            this.mDispatchMode = dispatchMode;
             return this;
         }
 

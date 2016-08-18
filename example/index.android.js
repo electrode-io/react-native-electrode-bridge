@@ -36,7 +36,7 @@ class ElectrodeBridgeExample extends Component {
 
     this.state = {
       pendingInboundRequest: null,
-      logText: ">>>",
+      logText: "[JS] >>>",
       eventDispatchMode: DispatchMode.NATIVE,
       requestDispatchType: DispatchMode.NATIVE
     };
@@ -169,7 +169,7 @@ class ElectrodeBridgeExample extends Component {
   }
 
   _setLoggerText(text) {
-    this.setState({logText: `>>> ${text}`});
+    this.setState({logText: `[JS] >>> ${text}`});
   }
 
   _renderIncomingRequestButtonGroup() {
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    backgroundColor: 'black'
+    backgroundColor: 'darkslategrey'
   },
   buttonGroup: {
     backgroundColor: 'dimgrey',

@@ -33,6 +33,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private static final String BRIDGE_MSG_TYPE = "type";
     private static final String BRIDGE_MSG_ID = "id";
     private static final String BRIDGE_REQUEST_ID = "requestId";
+    private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
 
     private final ReactApplicationContext mReactContext;
     private final EventDispatcher mEventDispatcher;
@@ -117,15 +118,15 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                         .getMap(BRIDGE_RESPONSE_ERROR)
                         .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
 
-                String errorName = "EUNKNOWN";
+                String errorCode = UNKNOWN_ERROR_CODE;
                 if (data
                         .getMap(BRIDGE_RESPONSE_ERROR)
                         .hasKey(BRDIGE_RESPONSE_ERROR_CODE)) {
-                    errorName = data
+                    errorCode = data
                             .getMap(BRIDGE_RESPONSE_ERROR)
                             .getString(BRDIGE_RESPONSE_ERROR_CODE);
                 }
-                promise.reject(errorName, errorMessage);
+                promise.reject(errorCode, errorMessage);
             } else if (data.hasKey(BRIDGE_MSG_DATA)) {
                 promise.resolve(data.getMap(BRIDGE_MSG_DATA));
             } else {
@@ -151,47 +152,44 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         mRequestDispatcher.dispatchRequest(type, id, data, promise);
     }
 
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void canHandleEventType(String type, Promise promise) {
-        promise.resolve(!mEventRegistrar.getEventListeners(type).isEmpty());
-    }
-
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void canHandleRequestType(String type, Promise promise) {
-        promise.resolve(mRequestRegistrar.getRequestHandler(type) != null);
-    }
-
     /**
      * Emits an event with some data to the JS react native side
      *
      * @param event The event to emit
      */
     @SuppressWarnings("unused")
-    public void emitEventToJs(@NonNull ElectrodeBridgeEvent event) {
+    public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
         String id = getUUID();
         WritableMap message = buildMessage(id, event.getType(), Arguments.fromBundle(event.getData()));
 
         Log.d(TAG, String.format("Emitting event[type:%s id:%s]", event.getType(), id));
 
-        mReactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(BRIDGE_EVENT, message);
+        if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.JS) {
+            mReactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(BRIDGE_EVENT, message);
+        } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.NATIVE) {
+            dispatchEvent(event.getType(), id, Arguments.fromBundle(event.getData()));
+        } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.GLOBAL) {
+            mReactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(BRIDGE_EVENT, message);
+            dispatchEvent(event.getType(), id, Arguments.fromBundle(event.getData()));
+        }
     }
 
     /**
-     * Sends a request with some data to the JS react native side
+     * Sends a request
      *
      * @param request The request to send
+     * @param completionListener Listener to be called upon request completion
     */
     @SuppressWarnings("unused")
-    public void sendRequestToJs(@NonNull ElectrodeBridgeRequest request) {
+    public void sendRequest(
+            @NonNull ElectrodeBridgeRequest request,
+            @NonNull final RequestCompletionListener completionListener) {
         final String id = getUUID();
-        WritableMap message = buildMessage(
-                id, request.getType(), Arguments.fromBundle(request.getData()));
 
-        final RequestCompletionListener completionListener = request.getRequestCompletionListener();
         final Promise promise = new PromiseImpl(new Callback() {
             @Override
             public void invoke(Object... args) {
@@ -207,6 +205,8 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
             }
         });
 
+        pendingPromiseByRequestId.put(id, promise);
+
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -217,13 +217,18 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
             }
         }, request.getTimeoutMs());
 
-        pendingPromiseByRequestId.put(id, promise);
-
         Log.d(TAG, String.format("Sending request[type:%s id:%s]", request.getType(), id));
 
-        mReactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(BRIDE_REQUEST, message);
+        if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.JS)) {
+            WritableMap message = buildMessage(
+                    id, request.getType(), Arguments.fromBundle(request.getData()));
+
+            mReactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(BRIDE_REQUEST, message);
+        } else if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.NATIVE)) {
+            dispatchRequest(request.getType(), id, Arguments.fromBundle(request.getData()), promise);
+        }
     }
 
     /**

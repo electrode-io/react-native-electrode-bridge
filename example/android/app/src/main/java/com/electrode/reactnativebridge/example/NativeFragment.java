@@ -33,31 +33,43 @@ public class NativeFragment extends Fragment {
     static final int SAMPLE_REQUEST_TIMEOUT_IN_MS = 8000;
 
     final RequestCompletionListener mCompletionListener = new ExampleRequestCompletionListener();
+    private ElectrodeBridge mElectrodeBridge;
 
+    // Logger
+    private TextView mLoggerTextView;
+
+    // Sending requests
     private Button mSendRequestWithDataButton;
     private Button mSendRequestWithoutDataButton;
+    private RadioGroup mRadioGroupRequest;
+
+    // Sending events
     private Button mSendEventWithDataButton;
     private Button mSendEventWithoutDataButton;
+    private RadioGroup mRadioGroupEvent;
+
+    // Receiving requests
+    private LinearLayout mLayoutRequestCompletion;
     private Button mResolveRequestWithoutDataButton;
     private Button mResolveRequestWithDataButton;
     private Button mRejectRequestButton;
-    private TextView mLoggerTextView;
-    private ElectrodeBridge mElectrodeBridge;
-    private LinearLayout mLayoutRequestCompletion;
-    private RadioGroup mRadioGroupRequest;
-    private RadioGroup mRadioGroupEvent;
+
     private Random mRand = new Random();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //
+        // Wait for bridge to be ready before registering for events and request
         ElectrodeBridgeHolder.setOnBridgeReadyListener(
                 new ElectrodeBridgeHolder.OnBridgeReadyListener() {
             @Override
             public void onBridgeReady(ElectrodeBridge electrodeBridge) {
                 mElectrodeBridge = electrodeBridge;
 
+                //
+                // Register event listener
                 electrodeBridge
                         .eventRegistrar()
                         .registerEventListener(EVENT_EXAMPLE_TYPE,
@@ -68,6 +80,8 @@ public class NativeFragment extends Fragment {
                     }
                 });
 
+                //
+                // Register request listener
                 try {
                     electrodeBridge
                             .requestRegistrar()
@@ -275,6 +289,5 @@ public class NativeFragment extends Fragment {
             }
         });
     }
-
 
 }

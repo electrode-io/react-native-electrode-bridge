@@ -98,58 +98,17 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Dispatch an event on the native side
-     *
-     * @param type The type of the event
-     * @param id The id of the event
-     * @param data The event data
+     * @return The event listener register
      */
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void dispatchEvent(String type, String id, ReadableMap data) {
-        Log.d(TAG, String.format("onEvent[type:%s id:%s]", type, id));
-
-        if (type.equals(BRIDGE_RESPONSE)) {
-            String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
-            Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
-            Promise promise = pendingPromiseByRequestId.remove(parentRequestId);
-            if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
-                String errorMessage = data
-                        .getMap(BRIDGE_RESPONSE_ERROR)
-                        .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
-
-                String errorCode = UNKNOWN_ERROR_CODE;
-                if (data
-                        .getMap(BRIDGE_RESPONSE_ERROR)
-                        .hasKey(BRDIGE_RESPONSE_ERROR_CODE)) {
-                    errorCode = data
-                            .getMap(BRIDGE_RESPONSE_ERROR)
-                            .getString(BRDIGE_RESPONSE_ERROR_CODE);
-                }
-                promise.reject(errorCode, errorMessage);
-            } else if (data.hasKey(BRIDGE_MSG_DATA)) {
-                promise.resolve(data.getMap(BRIDGE_MSG_DATA));
-            } else {
-                promise.reject(new UnsupportedOperationException());
-            }
-        } else {
-            mEventDispatcher.dispatchEvent(id, type, data);
-        }
+    public EventRegistrar<EventDispatcherImpl.EventListener> eventRegistrar() {
+        return mEventRegistrar;
     }
 
     /**
-     * Dispatch a request on the native side
-     *
-     * @param type The type of the request
-     * @param id The request id
-     * @param data The request data
-     * @param promise A promise to reject or resolve the request asynchronously
+     * @return The request handler registrar
      */
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void dispatchRequest(String type, String id, ReadableMap data, Promise promise) {
-        Log.d(TAG, String.format("dispatchRequest[type:%s id:%s]", type, id));
-        mRequestDispatcher.dispatchRequest(type, id, data, promise);
+    public RequestRegistrar<RequestDispatcherImpl.RequestHandler> requestRegistrar() {
+        return mRequestRegistrar;
     }
 
     /**
@@ -232,17 +191,58 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     }
 
     /**
-     * @return The request handler registrar
+     * Dispatch a request on the native side
+     *
+     * @param type The type of the request
+     * @param id The request id
+     * @param data The request data
+     * @param promise A promise to reject or resolve the request asynchronously
      */
-    public RequestRegistrar<RequestDispatcherImpl.RequestHandler> requestRegistrar() {
-        return mRequestRegistrar;
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void dispatchRequest(String type, String id, ReadableMap data, Promise promise) {
+        Log.d(TAG, String.format("dispatchRequest[type:%s id:%s]", type, id));
+        mRequestDispatcher.dispatchRequest(type, id, data, promise);
     }
 
     /**
-     * @return The event listener register
+     * Dispatch an event on the native side
+     *
+     * @param type The type of the event
+     * @param id The id of the event
+     * @param data The event data
      */
-    public EventRegistrar<EventDispatcherImpl.EventListener> eventRegistrar() {
-        return mEventRegistrar;
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void dispatchEvent(String type, String id, ReadableMap data) {
+        Log.d(TAG, String.format("onEvent[type:%s id:%s]", type, id));
+
+        if (type.equals(BRIDGE_RESPONSE)) {
+            String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
+            Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
+            Promise promise = pendingPromiseByRequestId.remove(parentRequestId);
+            if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
+                String errorMessage = data
+                        .getMap(BRIDGE_RESPONSE_ERROR)
+                        .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
+
+                String errorCode = UNKNOWN_ERROR_CODE;
+                if (data
+                        .getMap(BRIDGE_RESPONSE_ERROR)
+                        .hasKey(BRDIGE_RESPONSE_ERROR_CODE)) {
+                    errorCode = data
+                        .getMap(BRIDGE_RESPONSE_ERROR)
+                        .getString(BRDIGE_RESPONSE_ERROR_CODE);
+                }
+                promise.reject(errorCode, errorMessage);
+            } else if (data.hasKey(BRIDGE_MSG_DATA)) {
+                promise.resolve(data.getMap(BRIDGE_MSG_DATA));
+            } else {
+                promise.reject(new UnsupportedOperationException());
+            }
+        } else {
+            mEventDispatcher.dispatchEvent(id, type, data);
+        }
     }
 
     private String getUUID() {

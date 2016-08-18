@@ -7,7 +7,18 @@ const EventEmitter = require("EventEmitter");
 const ELECTRODE_BRIDGE_EVENT_EVENT_TYPE = "electrode.bridge.event";
 const ELECTRODE_BRIDGE_REQUEST_EVENT_TYPE = "electrode.bridge.request";
 const ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE = "electrode.bridge.response";
+
 const DEFAULT_REQUEST_TIMEOUT_IN_MS = 5000;
+
+const ERROR_REQUEST_TIMEOUT = {
+  code: "EREQUESTIMEOUT",
+  message: "Request timeout"
+}
+
+const ERROR_NO_REQUEST_HANDLER = {
+  code: "ENOHANDLER",
+  message: `No registered request handler`
+}
 
 class ElectrodeBridge extends EventEmitter {
 
@@ -22,12 +33,16 @@ class ElectrodeBridge extends EventEmitter {
     this.requestHandlerByRequestType = {};
   }
 
+  //============================================================================
+  // PUBLIC API
+  //============================================================================
+
   /**
    * Emits an event
    *
    * @param {string} type - The type of the event to emit
    * @param {Object} obj - Options
-   * @param {Object} obj.data - The data of this event [DEFAULT : {}]
+   * @param {Object} obj.data - The data attached to this event [DEFAULT : {}]
    * @param {number} obj.dispatchMode - The dispatch mode [DEFAULT: DispatchMode.NATIVE]
    */
   emitEvent(
@@ -35,16 +50,15 @@ class ElectrodeBridge extends EventEmitter {
       data = {},
       dispatchMode = DispatchMode.NATIVE
     } /*: Object */) {
-    const id = uuid.v4();
     switch (dispatchMode) {
       case DispatchMode.NATIVE:
-        NativeModules.ElectrodeBridge.dispatchEvent(type, id, data);
+        NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), data);
         break;
       case DispatchMode.JS:
         this.emit(type, data);
         break;
       case DispatchMode.GLOBAL:
-        NativeModules.ElectrodeBridge.dispatchEvent(type, id, data);
+        NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), data);
         this.emit(type, data);
         break;
     }
@@ -55,7 +69,7 @@ class ElectrodeBridge extends EventEmitter {
    *
    * @param {string} type - The type of the request to send
    * @param {Object} obj - Options
-   * @param {Object} obj.data - The data of this request [DEFAULT: {}]
+   * @param {Object} obj.data - The data attached to this request [DEFAULT: {}]
    * @param {number} obj.timeout - The timeout of the request in ms [DEFAULT:5000]
    * @param {number} obj.dispatchMode - The dispatch mode [DEFAULT : DispatchMode.NATIVE]
    */
@@ -78,10 +92,7 @@ class ElectrodeBridge extends EventEmitter {
     }
 
     const timeoutPromise = new Promise((resolve, reject) => {
-      setTimeout(reject, timeout, {
-        code: "EREQUESTIMEOUT",
-        message: "Request timeout"
-      });
+      setTimeout(reject, timeout, ERROR_REQUEST_TIMEOUT);
     });
 
     return Promise.race([requestPromise, timeoutPromise]);
@@ -101,6 +112,10 @@ class ElectrodeBridge extends EventEmitter {
 
     this.requestHandlerByRequestType[type] = handler;
   }
+
+  //============================================================================
+  // PRIVATE METHODS
+  //============================================================================
 
   /**
    * Called whenever an event from the native side has been received
@@ -132,10 +147,7 @@ class ElectrodeBridge extends EventEmitter {
     id /*: string */,
     data /*: Object */) {
     if (!this.requestHandlerByRequestType[type]) {
-      this._sendErrorResponseToNative(id, {
-        code: "ENOHANDLER",
-        message: `No registered request handler for type ${type}`
-      });
+      this._sendErrorResponseToNative(id, ERROR_NO_REQUEST_HANDLER);
       return;
     }
 
@@ -163,10 +175,7 @@ class ElectrodeBridge extends EventEmitter {
     id /*: string */,
     data /*: Object */) {
     if (!this.requestHandlerByRequestType[type]) {
-      throw {
-        code:"ENOHANDLER",
-        message: `No registered request handler for type ${type}`
-      };
+      throw ERROR_NO_REQUEST_HANDLER;
     }
     return this.requestHandlerByRequestType[type](data);
   }

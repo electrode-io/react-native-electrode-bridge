@@ -21,6 +21,7 @@ class ElectrodeBridge extends EventEmitter {
 
     this.requestHandlerByRequestType = {};
   }
+
   /**
    * Emits an event
    *
@@ -61,7 +62,7 @@ class ElectrodeBridge extends EventEmitter {
   sendRequest(
       type /*: string */, {
       data = {},
-      timeout = 5000,
+      timeout = DEFAULT_REQUEST_TIMEOUT_IN_MS,
       dispatchMode = DispatchMode.NATIVE
     } /*: Object */) /*: Promise<*> */ {
     let requestPromise;

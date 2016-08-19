@@ -100,6 +100,7 @@ class ElectrodeBridge extends EventEmitter {
 
   /**
    * Registers a request handler for a given request type
+   *
    * @param {string} type - The type of request associated to the handler
    * @param {Function} handler - The handler promise
    */
@@ -111,6 +112,18 @@ class ElectrodeBridge extends EventEmitter {
     }
 
     this.requestHandlerByRequestType[type] = handler;
+  }
+
+  /**
+   * Registers an event listener for a given event type
+   *
+   * @param {string} type - The type of the event
+   * @param {Function} handler - A function to handle incoming event
+   */
+  registerEventListener(
+    type /*:string */,
+    handler /*:Function*/) {
+    this.addListener(type, handler);
   }
 
   //============================================================================

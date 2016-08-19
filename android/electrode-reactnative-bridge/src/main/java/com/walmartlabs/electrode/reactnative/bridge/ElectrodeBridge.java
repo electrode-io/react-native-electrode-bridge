@@ -227,8 +227,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                         .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
 
                 String errorCode = UNKNOWN_ERROR_CODE;
-                if (data
-                        .getMap(BRIDGE_RESPONSE_ERROR)
+                if (data.getMap(BRIDGE_RESPONSE_ERROR)
                         .hasKey(BRDIGE_RESPONSE_ERROR_CODE)) {
                     errorCode = data
                         .getMap(BRIDGE_RESPONSE_ERROR)

@@ -7,12 +7,11 @@ Link to the [demo app](/example)
 
 This project is essentially a react native library, consisting of a JavaScript module and an associated Android Native Module (iOS implementation TBD).
 
-It is built on top of the react native built-in bridging constructs (to communicate between the react native JS side and Native side) and offers a clean bi-directional communication API, exposing methods to send events and/or requests from/to any side of the bridge (JS/Native). It offers more options and flexibility to communicate between the JS/Native side that is offered out of the box by react native. Ultimately it can help with integrating react native applications into existing native code bases. It might be used as the basic building block of react native mini apps and native modules.
+It is built on top of the react native built-in bridging constructs (to communicate between the react native JS side and Native side) and offers a clean bi-directional communication API, exposing methods to send events and/or requests from/to any side of the bridge (JS/Native). It offers more options and flexibility to communicate between the JS/Native side that is offered out of the box by react native. Ultimately it can help with integrating react native applications into existing native code bases. It might be used as one of the basic building block of react native mini apps and native modules.
 
 Here is a non-exhaustive list of a few reasons to use this library as the low level communication bridge instead of the built-in react native constructs :
 
 - Isolates the host application from react native library types and specifics (vanilla Java/Android implementation)
-- Shields bridge based native modules / apps from any react native breaking underlying changes (in such a case, only the bridge implementation will have to be updated)
 - Messages can be sent either to the other side of the bridge or on the same side (or both)
 - Request timeout supported
 - Offer a way to send requests from Native to JS side

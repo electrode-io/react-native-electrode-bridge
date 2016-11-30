@@ -19,7 +19,7 @@ Here is a non-exhaustive list of a few reasons to use this library as the low le
 
 The bridge API is built around two messaging idioms, `events` and `requests` :
 
-- An event is a fire & forget message type. You should emit an event whenever you are not expecting any kind of response back from whoever is listening for this specific event. Because of this, there can be multiple listeners for a given event type.
+- An event is a fire & forget message type. You should emit an event whenever you are not expecting any kind of response back from whoever is listening for this specific event. Because of this, there can be multiple listeners for a given event name.
 - On the other hand, a request expects some kind of response. You should send a request whenever you are asking for something (be it some data or just an acknowledgment that the request was successfully handled or not). A request can only have one "handler" registered for it. Also due to the fact that sending a request expects a response back; you can specify a timeout when sending the request.
 
 Both sides of the bridge (JS/Native) expose a similar API (mirrored) to respectively send requests and emit events, and also listen for specific events or requests.
@@ -44,18 +44,18 @@ Once you import the module, you can interact with the ```electrodeBridge``` inst
 
 ```javascript
 electrodeBridge.sendRequest(
-    type: String, {
+    name: String, {
     data: Object = {},
     timeout: Number = DEFAULT_REQUEST_TIMEOUT_IN_MS /* 5000 */,
     dispatchMode = DispatchMode.NATIVE
   }): Promise
 ```
 
-Sends a request of a specific `type` through the bridge.
+Sends a request with a specific `name` through the bridge.
 
 *Mandatory*
 
-- `type` : The type of the request to emit
+- `name` : The name of the request to emit
 
 Optional :
 
@@ -83,17 +83,17 @@ electrodeBridge.sendRequest(
 
 ```javascript
 electrodeBridge.emitEvent(
-    type: String, {
+    name: String, {
     data: Object = {},
     dispatchMode: DispatchMode = DispatchMode.NATIVE
   }): void
 ```
 
-Emits an event of a specific `type` through the bridge.
+Emits an event with a specific `name` through the bridge.
 
 *Mandatory*
 
-- `type` : The type of the event to emit
+- `name` : The name of the event to emit
 
 *Optional*
 
@@ -114,16 +114,16 @@ electrodeBridge.emitEvent("myapp.some.event");
 
 ```javascript
 electrodeBridge.registerRequestHandler(
-  type: String,
+  name: String,
   handler: Promise): void
 ```
 
-Registers a handler that can handle a specific request `type`.  
-Please note that if an handler already exists for the specific request type (on the side you are making the call) the method will throw an error. Current implementation only allows one request handler to be associated to a given request type.
+Registers a handler that can handle a specific request `name`.  
+Please note that if an handler already exists for the specific request name (on the side you are making the call) the method will throw an error. Current implementation only allows one request handler to be associated to a given request name.
 
 *Mandatory*
 
-- `type` : The type of request this handler can handle
+- `name` : The name of the request this handler can handle
 
 - `handler` : The handler function, taking a single parameter being the data of the request and returning a Promise. Implementer of the handler should either resolve the promise with an object being the response data (if any) or reject the promise with an Error.
 
@@ -142,7 +142,7 @@ electrodeBridge.registerRequestHandler(
 
 ```javascript
 electrodeBridge.registerEventListener(
-  type: String,
+  name: String,
   handler: Function): void
 }
 ```
@@ -151,7 +151,7 @@ Registers an event listener that will be invoked whenever an event of the specif
 
 *Mandatory*
 
-- `type` : The type of event that this listener is interested in
+- `name` : The name of the event that this listener is interested in
 
 - `handler` : A function to handle an incoming event. The function takes a single parameter being the data payload of the event (if any).
 
@@ -221,7 +221,7 @@ Bundle data = new Bundle();
 data.putInt("someInt", mRand.nextInt());
 
 ElectrodeBridgeRequest request =
-  new ElectrodeBridgeRequest.Builder("my.request.type")
+  new ElectrodeBridgeRequest.Builder("my.request.name")
     // Optional bundle containing the payload data (Default: no data)
     .withData(data)
     // Optional timeout in ms (Default: 5000)
@@ -263,7 +263,7 @@ Bundle data = new Bundle();
 data.putInt("someInt", mRand.nextInt());
 
 ElectrodeBridgeEvent event =
-  new ElectrodeBridgeEvent.Builder("my.event.type")
+  new ElectrodeBridgeEvent.Builder("my.event.name")
     // Optional bundle containing the payload data (Default: no data)
     .withData(data)
     // Optional dispatch mode (Default: RequestDispatchMode.JS)
@@ -277,16 +277,16 @@ electrodeBridge.emitEvent(event);
 
 ```java
 UUID registerRequestHandler(
-  @NonNull String type,
+  @NonNull String name,
   @NonNull RequestHandler requestHandler);
 ```
 
-Registers a handler that can handle a specific request `type`.  
-As for the JS API, please note that if an handler already exists for the specific request type (on the side you are making the call) the method will throw an error. Current implementation only allows one request handler to be associated to a given request type.
+Registers a handler that can handle a specific request `name`.  
+As for the JS API, please note that if an handler already exists for the specific request name (on the side you are making the call) the method will throw an error. Current implementation only allows one request handler to be associated to a given request name.
 
 *Mandatory*
 
-- `type` : The type of request this handler can handle
+- `name` : The name of the request this handler can handle
 
 - `requestHandler` an instance of `RequestHandler` that should take care of handling the request and completing it.
 
@@ -294,7 +294,7 @@ Example usage :
 
 ```java
 electrodeBridge.requestRegistrar()
-  .registerRequestHandler("awesomerequest.type",
+  .registerRequestHandler("awesomerequest.name",
     new RequestHandler() {
       @Override
       public void onRequest(Bundle data,
@@ -318,7 +318,7 @@ UUID registerEventHandler(
 
 *Mandatory*
 
-- `type` : The type of event that this listener is interested in
+- `name` : The name of the event that this listener is interested in
 
 - `eventListener` an instance of `EventListener` that should take care of handling the event.
 
@@ -326,7 +326,7 @@ Example usage :
 
 ```java
 electrodeBridge.eventRegistrar()
-  .registerEventHandler("awesomeevent.type",
+  .registerEventHandler("awesomeevent.name",
   new EventListener() {
     @Override
     public void onEvent(Bundle data) {

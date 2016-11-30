@@ -30,7 +30,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private static final String BRDIGE_RESPONSE_ERROR_CODE = "code";
     private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
     private static final String BRIDGE_MSG_DATA = "data";
-    private static final String BRIDGE_MSG_TYPE = "type";
+    private static final String BRIDGE_MSG_NAME = "name";
     private static final String BRIDGE_MSG_ID = "id";
     private static final String BRIDGE_REQUEST_ID = "requestId";
     private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
@@ -71,11 +71,11 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
          * Dispatch an event
          *
          * @param id The event id
-         * @param type The type of the event to dispatch
+         * @param name The name of the event to dispatch
          * @param data The data of the event as a ReadableMap
          */
         void dispatchEvent(@NonNull String id,
-                           @NonNull String type,
+                           @NonNull String name,
                            @NonNull ReadableMap data);
     }
 
@@ -86,12 +86,12 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         /**
          * Dispatch a request
          *
-         * @param type The type of the request to dispatch
+         * @param name The name of the request to dispatch
          * @param id The request id
          * @param data The data of the request as a ReadableMap
          * @param promise A promise to fulfil upon request completion
          */
-        void dispatchRequest(@NonNull String type,
+        void dispatchRequest(@NonNull String name,
                              @NonNull String id,
                              @NonNull ReadableMap data,
                              @NonNull Promise promise);
@@ -119,21 +119,21 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     @SuppressWarnings("unused")
     public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
         String id = getUUID();
-        WritableMap message = buildMessage(id, event.getType(), Arguments.fromBundle(event.getData()));
+        WritableMap message = buildMessage(id, event.getName(), Arguments.fromBundle(event.getData()));
 
-        Log.d(TAG, String.format("Emitting event[type:%s id:%s]", event.getType(), id));
+        Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), id));
 
         if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.JS) {
             mReactContext
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                     .emit(BRIDGE_EVENT, message);
         } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.NATIVE) {
-            dispatchEvent(event.getType(), id, Arguments.fromBundle(event.getData()));
+            dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
         } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.GLOBAL) {
             mReactContext
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                     .emit(BRIDGE_EVENT, message);
-            dispatchEvent(event.getType(), id, Arguments.fromBundle(event.getData()));
+            dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
         }
     }
 
@@ -176,48 +176,48 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
             }
         }, request.getTimeoutMs());
 
-        Log.d(TAG, String.format("Sending request[type:%s id:%s]", request.getType(), id));
+        Log.d(TAG, String.format("Sending request[name:%s id:%s]", request.getName(), id));
 
         if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.JS)) {
             WritableMap message = buildMessage(
-                    id, request.getType(), Arguments.fromBundle(request.getData()));
+                    id, request.getName(), Arguments.fromBundle(request.getData()));
 
             mReactContext
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                     .emit(BRIDE_REQUEST, message);
         } else if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.NATIVE)) {
-            dispatchRequest(request.getType(), id, Arguments.fromBundle(request.getData()), promise);
+            dispatchRequest(request.getName(), id, Arguments.fromBundle(request.getData()), promise);
         }
     }
 
     /**
      * Dispatch a request on the native side
      *
-     * @param type The type of the request
+     * @param name The name of the request
      * @param id The request id
      * @param data The request data
      * @param promise A promise to reject or resolve the request asynchronously
      */
     @ReactMethod
     @SuppressWarnings("unused")
-    public void dispatchRequest(String type, String id, ReadableMap data, Promise promise) {
-        Log.d(TAG, String.format("dispatchRequest[type:%s id:%s]", type, id));
-        mRequestDispatcher.dispatchRequest(type, id, data, promise);
+    public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
+        Log.d(TAG, String.format("dispatchRequest[name:%s id:%s]", name, id));
+        mRequestDispatcher.dispatchRequest(name, id, data, promise);
     }
 
     /**
      * Dispatch an event on the native side
      *
-     * @param type The type of the event
+     * @param name The name of the event
      * @param id The id of the event
      * @param data The event data
      */
     @ReactMethod
     @SuppressWarnings("unused")
-    public void dispatchEvent(String type, String id, ReadableMap data) {
-        Log.d(TAG, String.format("onEvent[type:%s id:%s]", type, id));
+    public void dispatchEvent(String name, String id, ReadableMap data) {
+        Log.d(TAG, String.format("onEvent[name:%s id:%s]", name, id));
 
-        if (type.equals(BRIDGE_RESPONSE)) {
+        if (name.equals(BRIDGE_RESPONSE)) {
             String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
             Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
             Promise promise = pendingPromiseByRequestId.remove(parentRequestId);
@@ -240,7 +240,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                 promise.reject(new UnsupportedOperationException());
             }
         } else {
-            mEventDispatcher.dispatchEvent(id, type, data);
+            mEventDispatcher.dispatchEvent(id, name, data);
         }
     }
 
@@ -248,10 +248,10 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         return UUID.randomUUID().toString();
     }
 
-    private WritableMap buildMessage(String id, String type, WritableMap data) {
+    private WritableMap buildMessage(String id, String name, WritableMap data) {
         WritableMap writableMap = Arguments.createMap();
         writableMap.putString(BRIDGE_MSG_ID, id);
-        writableMap.putString(BRIDGE_MSG_TYPE, type);
+        writableMap.putString(BRIDGE_MSG_NAME, name);
         writableMap.putMap(BRIDGE_MSG_DATA, data);
 
         return writableMap;

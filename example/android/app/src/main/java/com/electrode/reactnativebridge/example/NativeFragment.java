@@ -27,8 +27,8 @@ public class NativeFragment extends Fragment {
 
     private static final String TAG = NativeFragment.class.getSimpleName();
 
-    static final String EVENT_EXAMPLE_TYPE = "event.example";
-    static final String REQUEST_EXAMPLE_TYPE = "request.example";
+    static final String EVENT_EXAMPLE_NAME = "event.example";
+    static final String REQUEST_EXAMPLE_NAME = "request.example";
 
     static final int SAMPLE_REQUEST_TIMEOUT_IN_MS = 8000;
 
@@ -72,7 +72,7 @@ public class NativeFragment extends Fragment {
                 // Register event listener
                 electrodeBridge
                         .eventRegistrar()
-                        .registerEventListener(EVENT_EXAMPLE_TYPE,
+                        .registerEventListener(EVENT_EXAMPLE_NAME,
                                 new EventDispatcherImpl.EventListener() {
                     @Override
                     public void onEvent(final Bundle data) {
@@ -85,7 +85,7 @@ public class NativeFragment extends Fragment {
                 try {
                     electrodeBridge
                             .requestRegistrar()
-                            .registerRequestHandler(REQUEST_EXAMPLE_TYPE,
+                            .registerRequestHandler(REQUEST_EXAMPLE_NAME,
                                     new RequestDispatcherImpl.RequestHandler() {
                         @Override
                         public void onRequest(Bundle data,
@@ -186,7 +186,7 @@ public class NativeFragment extends Fragment {
 
                     ElectrodeBridgeRequest request =
                         new ElectrodeBridgeRequest.Builder(
-                                REQUEST_EXAMPLE_TYPE)
+                                REQUEST_EXAMPLE_NAME)
                                 .withData(data)
                                 .withTimeout(SAMPLE_REQUEST_TIMEOUT_IN_MS)
                                 .withDispatchMode(getCurrentRequestDispatchMode())
@@ -203,7 +203,7 @@ public class NativeFragment extends Fragment {
                 if (mElectrodeBridge != null) {
                     ElectrodeBridgeRequest request =
                             new ElectrodeBridgeRequest.Builder(
-                                    REQUEST_EXAMPLE_TYPE)
+                                    REQUEST_EXAMPLE_NAME)
                                     .withTimeout(SAMPLE_REQUEST_TIMEOUT_IN_MS)
                                     .withDispatchMode(getCurrentRequestDispatchMode())
                                     .build();
@@ -221,7 +221,7 @@ public class NativeFragment extends Fragment {
                     data.putInt("randint", mRand.nextInt());
 
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
-                            EVENT_EXAMPLE_TYPE)
+                            EVENT_EXAMPLE_NAME)
                             .withData(data)
                             .withDispatchMode(getCurrentEventDispatchMode())
                             .build();
@@ -236,7 +236,7 @@ public class NativeFragment extends Fragment {
             public void onClick(View v) {
                 if (mElectrodeBridge != null) {
                     ElectrodeBridgeEvent event = new ElectrodeBridgeEvent.Builder(
-                            EVENT_EXAMPLE_TYPE)
+                            EVENT_EXAMPLE_NAME)
                             .withDispatchMode(getCurrentEventDispatchMode())
                             .build();
 

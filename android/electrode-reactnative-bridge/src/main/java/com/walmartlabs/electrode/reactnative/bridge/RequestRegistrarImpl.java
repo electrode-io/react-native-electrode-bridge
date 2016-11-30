@@ -8,27 +8,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
 
-    private final ConcurrentHashMap<UUID, String> mRequestTypeByUUID = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, T> mRequestHandlerByRequestType = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, String> mRequestNameByUUID = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, T> mRequestHandlerByRequestName = new ConcurrentHashMap<>();
 
     /**
      * Registers a request handler
      *
-     * @param type The type of request this handler can handle
+     * @param name The request name this handler can handle
      * @param requestHandler The request handler instance
      * @return UUID to provide when calling unregisterRequestHandler
      */
     @SuppressWarnings("unused")
     @NonNull
-    public UUID registerRequestHandler(@NonNull String type, @NonNull T requestHandler)
+    public UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler)
             throws ExistingHandlerException {
-        if (mRequestHandlerByRequestType.containsKey(type)) {
+        if (mRequestHandlerByRequestName.containsKey(name)) {
             throw new ExistingHandlerException(
-                    String.format("A request handler has already been registered for type %s", type));
+                    String.format("A request handler has already been registered for name %s", name));
         }
         UUID requestHandlerUuid = UUID.randomUUID();
-        mRequestHandlerByRequestType.put(type, requestHandler);
-        mRequestTypeByUUID.put(requestHandlerUuid, type);
+        mRequestHandlerByRequestName.put(name, requestHandler);
+        mRequestNameByUUID.put(requestHandlerUuid, name);
         return requestHandlerUuid;
     }
 
@@ -40,21 +40,21 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
      */
     @SuppressWarnings("unused")
     public void unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
-        String requestType = mRequestTypeByUUID.remove(requestHandlerUuid);
-        if (requestType != null) {
-            mRequestHandlerByRequestType.remove(requestType);
+        String requestName = mRequestNameByUUID.remove(requestHandlerUuid);
+        if (requestName != null) {
+            mRequestHandlerByRequestName.remove(requestName);
         }
     }
 
     /**
-     * Gets the request handler registered for a given request type
+     * Gets the request handler registered for a given request name
      *
-     * @param type The type of request
-     * @return The request handler instance that can handle this request type or null if no such
+     * @param name The name of request
+     * @return The request handler instance that can handle this request name or null if no such
      * request handler was registered
      */
     @Nullable
-    public T getRequestHandler(@NonNull String type) {
-        return mRequestHandlerByRequestType.get(type);
+    public T getRequestHandler(@NonNull String name) {
+        return mRequestHandlerByRequestName.get(name);
     }
 }

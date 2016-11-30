@@ -30,12 +30,12 @@ public class EventDispatcherImpl implements ElectrodeBridge.EventDispatcher {
     /**
      * Dispatch an event
      * @param id The event id
-     * @param type The type of the event to dispatch
+     * @param name The name of the event to dispatch
      * @param payload The payload of the event as a ReadableMap
      */
     @Override
-    public void dispatchEvent(@NonNull String id, @NonNull String type, @NonNull ReadableMap payload) {
-        for (EventListener eventListener : mEventRegistrar.getEventListeners(type)) {
+    public void dispatchEvent(@NonNull String id, @NonNull String name, @NonNull ReadableMap payload) {
+        for (EventListener eventListener : mEventRegistrar.getEventListeners(name)) {
             Bundle bundle = Arguments.toBundle(payload);
 
             eventListener.onEvent(bundle != null ? bundle : EMPTY_BUNDLE);

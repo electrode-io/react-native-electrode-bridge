@@ -23,9 +23,9 @@ import RadioForm, {
   RadioButtonLabel
 } from 'react-native-simple-radio-button';
 
-// Inbound event/request types
-const REQUEST_EXAMPLE_TYPE = "request.example";
-const EVENT_EXAMPLE_TYPE = "event.example";
+// Inbound event/request names
+const REQUEST_EXAMPLE_NAME = "request.example";
+const EVENT_EXAMPLE_NAME = "event.example";
 
 class ElectrodeBridgeExample extends Component {
 
@@ -41,10 +41,10 @@ class ElectrodeBridgeExample extends Component {
   }
 
   componentDidMount() {
-    electrodeBridge.addListener(EVENT_EXAMPLE_TYPE,
+    electrodeBridge.addListener(EVENT_EXAMPLE_NAME,
     this._logIncomingEvent.bind(this));
 
-    electrodeBridge.registerRequestHandler(REQUEST_EXAMPLE_TYPE,
+    electrodeBridge.registerRequestHandler(REQUEST_EXAMPLE_NAME,
       this._receivedRequest.bind(this));
   }
 
@@ -120,7 +120,7 @@ class ElectrodeBridgeExample extends Component {
 
   _sendRequestWithData() {
     electrodeBridge
-      .sendRequest(REQUEST_EXAMPLE_TYPE, {
+      .sendRequest(REQUEST_EXAMPLE_NAME, {
         data: { randFloat: Math.random() },
         dispatchMode: this.state.requestDispatchType
       })
@@ -130,7 +130,7 @@ class ElectrodeBridgeExample extends Component {
 
   _sendRequestWithoutData() {
     electrodeBridge
-      .sendRequest(REQUEST_EXAMPLE_TYPE, {
+      .sendRequest(REQUEST_EXAMPLE_NAME, {
          dispatchMode: this.state.requestDispatchType
        })
       .then(resp => { this._logIncomingSuccessResponse(resp); })
@@ -140,7 +140,7 @@ class ElectrodeBridgeExample extends Component {
   _emitEventWithData() {
     electrodeBridge
       .emitEvent(
-        EVENT_EXAMPLE_TYPE, {
+        EVENT_EXAMPLE_NAME, {
           data: { randFloat: Math.random() },
           dispatchMode: this.state.eventDispatchType
         });
@@ -149,7 +149,7 @@ class ElectrodeBridgeExample extends Component {
   _emitEventWithoutData() {
     electrodeBridge
       .emitEvent(
-        EVENT_EXAMPLE_TYPE, {
+        EVENT_EXAMPLE_NAME, {
           dispatchMode: this.state.eventDispatchType
         });
   }

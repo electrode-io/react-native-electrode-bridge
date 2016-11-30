@@ -4,9 +4,9 @@ import { NativeModules, DeviceEventEmitter } from "react-native";
 import uuid from "uuid";
 var EventEmitter = require('events');
 
-const ELECTRODE_BRIDGE_EVENT_EVENT_TYPE = "electrode.bridge.event";
-const ELECTRODE_BRIDGE_REQUEST_EVENT_TYPE = "electrode.bridge.request";
-const ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE = "electrode.bridge.response";
+const ELECTRODE_BRIDGE_EVENT_EVENT_NAME = "electrode.bridge.event";
+const ELECTRODE_BRIDGE_REQUEST_EVENT_NAME = "electrode.bridge.request";
+const ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME = "electrode.bridge.response";
 
 const DEFAULT_REQUEST_TIMEOUT_IN_MS = 5000;
 
@@ -25,12 +25,12 @@ class ElectrodeBridge extends EventEmitter {
     constructor() {
         super();
 
-        DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_EVENT_EVENT_TYPE,
+        DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_EVENT_EVENT_NAME,
             this._onEventFromNative.bind(this));
-        DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_REQUEST_EVENT_TYPE,
+        DeviceEventEmitter.addListener(ELECTRODE_BRIDGE_REQUEST_EVENT_NAME,
             this._onRequestFromNative.bind(this));
 
-        this.requestHandlerByRequestType = {};
+        this.requestHandlerByRequestName = {};
     }
 
     //============================================================================
@@ -40,26 +40,26 @@ class ElectrodeBridge extends EventEmitter {
     /**
      * Emits an event
      *
-     * @param {string} type - The type of the event to emit
+     * @param {string} name - The name of the event to emit
      * @param {Object} obj - Options
      * @param {Object} obj.data - The data attached to this event [DEFAULT : {}]
      * @param {number} obj.dispatchMode - The dispatch mode [DEFAULT: DispatchMode.NATIVE]
      */
     emitEvent(
-        type /*: string */ , {
+        name /*: string */ , {
             data = {},
             dispatchMode = DispatchMode.NATIVE
         } /*: Object */ ) {
         switch (dispatchMode) {
             case DispatchMode.NATIVE:
-                NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), data);
+                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), data);
                 break;
             case DispatchMode.JS:
-                this.emit(type, data);
+                this.emit(name, data);
                 break;
             case DispatchMode.GLOBAL:
-                NativeModules.ElectrodeBridge.dispatchEvent(type, uuid.v4(), data);
-                this.emit(type, data);
+                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), data);
+                this.emit(name, data);
                 break;
         }
     }
@@ -67,14 +67,14 @@ class ElectrodeBridge extends EventEmitter {
     /**
      * Sends a request
      *
-     * @param {string} type - The type of the request to send
+     * @param {string} name - The name of the request to send
      * @param {Object} obj - Options
      * @param {Object} obj.data - The data attached to this request [DEFAULT: {}]
      * @param {number} obj.timeout - The timeout of the request in ms [DEFAULT:5000]
      * @param {number} obj.dispatchMode - The dispatch mode [DEFAULT : DispatchMode.NATIVE]
      */
     sendRequest(
-        type /*: string */ , {
+        name /*: string */ , {
             data = {},
             timeout = DEFAULT_REQUEST_TIMEOUT_IN_MS,
             dispatchMode = DispatchMode.NATIVE
@@ -82,10 +82,10 @@ class ElectrodeBridge extends EventEmitter {
         let requestPromise;
         switch (dispatchMode) {
             case DispatchMode.NATIVE:
-                requestPromise = NativeModules.ElectrodeBridge.dispatchRequest(type, uuid.v4(), data);
+                requestPromise = NativeModules.ElectrodeBridge.dispatchRequest(name, uuid.v4(), data);
                 break;
             case DispatchMode.JS:
-                requestPromise = this._dispatchJsOriginatingRequest(type, uuid.v4(), data);
+                requestPromise = this._dispatchJsOriginatingRequest(name, uuid.v4(), data);
                 break;
             default:
                 throw new Error(`Unknown dispatchMode : ${dispatchMode}`);
@@ -99,31 +99,31 @@ class ElectrodeBridge extends EventEmitter {
     }
 
     /**
-     * Registers a request handler for a given request type
+     * Registers a request handler for a given request name
      *
-     * @param {string} type - The type of request associated to the handler
+     * @param {string} name - The name of the request associated to the handler
      * @param {Function} handler - The handler promise
      */
     registerRequestHandler(
-        type /*: string */ ,
+        name /*: string */ ,
         handler /*: Promise<*> */ ) {
-        if (this.requestHandlerByRequestType[type]) {
-            throw new Error(`A handler is already registered for type ${type}`);
+        if (this.requestHandlerByRequestName[name]) {
+            throw new Error(`A handler is already registered for request name ${name}`);
         }
 
-        this.requestHandlerByRequestType[type] = handler;
+        this.requestHandlerByRequestName[name] = handler;
     }
 
     /**
-     * Registers an event listener for a given event type
+     * Registers an event listener for a given event name
      *
-     * @param {string} type - The type of the event
-     * @param {Function} handler - A function to handle incoming event
+     * @param {string} name - The name of the event
+     * @param {Function} handler - A function to handle incoming events having this name
      */
     registerEventListener(
-        type /*:string */ ,
+        name /*:string */ ,
         handler /*:Function*/ ) {
-        this.addListener(type, handler);
+        this.addListener(name, handler);
     }
 
     //============================================================================
@@ -136,7 +136,7 @@ class ElectrodeBridge extends EventEmitter {
      * @param {Object} event - The raw event received
      */
     _onEventFromNative(event /*: ElectrodeBridgeMessage */ ) {
-        this.emit(event.type, event.data);
+        this.emit(event.name, event.data);
     }
 
     /**
@@ -145,26 +145,26 @@ class ElectrodeBridge extends EventEmitter {
      * @param {Object} request - The raw request received
      */
     _onRequestFromNative(request /*: ElectrodeBridgeMessage */ ) {
-        this._dispatchNativeOriginatingRequest(request.type, request.id, request.data);
+        this._dispatchNativeOriginatingRequest(request.name, request.id, request.data);
     }
 
     /**
      * Dispatch a request originating from the native side
      *
-     * @param {string} type - The type of the request
+     * @param {string} name - The name of the request
      * @param {string} id - The request id
      * @param {Object} data - The data associated to the request
      */
     _dispatchNativeOriginatingRequest(
-        type /*: string */ ,
+        name /*: string */ ,
         id /*: string */ ,
         data /*: Object */ ) {
-        if (!this.requestHandlerByRequestType[type]) {
+        if (!this.requestHandlerByRequestName[name]) {
             this._sendErrorResponseToNative(id, ERROR_NO_REQUEST_HANDLER);
             return;
         }
 
-        this.requestHandlerByRequestType[type](data)
+        this.requestHandlerByRequestName[name](data)
             .then((data) => {
                 this._sendSuccessResponseToNative(id, data)
             })
@@ -179,18 +179,18 @@ class ElectrodeBridge extends EventEmitter {
     /**
      * Dispatch a request originating from the JS side
      *
-     * @param {string} type - The type of the request
+     * @param {string} name - The name of the request
      * @param {string} id - The request id
      * @param {Object} data - The data associated to the request
      */
     _dispatchJsOriginatingRequest(
-        type /* : string */ ,
+        name /* : string */ ,
         id /*: string */ ,
         data /*: Object */ ) {
-        if (!this.requestHandlerByRequestType[type]) {
+        if (!this.requestHandlerByRequestName[name]) {
             throw ERROR_NO_REQUEST_HANDLER;
         }
-        return this.requestHandlerByRequestType[type](data);
+        return this.requestHandlerByRequestName[name](data);
     }
 
     /**
@@ -203,7 +203,7 @@ class ElectrodeBridge extends EventEmitter {
         requestId /*: string */ ,
         data /*: Object*/ ) {
         NativeModules.ElectrodeBridge.dispatchEvent(
-            ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE,
+            ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME,
             uuid.v4(), { requestId, data });
     }
 
@@ -217,14 +217,14 @@ class ElectrodeBridge extends EventEmitter {
         requestId /*: string */ ,
         error /*: ElectrodeBridgeError */ ) {
         NativeModules.ElectrodeBridge.dispatchEvent(
-            ELECTRODE_BRIDGE_RESPONSE_EVENT_TYPE,
+            ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME,
             uuid.v4(), { requestId, error });
     }
 }
 
 type ElectrodeBridgeMessage = {
     id: string;
-    type: string;
+    name: string;
     data: Object;
 };
 

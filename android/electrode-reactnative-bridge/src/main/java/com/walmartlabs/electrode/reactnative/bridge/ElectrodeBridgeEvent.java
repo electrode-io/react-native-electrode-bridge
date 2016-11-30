@@ -3,7 +3,7 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import android.os.Bundle;
 
 public class ElectrodeBridgeEvent {
-    private final String mType;
+    private final String mName;
     private final Bundle mData;
     private final DispatchMode mDispatchMode;
 
@@ -12,16 +12,16 @@ public class ElectrodeBridgeEvent {
     }
 
     private ElectrodeBridgeEvent(Builder eventBuilder) {
-        mType = eventBuilder.mType;
+        mName = eventBuilder.mName;
         mData = eventBuilder.mData;
         mDispatchMode = eventBuilder.mDispatchMode;
     }
 
     /**
-     * @return The type of this event
+     * @return The name of this event
      */
-    public String getType() {
-        return mType;
+    public String getName() {
+        return mName;
     }
 
     /**
@@ -39,17 +39,17 @@ public class ElectrodeBridgeEvent {
     }
 
     public static class Builder {
-        private final String mType;
+        private final String mName;
         private Bundle mData;
         private DispatchMode mDispatchMode;
 
         /**
          * Initializes a new event builder
          *
-         * @param type The type of the event to build
+         * @param name The name of the event to build
          */
-        public Builder(String type) {
-            this.mType = type;
+        public Builder(String name) {
+            this.mName = name;
             this.mData = Bundle.EMPTY;
         }
 

@@ -10,24 +10,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventRegistrarImpl<T> implements EventRegistrar<T> {
     private final ConcurrentHashMap<UUID, T> mEventListenerByUUID = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, List<T>> mEventListenersByEventType = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<T>> mEventListenersByEventName = new ConcurrentHashMap<>();
 
     /**
      * Registers an event listener
      *
-     * @param type The type of event this listener is interested in
+     * @param name The event name this listener is interested in
      * @param eventListener The event listener
      * @return A UUID to pass back to unregisterEventListener
      */
     @SuppressWarnings("unused")
-    public UUID registerEventListener(@NonNull String type, @NonNull T eventListener) {
+    public UUID registerEventListener(@NonNull String name, @NonNull T eventListener) {
         UUID eventListenerUuid = UUID.randomUUID();
-        if (mEventListenersByEventType.containsKey(type)) {
-            mEventListenersByEventType.get(type).add(eventListener);
+        if (mEventListenersByEventName.containsKey(name)) {
+            mEventListenersByEventName.get(name).add(eventListener);
         } else {
             List<T> eventListeners = new ArrayList<>();
             eventListeners.add(eventListener);
-            mEventListenersByEventType.put(type, eventListeners);
+            mEventListenersByEventName.put(name, eventListeners);
         }
         mEventListenerByUUID.put(eventListenerUuid, eventListener);
         return eventListenerUuid;
@@ -43,7 +43,7 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
     public void unregisterEventListener(@NonNull UUID eventListenerUuid) {
         T eventListener = mEventListenerByUUID.remove(eventListenerUuid);
         if (eventListener != null) {
-            for (List<T> eventListeners : mEventListenersByEventType.values()) {
+            for (List<T> eventListeners : mEventListenersByEventName.values()) {
                 if (eventListeners.contains(eventListener)) {
                     eventListeners.remove(eventListener);
                     break;
@@ -53,19 +53,19 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
     }
 
     /**
-     * Gets the list of all event listeners registered for a given event type
+     * Gets the list of all event listeners registered for a given event name
      *
-     * @param type The type of the event
-     * @return A list of event listeners registered for the given event type or an empty list if no
-     * event listeners are currently registered for this event type
+     * @param name The event name
+     * @return A list of event listeners registered for the given event name or an empty list if no
+     * event listeners are currently registered for this event name
      */
     @NonNull
     @Override
-    public List<T> getEventListeners(@NonNull String type) {
-        if (!mEventListenersByEventType.containsKey(type)) {
+    public List<T> getEventListeners(@NonNull String name) {
+        if (!mEventListenersByEventName.containsKey(name)) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList(mEventListenersByEventType.get(type));
+        return Collections.unmodifiableList(mEventListenersByEventName.get(name));
     }
 }

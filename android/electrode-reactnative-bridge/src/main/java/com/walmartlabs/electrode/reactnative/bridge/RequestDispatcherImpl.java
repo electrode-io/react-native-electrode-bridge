@@ -64,22 +64,22 @@ public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher 
     /**
      * Dispatch a request
      *
-     * @param type The type of the request to dispatch
+     * @param name The name of the request to dispatch
      * @param id The id of the request
      * @param payload The payload of the request as a ReadableMap
      * @param promise A promise to fulfil upon request completion
      */
     @Override
-    public void dispatchRequest(@NonNull String type,
+    public void dispatchRequest(@NonNull String name,
                                 @NonNull String id,
                                 @NonNull ReadableMap payload,
                                 @NonNull final Promise promise) {
         Bundle payloadBundle = Arguments.toBundle(payload);
 
-        RequestHandler requestHandler = mRequestRegistrar.getRequestHandler(type);
+        RequestHandler requestHandler = mRequestRegistrar.getRequestHandler(name);
 
         if (requestHandler == null) {
-            promise.reject("ENOHANDLER", "No registered request handler for type " + type);
+            promise.reject("ENOHANDLER", "No registered request handler for request name " + name);
             return;
         }
 

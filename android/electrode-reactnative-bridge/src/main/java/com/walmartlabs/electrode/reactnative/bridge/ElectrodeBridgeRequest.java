@@ -5,7 +5,7 @@ import android.os.Bundle;
 public class ElectrodeBridgeRequest {
     private static final int DEFAULT_REQUEST_TIMEOUT = 5000;
 
-    private final String mType;
+    private final String mName;
     private final Bundle mData;
     private final int mTimeoutMs;
     private DispatchMode mDispatchMode;
@@ -15,17 +15,17 @@ public class ElectrodeBridgeRequest {
     }
 
     private ElectrodeBridgeRequest(Builder requestBuilder) {
-        mType = requestBuilder.mType;
+        mName = requestBuilder.mName;
         mData = requestBuilder.mData;
         mTimeoutMs = requestBuilder.mTimeoutMs;
         mDispatchMode = requestBuilder.mDispatchMode;
     }
 
     /**
-     * @return The type of this request
+     * @return The name of this request
      */
-    public String getType() {
-        return this.mType;
+    public String getName() {
+        return this.mName;
     }
 
     /**
@@ -50,7 +50,7 @@ public class ElectrodeBridgeRequest {
     }
 
     public static class Builder {
-        private final String mType;
+        private final String mName;
         private Bundle mData;
         private int mTimeoutMs;
         private DispatchMode mDispatchMode;
@@ -58,10 +58,10 @@ public class ElectrodeBridgeRequest {
         /**
          * Initializes a new request builder
          *
-         * @param type The type of the request to build
+         * @param name The name of the request to build
          */
-        public Builder(String type) {
-            mType = type;
+        public Builder(String name) {
+            mName = name;
             mTimeoutMs = DEFAULT_REQUEST_TIMEOUT;
             mData = Bundle.EMPTY;
             mDispatchMode = DispatchMode.JS;

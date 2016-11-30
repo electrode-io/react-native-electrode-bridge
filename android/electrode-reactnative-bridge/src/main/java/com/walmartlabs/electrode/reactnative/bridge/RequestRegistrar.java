@@ -10,12 +10,12 @@ public interface RequestRegistrar<T> {
     /**
      * Registers a request handler
      *
-     * @param type The type of request this handler can handle
+     * @param name The request name this handler can handle
      * @param requestHandler The request handler instance
      * @return UUID to provide when calling unregisterRequestHandler
      */
     @NonNull
-    UUID registerRequestHandler(@NonNull String type, @NonNull T requestHandler)
+    UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler)
             throws ExistingHandlerException;
 
     /**
@@ -27,12 +27,12 @@ public interface RequestRegistrar<T> {
     void unregisterRequestHandler(@NonNull UUID requestHandlerUuid);
 
     /**
-     * Gets the request handler registered for a given request type
+     * Gets the request handler registered for a given request name
      *
-     * @param type The type of request
-     * @return The request handler instance that can handle this request type or null if no such
+     * @param name The request name
+     * @return The request handler instance that can handle this request name or null if no such
      * request handler was registered
      */
     @Nullable
-    T getRequestHandler(@NonNull String type);
+    T getRequestHandler(@NonNull String name);
 }

@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "@walmart/react-native-electrode-bridge": "../",
-    "react": "15.2.1",
-    "react-native": "0.31.0",
+    "react": "15.4.1",
+    "react-native": "0.38.0",
     "react-native-simple-radio-button": "^2.2.0"
   }
 }

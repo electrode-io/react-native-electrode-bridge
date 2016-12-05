@@ -49,7 +49,7 @@ class ElectrodeBridge extends EventEmitter {
         name /*: string */ , {
             data = {},
             dispatchMode = DispatchMode.NATIVE
-        } /*: Object */ ) {
+        } = {} /*: Object */ ) {
         switch (dispatchMode) {
             case DispatchMode.NATIVE:
                 NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), data);
@@ -78,7 +78,7 @@ class ElectrodeBridge extends EventEmitter {
             data = {},
             timeout = DEFAULT_REQUEST_TIMEOUT_IN_MS,
             dispatchMode = DispatchMode.NATIVE
-        } /*: Object */ ) /*: Promise<*> */ {
+        } = {} /*: Object */ ) /*: Promise<*> */ {
         let requestPromise;
         switch (dispatchMode) {
             case DispatchMode.NATIVE:

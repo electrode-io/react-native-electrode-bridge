@@ -27,9 +27,11 @@ Both sides of the bridge (JS/Native) expose a similar API (mirrored) to respecti
 While this bridge can be used a standalone react native plugin to integrate a single react native app into an native host application, this is not the optimal use of it. Indeed multiple native modules using the bridge for communication will be able to exchange messages between themselves or with the react native apps.
 
 ```
-DOCUMENTATION TODO :
-- Work on rewriting all of the above .. it's very drafty
-- Add more to detail benefits and use cases more clearly
+TODO :
+
+ANDROID :
+- Incoming events/requests/responses should be on the main thread (or at least give option to choose main thread or not)
+- Offer a way to unregister event/request handlers in order to avoid keeping references around 
 ```
 
 ### JavaScript API Reference

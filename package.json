@@ -2,6 +2,11 @@
   "name": "@walmart/react-native-electrode-bridge",
   "version": "1.0.0",
   "description": "Low level communication bridge between reaact native js and native",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://gecgithub01.walmart.com/Electrode-Mobile-Platform/react-native-electrode-bridge.git"
+  },
   "main": "js/ElectrodeBridge.js",
   "dependencies": {
     "react": "15.4.1",

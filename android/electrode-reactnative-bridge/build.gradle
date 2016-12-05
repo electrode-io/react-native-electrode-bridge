@@ -1,4 +1,28 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+    include '**/*.java'
+}
+
+artifacts {
+    archives androidSourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.version = '0.0.1'
+            pom.artifactId = 'react-native-electrode-bridge'
+            pom.groupId = 'com.walmartlabs.react'
+            repository(url: "http://mobilebuild.homeoffice.wal-mart.com:8081/nexus/content/repositories/hosted") {
+                authentication(userName: mavenUser, password: mavenPassword)
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion 24

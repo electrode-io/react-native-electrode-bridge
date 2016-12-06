@@ -51,37 +51,35 @@ class ElectrodeBridgeExample extends Component {
     electrodeBridge.registerRequestHandler(REQUEST_EXAMPLE_NAME,
       this._receivedRequest.bind(this));
   }
-  
+
 
 
   render() {
-    
+
     const requestOptions = [
 		'Native', 'JS'
   	];
-  	
+
   	const eventOptions = [
   		'Native', 'JS', 'Global'
   	];
 
     function setSelectedRequestOption(selectedOption) {
-   		console.log( "Request Type: " + selectedOption );
-   		this.setState({ eventDispatchMode: selectedOption == 'JS' ? DispatchMode.JS : DispatchMode.NATIVE });
+   		this.setState({ requestDispatchType: selectedOption == 'JS' ? DispatchMode.JS : DispatchMode.NATIVE });
    		this.setState({ selectedRequestOption: selectedOption });
   	}
-  	
+
     function setSelectedEventOption(selectedOption) {
-   		console.log( "Event Type: " + selectedOption );
    		var eventState = DispatchMode.JS;
    		if (selectedOption == 'Native') {
-   			eventState = DispatchMode.NATIVE;   		
+   			eventState = DispatchMode.NATIVE;
    		} else if (selectedOption == 'Global') {
    			eventState = DispatchMode.GLOBAL;
    		}
    		this.setState({ eventDispatchMode: eventState });
    		this.setState({ selectedEventOption: selectedOption });
   	}
-  	
+
     return (
       <View style={styles.container}>
         <View style={{flexDirection:'column', justifyContent: 'space-between'}}>

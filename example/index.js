@@ -23,6 +23,8 @@ import RadioForm, {
   RadioButtonLabel
 } from 'react-native-simple-radio-button';
 
+import { RadioButtons, SegmentedControls } from 'react-native-radio-buttons';
+
 // Inbound event/request names
 const REQUEST_EXAMPLE_NAME = "request.example";
 const EVENT_EXAMPLE_NAME = "event.example";
@@ -36,7 +38,9 @@ class ElectrodeBridgeExample extends Component {
       pendingInboundRequest: null,
       logText: "[JS] >>>",
       eventDispatchMode: DispatchMode.NATIVE,
-      requestDispatchType: DispatchMode.NATIVE
+      requestDispatchType: DispatchMode.NATIVE,
+      selectedRequestOption: 'Native',
+      selectedEventOption: 'Native'
     };
   }
 
@@ -47,18 +51,37 @@ class ElectrodeBridgeExample extends Component {
     electrodeBridge.registerRequestHandler(REQUEST_EXAMPLE_NAME,
       this._receivedRequest.bind(this));
   }
+  
+
 
   render() {
-    let radio_props_request_dispatch_modes = [
-      { label: 'Native  ', value: DispatchMode.NATIVE },
-      { label: 'JS  ', value: DispatchMode.JS, }
-    ];
+    
+    const requestOptions = [
+		'Native', 'JS'
+  	];
+  	
+  	const eventOptions = [
+  		'Native', 'JS', 'Global'
+  	];
 
-    let radio_props_event_dispatch_modes = [
-      ...radio_props_request_dispatch_modes,
-      { label: 'Global  ', value: DispatchMode.GLOBAL }
-    ];
-
+    function setSelectedRequestOption(selectedOption) {
+   		console.log( "Request Type: " + selectedOption );
+   		this.setState({ eventDispatchMode: selectedOption == 'JS' ? DispatchMode.JS : DispatchMode.NATIVE });
+   		this.setState({ selectedRequestOption: selectedOption });
+  	}
+  	
+    function setSelectedEventOption(selectedOption) {
+   		console.log( "Event Type: " + selectedOption );
+   		var eventState = DispatchMode.JS;
+   		if (selectedOption == 'Native') {
+   			eventState = DispatchMode.NATIVE;   		
+   		} else if (selectedOption == 'Global') {
+   			eventState = DispatchMode.GLOBAL;
+   		}
+   		this.setState({ eventDispatchMode: eventState });
+   		this.setState({ selectedEventOption: selectedOption });
+  	}
+  	
     return (
       <View style={styles.container}>
         <View style={{flexDirection:'column', justifyContent: 'space-between'}}>
@@ -74,14 +97,15 @@ class ElectrodeBridgeExample extends Component {
               {this._renderButton('w/o data', 'royalblue',
                 this._sendRequestWithoutData.bind(this))}
             </View>
-            <RadioForm
-                radio_props={radio_props_request_dispatch_modes}
-                initial={this.state.requestDispatchType}
-                formHorizontal={true}
-                onPress={(val,idx) => { this.setState({requestDispatchType:idx}) }}
-                buttonSize={5}
-                labelColor={'white'}
-                style={styles.radioForm}/>
+            <View style={{margin: 10}}>
+				<SegmentedControls
+				  options={ requestOptions }
+				  onSelection={ setSelectedRequestOption.bind(this) }
+				  selectedOption={ this.state.selectedRequestOption }
+				  selectedTint={'white'}
+				  tint={'royalblue'}
+				/>
+			</View>
           </View>
         </View>
         <View style={styles.buttonGroup}>
@@ -93,14 +117,15 @@ class ElectrodeBridgeExample extends Component {
               {this._renderButton('w/o data', 'royalblue',
                 this._emitEventWithoutData.bind(this))}
             </View>
-            <RadioForm
-                radio_props={radio_props_event_dispatch_modes}
-                initial={this.state.eventDispatchType}
-                formHorizontal={true}
-                onPress={(val,idx) => { this.setState({eventDispatchType:idx}) }}
-                buttonSize={5}
-                labelColor={'white'}
-                style={styles.radioForm}/>
+            <View style={{margin: 10}}>
+				<SegmentedControls
+				  options={ eventOptions }
+				  onSelection={ setSelectedEventOption.bind(this) }
+				  selectedOption={ this.state.selectedEventOption }
+				  selectedTint={'white'}
+				  tint={'royalblue'}
+				/>
+			</View>
           </View>
         </View>
         {this._renderIncomingRequestButtonGroup()}

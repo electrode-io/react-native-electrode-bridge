@@ -30,7 +30,6 @@ While this bridge can be used a standalone react native plugin to integrate a si
 TODO :
 
 ANDROID :
-- Incoming events/requests/responses should be on the main thread (or at least give option to choose main thread or not)
 - Offer a way to unregister event/request handlers in order to avoid keeping references around
 - Figure if annotations might offer a nicer client API and implement annotation support (@EventHandler @RequestHandler)
 ```

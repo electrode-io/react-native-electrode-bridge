@@ -102,12 +102,7 @@ public class NativeFragment extends Fragment {
     }
 
     private void setLoggerText(final String text) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mLoggerTextView.setText(String.format("[NATIVE] >>> %s", text));
-            }
-        });
+        mLoggerTextView.setText(String.format("[NATIVE] >>> %s", text));
     }
 
     private void hideRequestCompletionButtons() {

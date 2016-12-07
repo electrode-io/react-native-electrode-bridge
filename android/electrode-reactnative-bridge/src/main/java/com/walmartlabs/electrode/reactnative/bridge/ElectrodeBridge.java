@@ -52,6 +52,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         mReactContext = reactContext;
         mEventDispatcher = new EventDispatcherImpl(mEventRegistrar);
         mRequestDispatcher = new RequestDispatcherImpl(mRequestRegistrar);
+
     }
 
     /**
@@ -151,16 +152,26 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
 
         final Promise promise = new PromiseImpl(new Callback() {
             @Override
-            public void invoke(Object... args) {
-                completionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
+            public void invoke(final Object... args) {
+                mReactContext.runOnUiQueueThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        completionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
+                    }
+                });
             }
         }, new Callback() {
             @Override
-            public void invoke(Object... args) {
-                WritableMap writableMap = (WritableMap)args[0];
-                completionListener.onError(
-                        writableMap.getString("code"),
-                        writableMap.getString("message"));
+            public void invoke(final Object... args) {
+                mReactContext.runOnUiQueueThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        WritableMap writableMap = (WritableMap)args[0];
+                        completionListener.onError(
+                                writableMap.getString("code"),
+                                writableMap.getString("message"));
+                    }
+                });
             }
         });
 
@@ -214,7 +225,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     @SuppressWarnings("unused")
-    public void dispatchEvent(String name, String id, ReadableMap data) {
+    public void dispatchEvent(final String name, final String id, final ReadableMap data) {
         Log.d(TAG, String.format("onEvent[name:%s id:%s]", name, id));
 
         if (name.equals(BRIDGE_RESPONSE)) {
@@ -240,7 +251,12 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                 promise.reject(new UnsupportedOperationException());
             }
         } else {
-            mEventDispatcher.dispatchEvent(id, name, data);
+            mReactContext.runOnUiQueueThread(new Runnable() {
+                @Override
+                public void run() {
+                    mEventDispatcher.dispatchEvent(id, name, data);
+                }
+            });
         }
     }
 

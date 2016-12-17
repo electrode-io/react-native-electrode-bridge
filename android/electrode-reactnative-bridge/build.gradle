@@ -14,7 +14,7 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
-            pom.version = '0.0.3'
+            pom.version = '0.0.4'
             pom.artifactId = 'react-native-electrode-bridge'
             pom.groupId = 'com.walmartlabs.react'
             repository(url: "http://mobilebuild.homeoffice.wal-mart.com:8081/nexus/content/repositories/hosted") {

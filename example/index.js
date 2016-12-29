@@ -17,11 +17,6 @@ import {
   electrodeBridge,
   DispatchMode
 } from '@walmart/react-native-electrode-bridge';
-import RadioForm, {
-  RadioButton,
-  RadioButtonInput,
-  RadioButtonLabel
-} from 'react-native-simple-radio-button';
 
 import { RadioButtons, SegmentedControls } from 'react-native-radio-buttons';
 
@@ -57,7 +52,7 @@ class ElectrodeBridgeExample extends Component {
   render() {
 
     const requestOptions = [
-		'Native', 'JS'
+		  'Native', 'JS'
   	];
 
   	const eventOptions = [
@@ -76,7 +71,9 @@ class ElectrodeBridgeExample extends Component {
    		} else if (selectedOption == 'Global') {
    			eventState = DispatchMode.GLOBAL;
    		}
+      console.log("eventState " + eventState);
    		this.setState({ eventDispatchMode: eventState });
+      console.log("selectedOption " + selectedOption);
    		this.setState({ selectedEventOption: selectedOption });
   	}
 
@@ -96,14 +93,14 @@ class ElectrodeBridgeExample extends Component {
                 this._sendRequestWithoutData.bind(this))}
             </View>
             <View style={{margin: 10}}>
-				<SegmentedControls
-				  options={ requestOptions }
-				  onSelection={ setSelectedRequestOption.bind(this) }
-				  selectedOption={ this.state.selectedRequestOption }
-				  selectedTint={'white'}
-				  tint={'royalblue'}
-				/>
-			</View>
+      				<SegmentedControls
+      				  options={ requestOptions }
+      				  onSelection={ setSelectedRequestOption.bind(this) }
+      				  selectedOption={ this.state.selectedRequestOption }
+      				  selectedTint={'white'}
+      				  tint={'royalblue'}
+      				/>
+			      </View>
           </View>
         </View>
         <View style={styles.buttonGroup}>
@@ -116,14 +113,14 @@ class ElectrodeBridgeExample extends Component {
                 this._emitEventWithoutData.bind(this))}
             </View>
             <View style={{margin: 10}}>
-				<SegmentedControls
-				  options={ eventOptions }
-				  onSelection={ setSelectedEventOption.bind(this) }
-				  selectedOption={ this.state.selectedEventOption }
-				  selectedTint={'white'}
-				  tint={'royalblue'}
-				/>
-			</View>
+      				<SegmentedControls
+      				  options={ eventOptions }
+      				  onSelection={ setSelectedEventOption.bind(this) }
+      				  selectedOption={ this.state.selectedEventOption }
+      				  selectedTint={'white'}
+      				  tint={'royalblue'}
+      				/>
+			      </View>
           </View>
         </View>
         {this._renderIncomingRequestButtonGroup()}
@@ -165,7 +162,7 @@ class ElectrodeBridgeExample extends Component {
       .emitEvent(
         EVENT_EXAMPLE_NAME, {
           data: { randFloat: Math.random() },
-          dispatchMode: this.state.eventDispatchType
+          dispatchMode: this.state.eventDispatchMode
         });
   }
 
@@ -173,7 +170,7 @@ class ElectrodeBridgeExample extends Component {
     electrodeBridge
       .emitEvent(
         EVENT_EXAMPLE_NAME, {
-          dispatchMode: this.state.eventDispatchType
+          dispatchMode: this.state.eventDispatchMode
         });
   }
 
@@ -186,7 +183,7 @@ class ElectrodeBridgeExample extends Component {
   }
 
   _logIncomingFailureResponse(resp) {
-    this._setLoggerText(`Response failure. Data : ${JSON.stringify(resp)}`)
+    this._setLoggerText(`Response failure. code : ${resp.code} . message: ${resp.message}`)
   }
 
   _setLoggerText(text) {

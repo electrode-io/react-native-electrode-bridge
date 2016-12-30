@@ -10,13 +10,13 @@
 
 @interface ElectrodeBridgeEvent ()
 @property (nonatomic, copy, readwrite) NSString *name;
-@property (nonatomic, strong, readwrite) NSData *data;
+@property (nonatomic, strong, readwrite) NSDictionary *data;
 @property (nonatomic, assign, readwrite) EBDispatchMode dispatchMode;
 @end
 
 @implementation ElectrodeBridgeEvent
 
-- (instancetype)initWithName:(NSString *)name data:(NSData *)data mode:(EBDispatchMode)mode {
+- (instancetype)initWithName:(NSString *)name data:(NSDictionary *)data mode:(EBDispatchMode)mode {
   
   self = [super init];
   if (self) {

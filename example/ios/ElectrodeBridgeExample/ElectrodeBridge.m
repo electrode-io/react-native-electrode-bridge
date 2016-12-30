@@ -89,7 +89,7 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event id:(NSString *)id data:(NSDict
   {
     NSString *parentRequestID = [data objectForKey:EBBridgeRequestID];
     RCTLogInfo(@"Received response [id:%@", parentRequestID);
-
+    
     
   }
   else
@@ -130,27 +130,25 @@ if (name.equals(BRIDGE_RESPONSE)) {
   return [[NSUUID UUID] UUIDString];
 }
 
-- (void)emitEvent:(ElectrodeBridgeEvent *)event id:(NSString *)id
+- (void)emitEvent:(ElectrodeBridgeEvent *)event
 {
 
-  RCTLogInfo(@"Emitting event[name:%@ id:%@", event.name, id);
+  NSString *eventID = [self getUUID];
+  RCTLogInfo(@"Emitting event[name:%@ id:%@", event.name, eventID);
   
-  if (event.dispatchMode == JS)
+  if (event.dispatchMode == JS || event.dispatchMode == GLOBAL)
   { // Handle JS
     
     // TODO: Update later to get rid of warning
     [self.bridge.eventDispatcher sendAppEventWithName:EBBridgeEvent
-                                                 body:@{EBBridgeMsgID: id,
+                                                 body:@{EBBridgeMsgID: eventID,
                                                         EBBridgeMsgName: event.name,
-                                                        EBBridgeMsgData: event.data}];
+                                                        EBBridgeMsgData: @{}}];
   }
-  else if (event.dispatchMode == NATIVE)
-  { // Handle Native
-    
-  }
-  else
-  { // Must be global
-    
+  
+  if (event.dispatchMode == NATIVE || event.dispatchMode == GLOBAL)
+  { // Handle Native dispatches
+    [_eventDispatcher dispatchEvent:event.name id:eventID data:event.data];
   }
 }
 

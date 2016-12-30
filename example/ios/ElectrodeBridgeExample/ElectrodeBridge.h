@@ -33,5 +33,7 @@ typedef NS_ENUM(NSInteger, EBDispatchMode)
 @interface ElectrodeBridge : NSObject <RCTBridgeModule>
 
 @property (nonatomic, readonly) ElectrodeEventRegistrar *eventRegistrar;
-//- (void)emitEvent:(ElectrodeBridgeEvent *)event id:(NSString *)id;
+
+
+- (void)emitEvent:(ElectrodeBridgeEvent *)event;
 @end

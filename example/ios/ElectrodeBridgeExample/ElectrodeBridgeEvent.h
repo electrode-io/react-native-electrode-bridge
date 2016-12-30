@@ -13,8 +13,8 @@
 @interface ElectrodeBridgeEvent : NSObject
 
 @property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSData *data;
+@property (nonatomic, readonly) NSDictionary *data;
 @property (nonatomic, readonly) EBDispatchMode dispatchMode;
 
-- (instancetype)initWithName:(NSString *)name data:(NSData *)data mode:(EBDispatchMode)mode;
+- (instancetype)initWithName:(NSString *)name data:(NSDictionary *)data mode:(EBDispatchMode)mode;
 @end

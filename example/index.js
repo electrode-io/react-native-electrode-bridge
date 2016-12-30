@@ -71,9 +71,7 @@ class ElectrodeBridgeExample extends Component {
    		} else if (selectedOption == 'Global') {
    			eventState = DispatchMode.GLOBAL;
    		}
-      console.log("eventState " + eventState);
    		this.setState({ eventDispatchMode: eventState });
-      console.log("selectedOption " + selectedOption);
    		this.setState({ selectedEventOption: selectedOption });
   	}
 

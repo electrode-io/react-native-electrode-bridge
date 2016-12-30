@@ -8,10 +8,12 @@
 
 #import "RNNativeViewController.h"
 #import "ElectrodeBridge.h"
+#import "ElectrodeBridgeEvent.h"
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeEventDispatcher.h"
 #import "ElectrodeEventRegistrar.h"
 #import <UIKit/UIKit.h>
+#import <stdlib.h>
 
 typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
 
@@ -43,6 +45,7 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   // Do any additional setup after loading the view.
   self.view.backgroundColor = [UIColor blackColor];
   
+  // Add the event listener to the JS bridge
   [[ElectrodeBridgeHolder sharedInstance] addListenerBlock:^(ElectrodeBridge *bridge) {
     // Create an event listener so we know when events are sent to native
     RNNativeEventListener *eventListener = [[RNNativeEventListener alloc] init];
@@ -58,9 +61,22 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
         weakSelf.logString = @"event received w/o data";
       }
     };
+    [[[[ElectrodeBridgeHolder sharedInstance] bridge] eventRegistrar] registerEventListener:@"event.example" eventListener:eventListener];
     
     // Add the event listener to the bridge
-    [[[[ElectrodeBridgeHolder sharedInstance] bridge] eventRegistrar] registerEventListener:@"event.example" eventListener:eventListener];    
+    RNNativeEventListener *nativeEventListener = [[RNNativeEventListener alloc] init];
+    nativeEventListener.eventListenerBlock = ^(NSDictionary *data) {
+      
+      if ([data objectForKey:@"randFloat"])
+      {
+        weakSelf.logString = [NSString stringWithFormat:@"Native Event: randFloat=%@", [data objectForKey:@"randFloat"]];
+      }
+      else
+      {
+        weakSelf.logString = @"Native Event w/o data";
+      }
+    };
+    [[[[ElectrodeBridgeHolder sharedInstance] bridge] eventRegistrar] registerEventListener:EBBridgeEvent eventListener:eventListener];
   }];
   
   
@@ -162,12 +178,16 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   [withEventData setTitle:@"with data" forState:UIControlStateNormal];
   [withEventData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withEventData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
+  withEventData.tag = 101;
+  [withEventData addTarget:self action:@selector(sendEvent:) forControlEvents:UIControlEventTouchUpInside];
   [containerEventView addSubview:withEventData];
   
   UIButton *withoutEventData = [[UIButton alloc] init];
   [withoutEventData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutEventData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withoutEventData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
+  withoutEventData.tag = 201;
+  [withoutEventData addTarget:self action:@selector(sendEvent:) forControlEvents:UIControlEventTouchUpInside];
   [containerEventView addSubview:withoutEventData];
   
   containerEventView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -202,6 +222,7 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   // Add the resolve view
   self.containerResolveView = [[UIView alloc] init];
   _containerResolveView.backgroundColor = [UIColor colorWithRed:0.356f green:0.356f blue:0.356f alpha:1.0];
+  _containerResolveView.hidden = YES;
   [self.view addSubview:_containerResolveView];
   
   UILabel *sendResolveLabel = [[UILabel alloc] init];
@@ -282,4 +303,52 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   }
 }
 
+- (void)sendEvent:(UIControl *)sender
+{
+  EBDispatchMode mode = JS;
+  switch (_eventControl.selectedSegmentIndex)
+  {
+    case 0:
+      mode = JS;
+      break;
+    case 1:
+      mode = NATIVE;
+      break;
+    case 2:
+      mode = GLOBAL;
+      break;
+  }
+  
+  NSDictionary *randomData = nil;
+  if (sender.tag == 101)
+  { // It's with data
+    randomData = @{@"randFloat":@((float)rand() / RAND_MAX)};
+  }
+  
+  [[ElectrodeBridgeHolder sharedInstance] addListenerBlock:^(ElectrodeBridge *bridge) {
+
+    ElectrodeBridgeEvent *event = [[ElectrodeBridgeEvent alloc] initWithName:@"event.example" data:randomData  mode:mode];
+    [bridge emitEvent:event];
+  }];
+  
+}
+
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

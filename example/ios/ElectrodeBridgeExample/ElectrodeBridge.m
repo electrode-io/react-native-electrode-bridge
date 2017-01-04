@@ -143,7 +143,7 @@ if (name.equals(BRIDGE_RESPONSE)) {
     [self.bridge.eventDispatcher sendAppEventWithName:EBBridgeEvent
                                                  body:@{EBBridgeMsgID: eventID,
                                                         EBBridgeMsgName: event.name,
-                                                        EBBridgeMsgData: @{}}];
+                                                        EBBridgeMsgData: event.data}];
   }
   
   if (event.dispatchMode == NATIVE || event.dispatchMode == GLOBAL)

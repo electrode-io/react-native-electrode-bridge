@@ -56,6 +56,10 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
       {
         weakSelf.logString = [NSString stringWithFormat:@"event received: randFloat=%@", [data objectForKey:@"randFloat"]];
       }
+      else if ([data objectForKey:@"randInt"])
+      {
+        weakSelf.logString = [NSString stringWithFormat:@"event received: randFloat=%@", [data objectForKey:@"randInt"]];
+      }
       else
       {
         weakSelf.logString = @"event received w/o data";

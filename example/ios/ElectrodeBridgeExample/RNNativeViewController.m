@@ -12,11 +12,16 @@
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeEventDispatcher.h"
 #import "ElectrodeEventRegistrar.h"
+#import "ElectrodeRequestRegistrar.h"
+#import "ElectrodeRequestDispatcher.h"
 #import <UIKit/UIKit.h>
 #import <stdlib.h>
 
 typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
+typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeRequestCompletioner> completioner);
 
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - RNNativeEventListener
 @interface RNNativeEventListener : NSObject  <ElectrodeEventListener>
 @property (nonatomic, copy) RNNativeEventListenerBlock eventListenerBlock;
 @end
@@ -30,13 +35,34 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
 
 @end
 
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - RNNativeRequestHandler
+@interface RNNativeRequestHandler : NSObject <ElectrodeRequestHandler>
+@property (nonatomic, copy) RNNativeRequestListenerBlock requestHitBlock;
+@end
 
+@implementation RNNativeRequestHandler
+
+- (void)onRequest:(NSDictionary *)data requestCompletioner:(id<ElectrodeRequestCompletioner>)completioner
+{
+  NSLog(@"Time to do request: %@", data);
+  // Show the buttons
+  self.requestHitBlock(data, completioner);
+}
+
+@end
+
+
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - RNNativeViewController extension
 @interface RNNativeViewController ()
 @property (nonatomic, strong) UILabel *logLabel;
 @property (nonatomic, strong) UISegmentedControl *requestControl;
 @property (nonatomic, strong) UISegmentedControl *eventControl;
 @property (nonatomic, strong) UIView *containerResolveView;
+@property (nonatomic, strong) id<ElectrodeRequestCompletioner> requestCompletioner;
 @end
+
 
 @implementation RNNativeViewController
 
@@ -81,8 +107,32 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
       }
     };
     [[[[ElectrodeBridgeHolder sharedInstance] bridge] eventRegistrar] registerEventListener:EBBridgeEvent eventListener:eventListener];
+    
+    // Add the request listener to the bridge
+    RNNativeRequestHandler *nativeRequestHandler = [[RNNativeRequestHandler alloc] init];
+    nativeRequestHandler.requestHitBlock = ^(NSDictionary *data, id<ElectrodeRequestCompletioner> completioner){
+      
+      if ([data objectForKey:@"randFloat"])
+      {
+        weakSelf.logString = [NSString stringWithFormat:@"Request Received: randFloat=%@", [data objectForKey:@"randFloat"]];
+      }
+      else
+      {
+        weakSelf.logString = @"Request Received w/o data";
+      }
+
+      _containerResolveView.hidden = NO;
+      weakSelf.requestCompletioner = completioner;
+    };
+    NSError *error = nil;
+    [[[[ElectrodeBridgeHolder sharedInstance] bridge] requestRegistrar] registerRequestHandler:@"request.example" requestHandler:nativeRequestHandler error:&error];
+    
+    if (error)
+    {
+      // Event handler already exists
+      NSLog(@"Event handler already exists, try again newb");
+    }
   }];
-  
   
   // Build up the view
   [self buildView];
@@ -92,16 +142,6 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 - (void)buildView {
   
@@ -190,7 +230,7 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   [withoutEventData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutEventData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withoutEventData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
-  withoutEventData.tag = 201;
+  withoutEventData.tag = 102;
   [withoutEventData addTarget:self action:@selector(sendEvent:) forControlEvents:UIControlEventTouchUpInside];
   [containerEventView addSubview:withoutEventData];
   
@@ -239,11 +279,15 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   [withResolveData setTitle:@"with data" forState:UIControlStateNormal];
   [withResolveData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withResolveData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
+  [withResolveData setTag:201];
+  [withResolveData addTarget:self action:@selector(handleRequest:) forControlEvents:UIControlEventTouchUpInside];
   [_containerResolveView addSubview:withResolveData];
   
   UIButton *withoutResolveData = [[UIButton alloc] init];
   [withoutResolveData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutResolveData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
+  [withoutResolveData setTag:202];
+  [withoutResolveData addTarget:self action:@selector(handleRequest:) forControlEvents:UIControlEventTouchUpInside];
   [[withoutResolveData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
   [_containerResolveView addSubview:withoutResolveData];
   
@@ -257,6 +301,8 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
   [withoutRejectData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutRejectData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withoutRejectData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
+  [withoutRejectData setTag:203];
+  [withoutRejectData addTarget:self action:@selector(handleRequest:) forControlEvents:UIControlEventTouchUpInside];
   [_containerResolveView addSubview:withoutRejectData];
 
   
@@ -272,7 +318,7 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
                                            metrics:nil
                                            views:@{@"containerResolveView":_containerResolveView}]];
   [NSLayoutConstraint activateConstraints:[NSLayoutConstraint
-                                           constraintsWithVisualFormat:@"V:|-20-[logLabel(40)][containerRequestView(80)]-10-[containerEventView(80)]-10-[containerResolveView(80)]"
+                                           constraintsWithVisualFormat:@"V:|-20-[logLabel(40)][containerRequestView(80)]-10-[containerEventView(80)]-10-[containerResolveView]"
                                            options:0
                                            metrics:nil
                                            views:@{@"logLabel": _logLabel, @"containerRequestView": containerRequestView, @"containerEventView":containerEventView, @"containerResolveView": _containerResolveView}]];
@@ -290,7 +336,7 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
                                            views:NSDictionaryOfVariableBindings(rejectResolveLabel, withoutRejectData)]];
   
   [NSLayoutConstraint activateConstraints:[NSLayoutConstraint
-                                           constraintsWithVisualFormat:@"V:|-10-[sendResolveLabel]-10-[rejectResolveLabel]"
+                                           constraintsWithVisualFormat:@"V:|-10-[sendResolveLabel]-10-[rejectResolveLabel]->=10-|"
                                            options:0
                                            metrics:nil
                                            views:@{@"sendResolveLabel":sendResolveLabel, @"rejectResolveLabel": rejectResolveLabel}]];
@@ -335,6 +381,24 @@ typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
     [bridge emitEvent:event];
   }];
   
+}
+
+- (void)handleRequest:(UIControl *)sender
+{
+  _containerResolveView.hidden = YES;
+  
+  if (sender.tag == 201)
+  { // Resolve with data
+    [self.requestCompletioner success:@{@"randFloat":@((float)rand() / RAND_MAX)}];
+  }
+  else if (sender.tag == 202)
+  { // Resolve without data
+    [self.requestCompletioner success];
+  }
+  else
+  { // Reject without data
+    [self.requestCompletioner error:@"-231" message:@"BROKEN!!"];
+  }
 }
 
 @end

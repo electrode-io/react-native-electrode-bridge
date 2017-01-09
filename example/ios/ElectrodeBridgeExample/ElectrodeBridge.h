@@ -28,12 +28,20 @@ typedef NS_ENUM(NSInteger, EBDispatchMode)
   GLOBAL
 };
 
-@class ElectrodeBridgeEvent, ElectrodeEventRegistrar;
+@class ElectrodeBridgeEvent, ElectrodeEventRegistrar, ElectrodeRequestRegistrar, ElectrodeBridgeRequest;
+@protocol ElectrodeRequestCompletionListener;
 
 @interface ElectrodeBridge : NSObject <RCTBridgeModule>
 
 @property (nonatomic, readonly) ElectrodeEventRegistrar *eventRegistrar;
+@property (nonatomic, readonly) ElectrodeRequestRegistrar *requestRegistrar;
 
+/**
+ Send an event from native.
 
+ @param event The event object that will be dispersed throughout the system.
+ */
 - (void)emitEvent:(ElectrodeBridgeEvent *)event;
+
+- (void)sendRequest:(ElectrodeBridgeRequest *)request completionListener:(id<ElectrodeRequestCompletionListener>)listener;
 @end

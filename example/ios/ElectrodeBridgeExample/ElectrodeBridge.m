@@ -14,6 +14,7 @@
 #import "RCTBridge.h"
 #import "RCTEventDispatcher.h"
 #import "ElectrodeBridgeHolder.h"
+#import "ElectrodeRequestDispatcher.h"
 
 NSString * const EBBridgeEvent = @"electrode.bridge.event";
 NSString * const EBBridgeRequest = @"electrode.bridge.request";
@@ -45,6 +46,7 @@ NSString * const EBBridgeUnknownError = @"EUNKNOWN";
 
 @property (nonatomic, assign) BOOL usedPromise;
 @property (nonatomic, strong) ElectrodeEventDispatcher *eventDispatcher;
+@property (nonatomic, strong) ElectrodeRequestDispatcher *requestDispatcher;
 @end
 
 @implementation ElectrodeBridge
@@ -57,6 +59,7 @@ NSString * const EBBridgeUnknownError = @"EUNKNOWN";
   if (self)
   {
     self.eventDispatcher = [[ElectrodeEventDispatcher alloc] init];
+    self.requestDispatcher = [[ElectrodeRequestDispatcher alloc] init];
     [ElectrodeBridgeHolder sharedInstance].bridge = self;
   }
   return self;
@@ -64,24 +67,30 @@ NSString * const EBBridgeUnknownError = @"EUNKNOWN";
 
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(dispatchRequest:(NSString *)name id:(NSString *)id data:(NSDictionary *)data resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(dispatchRequest:(NSString *)name id:(NSString *)id
+                  data:(NSDictionary *)data
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-  RCTLogInfo(@"TODO: Implement dispatch request: %@ %@ %@", name, id, data);
-  
-  if (!_usedPromise)
+  RCTLogInfo(@"dispatchRequest[name:%@ id:%@]", name, id);
+
+  [self.requestDispatcher dispatchRequest:name id:id data:data completion:
+   ^(NSDictionary *data, NSError *error)
   {
-    resolve(@{@"Received": @"yep"});
-  }
-  else
-  {
-    NSError *error = [NSError errorWithDomain:@"ElectrodeBridge" code:41 userInfo:@{@"Failed":@"no idea why"}];
-    reject(@"41", @"Message failed", error);
-  }
-  
-  self.usedPromise = !self.usedPromise;
+    if (!error)
+    {
+      resolve(data);
+    }
+    else
+    {
+      reject([NSString stringWithFormat:@"%zd", error.code], error.localizedDescription, error);
+    }
+  }];
 }
 
-RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event id:(NSString *)id data:(NSDictionary *)data)
+RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
+                  id:(NSString *)id
+                  data:(NSDictionary *)data)
 {
   RCTLogInfo(@"onEvent[name:%@ id:%@] %@", event, id, data);
   
@@ -89,8 +98,6 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event id:(NSString *)id data:(NSDict
   {
     NSString *parentRequestID = [data objectForKey:EBBridgeRequestID];
     RCTLogInfo(@"Received response [id:%@", parentRequestID);
-    
-    
   }
   else
   {
@@ -152,8 +159,19 @@ if (name.equals(BRIDGE_RESPONSE)) {
   }
 }
 
+- (void)sendRequest:(ElectrodeBridgeRequest *)request
+ completionListener:(id<ElectrodeRequestCompletionListener>)listener
+{
+  // TODO: NOW YAY HURRY
+}
+
 - (ElectrodeEventRegistrar *)eventRegistrar
 {
   return self.eventDispatcher.eventRegistrar;
+}
+
+- (ElectrodeRequestRegistrar *)requestRegistrar
+{
+  return self.requestDispatcher.requestRegistrar;
 }
 @end

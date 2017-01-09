@@ -26,6 +26,9 @@
 		481F3BAE1E0873A300513598 /* ElectrodeEventDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 481F3BAD1E0873A300513598 /* ElectrodeEventDispatcher.m */; };
 		4837CD571E09BC9300E148F7 /* ElectrodeEventRegistrar.m in Sources */ = {isa = PBXBuildFile; fileRef = 4837CD561E09BC9300E148F7 /* ElectrodeEventRegistrar.m */; };
 		4850079F1E1322A9009B6610 /* ElectrodeBridgeHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4850079E1E1322A9009B6610 /* ElectrodeBridgeHolder.m */; };
+		4850092F1E1DCB87009B6610 /* ElectrodeBridgeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4850092E1E1DCB87009B6610 /* ElectrodeBridgeRequest.m */; };
+		485009321E1DCE3C009B6610 /* ElectrodeRequestRegistrar.m in Sources */ = {isa = PBXBuildFile; fileRef = 485009311E1DCE3C009B6610 /* ElectrodeRequestRegistrar.m */; };
+		485009351E1ECA27009B6610 /* ElectrodeRequestDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 485009341E1ECA27009B6610 /* ElectrodeRequestDispatcher.m */; };
 		485164F31DF0E906003B2F35 /* RNNativeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 485164F21DF0E906003B2F35 /* RNNativeViewController.m */; };
 		485165A41DF74B66003B2F35 /* ElectrodeBridgeExampleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 485165A31DF74B66003B2F35 /* ElectrodeBridgeExampleViewController.m */; };
 		485166D81DFF3450003B2F35 /* ElectrodeBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 485166D71DFF3450003B2F35 /* ElectrodeBridge.m */; };
@@ -189,6 +192,12 @@
 		4837CD561E09BC9300E148F7 /* ElectrodeEventRegistrar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ElectrodeEventRegistrar.m; path = ElectrodeBridgeExample/ElectrodeEventRegistrar.m; sourceTree = "<group>"; };
 		4850079D1E1322A9009B6610 /* ElectrodeBridgeHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeHolder.h; sourceTree = "<group>"; };
 		4850079E1E1322A9009B6610 /* ElectrodeBridgeHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeHolder.m; sourceTree = "<group>"; };
+		4850092D1E1DCB87009B6610 /* ElectrodeBridgeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ElectrodeBridgeRequest.h; path = ElectrodeBridgeExample/ElectrodeBridgeRequest.h; sourceTree = "<group>"; };
+		4850092E1E1DCB87009B6610 /* ElectrodeBridgeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ElectrodeBridgeRequest.m; path = ElectrodeBridgeExample/ElectrodeBridgeRequest.m; sourceTree = "<group>"; };
+		485009301E1DCE3C009B6610 /* ElectrodeRequestRegistrar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ElectrodeRequestRegistrar.h; path = ElectrodeBridgeExample/ElectrodeRequestRegistrar.h; sourceTree = "<group>"; };
+		485009311E1DCE3C009B6610 /* ElectrodeRequestRegistrar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ElectrodeRequestRegistrar.m; path = ElectrodeBridgeExample/ElectrodeRequestRegistrar.m; sourceTree = "<group>"; };
+		485009331E1ECA27009B6610 /* ElectrodeRequestDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ElectrodeRequestDispatcher.h; path = ElectrodeBridgeExample/ElectrodeRequestDispatcher.h; sourceTree = "<group>"; };
+		485009341E1ECA27009B6610 /* ElectrodeRequestDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ElectrodeRequestDispatcher.m; path = ElectrodeBridgeExample/ElectrodeRequestDispatcher.m; sourceTree = "<group>"; };
 		485164F11DF0E906003B2F35 /* RNNativeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNNativeViewController.h; path = ElectrodeBridgeExample/RNNativeViewController.h; sourceTree = "<group>"; };
 		485164F21DF0E906003B2F35 /* RNNativeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNNativeViewController.m; path = ElectrodeBridgeExample/RNNativeViewController.m; sourceTree = "<group>"; };
 		485165A21DF74B66003B2F35 /* ElectrodeBridgeExampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ElectrodeBridgeExampleViewController.h; path = ElectrodeBridgeExample/ElectrodeBridgeExampleViewController.h; sourceTree = "<group>"; };
@@ -342,10 +351,16 @@
 				481F3B991E04B29300513598 /* ElectrodeBridgeEvent.m */,
 				4850079D1E1322A9009B6610 /* ElectrodeBridgeHolder.h */,
 				4850079E1E1322A9009B6610 /* ElectrodeBridgeHolder.m */,
+				4850092D1E1DCB87009B6610 /* ElectrodeBridgeRequest.h */,
+				4850092E1E1DCB87009B6610 /* ElectrodeBridgeRequest.m */,
 				481F3BAC1E0873A300513598 /* ElectrodeEventDispatcher.h */,
 				481F3BAD1E0873A300513598 /* ElectrodeEventDispatcher.m */,
 				4837CD551E09BC9300E148F7 /* ElectrodeEventRegistrar.h */,
 				4837CD561E09BC9300E148F7 /* ElectrodeEventRegistrar.m */,
+				485009331E1ECA27009B6610 /* ElectrodeRequestDispatcher.h */,
+				485009341E1ECA27009B6610 /* ElectrodeRequestDispatcher.m */,
+				485009301E1DCE3C009B6610 /* ElectrodeRequestRegistrar.h */,
+				485009311E1DCE3C009B6610 /* ElectrodeRequestRegistrar.m */,
 			);
 			name = "electrode-reactnative-bridge";
 			sourceTree = "<group>";
@@ -694,10 +709,13 @@
 			files = (
 				485166D81DFF3450003B2F35 /* ElectrodeBridge.m in Sources */,
 				481F3BAE1E0873A300513598 /* ElectrodeEventDispatcher.m in Sources */,
+				485009351E1ECA27009B6610 /* ElectrodeRequestDispatcher.m in Sources */,
+				4850092F1E1DCB87009B6610 /* ElectrodeBridgeRequest.m in Sources */,
 				481F3B9A1E04B29300513598 /* ElectrodeBridgeEvent.m in Sources */,
 				4850079F1E1322A9009B6610 /* ElectrodeBridgeHolder.m in Sources */,
 				485165A41DF74B66003B2F35 /* ElectrodeBridgeExampleViewController.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				485009321E1DCE3C009B6610 /* ElectrodeRequestRegistrar.m in Sources */,
 				485164F31DF0E906003B2F35 /* RNNativeViewController.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				4837CD571E09BC9300E148F7 /* ElectrodeEventRegistrar.m in Sources */,

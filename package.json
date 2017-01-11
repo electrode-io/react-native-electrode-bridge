@@ -1,6 +1,6 @@
 {
   "name": "@walmart/react-native-electrode-bridge",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Low level communication bridge between reaact native js and native",
   "repository": {
     "type": "git",
@@ -8,10 +8,11 @@
   },
   "main": "js/ElectrodeBridge.js",
   "dependencies": {
-    "react": "15.4.1",
-    "react-native": "0.38.0",
     "uuid": "^3.0.0",
     "events": "^1.1.1"
   },
-  "devDependencies": {}
+  "peerDependencies": {
+   "react": ">=15.4",
+   "react-native": ">=0.38"
+  }
 }

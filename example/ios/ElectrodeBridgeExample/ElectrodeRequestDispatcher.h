@@ -20,8 +20,9 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
 @protocol ElectrodeRequestCompletionListener <NSObject>
 
 /**
- Stuff
-
+ The method that is executed when a request listener is executed for a given 
+ request.
+ 
  @param data The data that may be attached to a request being returned.
  */
 - (void)onSuccess:(NSDictionary *)data;

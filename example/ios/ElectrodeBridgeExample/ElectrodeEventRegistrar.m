@@ -41,7 +41,7 @@
   NSString *eventListenerUUID = [[NSUUID UUID] UUIDString];
   [self.eventListenerByUUID setObject:eventListener forKey:eventListenerUUID];
   
-  return nil;
+  return eventListenerUUID;
 }
 
 /**

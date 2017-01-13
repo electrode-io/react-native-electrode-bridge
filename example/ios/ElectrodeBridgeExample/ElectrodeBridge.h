@@ -44,7 +44,8 @@ typedef NS_ENUM(NSInteger, EBDispatchMode)
 @class ElectrodeBridgeEvent, ElectrodeEventRegistrar, ElectrodeRequestRegistrar, ElectrodeBridgeRequest;
 @protocol ElectrodeRequestCompletionListener;
 
-
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - ElectrodeBridge
 /**
  ElectrodeBridge is responsible for dispatching and handling both events and 
  requests between React Native and iOS platforms. It allows native to native, 
@@ -71,13 +72,13 @@ typedef NS_ENUM(NSInteger, EBDispatchMode)
  */
 @property (nonatomic, readonly) ElectrodeRequestRegistrar *requestRegistrar;
 
+
 /**
  Send an event from native.
 
  @param event The event object that will be dispersed throughout the system.
  */
 - (void)emitEvent:(ElectrodeBridgeEvent *)event;
-
 
 /**
  Send a request from iOS to either iOS or React Native.

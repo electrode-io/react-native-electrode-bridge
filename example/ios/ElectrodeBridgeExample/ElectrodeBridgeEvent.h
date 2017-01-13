@@ -10,7 +10,8 @@
 
 #import "ElectrodeBridge.h"
 
-
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - ElectrodeBridgeEvent
 /**
  The ElectrodeBridgeEvent model for events that will contain the event dispatch 
  name, data that will be received and the destination mode. Used to bottle up 

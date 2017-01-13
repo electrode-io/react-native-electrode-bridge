@@ -9,12 +9,22 @@
 #import <Foundation/Foundation.h>
 
 @class ElectrodeBridge, ElectrodeEventRegistrar;
+@protocol ElectrodeEventListener, ElectrodeRequestHandler;
 
-typedef void (^ElectrodeBridgeHolderListener)(ElectrodeBridge *);
 
+/**
+ A block type that is used to register a handler when the bridge is started up.
+
+ @param bridge The main ElectrodeBridge is passed into the closure.
+ */
+typedef void (^ElectrodeBridgeHolderListener)(ElectrodeBridge *bridge);
+
+
+/**
+ ElectrodeBridgeHolder helps native code talk to the bridge. All native code that 
+ */
 @interface ElectrodeBridgeHolder : NSObject
 @property (nonatomic, weak) ElectrodeBridge *bridge;
-@property (nonatomic, weak) ElectrodeEventRegistrar *eventRegistrar;
 
 /**
  Singleton -- duh
@@ -24,5 +34,9 @@ typedef void (^ElectrodeBridgeHolderListener)(ElectrodeBridge *);
 /**
  Adds ability to be notified when the bridge is ready to go.
  */
-- (void)addListenerBlock:(ElectrodeBridgeHolderListener)listenerBlock;
+- (void)registerStartupListener:(ElectrodeBridgeHolderListener)listenerBlock;
+
+- (NSString *)registerEventListener:(NSString *)name eventListener:(id<ElectrodeEventListener>)eventListener;
+
+- (NSString *)registerRequestHandler:(NSString *)name requestHandler:(id<ElectrodeRequestHandler>)handler error:(NSError **)error;
 @end

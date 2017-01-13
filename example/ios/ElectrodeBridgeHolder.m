@@ -9,6 +9,7 @@
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeBridge.h"
 #import "ElectrodeEventRegistrar.h"
+#import "ElectrodeRequestRegistrar.h"
 
 @interface ElectrodeBridgeHolder ()
 @property (nonatomic, strong) NSMutableArray *listenerBlocks;
@@ -47,7 +48,7 @@
   }
 }
 
-- (void)addListenerBlock:(ElectrodeBridgeHolderListener)listenerBlock
+- (void)registerStartupListener:(ElectrodeBridgeHolderListener)listenerBlock
 {
   if (self.bridge)
   {
@@ -62,6 +63,16 @@
     
     [self.listenerBlocks addObject:[listenerBlock copy]];
   }
+}
+
+- (NSString *)registerEventListener:(NSString *)name eventListener:(id<ElectrodeEventListener>)eventListener
+{
+  return [self.bridge.eventRegistrar registerEventListener:name eventListener:eventListener];
+}
+
+- (NSString *)registerRequestHandler:(NSString *)name requestHandler:(id<ElectrodeRequestHandler>)handler error:(NSError **)error
+{
+  return [self.bridge.requestRegistrar registerRequestHandler:name requestHandler:handler error:error];
 }
 
 @end

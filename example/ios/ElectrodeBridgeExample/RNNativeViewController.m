@@ -6,18 +6,21 @@
 //  Copyright © 2016 Facebook. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+#import <stdlib.h>
+
 #import "RNNativeViewController.h"
 #import "ElectrodeBridge.h"
 #import "ElectrodeBridgeEvent.h"
+#import "ElectrodeBridgeRequest.h"
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeEventDispatcher.h"
 #import "ElectrodeEventRegistrar.h"
 #import "ElectrodeRequestRegistrar.h"
 #import "ElectrodeRequestDispatcher.h"
-#import <UIKit/UIKit.h>
-#import <stdlib.h>
 
-typedef void (^RNNativeEventListenerBlock)(NSDictionary *);
+typedef void (^RNNativeEventListenerBlock)(NSDictionary *data);
+typedef void (^RNNativeRequestListenerErrorBlock)(NSString *code, NSString *message);
 typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeRequestCompletioner> completioner);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +55,38 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
 
 @end
 
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - RNNativeRequestListener
+@interface RNNativeRequestListener : NSObject <ElectrodeRequestCompletionListener>
+- (instancetype)initWithSuccesBlock:(RNNativeEventListenerBlock)success errorBlock:(RNNativeRequestListenerErrorBlock)error;
+@property (nonatomic, copy) RNNativeEventListenerBlock successBlock;
+@property (nonatomic, copy) RNNativeRequestListenerErrorBlock errorBlock;
+@end
+
+@implementation RNNativeRequestListener
+
+- (instancetype)initWithSuccesBlock:(RNNativeEventListenerBlock)success errorBlock:(RNNativeRequestListenerErrorBlock)error
+{
+  self = [super init];
+  if (self)
+  {
+    self.successBlock = success;
+    self.errorBlock = error;
+  }
+  return self;
+}
+
+- (void)onSuccess:(NSDictionary *)data
+{
+  self.successBlock(data);
+}
+
+- (void)onError:(NSString *)code message:(NSString *)message
+{
+  self.errorBlock(code, message);
+}
+
+@end
 
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - RNNativeViewController extension
@@ -71,8 +106,11 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   // Do any additional setup after loading the view.
   self.view.backgroundColor = [UIColor blackColor];
   
+  ////
   // Add the event listener to the JS bridge
-  [[ElectrodeBridgeHolder sharedInstance] addListenerBlock:^(ElectrodeBridge *bridge) {
+  [[ElectrodeBridgeHolder sharedInstance] registerStartupListener:^(ElectrodeBridge *bridge) {
+
+    ////
     // Create an event listener so we know when events are sent to native
     RNNativeEventListener *eventListener = [[RNNativeEventListener alloc] init];
     __weak RNNativeViewController *weakSelf = self;
@@ -80,34 +118,20 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
       
       if ([data objectForKey:@"randFloat"])
       {
-        weakSelf.logString = [NSString stringWithFormat:@"event received: randFloat=%@", [data objectForKey:@"randFloat"]];
+        weakSelf.logString = [NSString stringWithFormat:@"Event Received: randFloat=%@", [data objectForKey:@"randFloat"]];
       }
       else if ([data objectForKey:@"randInt"])
       {
-        weakSelf.logString = [NSString stringWithFormat:@"event received: randFloat=%@", [data objectForKey:@"randInt"]];
+        weakSelf.logString = [NSString stringWithFormat:@"Event Received: randFloat=%@", [data objectForKey:@"randInt"]];
       }
       else
       {
-        weakSelf.logString = @"event received w/o data";
+        weakSelf.logString = @"Event Received w/o data";
       }
     };
-    [[[[ElectrodeBridgeHolder sharedInstance] bridge] eventRegistrar] registerEventListener:@"event.example" eventListener:eventListener];
+    [[ElectrodeBridgeHolder sharedInstance] registerEventListener:@"event.example" eventListener:eventListener];
     
-    // Add the event listener to the bridge
-    RNNativeEventListener *nativeEventListener = [[RNNativeEventListener alloc] init];
-    nativeEventListener.eventListenerBlock = ^(NSDictionary *data) {
-      
-      if ([data objectForKey:@"randFloat"])
-      {
-        weakSelf.logString = [NSString stringWithFormat:@"Native Event: randFloat=%@", [data objectForKey:@"randFloat"]];
-      }
-      else
-      {
-        weakSelf.logString = @"Native Event w/o data";
-      }
-    };
-    [[[[ElectrodeBridgeHolder sharedInstance] bridge] eventRegistrar] registerEventListener:EBBridgeEvent eventListener:eventListener];
-    
+    ////
     // Add the request listener to the bridge
     RNNativeRequestHandler *nativeRequestHandler = [[RNNativeRequestHandler alloc] init];
     nativeRequestHandler.requestHitBlock = ^(NSDictionary *data, id<ElectrodeRequestCompletioner> completioner){
@@ -125,7 +149,7 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
       weakSelf.requestCompletioner = completioner;
     };
     NSError *error = nil;
-    [[[[ElectrodeBridgeHolder sharedInstance] bridge] requestRegistrar] registerRequestHandler:@"request.example" requestHandler:nativeRequestHandler error:&error];
+    [[ElectrodeBridgeHolder sharedInstance] registerRequestHandler:@"request.example" requestHandler:nativeRequestHandler error:&error];
     
     if (error)
     {
@@ -176,12 +200,16 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   [withRequestData setTitle:@"with data" forState:UIControlStateNormal];
   [withRequestData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withRequestData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
+  [withRequestData setTag:101];
+  [withRequestData addTarget:self action:@selector(sendRequest:) forControlEvents:UIControlEventTouchUpInside];
   [containerRequestView addSubview:withRequestData];
   
   UIButton *withoutRequestData = [[UIButton alloc] init];
   [withoutRequestData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutRequestData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withoutRequestData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
+  [withoutRequestData setTag:102];
+  [withoutRequestData addTarget:self action:@selector(sendRequest:) forControlEvents:UIControlEventTouchUpInside];
   [containerRequestView addSubview:withoutRequestData];
   
   _logLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -222,7 +250,7 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   [withEventData setTitle:@"with data" forState:UIControlStateNormal];
   [withEventData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withEventData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
-  withEventData.tag = 101;
+  withEventData.tag = 201;
   [withEventData addTarget:self action:@selector(sendEvent:) forControlEvents:UIControlEventTouchUpInside];
   [containerEventView addSubview:withEventData];
   
@@ -230,7 +258,7 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   [withoutEventData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutEventData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withoutEventData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
-  withoutEventData.tag = 102;
+  withoutEventData.tag = 202;
   [withoutEventData addTarget:self action:@selector(sendEvent:) forControlEvents:UIControlEventTouchUpInside];
   [containerEventView addSubview:withoutEventData];
   
@@ -279,14 +307,14 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   [withResolveData setTitle:@"with data" forState:UIControlStateNormal];
   [withResolveData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withResolveData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
-  [withResolveData setTag:201];
+  [withResolveData setTag:301];
   [withResolveData addTarget:self action:@selector(handleRequest:) forControlEvents:UIControlEventTouchUpInside];
   [_containerResolveView addSubview:withResolveData];
   
   UIButton *withoutResolveData = [[UIButton alloc] init];
   [withoutResolveData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutResolveData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
-  [withoutResolveData setTag:202];
+  [withoutResolveData setTag:302];
   [withoutResolveData addTarget:self action:@selector(handleRequest:) forControlEvents:UIControlEventTouchUpInside];
   [[withoutResolveData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
   [_containerResolveView addSubview:withoutResolveData];
@@ -301,7 +329,7 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   [withoutRejectData setTitle:@"w/o data" forState:UIControlStateNormal];
   [withoutRejectData setBackgroundColor:[UIColor colorWithRed:0.254f green:0.427f blue:0.858f alpha:1.0f]];
   [[withoutRejectData titleLabel] setFont:[UIFont systemFontOfSize:11.0f]];
-  [withoutRejectData setTag:203];
+  [withoutRejectData setTag:303];
   [withoutRejectData addTarget:self action:@selector(handleRequest:) forControlEvents:UIControlEventTouchUpInside];
   [_containerResolveView addSubview:withoutRejectData];
 
@@ -370,12 +398,12 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   }
   
   NSDictionary *randomData = nil;
-  if (sender.tag == 101)
+  if (sender.tag == 201)
   { // It's with data
     randomData = @{@"randFloat":@((float)rand() / RAND_MAX)};
   }
   
-  [[ElectrodeBridgeHolder sharedInstance] addListenerBlock:^(ElectrodeBridge *bridge) {
+  [[ElectrodeBridgeHolder sharedInstance] registerStartupListener:^(ElectrodeBridge *bridge) {
 
     ElectrodeBridgeEvent *event = [[ElectrodeBridgeEvent alloc] initWithName:@"event.example" data:randomData  mode:mode];
     [bridge emitEvent:event];
@@ -383,15 +411,61 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   
 }
 
+- (void)sendRequest:(UIControl *)sender
+{
+  EBDispatchMode mode = JS;
+  switch (_requestControl.selectedSegmentIndex)
+  {
+    case 0:
+      mode = JS;
+      break;
+    case 1:
+      mode = NATIVE;
+      break;
+  }
+  
+  // Create the random data needed to send the request
+  NSDictionary *randomData = nil;
+  if (sender.tag == 101)
+  { // It's with data
+    randomData = @{@"randFloat":@((float)rand() / RAND_MAX)};
+  }
+  
+  
+  __weak RNNativeViewController *weakSelf = self;
+  [[ElectrodeBridgeHolder sharedInstance] registerStartupListener:^(ElectrodeBridge *bridge) {
+    ElectrodeBridgeRequest *request = [[ElectrodeBridgeRequest alloc] initWithName:@"request.example" data:randomData mode:mode timeout:5];
+    
+    [bridge sendRequest:request completionListener:
+     [[RNNativeRequestListener alloc] initWithSuccesBlock:
+      ^(NSDictionary *data)
+      {
+        if ([data objectForKey:@"randFloat"])
+        {
+          weakSelf.logString = [NSString stringWithFormat:@"Request Handled: randFloat=%@", [data objectForKey:@"randFloat"]];
+        }
+        else
+        {
+          weakSelf.logString = @"Request Handled w/o data";
+        }
+
+      } errorBlock:
+      ^(NSString *code, NSString *message)
+      {
+        weakSelf.logString = [NSString stringWithFormat:@"Request Rejected: %@: %@", code, message];
+      }]];
+  }];
+}
+
 - (void)handleRequest:(UIControl *)sender
 {
   _containerResolveView.hidden = YES;
   
-  if (sender.tag == 201)
+  if (sender.tag == 301)
   { // Resolve with data
     [self.requestCompletioner success:@{@"randFloat":@((float)rand() / RAND_MAX)}];
   }
-  else if (sender.tag == 202)
+  else if (sender.tag == 302)
   { // Resolve without data
     [self.requestCompletioner success];
   }

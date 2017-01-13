@@ -15,6 +15,7 @@
 #import "RCTEventDispatcher.h"
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeRequestDispatcher.h"
+#import "ElectrodeBridgeRequest.h"
 
 NSString * const EBBridgeEvent = @"electrode.bridge.event";
 NSString * const EBBridgeRequest = @"electrode.bridge.request";
@@ -27,20 +28,6 @@ NSString * const EBBridgeMsgName = @"name";
 NSString * const EBBridgeMsgID = @"id";
 NSString * const EBBridgeRequestID = @"requestId";
 NSString * const EBBridgeUnknownError = @"EUNKNOWN";
-
-/*
- private static final String BRIDGE_EVENT = "electrode.bridge.event";
- private static final String BRIDE_REQUEST = "electrode.bridge.request";
- private static final String BRIDGE_RESPONSE = "electrode.bridge.response";
- private static final String BRIDGE_RESPONSE_ERROR = "error";
- private static final String BRDIGE_RESPONSE_ERROR_CODE = "code";
- private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
- private static final String BRIDGE_MSG_DATA = "data";
- private static final String BRIDGE_MSG_NAME = "name";
- private static final String BRIDGE_MSG_ID = "id";
- private static final String BRIDGE_REQUEST_ID = "requestId";
- private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
- */
 
 @interface ElectrodeBridge ()
 
@@ -145,12 +132,24 @@ if (name.equals(BRIDGE_RESPONSE)) {
   
   if (event.dispatchMode == JS || event.dispatchMode == GLOBAL)
   { // Handle JS
+
+    NSDictionary *body = nil;
+    if (event.data)
+    {
+      body = @{EBBridgeMsgID: eventID,
+               EBBridgeMsgName: event.name,
+               EBBridgeMsgData: event.data};
+    }
+    else
+    {
+      body = @{EBBridgeMsgID: eventID,
+               EBBridgeMsgName: event.name};
+    }
+
     
     // TODO: Update later to get rid of warning
     [self.bridge.eventDispatcher sendAppEventWithName:EBBridgeEvent
-                                                 body:@{EBBridgeMsgID: eventID,
-                                                        EBBridgeMsgName: event.name,
-                                                        EBBridgeMsgData: event.data}];
+                                                 body:body];
   }
   
   if (event.dispatchMode == NATIVE || event.dispatchMode == GLOBAL)
@@ -162,7 +161,43 @@ if (name.equals(BRIDGE_RESPONSE)) {
 - (void)sendRequest:(ElectrodeBridgeRequest *)request
  completionListener:(id<ElectrodeRequestCompletionListener>)listener
 {
-  // TODO: NOW YAY HURRY
+  NSString *requestID = [self getUUID];
+
+  RCTLogInfo(@"Sending request[name:%@ id:%@", request.name, requestID);
+  
+  // Dispatch to JS or Native depending which was selected
+  if (request.dispatchMode == JS)
+  {
+    NSDictionary *body = nil;
+    if (request.data)
+    {
+      body = @{EBBridgeMsgID: requestID,
+               EBBridgeMsgName: request.name,
+               EBBridgeMsgData: request.data};
+    }
+    else
+    {
+      body = @{EBBridgeMsgID: requestID,
+               EBBridgeMsgName: request.name};
+    }
+    
+    // TODO: Update later to get rid of warning
+    [self.bridge.eventDispatcher sendAppEventWithName:EBBridgeRequest
+                                                 body:body];
+  }
+  else
+  {
+    [_requestDispatcher dispatchRequest:request.name id:requestID data:request.data completion:^(NSDictionary *data, NSError *error) {
+      if (!error)
+      {
+        [listener onSuccess:data];
+      }
+      else
+      {
+        [listener onError:error.domain message:error.localizedDescription];
+      }
+    }];
+  }
 }
 
 - (ElectrodeEventRegistrar *)eventRegistrar

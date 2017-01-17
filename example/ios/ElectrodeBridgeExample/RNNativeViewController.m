@@ -110,10 +110,11 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
   // Add the event listener to the JS bridge
   [[ElectrodeBridgeHolder sharedInstance] registerStartupListener:^(ElectrodeBridge *bridge) {
 
+    __weak RNNativeViewController *weakSelf = self;
+    
     ////
     // Create an event listener so we know when events are sent to native
     RNNativeEventListener *eventListener = [[RNNativeEventListener alloc] init];
-    __weak RNNativeViewController *weakSelf = self;
     eventListener.eventListenerBlock = ^(NSDictionary *data) {
       
       if ([data objectForKey:@"randFloat"])
@@ -150,7 +151,6 @@ typedef void (^RNNativeRequestListenerBlock)(NSDictionary *data, id<ElectrodeReq
     };
     NSError *error = nil;
     [[ElectrodeBridgeHolder sharedInstance] registerRequestHandler:@"request.example" requestHandler:nativeRequestHandler error:&error];
-    
     if (error)
     {
       // Event handler already exists

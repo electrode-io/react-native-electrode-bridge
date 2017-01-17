@@ -10,7 +10,7 @@
 #import "RCTBridgeModule.h"
 
 /**
- Commong Bridge codes used by external libraries
+ Common Bridge codes used by external libraries
  */
 extern NSString * const EBBridgeEvent;
 extern NSString * const EBBridgeRequest;
@@ -25,6 +25,8 @@ extern NSString * const EBBridgeRequestID;
 extern NSString * const EBBridgeUnknownError;
 
 
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - Enums
 /**
  The mode determining the path of the request or event. If it is JS, the event 
  or request is handled by javascript (or React Native). If it is Native the event

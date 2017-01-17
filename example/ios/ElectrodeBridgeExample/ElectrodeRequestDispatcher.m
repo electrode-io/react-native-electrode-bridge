@@ -58,6 +58,8 @@
   }
   
   dispatch_async(dispatch_get_main_queue(), ^{
+    
+    // TODO: Add timeout here
     [requestHandler onRequest:data requestCompletioner:[[ElectrodeRequestCompletionerImplentator alloc] initWithCompletionBlock:completion]];
   });
   

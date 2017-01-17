@@ -56,8 +56,16 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
  */
 - (void)error:(NSString *)code message:(NSString *)message;
 
+/**
+ Executes when a successul request happens and has data associated with it
+
+ @param data NSDictionary of any key value pairs of data that may be expected.
+ */
 - (void)success:(NSDictionary *)data;
 
+/**
+ Executes when a successul request happens and does not have data.
+ */
 - (void)success;
 
 @end

@@ -29,11 +29,14 @@ NSString * const EBBridgeMsgID = @"id";
 NSString * const EBBridgeRequestID = @"requestId";
 NSString * const EBBridgeUnknownError = @"EUNKNOWN";
 
+typedef void (^ElectrodeBridgeRequestBlock)();
+
 @interface ElectrodeBridge ()
 
 @property (nonatomic, assign) BOOL usedPromise;
 @property (nonatomic, strong) ElectrodeEventDispatcher *eventDispatcher;
 @property (nonatomic, strong) ElectrodeRequestDispatcher *requestDispatcher;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, id<ElectrodeRequestCompletionListener>> *requestListeners;
 @end
 
 @implementation ElectrodeBridge
@@ -76,48 +79,55 @@ RCT_EXPORT_METHOD(dispatchRequest:(NSString *)name id:(NSString *)id
 }
 
 RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
-                  id:(NSString *)id
+                  id:(NSString *)eventID
                   data:(NSDictionary *)data)
 {
-  RCTLogInfo(@"onEvent[name:%@ id:%@] %@", event, id, data);
+  RCTLogInfo(@"onEvent[name:%@ id:%@] %@", event, eventID, data);
   
+  // Handle JS request responses here
   if ([event isEqualToString:EBBridgeResponse])
   {
     NSString *parentRequestID = [data objectForKey:EBBridgeRequestID];
     RCTLogInfo(@"Received response [id:%@", parentRequestID);
+    
+    
+    id<ElectrodeRequestCompletionListener> listener = [_requestListeners objectForKey:parentRequestID];
+    if (listener && [listener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
+    {
+      [_requestListeners removeObjectForKey:eventID];
+      
+      if ([data objectForKey:EBBridgeError])
+      { // Grab the handler and reject it
+        NSString *errorMessage = EBBridgeUnknownError;
+        NSDictionary *errorData = [data objectForKey:EBBridgeError];
+        if ([errorData isKindOfClass:[NSDictionary class]])
+        {
+          errorMessage = [errorData objectForKey:EBBridgeErrorMessage];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [listener onError:EBBridgeUnknownError message:errorMessage];
+        });
+      }
+      else if ([data objectForKey:EBBridgeMsgData])
+      { // Grab the handler and accept it
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [listener onSuccess:[data objectForKey:EBBridgeMsgData]];
+        });
+      }
+      else
+      { // Grab the handler and reject it
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [listener onError:EBBridgeUnknownError message:@"An unknown error has occurred"];
+        });
+      }
+    }
   }
   else
   {
-    [_eventDispatcher dispatchEvent:event id:id data:data];
+    [_eventDispatcher dispatchEvent:event id:eventID data:data];
   }
 }
-
-/*
-if (name.equals(BRIDGE_RESPONSE)) {
-  String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
-  Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
-  Promise promise = pendingPromiseByRequestId.remove(parentRequestId);
-  if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
-    String errorMessage = data
-    .getMap(BRIDGE_RESPONSE_ERROR)
-    .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
-    
-    String errorCode = UNKNOWN_ERROR_CODE;
-    if (data.getMap(BRIDGE_RESPONSE_ERROR)
-        .hasKey(BRDIGE_RESPONSE_ERROR_CODE)) {
-      errorCode = data
-      .getMap(BRIDGE_RESPONSE_ERROR)
-      .getString(BRDIGE_RESPONSE_ERROR_CODE);
-    }
-    promise.reject(errorCode, errorMessage);
-  } else if (data.hasKey(BRIDGE_MSG_DATA)) {
-    promise.resolve(data.getMap(BRIDGE_MSG_DATA));
-  } else {
-    promise.reject(new UnsupportedOperationException());
-  }
-} else {
-  mEventDispatcher.dispatchEvent(id, name, data);
-}*/
 
 - (NSString *)getUUID
 {
@@ -165,6 +175,21 @@ if (name.equals(BRIDGE_RESPONSE)) {
 
   RCTLogInfo(@"Sending request[name:%@ id:%@", request.name, requestID);
   
+  // Add the request listener since it could be executed later by JS responding
+  [self.requestListeners setObject:listener forKey:requestID];
+  
+  // Add the timeout handler
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(request.timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    
+    // Grab the handler and execute an error, make sure to remove it
+    id<ElectrodeRequestCompletionListener> tempListener = [_requestListeners objectForKey:requestID];
+    if (tempListener && [tempListener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
+    {
+      [_requestListeners removeObjectForKey:requestID];
+      [tempListener onError:@"EREQUESTTIMEOUT" message:@"Request Timeout"];
+    }
+  });
+  
   // Dispatch to JS or Native depending which was selected
   if (request.dispatchMode == JS)
   {
@@ -187,16 +212,25 @@ if (name.equals(BRIDGE_RESPONSE)) {
   }
   else
   {
-    [_requestDispatcher dispatchRequest:request.name id:requestID data:request.data completion:^(NSDictionary *data, NSError *error) {
-      if (!error)
-      {
-        [listener onSuccess:data];
-      }
-      else
-      {
-        [listener onError:error.domain message:error.localizedDescription];
-      }
-    }];
+    [_requestDispatcher dispatchRequest:request.name id:requestID data:request.data completion:
+     ^(NSDictionary *data, NSError *error)
+     {
+       
+       id<ElectrodeRequestCompletionListener> tempListener = [_requestListeners objectForKey:requestID];
+       if (tempListener && [tempListener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
+       {
+         [_requestListeners removeObjectForKey:requestID];
+         
+         if (!error)
+         {
+           [listener onSuccess:data];
+         }
+         else
+         {
+           [listener onError:error.domain message:error.localizedDescription];
+         }
+       }
+     }];
   }
 }
 
@@ -208,5 +242,15 @@ if (name.equals(BRIDGE_RESPONSE)) {
 - (ElectrodeRequestRegistrar *)requestRegistrar
 {
   return self.requestDispatcher.requestRegistrar;
+}
+
+- (NSMutableDictionary<NSString *, id<ElectrodeRequestCompletionListener>> *)requestListeners
+{
+  if (!_requestListeners)
+  {
+    _requestListeners = [[NSMutableDictionary alloc] init];
+  }
+  
+  return _requestListeners;
 }
 @end

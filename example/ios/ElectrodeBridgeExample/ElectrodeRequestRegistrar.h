@@ -13,8 +13,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Protocols
+
+/**
+ ElectrodeRequestHandlers execute when a given request comes through. The 
+ completioners execute once the request has fully been handled.
+ */
 @protocol ElectrodeRequestHandler <NSObject>
 
+/**
+ Initial request handling starts. Respond on success or error.
+
+ @param data Data that is associated with a request, always in NSDictionary format.
+ @param completioner The request completion that is executed when a request is 
+ being processed.
+ */
 - (void)onRequest:(NSDictionary *)data
 requestCompletioner:(id<ElectrodeRequestCompletioner>)completioner;
 
@@ -23,6 +35,12 @@ requestCompletioner:(id<ElectrodeRequestCompletioner>)completioner;
 
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - ElectrodeRequestRegistrar
+
+/**
+ Register request handlers. These handlers will respond to specific requests 
+ with a given name and ultimately fire off request completioners if they are 
+ handled appropriately.
+ */
 @interface ElectrodeRequestRegistrar : NSObject
 
 

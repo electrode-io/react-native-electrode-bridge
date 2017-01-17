@@ -20,13 +20,13 @@
 /**
  The name of the request in reverse url form.
  */
-@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly, nonnull) NSString *name;
 
 /**
  The data that comes in the original request. Can be used to handle the request 
  or give information on paths.
  */
-@property (nonatomic, readonly) NSDictionary *data;
+@property (nonatomic, readonly, nullable) NSDictionary *data;
 
 /**
  The mode or endpoint of where the request should end up. Either in React Native
@@ -49,7 +49,7 @@
  @param mode The destination of the request, JS or Native.
  @return An instance of the request.
  */
-- (instancetype)initWithName:(NSString *)name data:(NSDictionary *)data mode:(EBDispatchMode)mode;
+- (instancetype _Nonnull)initWithName:(NSString * _Nonnull)name data:(NSDictionary * _Nullable)data mode:(EBDispatchMode)mode;
 
 /**
  Create a request with a default timeout of 5 seconds.
@@ -60,5 +60,5 @@
  @param timeout The time until the request timesout in seconds.
  @return An instance of the request.
  */
-- (instancetype)initWithName:(NSString *)name data:(NSDictionary *)data mode:(EBDispatchMode)mode timeout:(NSInteger)timeout;
+- (instancetype _Nonnull)initWithName:(NSString * _Nonnull)name data:(NSDictionary * _Nullable)data mode:(EBDispatchMode)mode timeout:(NSInteger)timeout;
 @end

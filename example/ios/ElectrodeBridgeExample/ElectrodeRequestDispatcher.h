@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *error);
+typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary * _Nullable data, NSError * _Nullable error);
 
 @class ElectrodeRequestRegistrar;
 
@@ -25,7 +25,7 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
  
  @param data The data that may be attached to a request being returned.
  */
-- (void)onSuccess:(NSDictionary *)data;
+- (void)onSuccess:(NSDictionary * _Nullable)data;
 
 
 /**
@@ -34,7 +34,7 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
  @param code The error code associated with the error
  @param message The message that is generated for the error
  */
-- (void)onError:(NSString *)code message:(NSString *)message;
+- (void)onError:(NSString * _Nonnull)code message:(NSString * _Nonnull)message;
 
 @end
 
@@ -46,7 +46,7 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
  */
 @protocol ElectrodeRequestCompletioner <NSObject>
 
-- (instancetype)initWithCompletionBlock:(ElectrodeRequestCompletionBlock)completion;
+- (instancetype _Nonnull)initWithCompletionBlock:(ElectrodeRequestCompletionBlock _Nonnull)completion;
 
 /**
  Error response
@@ -54,14 +54,14 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
  @param code The error code
  @param message The error message details
  */
-- (void)error:(NSString *)code message:(NSString *)message;
+- (void)error:(NSString * _Nonnull)code message:(NSString * _Nonnull)message;
 
 /**
  Executes when a successul request happens and has data associated with it
 
  @param data NSDictionary of any key value pairs of data that may be expected.
  */
-- (void)success:(NSDictionary *)data;
+- (void)success:(NSDictionary * _Nonnull)data;
 
 /**
  Executes when a successul request happens and does not have data.
@@ -79,8 +79,11 @@ typedef void (^ElectrodeRequestCompletionBlock)(NSDictionary *data, NSError *err
  */
 @interface ElectrodeRequestDispatcher : NSObject
 
-@property (nonatomic, strong) ElectrodeRequestRegistrar *requestRegistrar;
+@property (nonatomic, strong, nonnull) ElectrodeRequestRegistrar *requestRegistrar;
 
-- (void)dispatchRequest:(NSString *)name id:(NSString *)requestID data:(NSDictionary *)data completion:(ElectrodeRequestCompletionBlock)completion;
+- (void)dispatchRequest:(NSString * _Nonnull)name
+                     id:(NSString * _Nonnull)requestID
+                   data:(NSDictionary * _Nullable)data
+             completion:(ElectrodeRequestCompletionBlock _Nonnull)completion;
 @end
 

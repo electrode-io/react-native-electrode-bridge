@@ -6,6 +6,8 @@
 //  Copyright © 2016 Facebook. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+
 #import "ElectrodeBridge.h"
 #import "ElectrodeEventDispatcher.h"
 #import "ElectrodeEventRegistrar.h"
@@ -36,7 +38,8 @@ typedef void (^ElectrodeBridgeRequestBlock)();
 @property (nonatomic, assign) BOOL usedPromise;
 @property (nonatomic, strong) ElectrodeEventDispatcher *eventDispatcher;
 @property (nonatomic, strong) ElectrodeRequestDispatcher *requestDispatcher;
-@property (nonatomic, strong) NSMutableDictionary<NSString *, id<ElectrodeRequestCompletionListener>> *requestListeners;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, id<ElectrodeRequestCompletionListener>>  * _Nullable requestListeners;
+@property (nonatomic, assign) dispatch_queue_t syncQueue;
 @end
 
 @implementation ElectrodeBridge
@@ -51,6 +54,8 @@ typedef void (^ElectrodeBridgeRequestBlock)();
     self.eventDispatcher = [[ElectrodeEventDispatcher alloc] init];
     self.requestDispatcher = [[ElectrodeRequestDispatcher alloc] init];
     [ElectrodeBridgeHolder sharedInstance].bridge = self;
+    self.syncQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    self.requestListeners = [[NSMutableDictionary alloc] init];
   }
   return self;
 }
@@ -91,10 +96,10 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
     RCTLogInfo(@"Received response [id:%@", parentRequestID);
     
     
-    id<ElectrodeRequestCompletionListener> listener = [_requestListeners objectForKey:parentRequestID];
+    id<ElectrodeRequestCompletionListener> listener = [self listenerForUUID:parentRequestID];
     if (listener && [listener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
     {
-      [_requestListeners removeObjectForKey:eventID];
+      [self removeRequestListenerByUUID:parentRequestID];
       
       if ([data objectForKey:EBBridgeError])
       { // Grab the handler and reject it
@@ -176,16 +181,16 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
   RCTLogInfo(@"Sending request[name:%@ id:%@", request.name, requestID);
   
   // Add the request listener since it could be executed later by JS responding
-  [self.requestListeners setObject:listener forKey:requestID];
+  [self addRequestListener:listener forUUID:requestID];
   
   // Add the timeout handler
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(request.timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
     
     // Grab the handler and execute an error, make sure to remove it
-    id<ElectrodeRequestCompletionListener> tempListener = [_requestListeners objectForKey:requestID];
+    id<ElectrodeRequestCompletionListener> tempListener = [self listenerForUUID:requestID];
     if (tempListener && [tempListener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
     {
-      [_requestListeners removeObjectForKey:requestID];
+      [self removeRequestListenerByUUID:requestID];
       [tempListener onError:@"EREQUESTTIMEOUT" message:@"Request Timeout"];
     }
   });
@@ -216,10 +221,10 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
      ^(NSDictionary *data, NSError *error)
      {
        
-       id<ElectrodeRequestCompletionListener> tempListener = [_requestListeners objectForKey:requestID];
+       id<ElectrodeRequestCompletionListener> tempListener = [self listenerForUUID:requestID];
        if (tempListener && [tempListener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
        {
-         [_requestListeners removeObjectForKey:requestID];
+         [self removeRequestListenerByUUID:requestID];
          
          if (!error)
          {
@@ -234,23 +239,50 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
   }
 }
 
+// Convenience method to easily register events
 - (ElectrodeEventRegistrar *)eventRegistrar
 {
   return self.eventDispatcher.eventRegistrar;
 }
 
+// Convenience method to easily register requests
 - (ElectrodeRequestRegistrar *)requestRegistrar
 {
   return self.requestDispatcher.requestRegistrar;
 }
 
-- (NSMutableDictionary<NSString *, id<ElectrodeRequestCompletionListener>> *)requestListeners
+////////////////////////////////////////////////////////////////////////////////
+#pragma mark - Convenience multi-threaded methods for listeners
+- (id<ElectrodeRequestCompletionListener>)listenerForUUID:(NSString *)uuid
 {
-  if (!_requestListeners)
-  {
-    _requestListeners = [[NSMutableDictionary alloc] init];
-  }
-  
-  return _requestListeners;
+  __weak ElectrodeBridge *weakSelf = self;
+  __block id<ElectrodeRequestCompletionListener> listener = nil;
+  dispatch_sync(_syncQueue, ^{
+    listener = [weakSelf.requestListeners objectForKey:uuid];
+    if (![listener conformsToProtocol:@protocol(ElectrodeRequestCompletionListener)])
+    {
+      listener = nil;
+    }
+  });
+  return listener;
 }
+
+- (void)removeRequestListenerByUUID:(NSString *)uuid
+{
+  __weak ElectrodeBridge *weakSelf = self;
+  dispatch_sync(_syncQueue, ^{
+    [weakSelf.requestListeners removeObjectForKey:uuid];
+  });
+  
+}
+
+- (void)addRequestListener:(id<ElectrodeRequestCompletionListener>)listener forUUID:(NSString *)uuid
+{
+  __weak ElectrodeBridge *weakSelf = self;
+  dispatch_async(_syncQueue, ^{
+    [weakSelf.requestListeners setObject:listener forKey:uuid];
+  });
+  
+}
+
 @end

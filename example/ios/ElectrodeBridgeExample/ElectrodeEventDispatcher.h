@@ -23,7 +23,7 @@
 
  @param data Data that may or may not be present with a given event.
  */
-- (void)onEvent:(NSDictionary *)data;
+- (void)onEvent:(NSDictionary * _Nullable)data;
 
 @end
 
@@ -41,7 +41,7 @@
 /**
  The register mechanism to adding, removing and getting event listeners.
  */
-@property (nonatomic, strong) ElectrodeEventRegistrar *eventRegistrar;
+@property (nonatomic, strong, nonnull) ElectrodeEventRegistrar *eventRegistrar;
 
 
 /**
@@ -51,5 +51,5 @@
  @param id The UUID of the event.
  @param data The data that comes with a given event. Could be nil.
  */
-- (void)dispatchEvent:(NSString *)event id:(NSString *)id data:(NSDictionary *)data;
+- (void)dispatchEvent:(NSString * _Nonnull)event id:(NSString * _Nonnull)id data:(NSDictionary * _Nullable)data;
 @end

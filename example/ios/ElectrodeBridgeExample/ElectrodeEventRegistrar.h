@@ -28,8 +28,8 @@
  @param eventListener The event listener that will respond to a given event.
  @return The UUID of the registered event listener.
  */
-- (NSString *)registerEventListener:(NSString *)name
-                      eventListener:(id<ElectrodeEventListener>)eventListener;
+- (NSString  * _Nonnull)registerEventListener:(NSString * _Nonnull)name
+                                eventListener:(id<ElectrodeEventListener> _Nonnull)eventListener;
 
 /**
  Remove an event listener by a given UUID. It is possible to have multiple event
@@ -37,7 +37,7 @@
 
  @param eventListenerUUID The UUID of the event listener.
  */
-- (void)unregisterEventListener:(NSString *)eventListenerUUID;
+- (void)unregisterEventListener:(NSString  * _Nonnull)eventListenerUUID;
 
 /**
  Grabs all of the event listeners of a given name.
@@ -45,6 +45,6 @@
  @param name The name that the event listeners will respond to.
  @return An array of all of the event listeners, will return nil if none are found.
  */
-- (NSArray<ElectrodeEventListener> *)getEventListnersForName:(NSString *)name;
+- (NSArray<ElectrodeEventListener> * _Nullable)getEventListnersForName:(NSString * _Nonnull)name;
 
 @end

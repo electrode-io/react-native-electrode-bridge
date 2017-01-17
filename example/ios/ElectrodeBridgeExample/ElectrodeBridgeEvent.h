@@ -23,14 +23,14 @@
 /**
  The reverse name to differentiate events that are coming in.
  */
-@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly, nonnull) NSString *name;
 
 
 /**
  The data that is associated with the event to be received. Data can be nil, and 
  is always in the form of a dictionary.
  */
-@property (nonatomic, readonly) NSDictionary *data;
+@property (nonatomic, readonly, nullable) NSDictionary *data;
 
 
 /**
@@ -49,5 +49,5 @@
  @param mode The intended destination.
  @return ElectrodeBridgeEvent is returned.
  */
-- (instancetype)initWithName:(NSString *)name data:(NSDictionary *)data mode:(EBDispatchMode)mode;
+- (instancetype _Nonnull)initWithName:(NSString * _Nonnull)name data:(NSDictionary * _Nullable)data mode:(EBDispatchMode)mode;
 @end

@@ -17,11 +17,8 @@ import {
   electrodeBridge,
   DispatchMode
 } from '@walmart/react-native-electrode-bridge';
-import RadioForm, {
-  RadioButton,
-  RadioButtonInput,
-  RadioButtonLabel
-} from 'react-native-simple-radio-button';
+
+import { RadioButtons, SegmentedControls } from 'react-native-radio-buttons';
 
 // Inbound event/request names
 const REQUEST_EXAMPLE_NAME = "request.example";
@@ -36,7 +33,9 @@ class ElectrodeBridgeExample extends Component {
       pendingInboundRequest: null,
       logText: "[JS] >>>",
       eventDispatchMode: DispatchMode.NATIVE,
-      requestDispatchType: DispatchMode.NATIVE
+      requestDispatchType: DispatchMode.NATIVE,
+      selectedRequestOption: 'Native',
+      selectedEventOption: 'Native'
     };
   }
 
@@ -48,16 +47,33 @@ class ElectrodeBridgeExample extends Component {
       this._receivedRequest.bind(this));
   }
 
-  render() {
-    let radio_props_request_dispatch_modes = [
-      { label: 'Native  ', value: DispatchMode.NATIVE },
-      { label: 'JS  ', value: DispatchMode.JS, }
-    ];
 
-    let radio_props_event_dispatch_modes = [
-      ...radio_props_request_dispatch_modes,
-      { label: 'Global  ', value: DispatchMode.GLOBAL }
-    ];
+
+  render() {
+
+    const requestOptions = [
+		  'Native', 'JS'
+  	];
+
+  	const eventOptions = [
+  		'Native', 'JS', 'Global'
+  	];
+
+    function setSelectedRequestOption(selectedOption) {
+   		this.setState({ requestDispatchType: selectedOption == 'JS' ? DispatchMode.JS : DispatchMode.NATIVE });
+   		this.setState({ selectedRequestOption: selectedOption });
+  	}
+
+    function setSelectedEventOption(selectedOption) {
+   		var eventState = DispatchMode.JS;
+   		if (selectedOption == 'Native') {
+   			eventState = DispatchMode.NATIVE;
+   		} else if (selectedOption == 'Global') {
+   			eventState = DispatchMode.GLOBAL;
+   		}
+   		this.setState({ eventDispatchMode: eventState });
+   		this.setState({ selectedEventOption: selectedOption });
+  	}
 
     return (
       <View style={styles.container}>
@@ -74,14 +90,15 @@ class ElectrodeBridgeExample extends Component {
               {this._renderButton('w/o data', 'royalblue',
                 this._sendRequestWithoutData.bind(this))}
             </View>
-            <RadioForm
-                radio_props={radio_props_request_dispatch_modes}
-                initial={this.state.requestDispatchType}
-                formHorizontal={true}
-                onPress={(val,idx) => { this.setState({requestDispatchType:idx}) }}
-                buttonSize={5}
-                labelColor={'white'}
-                style={styles.radioForm}/>
+            <View style={{margin: 10}}>
+      				<SegmentedControls
+      				  options={ requestOptions }
+      				  onSelection={ setSelectedRequestOption.bind(this) }
+      				  selectedOption={ this.state.selectedRequestOption }
+      				  selectedTint={'white'}
+      				  tint={'royalblue'}
+      				/>
+			      </View>
           </View>
         </View>
         <View style={styles.buttonGroup}>
@@ -93,14 +110,15 @@ class ElectrodeBridgeExample extends Component {
               {this._renderButton('w/o data', 'royalblue',
                 this._emitEventWithoutData.bind(this))}
             </View>
-            <RadioForm
-                radio_props={radio_props_event_dispatch_modes}
-                initial={this.state.eventDispatchType}
-                formHorizontal={true}
-                onPress={(val,idx) => { this.setState({eventDispatchType:idx}) }}
-                buttonSize={5}
-                labelColor={'white'}
-                style={styles.radioForm}/>
+            <View style={{margin: 10}}>
+      				<SegmentedControls
+      				  options={ eventOptions }
+      				  onSelection={ setSelectedEventOption.bind(this) }
+      				  selectedOption={ this.state.selectedEventOption }
+      				  selectedTint={'white'}
+      				  tint={'royalblue'}
+      				/>
+			      </View>
           </View>
         </View>
         {this._renderIncomingRequestButtonGroup()}
@@ -142,7 +160,7 @@ class ElectrodeBridgeExample extends Component {
       .emitEvent(
         EVENT_EXAMPLE_NAME, {
           data: { randFloat: Math.random() },
-          dispatchMode: this.state.eventDispatchType
+          dispatchMode: this.state.eventDispatchMode
         });
   }
 
@@ -150,7 +168,7 @@ class ElectrodeBridgeExample extends Component {
     electrodeBridge
       .emitEvent(
         EVENT_EXAMPLE_NAME, {
-          dispatchMode: this.state.eventDispatchType
+          dispatchMode: this.state.eventDispatchMode
         });
   }
 
@@ -163,7 +181,7 @@ class ElectrodeBridgeExample extends Component {
   }
 
   _logIncomingFailureResponse(resp) {
-    this._setLoggerText(`Response failure. Data : ${JSON.stringify(resp)}`)
+    this._setLoggerText(`Response failure. code : ${resp.code} . message: ${resp.message}`)
   }
 
   _setLoggerText(text) {

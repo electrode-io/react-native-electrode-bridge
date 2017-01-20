@@ -1,6 +1,6 @@
 // @flow
 
-import { NativeModules, DeviceEventEmitter } from "react-native";
+import { DeviceEventEmitter, NativeModules, Platform } from "react-native";
 import uuid from "uuid";
 var EventEmitter = require('events');
 
@@ -24,7 +24,7 @@ class ElectrodeBridge extends EventEmitter {
 
     constructor() {
         super();
-        const emitter = Platform.OS == 'ios' ? NativeAppEventEmitter : DeviceEventEmitter;
+        const emitter = Platform.OS === 'ios' ? NativeAppEventEmitter : DeviceEventEmitter;
         emitter.addListener(ELECTRODE_BRIDGE_EVENT_EVENT_NAME,
             this._onEventFromNative.bind(this));
         emitter.addListener(ELECTRODE_BRIDGE_REQUEST_EVENT_NAME,

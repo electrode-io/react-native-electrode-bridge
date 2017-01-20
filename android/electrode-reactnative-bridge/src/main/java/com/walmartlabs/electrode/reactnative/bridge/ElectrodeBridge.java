@@ -1,5 +1,6 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -12,9 +13,12 @@ import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +33,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
     private static final String BRIDGE_RESPONSE_ERROR = "error";
     private static final String BRDIGE_RESPONSE_ERROR_CODE = "code";
     private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
-    private static final String BRIDGE_MSG_DATA = "data";
+    public static final String BRIDGE_MSG_DATA = "data";
     private static final String BRIDGE_MSG_NAME = "name";
     private static final String BRIDGE_MSG_ID = "id";
     private static final String BRIDGE_REQUEST_ID = "requestId";
@@ -78,6 +82,7 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
         void dispatchEvent(@NonNull String id,
                            @NonNull String name,
                            @NonNull ReadableMap data);
+
     }
 
     /**
@@ -156,7 +161,30 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                 mReactContext.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        completionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
+                        if (args[0] instanceof ReadableMap) {
+                            completionListener.onSuccess(Arguments.toBundle((ReadableMap)args[0]));
+                        } else if (args[0] instanceof ReadableArray) {
+                            ReadableArray readableArray = (ReadableArray)args[0];
+                            Bundle b = new Bundle();
+                            if (readableArray.size() != 0) {
+                                switch (readableArray.getType(0)) {
+                                    case String:
+                                        b.putStringArray("rsp", ArgumentsEx.toStringArray(readableArray));
+                                        break;
+                                    case Boolean:
+                                        b.putBooleanArray("rsp", ArgumentsEx.toBooleanArray(readableArray));
+                                        break;
+                                    case Number:
+                                        // Can be int or double but we just assume double for now
+                                        b.putDoubleArray("rsp", ArgumentsEx.toDoubleArray(readableArray));
+                                        break;
+                                    case Map:
+                                    case Array:
+                                        break;
+                                }
+                            }
+                            completionListener.onSuccess(b);
+                        }
                     }
                 });
             }
@@ -246,7 +274,12 @@ public class ElectrodeBridge extends ReactContextBaseJavaModule {
                 }
                 promise.reject(errorCode, errorMessage);
             } else if (data.hasKey(BRIDGE_MSG_DATA)) {
-                promise.resolve(data.getMap(BRIDGE_MSG_DATA));
+                if (data.getType(BRIDGE_MSG_DATA).equals(ReadableType.Array)) {
+                    promise.resolve(data.getArray(BRIDGE_MSG_DATA));
+                } else if (data.getType(BRIDGE_MSG_DATA).equals(ReadableType.Map)) {
+                    promise.resolve(data.getMap(BRIDGE_MSG_DATA));
+                }
+
             } else {
                 promise.reject(new UnsupportedOperationException());
             }

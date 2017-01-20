@@ -3,8 +3,8 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 
 @SuppressWarnings("unused")
 public class EventDispatcherImpl implements ElectrodeBridge.EventDispatcher {
@@ -36,7 +36,7 @@ public class EventDispatcherImpl implements ElectrodeBridge.EventDispatcher {
     @Override
     public void dispatchEvent(@NonNull String id, @NonNull String name, @NonNull ReadableMap payload) {
         for (EventListener eventListener : mEventRegistrar.getEventListeners(name)) {
-            Bundle bundle = Arguments.toBundle(payload);
+            Bundle bundle = ArgumentsEx.toBundle(payload);
 
             eventListener.onEvent(bundle != null ? bundle : EMPTY_BUNDLE);
         }

@@ -94,6 +94,7 @@ public class ElectrodeBridge {
     if (!isReactNativeReady) {
       Log.d(TAG, "Queuing request handler registration. Will register once react native initialization is complete.");
       mQueuedRequestHandlersRegistration.put(name, requestHandler);
+      return;
     }
 
     ElectrodeBridgeInternal.instance().requestRegistrar().registerRequestHandler(name, requestHandler);
@@ -112,6 +113,7 @@ public class ElectrodeBridge {
     if (!isReactNativeReady) {
       Log.d(TAG, "Queuing event handler registration. Will register once react native initialization is complete.");
       mQueuedEventListenersRegistration.put(name, eventListener);
+      return;
     }
 
     ElectrodeBridgeInternal.instance().eventRegistrar().registerEventListener(name, eventListener);

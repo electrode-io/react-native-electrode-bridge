@@ -15,8 +15,7 @@ public interface RequestRegistrar<T> {
      * @return UUID to provide when calling unregisterRequestHandler
      */
     @NonNull
-    UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler)
-            throws ExistingHandlerException;
+    UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler);
 
     /**
      * Unregisters a request handler

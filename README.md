@@ -182,25 +182,9 @@ protected List<ReactPackage> getPackages() {
 }
 ```
 
-Then, access to API methods is provided through an instance of the `ElectrodeBridge` class.
+Then, access to API methods is provided through static methods of the `ElectrodeBridge` class.
 
-React Native engine initialization, including the initialization of all native modules is done on it's own thread. Because of this, the bridge Native Module might not be immediately ready and therefore the `ElectrodeBridge` instance can not be obtained directly.
-
-To get a hold of this instance (which will be a singleton instance), you'll need to pass a callback to the method `ElectrodeBridgeHolder.setOnBridgeReadyListener` which will then be invoked with the bridge instance whenever it is ready to roll.
-
-```java
-ElectrodeBridgeHolder.setOnBridgeReadyListener(
-  new ElectrodeBridgeHolder.OnBridgeReadyListener() {
-     @Override
-     public void onBridgeReady(ElectrodeBridge electrodeBridge) {
-         // Here is your electrodeBridge instance !
-     }
-  });
-```
-
-Once you have the singleton instance of `ElectrodeBridge` at your disposal, you can start accessing its API.
-
-#### electrodeBridge.sendRequest
+#### ElectrodeBridge.sendRequest
 
 ```java
 void sendRequest(
@@ -232,7 +216,7 @@ ElectrodeBridgeRequest request =
     .withDispatchMode(RequestDispatchMode.NATIVE)  
     .build();
 
-electrodeBridge.sendRequest(request, new RequestCompletionListener() {
+ElectrodeBridge.sendRequest(request, new RequestCompletionListener() {
   @Override
   public void onSuccess(@NonNull Bundle payload) {
       // Do whatever you need to do with the response
@@ -246,7 +230,7 @@ electrodeBridge.sendRequest(request, new RequestCompletionListener() {
 });
 ```
 
-#### electrodeBridge.emitEvent
+#### ElectrodeBridge.emitEvent
 
 ```java
 void emitEvent(@NonNull ElectrodeBridgeEvent event)
@@ -272,10 +256,10 @@ ElectrodeBridgeEvent event =
     .withDispatchMode(RequestDispatchMode.NATIVE)  
     .build();
 
-electrodeBridge.emitEvent(event);
+ElectrodeBridge.emitEvent(event);
 ```
 
-#### electrodeBridge.requestRegistrar().registerRequestHandler
+#### ElectrodeBridge.registerRequestHandler
 
 ```java
 UUID registerRequestHandler(
@@ -295,8 +279,7 @@ As for the JS API, please note that if an handler already exists for the specifi
 Example usage :
 
 ```java
-electrodeBridge.requestRegistrar()
-  .registerRequestHandler("awesomerequest.name",
+ElectrodeBridge.registerRequestHandler("awesomerequest.name",
     new RequestHandler() {
       @Override
       public void onRequest(Bundle data,
@@ -309,7 +292,7 @@ electrodeBridge.requestRegistrar()
   });
 ```
 
-#### electrodeBridge.eventRegistrar().registerEventListener
+#### ElectrodeBridge.registerEventListener
 
 ```java
 UUID registerEventHandler(
@@ -327,8 +310,7 @@ UUID registerEventHandler(
 Example usage :
 
 ```java
-electrodeBridge.eventRegistrar()
-  .registerEventHandler("awesomeevent.name",
+ElectrodeBridge.registerEventHandler("awesomeevent.name",
   new EventListener() {
     @Override
     public void onEvent(Bundle data) {

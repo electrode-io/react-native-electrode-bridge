@@ -8,7 +8,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 
 @SuppressWarnings("unused")
-public class RequestDispatcherImpl implements ElectrodeBridge.RequestDispatcher {
+public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDispatcher {
     private static final Bundle EMPTY_BUNDLE = new Bundle();
 
     private final RequestRegistrar<RequestHandler> mRequestRegistrar;

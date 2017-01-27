@@ -12,10 +12,13 @@ import java.util.List;
 
 public class ElectrodeBridgePackage implements ReactPackage {
 
+    private ElectrodeBridgeInternal electrodeBridgeInternal;
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(ElectrodeBridgeHolder.createElectrodeBridge(reactContext));
+        this.electrodeBridgeInternal = ElectrodeBridgeInternal.create(reactContext);
+        modules.add(electrodeBridgeInternal);
         return modules;
     }
 
@@ -27,6 +30,12 @@ public class ElectrodeBridgePackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Collections.emptyList();
+    }
+
+    //
+    // Invoked by ern platform once react native engine is initialized/ready
+    public void onReactNativeInitialized() {
+        this.electrodeBridgeInternal.onReactNativeInitialized();
     }
 
 }

@@ -7,7 +7,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 
 @SuppressWarnings("unused")
-public class EventDispatcherImpl implements ElectrodeBridge.EventDispatcher {
+public class EventDispatcherImpl implements ElectrodeBridgeInternal.EventDispatcher {
 
     private final EventRegistrar<EventListener> mEventRegistrar;
     private static final Bundle EMPTY_BUNDLE = new Bundle();

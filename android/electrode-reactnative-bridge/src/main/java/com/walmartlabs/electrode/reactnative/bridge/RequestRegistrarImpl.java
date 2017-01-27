@@ -20,12 +20,7 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
      */
     @SuppressWarnings("unused")
     @NonNull
-    public UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler)
-            throws ExistingHandlerException {
-        if (mRequestHandlerByRequestName.containsKey(name)) {
-            throw new ExistingHandlerException(
-                    String.format("A request handler has already been registered for name %s", name));
-        }
+    public UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler) {
         UUID requestHandlerUuid = UUID.randomUUID();
         mRequestHandlerByRequestName.put(name, requestHandler);
         mRequestNameByUUID.put(requestHandlerUuid, name);

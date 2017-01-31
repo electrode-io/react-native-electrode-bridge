@@ -1,6 +1,6 @@
 // @flow
 
-import { DeviceEventEmitter, NativeModules, Platform } from "react-native";
+import { DeviceEventEmitter, NativeAppEventEmitter, NativeModules, Platform } from "react-native";
 import uuid from "uuid";
 var EventEmitter = require('events');
 

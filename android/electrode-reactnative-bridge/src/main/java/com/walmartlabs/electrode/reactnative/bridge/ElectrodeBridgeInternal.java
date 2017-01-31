@@ -50,6 +50,8 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
   private final EventRegistrar<EventDispatcherImpl.EventListener> mEventRegistrar = new EventRegistrarImpl<>();
   private final RequestRegistrar<RequestDispatcherImpl.RequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
 
+  private static boolean sIsReactNativeReady;
+
   /**
    * Initializes a new instance of ElectrodeBridgeInternal
    *
@@ -371,10 +373,19 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
   private static ReactNativeReadyListener sReactNativeReadyListener;
 
   public static void registerReactNativeReadyListener(ReactNativeReadyListener listener) {
-    sReactNativeReadyListener = listener;
+    // If react native initialization is already completed, just call listener
+    // immediately
+    if (sIsReactNativeReady) {
+      listener.onReactNativeReady();
+    }
+    // Else it will get invoked whenever react native initialization is done
+    else {
+      sReactNativeReadyListener = listener;
+    }
   }
 
   public void onReactNativeInitialized() {
+    sIsReactNativeReady = true;
     sReactNativeReadyListener.onReactNativeReady();
   }
 

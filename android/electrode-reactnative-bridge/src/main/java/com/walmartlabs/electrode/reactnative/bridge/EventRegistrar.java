@@ -10,7 +10,7 @@ public interface EventRegistrar<T> {
     /**
      * Registers an event listener
      *
-     * @param name The event name this listener is interested in
+     * @param name          The event name this listener is interested in
      * @param eventListener The event listener
      * @return A UUID to pass back to unregisterEventListener
      */
@@ -20,8 +20,7 @@ public interface EventRegistrar<T> {
     /**
      * Unregisters an event listener
      *
-     * @param eventListenerUuid The UUID that was obtained through initial registerEventListener
-     * call
+     * @param eventListenerUuid The UUID that was obtained through initial registerEventListener call
      */
     @SuppressWarnings("unused")
     void unregisterEventListener(@NonNull UUID eventListenerUuid);

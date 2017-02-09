@@ -22,6 +22,7 @@ public class EventDispatcherImpl implements ElectrodeBridgeInternal.EventDispatc
     public interface EventListener {
         /**
          * Called whenever an event matching this event listener is received
+         *
          * @param payload The event payload
          */
         void onEvent(@NonNull Bundle payload);
@@ -29,8 +30,9 @@ public class EventDispatcherImpl implements ElectrodeBridgeInternal.EventDispatc
 
     /**
      * Dispatch an event
-     * @param id The event id
-     * @param name The name of the event to dispatch
+     *
+     * @param id      The event id
+     * @param name    The name of the event to dispatch
      * @param payload The payload of the event as a ReadableMap
      */
     @Override

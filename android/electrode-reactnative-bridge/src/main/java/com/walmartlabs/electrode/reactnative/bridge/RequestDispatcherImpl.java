@@ -27,10 +27,9 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
      */
     public interface RequestCompletioner {
         /**
-         *
          * Error response
          *
-         * @param code The error code
+         * @param code    The error code
          * @param message The error message
          */
         void error(@NonNull String code, @NonNull String message);
@@ -55,7 +54,7 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         /**
          * Called whenever a request matching this handler is received
          *
-         * @param payload The payload of the request as a Bundle
+         * @param payload             The payload of the request as a Bundle
          * @param requestCompletioner An instance of RequestCompletioner
          */
         void onRequest(@NonNull Bundle payload, @NonNull RequestCompletioner requestCompletioner);
@@ -64,8 +63,8 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
     /**
      * Dispatch a request
      *
-     * @param name The name of the request to dispatch
-     * @param id The id of the request
+     * @param name    The name of the request to dispatch
+     * @param id      The id of the request
      * @param payload The payload of the request as a ReadableMap
      * @param promise A promise to fulfil upon request completion
      */
@@ -85,20 +84,20 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
 
         requestHandler.onRequest((payloadBundle != null ? payloadBundle : EMPTY_BUNDLE),
                 new RequestCompletioner() {
-            @Override
-            public void error(@NonNull String code, @NonNull String message) {
-                promise.reject(code, message);
-            }
+                    @Override
+                    public void error(@NonNull String code, @NonNull String message) {
+                        promise.reject(code, message);
+                    }
 
-            @Override
-            public void success(@NonNull Bundle bundle) {
-                promise.resolve(Arguments.fromBundle(bundle));
-            }
+                    @Override
+                    public void success(@NonNull Bundle bundle) {
+                        promise.resolve(Arguments.fromBundle(bundle));
+                    }
 
-            @Override
-            public void success() {
-                promise.resolve(Arguments.createMap());
-            }
-        });
+                    @Override
+                    public void success() {
+                        promise.resolve(Arguments.createMap());
+                    }
+                });
     }
 }

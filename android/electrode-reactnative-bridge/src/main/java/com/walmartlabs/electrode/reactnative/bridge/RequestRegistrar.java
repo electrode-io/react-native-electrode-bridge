@@ -10,7 +10,7 @@ public interface RequestRegistrar<T> {
     /**
      * Registers a request handler
      *
-     * @param name The request name this handler can handle
+     * @param name           The request name this handler can handle
      * @param requestHandler The request handler instance
      * @return UUID to provide when calling unregisterRequestHandler
      */
@@ -20,8 +20,7 @@ public interface RequestRegistrar<T> {
     /**
      * Unregisters a request handler
      *
-     * @param requestHandlerUuid The UUID that was obtained through initial registerRequestHandler
-     * call
+     * @param requestHandlerUuid The UUID that was obtained through initial registerRequestHandler call
      */
     void unregisterRequestHandler(@NonNull UUID requestHandlerUuid);
 

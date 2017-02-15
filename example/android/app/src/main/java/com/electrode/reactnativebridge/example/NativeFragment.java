@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridge;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEvent;
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest;
 import com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl;
 import com.walmartlabs.electrode.reactnative.bridge.ExistingHandlerException;
@@ -61,42 +60,26 @@ public class NativeFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         //
-        // Wait for bridge to be ready before registering for events and request
-        ElectrodeBridgeHolder.setOnBridgeReadyListener(
-                new ElectrodeBridgeHolder.OnBridgeReadyListener() {
+        // Register event listener
+        ElectrodeBridge
+                .registerEventListener(EVENT_EXAMPLE_NAME,
+                        new EventDispatcherImpl.EventListener() {
             @Override
-            public void onBridgeReady(ElectrodeBridge electrodeBridge) {
-                mElectrodeBridge = electrodeBridge;
+            public void onEvent(final Bundle data) {
+                setLoggerText(String.format("Event received. %s", data.toString()));
+            }
+        });
 
-                //
-                // Register event listener
-                electrodeBridge
-                        .eventRegistrar()
-                        .registerEventListener(EVENT_EXAMPLE_NAME,
-                                new EventDispatcherImpl.EventListener() {
-                    @Override
-                    public void onEvent(final Bundle data) {
-                        setLoggerText(String.format("Event received. %s", data.toString()));
-                    }
-                });
-
-                //
-                // Register request listener
-                try {
-                    electrodeBridge
-                            .requestRegistrar()
-                            .registerRequestHandler(REQUEST_EXAMPLE_NAME,
-                                    new RequestDispatcherImpl.RequestHandler() {
-                        @Override
-                        public void onRequest(Bundle data,
-                                              RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
-                            setLoggerText(String.format("Request received. %s", data.toString()));
-                            showRequestCompletionButtons(requestCompletioner);
-                        }
-                    });
-                } catch (ExistingHandlerException e) {
-                    e.printStackTrace();
-                }
+        //
+        // Register request listener
+        ElectrodeBridge
+                .registerRequestHandler(REQUEST_EXAMPLE_NAME,
+                        new RequestDispatcherImpl.RequestHandler() {
+            @Override
+            public void onRequest(Bundle data,
+                                  RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
+                setLoggerText(String.format("Request received. %s", data.toString()));
+                showRequestCompletionButtons(requestCompletioner);
             }
         });
     }

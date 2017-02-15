@@ -7,6 +7,7 @@ import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.shell.MainReactPackage;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgePackage;
 
@@ -14,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
+
+    private final ElectrodeBridgePackage bridge = new ElectrodeBridgePackage();
 
     private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
         @Override
@@ -25,7 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
-                    new ElectrodeBridgePackage()
+                    bridge
             );
         }
     };
@@ -41,5 +44,13 @@ public class MainApplication extends Application implements ReactApplication {
 
         // Loads the bundle
         getReactNativeHost().getReactInstanceManager().createReactContextInBackground();
+
+        getReactNativeHost().getReactInstanceManager().addReactInstanceEventListener(
+                new ReactInstanceManager.ReactInstanceEventListener() {
+            @Override
+            public void onReactContextInitialized(ReactContext context) {
+                bridge.onReactNativeInitialized();
+            }
+        });
     }
 }

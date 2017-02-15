@@ -180,82 +180,71 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
             dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
         }
     }
+  }
 
-    /**
-     * Sends a request
-     *
-     * @param request            The request to send
-     * @param completionListener Listener to be called upon request completion
-     */
-    @SuppressWarnings("unused")
-    public void sendRequest(@NonNull ElectrodeBridgeRequest request, @NonNull final RequestCompletionListener completionListener) {
-        final String id = getUUID();
+  /**
+   * Sends a request
+   *
+   * @param request The request to send
+   * @param completionListener Listener to be called upon request completion
+   */
+  @SuppressWarnings("unused")
+  public void sendRequest(
+          @NonNull ElectrodeBridgeRequest request,
+          @NonNull final RequestCompletionListener completionListener) {
+    final String id = getUUID();
 
-        final Promise promise = new PromiseImpl(new Callback() {
-            @Override
-            public void invoke(final Object... args) {
-                mReactContextWrapper.runOnUiQueueThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ReadableMap data = (ReadableMap) args[0];
-                        Bundle bundle = new Bundle();
+    final Promise promise = new PromiseImpl(new Callback() {
+      @Override
+      public void invoke(final Object... args) {
+        mReactContext.runOnUiQueueThread(new Runnable() {
+          @Override
+          public void run() {
+            ReadableMap data = (ReadableMap) args[0];
+            Bundle bundle = new Bundle();
 
-                        if (data != null) {
-                            switch (data.getType(BRIDGE_MSG_DATA)) {
-                                case Array: {
-                                    ReadableArray readableArray = data.getArray(BRIDGE_MSG_DATA);
-                                    if (readableArray.size() != 0) {
-                                        switch (readableArray.getType(0)) {
-                                            case String:
-                                                bundle.putStringArray("rsp", ArgumentsEx.toStringArray(readableArray));
-                                                break;
-                                            case Boolean:
-                                                bundle.putBooleanArray("rsp", ArgumentsEx.toBooleanArray(readableArray));
-                                                break;
-                                            case Number:
-                                                // Can be int or double but we just assume double for now
-                                                bundle.putDoubleArray("rsp", ArgumentsEx.toDoubleArray(readableArray));
-                                                break;
-                                            case Map:
-                                            case Array:
-                                                break;
-                                        }
-                                    }
-                                }
-                                break;
-                                case Map:
-                                    bundle = Arguments.toBundle(data.getMap(BRIDGE_MSG_DATA));
-                                    break;
-                                case Boolean:
-                                    bundle.putBoolean("rsp", data.getBoolean(BRIDGE_MSG_DATA));
-                                    break;
-                                case Number:
-                                    // default to double for now
-                                    bundle.putDouble("rsp", data.getDouble(BRIDGE_MSG_DATA));
-                                    break;
-                                case String:
-                                    bundle.putString("rsp", data.getString(BRIDGE_MSG_DATA));
-                                    break;
-                                case Null:
-                                    break;
-                            }
-                        }
-                        completionListener.onSuccess(bundle);
+            if (data != null) {
+              switch (data.getType(BRIDGE_MSG_DATA)) {
+                case Array: {
+                  ReadableArray readableArray = data.getArray(BRIDGE_MSG_DATA);
+                  if (readableArray.size() != 0) {
+                    switch (readableArray.getType(0)) {
+                      case String:
+                        bundle.putStringArray("rsp", ArgumentsEx.toStringArray(readableArray));
+                        break;
+                      case Boolean:
+                        bundle.putBooleanArray("rsp", ArgumentsEx.toBooleanArray(readableArray));
+                        break;
+                      case Number:
+                        // Can be int or double
+                        bundle.putDoubleArray("rsp", ArgumentsEx.toDoubleArray(readableArray));
+                        break;
+                      case Map:
+                        bundle.putParcelableArray("rsp", ArgumentsEx.toBundleArray(readableArray));
+                        break;
+                      case Array:
+                        // Don't support array of arrays yet
+                        break;
                     }
-                });
-            }
-        }, new Callback() {
-            @Override
-            public void invoke(final Object... args) {
-                mReactContextWrapper.runOnUiQueueThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WritableMap writableMap = (WritableMap) args[0];
-                        completionListener.onError(
-                                writableMap.getString("code"),
-                                writableMap.getString("message"));
-                    }
-                });
+                  }
+                }
+                break;
+                case Map:
+                  bundle.putBundle("rsp", ArgumentsEx.toBundle(data.getMap(BRIDGE_MSG_DATA)));
+                  break;
+                case Boolean:
+                  bundle.putBoolean("rsp", data.getBoolean(BRIDGE_MSG_DATA));
+                  break;
+                case Number:
+                  // can be int or double
+                  bundle.putDouble("rsp", data.getDouble(BRIDGE_MSG_DATA));
+                  break;
+                case String:
+                  bundle.putString("rsp", data.getString(BRIDGE_MSG_DATA));
+                  break;
+                case Null:
+                  break;
+              }
             }
         });
 

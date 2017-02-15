@@ -383,7 +383,9 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
 
     public void onReactNativeInitialized() {
         sIsReactNativeReady = true;
-        sReactNativeReadyListener.onReactNativeReady();
+        if (sReactNativeReadyListener != null) {
+            sReactNativeReadyListener.onReactNativeReady();
+        }
     }
 
 }

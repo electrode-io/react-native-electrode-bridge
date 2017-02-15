@@ -75,11 +75,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
             });
         }
 
-        try {
-            assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            fail();
-        }
+        waitForCountDownToFinishOrFail(countDownLatch);
     }
 
     private class MockElectrodePackage extends ElectrodeBridgePackage {
@@ -111,4 +107,13 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     private void runOnUiThread(Runnable runnable) {
         new Handler(Looper.getMainLooper()).post(runnable);
     }
+
+    void waitForCountDownToFinishOrFail(CountDownLatch countDown) {
+        try {
+            assertTrue(countDown.await(1000, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            fail();
+        }
+    }
+
 }

@@ -132,4 +132,23 @@ public final class PersonBridgeRequests {
             }
         });
     }
+
+    public static void getUserNameRequest(@NonNull final Response<String> response) {
+        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_STATUS)
+                .withData(Bundle.EMPTY)
+                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
+                .build();
+
+        ElectrodeBridge.sendRequest(req, new RequestCompletionListener() {
+            @Override
+            public void onSuccess(Bundle bundle) {
+                response.onSuccess(bundle.getString("userName"));
+            }
+
+            @Override
+            public void onError(String code, String message) {
+                response.onError(code, message);
+            }
+        });
+    }
 }

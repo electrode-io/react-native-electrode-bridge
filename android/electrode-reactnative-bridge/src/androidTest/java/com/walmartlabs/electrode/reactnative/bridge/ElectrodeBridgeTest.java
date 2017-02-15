@@ -3,7 +3,6 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Response;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonBridgeRequests;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
-import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -13,14 +12,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
-
-    public void testSample() {
+    public void testSampleRequest() {
         final CountDownLatch countDown = new CountDownLatch(1);
 
         Person person = new Person.Builder("John", 05).build();
-        PersonBridgeRequests.getStatusRequest(person, new Response<Status>() {
+        PersonBridgeRequests.getUserNameRequest(new Response<String>() {
             @Override
-            public void onSuccess(Status obj) {
+            public void onSuccess(String obj) {
                 fail();
             }
 
@@ -38,4 +36,6 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
             fail();
         }
     }
+
+
 }

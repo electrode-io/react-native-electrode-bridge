@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -16,8 +17,8 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +39,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
     private static final String BRIDGE_REQUEST_ID = "requestId";
     private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
 
-    private final ReactApplicationContext mReactContext;
+    private final ReactContextWrapper mReactContextWrapper;
     private final EventDispatcher mEventDispatcher;
     private final RequestDispatcher mRequestDispatcher;
 
@@ -54,11 +55,11 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
     /**
      * Initializes a new instance of ElectrodeBridgeInternal
      *
-     * @param reactContext The react application context
+     * @param reactContextWrapper The react application context
      */
-    private ElectrodeBridgeInternal(@NonNull ReactApplicationContext reactContext) {
-        super(reactContext);
-        mReactContext = reactContext;
+    private ElectrodeBridgeInternal(@NonNull ReactContextWrapper reactContextWrapper) {
+        super(reactContextWrapper.getContext());
+        mReactContextWrapper = reactContextWrapper;
         mEventDispatcher = new EventDispatcherImpl(mEventRegistrar);
         mRequestDispatcher = new RequestDispatcherImpl(mRequestRegistrar);
     }
@@ -70,9 +71,21 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
      * @return The singleton instance of ElectrodeBridgeInternal
      */
     public static ElectrodeBridgeInternal create(ReactApplicationContext reactApplicationContext) {
+        return create(new ReactContextWrapperInternal(reactApplicationContext));
+    }
+
+    /**
+     * Creates the ElectrodeBridgeInternal singleton
+     *
+     * @param reactContextWrapper
+     * @return The singleton instance of ElectrodeBridgeInternal
+     */
+    @VisibleForTesting
+    static ElectrodeBridgeInternal create(ReactContextWrapper reactContextWrapper) {
+        Logger.d(TAG, "Creating ElectrodeBridgeInternal instance");
         synchronized (ElectrodeBridgeInternal.class) {
             if (sInstance == null) {
-                sInstance = new ElectrodeBridgeInternal(reactApplicationContext);
+                sInstance = new ElectrodeBridgeInternal(reactContextWrapper);
             }
         }
         return sInstance;
@@ -159,15 +172,11 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
         Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), id));
 
         if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.JS) {
-            mReactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(BRIDGE_EVENT, message);
+            mReactContextWrapper.emitEvent(BRIDGE_EVENT, message);
         } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.NATIVE) {
             dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
         } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.GLOBAL) {
-            mReactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(BRIDGE_EVENT, message);
+            mReactContextWrapper.emitEvent(BRIDGE_EVENT, message);
             dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
         }
     }
@@ -185,7 +194,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
         final Promise promise = new PromiseImpl(new Callback() {
             @Override
             public void invoke(final Object... args) {
-                mReactContext.runOnUiQueueThread(new Runnable() {
+                mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
                         ReadableMap data = (ReadableMap) args[0];
@@ -238,7 +247,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
         }, new Callback() {
             @Override
             public void invoke(final Object... args) {
-                mReactContext.runOnUiQueueThread(new Runnable() {
+                mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
                         WritableMap writableMap = (WritableMap) args[0];
@@ -268,9 +277,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
             WritableMap message = buildMessage(
                     id, request.getName(), Arguments.fromBundle(request.getData()));
 
-            mReactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(BRIDE_REQUEST, message);
+            mReactContextWrapper.emitEvent(BRIDE_REQUEST, message);
         } else if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.NATIVE)) {
             dispatchRequest(request.getName(), id, Arguments.fromBundle(request.getData()), promise);
         }
@@ -341,7 +348,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                 promise.reject(new UnsupportedOperationException());
             }
         } else {
-            mReactContext.runOnUiQueueThread(new Runnable() {
+            mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                 @Override
                 public void run() {
                     mEventDispatcher.dispatchEvent(id, name, data);

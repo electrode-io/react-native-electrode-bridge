@@ -19,9 +19,11 @@ public class ArgumentsEx {
   public static double[] toDoubleArray(@NonNull ReadableArray readableArray) {
     int arraySize = readableArray.size();
     double[] result = new double[arraySize];
-    for (int i=0; i<arraySize; i++) {
+    for (int i = 0; i < arraySize; i++) {
       result[i] = readableArray.getDouble(i);
     }
+    return result;
+  }
 
   public static int[] toIntArray(@NonNull ReadableArray readableArray) {
     int arraySize = readableArray.size();
@@ -35,16 +37,20 @@ public class ArgumentsEx {
   public static String[] toStringArray(@NonNull ReadableArray readableArray) {
     int arraySize = readableArray.size();
     String[] result = new String[arraySize];
-    for (int i=0; i<arraySize; i++) {
+    for (int i = 0; i < arraySize; i++) {
       result[i] = readableArray.getString(i);
     }
+    return result;
+  }
 
   public static boolean[] toBooleanArray(@NonNull ReadableArray readableArray) {
     int arraySize = readableArray.size();
     boolean[] result = new boolean[arraySize];
-    for (int i=0; i<arraySize; i++) {
+    for (int i = 0; i < arraySize; i++) {
       result[i] = readableArray.getBoolean(i);
     }
+    return result;
+  }
 
   public static Bundle[] toBundleArray(@NonNull ReadableArray readableArray) {
     int arraySize = readableArray.size();

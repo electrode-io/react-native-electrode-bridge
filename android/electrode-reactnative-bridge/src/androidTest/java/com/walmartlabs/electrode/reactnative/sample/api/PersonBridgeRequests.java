@@ -116,7 +116,7 @@ public final class PersonBridgeRequests {
         Bundle bundle = person.toBundle();
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_STATUS)
                 .withData(bundle)
-                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
+                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.NATIVE)
                 .build();
 
         ElectrodeBridge.sendRequest(req, new RequestCompletionListener() {

@@ -7,46 +7,55 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class Person implements Parcelable {
-
-    private static final String KEY_BUNDLE_PERSON = "person";
+    private static final String KEY_BUNDLE_ID = "className";
+    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
 
     @Nullable
     public static Person fromBundle(@Nullable Bundle bundle) {
         if (bundle == null) {
             return null;
         }
-
-        Parcelable parcelable = bundle.getParcelable(KEY_BUNDLE_PERSON);
-        if (parcelable instanceof Person) {
-            return (Person) parcelable;
-        } else {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
             return null;
         }
+        //Validate to make sure all required fields are available
+        if (!bundle.containsKey("name")
+                || !bundle.containsKey("month")) {
+            return null;
+        }
+        return new Builder(bundle.getString("name"), (int) bundle.getDouble("month"))
+                .age(bundle.containsKey("age") ? bundle.getInt("age") : null)
+                .status(bundle.containsKey("status") ? Status.fromBundle(bundle.getBundle("status")) : null)
+                .position(bundle.containsKey("position") ? Position.fromBundle(bundle.getBundle("position")) : null)
+                .birthYear(bundle.containsKey("birthYear") ? BirthYear.fromBundle(bundle.getBundle("birthYear")) : null)
+                .build();
     }
 
     private final String name;
+    private final Number month;
     private final Integer age;
-    private final Integer month;
     private final Status status;
     private final Position position;
     private final BirthYear birthYear;
 
     private Person(Builder builder) {
         this.name = builder.name;
-        this.age = builder.age;
         this.month = builder.month;
+        this.age = builder.age;
         this.status = builder.status;
         this.position = builder.position;
         this.birthYear = builder.birthYear;
     }
 
-    private Person(Parcel in) {
-        name = in.readString();
-        age = in.readInt();
-        month = in.readInt();
-        status = in.readParcelable(Status.class.getClassLoader());
-        position = in.readParcelable(Position.class.getClassLoader());
-        birthYear = in.readParcelable(BirthYear.class.getClassLoader());
+    protected Person(Parcel in) {
+        Bundle bundle = in.readBundle();
+        this.name = bundle.getString("name");
+        this.month = bundle.getDouble("month");
+        this.age = bundle.containsKey("age") ? bundle.getInt("age") : null;
+        this.status = bundle.containsKey("status") ? Status.fromBundle(bundle.getBundle("status")) : null;
+        this.position = bundle.containsKey("position") ? Position.fromBundle(bundle.getBundle("position")) : null;
+        this.birthYear = bundle.containsKey("birthYear") ? BirthYear.fromBundle(bundle.getBundle("birthYear")) : null;
     }
 
     public static final Creator<Person> CREATOR = new Creator<Person>() {
@@ -66,26 +75,26 @@ public class Person implements Parcelable {
         return name;
     }
 
+    /**
+     * Month hired
+     *
+     * @return Integer
+     */
+    @NonNull
+    public Number getMonth() {
+        return month;
+    }
+
     @Nullable
     public Integer getAge() {
         return age;
     }
 
     /**
-    * Month hired
-    *
-    * @return Integer
-    */
-    @NonNull
-    public Integer getMonth() {
-        return month;
-    }
-
-    /**
-    * Membership status
-    *
-    * @return Status
-    */
+     * Membership status
+     *
+     * @return Status
+     */
     @Nullable
     public Status getStatus() {
         return status;
@@ -101,6 +110,26 @@ public class Person implements Parcelable {
         return birthYear;
     }
 
+    @NonNull
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putInt("month", month.intValue());
+        if (age != null) {
+            bundle.putInt("age", age);
+        }
+        if (status != null) {
+            bundle.putParcelable("status", status.toBundle());
+        }
+        if (position != null) {
+            bundle.putParcelable("position", position.toBundle());
+        }
+        if (birthYear != null) {
+            bundle.putParcelable("birthYear", birthYear.toBundle());
+        }
+        bundle.putString(KEY_BUNDLE_ID, VALUE_BUNDLE_ID);
+        return bundle;
+    }
 
     @Override
     public int describeContents() {
@@ -109,25 +138,13 @@ public class Person implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeInt(age);
-        dest.writeInt(month);
-        dest.writeParcelable(status, flags);
-        dest.writeParcelable(position, flags);
-        dest.writeParcelable(birthYear, flags);
-    }
-
-    @NonNull
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_BUNDLE_PERSON, this);
-        return bundle;
+        dest.writeBundle(toBundle());
     }
 
     public static class Builder {
         private final String name;
-        private Integer age;
         private final Integer month;
+        private Integer age;
         private Status status;
         private Position position;
         private BirthYear birthYear;

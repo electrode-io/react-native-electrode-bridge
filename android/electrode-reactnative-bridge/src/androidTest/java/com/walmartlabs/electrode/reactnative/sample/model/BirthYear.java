@@ -8,7 +8,8 @@ import android.support.annotation.Nullable;
 
 public class BirthYear implements Parcelable {
 
-    private static final String KEY_BUNDLE_BIRTHYEAR = "birthYear";
+    private static final String KEY_BUNDLE_ID = "className";
+    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
 
     @Nullable
     public static BirthYear fromBundle(@Nullable Bundle bundle) {
@@ -16,12 +17,18 @@ public class BirthYear implements Parcelable {
             return null;
         }
 
-        Parcelable parcelable = bundle.getParcelable(KEY_BUNDLE_BIRTHYEAR);
-        if (parcelable instanceof BirthYear) {
-            return (BirthYear) parcelable;
-        } else {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
             return null;
         }
+
+        //Validate to make sure all required fields are available
+        if (!bundle.containsKey("month")
+                || !bundle.containsKey("year")) {
+            return null;
+        }
+
+        return new Builder(bundle.getInt("month"), bundle.getInt("year")).build();
     }
 
     private final Integer month;
@@ -33,8 +40,10 @@ public class BirthYear implements Parcelable {
     }
 
     private BirthYear(Parcel in) {
-        month = in.readInt();
-        year = in.readInt();
+        Bundle bundle = in.readBundle();
+
+        month = bundle.getInt("month");
+        year = bundle.getInt("year");
     }
 
     public static final Creator<BirthYear> CREATOR = new Creator<BirthYear>() {
@@ -67,14 +76,15 @@ public class BirthYear implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(month);
-        dest.writeInt(year);
+        dest.writeBundle(toBundle());
     }
 
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_BUNDLE_BIRTHYEAR, this);
+        bundle.putInt("month", month);
+        bundle.putInt("year", year);
+        bundle.putString(KEY_BUNDLE_ID, VALUE_BUNDLE_ID);
         return bundle;
     }
 

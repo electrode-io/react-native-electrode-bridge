@@ -8,7 +8,8 @@ import android.support.annotation.Nullable;
 
 public class Status implements Parcelable {
 
-    private static final String KEY_BUNDLE_STATUS = "status";
+    private static final String KEY_BUNDLE_ID = "className";
+    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
 
     @Nullable
     public static Status fromBundle(@Nullable Bundle bundle) {
@@ -16,25 +17,31 @@ public class Status implements Parcelable {
             return null;
         }
 
-        Parcelable parcelable = bundle.getParcelable(KEY_BUNDLE_STATUS);
-        if (parcelable instanceof Status) {
-            return (Status) parcelable;
-        } else {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
             return null;
         }
+
+        //Validate to make sure all required fields are available
+        if (!bundle.containsKey("member")) {
+            return null;
+        }
+
+        return new Builder(bundle.getBoolean("member")).log(bundle.getBoolean("log")).build();
     }
 
-    private final Boolean log;
     private final Boolean member;
+    private final Boolean log;
 
     private Status(Builder builder) {
-        this.log = builder.log;
         this.member = builder.member;
+        this.log = builder.log;
     }
 
     private Status(Parcel in) {
-        log = in.readInt() != 0;
-        member = in.readInt() != 0;
+        Bundle bundle = in.readBundle();
+        member = bundle.getBoolean("member");
+        log = bundle.getBoolean("log");
     }
 
     public static final Creator<Status> CREATOR = new Creator<Status>() {
@@ -77,14 +84,16 @@ public class Status implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(log ? 1 : 0);
-        dest.writeInt(member ? 1 : 0);
+        dest.writeBundle(toBundle());
     }
 
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_BUNDLE_STATUS, this);
+        bundle.putBoolean("member", member);
+        if (log != null) {
+            bundle.putBoolean("log", log);
+        }
         return bundle;
     }
 

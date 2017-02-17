@@ -8,9 +8,6 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Created by d0g00g4 on 2/13/17.
- */
 public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
     public void testSampleRequest() {

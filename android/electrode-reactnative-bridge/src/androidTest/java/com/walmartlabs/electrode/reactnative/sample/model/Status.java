@@ -94,6 +94,7 @@ public class Status implements Parcelable {
         if (log != null) {
             bundle.putBoolean("log", log);
         }
+        bundle.putString(KEY_BUNDLE_ID, VALUE_BUNDLE_ID);
         return bundle;
     }
 

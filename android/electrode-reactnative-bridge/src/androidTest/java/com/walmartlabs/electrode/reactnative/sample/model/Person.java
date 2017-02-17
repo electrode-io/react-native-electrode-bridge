@@ -24,7 +24,7 @@ public class Person implements Parcelable {
                 || !bundle.containsKey("month")) {
             return null;
         }
-        return new Builder(bundle.getString("name"), (int) bundle.getDouble("month"))
+        return new Builder(bundle.getString("name"), bundle.getInt("month"))
                 .age(bundle.containsKey("age") ? bundle.getInt("age") : null)
                 .status(bundle.containsKey("status") ? Status.fromBundle(bundle.getBundle("status")) : null)
                 .position(bundle.containsKey("position") ? Position.fromBundle(bundle.getBundle("position")) : null)
@@ -51,7 +51,7 @@ public class Person implements Parcelable {
     protected Person(Parcel in) {
         Bundle bundle = in.readBundle();
         this.name = bundle.getString("name");
-        this.month = bundle.getDouble("month");
+        this.month = bundle.getInt("month");
         this.age = bundle.containsKey("age") ? bundle.getInt("age") : null;
         this.status = bundle.containsKey("status") ? Status.fromBundle(bundle.getBundle("status")) : null;
         this.position = bundle.containsKey("position") ? Position.fromBundle(bundle.getBundle("position")) : null;

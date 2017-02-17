@@ -35,21 +35,27 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
     public void testRegisterGetStatusRequestHandler() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Status result = new Status.Builder(true).log(true).build();
+        final Person person = new Person.Builder("John", 05).build();
 
 
         PersonBridgeRequests.registerGetStatusRequestHandler(new RequestHandlerEx<Person, Status>() {
             @Override
             public void handleRequest(Person payload, Response<Status> response) {
-                response.onSuccess(new Status.Builder(true).log(true).build());
+                assertEquals(person.getName(), payload.getName());
+                assertEquals(person.getMonth(), payload.getMonth());
+                response.onSuccess(result);
             }
         });
 
 
-        Person person = new Person.Builder("John", 05).build();
         PersonBridgeRequests.getStatusRequest(person, new Response<Status>() {
             @Override
             public void onSuccess(Status obj) {
-                fail();
+                assertNotNull(obj);
+                assertEquals(result.getLog(), obj.getLog());
+                assertEquals(result.getMember(), obj.getMember());
+                countDownLatch.countDown();
             }
 
             @Override

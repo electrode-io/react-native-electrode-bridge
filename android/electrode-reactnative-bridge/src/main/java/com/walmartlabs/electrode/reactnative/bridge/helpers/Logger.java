@@ -46,9 +46,9 @@ public final class Logger {
      *            the class or activity where the log call occurs.
      * @param msg The message you would like logged.
      */
-    public static int v(String tag, String msg) {
+    public static int v(String tag, String msg, Object... args) {
         if (shouldLog(LogLevel.VERBOSE)) {
-            return Log.v(tag, msg);
+            return Log.v(tag, args != null ? String.format(msg, args) : msg);
         }
         return -1;
     }
@@ -75,9 +75,9 @@ public final class Logger {
      *            the class or activity where the log call occurs.
      * @param msg The message you would like logged.
      */
-    public static int d(String tag, String msg) {
+    public static int d(String tag, String msg, Object... args) {
         if (shouldLog(LogLevel.DEBUG)) {
-            return Log.d(tag, msg);
+            return Log.d(tag, args != null ? String.format(msg, args) : msg);
         }
         return -1;
     }
@@ -104,9 +104,9 @@ public final class Logger {
      *            the class or activity where the log call occurs.
      * @param msg The message you would like logged.
      */
-    public static int i(String tag, String msg) {
+    public static int i(String tag, String msg, Object... args) {
         if (shouldLog(LogLevel.INFO)) {
-            return Log.i(tag, msg);
+            return Log.i(tag, args != null ? String.format(msg, args) : msg);
         }
         return -1;
     }
@@ -133,9 +133,9 @@ public final class Logger {
      *            the class or activity where the log call occurs.
      * @param msg The message you would like logged.
      */
-    public static int w(String tag, String msg) {
+    public static int w(String tag, String msg, Object... args) {
         if (shouldLog(LogLevel.WARN)) {
-            return Log.w(tag, msg);
+            return Log.w(tag, args != null ? String.format(msg, args) : msg);
         }
         return -1;
     }
@@ -176,9 +176,9 @@ public final class Logger {
      *            the class or activity where the log call occurs.
      * @param msg The message you would like logged.
      */
-    public static int e(String tag, String msg) {
+    public static int e(String tag, String msg, Object... args) {
         if (shouldLog(LogLevel.ERROR)) {
-            return Log.e(tag, msg);
+            return Log.e(tag, args != null ? String.format(msg, args) : msg);
         }
         return -1;
     }

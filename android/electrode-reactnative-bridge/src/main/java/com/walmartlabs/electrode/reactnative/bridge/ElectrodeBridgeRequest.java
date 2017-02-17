@@ -3,7 +3,7 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import android.os.Bundle;
 
 public class ElectrodeBridgeRequest {
-    private static final int DEFAULT_REQUEST_TIMEOUT = 5000;
+    private static final int DEFAULT_REQUEST_TIMEOUT_MS = 5000;
 
     private final String mName;
     private final Bundle mData;
@@ -49,6 +49,11 @@ public class ElectrodeBridgeRequest {
         return this.mDispatchMode;
     }
 
+    @Override
+    public String toString() {
+        return mName + ", data: " + (mData != null ? mData : "<empty>") + ", dispatchMode:" + mDispatchMode;
+    }
+
     public static class Builder {
         private final String mName;
         private Bundle mData;
@@ -62,7 +67,7 @@ public class ElectrodeBridgeRequest {
          */
         public Builder(String name) {
             mName = name;
-            mTimeoutMs = DEFAULT_REQUEST_TIMEOUT;
+            mTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS;
             mData = Bundle.EMPTY;
             mDispatchMode = DispatchMode.JS;
         }

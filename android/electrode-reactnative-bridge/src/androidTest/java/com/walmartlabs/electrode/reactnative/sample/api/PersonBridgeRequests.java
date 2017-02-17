@@ -24,6 +24,7 @@ public final class PersonBridgeRequests {
 
     private static final String EVENT_GET_PERSON = "com.apisample.ern.apisample.get.person";
     private static final String EVENT_GET_STATUS = "com.apisample.ern.apisample.get.status";
+    private static final String EVENT_GET_USER_NAME = "com.apisample.ern.apisample.get.user.name";
 
     /***
      * Registers a handler that returns the current user when {@link #getPersonRequest(Response)} is invoked through client(Native or JS side).
@@ -116,7 +117,7 @@ public final class PersonBridgeRequests {
         Bundle bundle = person.toBundle();
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_STATUS)
                 .withData(bundle)
-                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
+                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.NATIVE)
                 .build();
 
         ElectrodeBridge.sendRequest(req, new RequestCompletionListener() {
@@ -134,7 +135,7 @@ public final class PersonBridgeRequests {
     }
 
     public static void getUserNameRequest(@NonNull final Response<String> response) {
-        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_STATUS)
+        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_USER_NAME)
                 .withData(Bundle.EMPTY)
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
                 .build();

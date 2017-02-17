@@ -3,12 +3,12 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableMap;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 @SuppressWarnings("unused")
 public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDispatcher {
+    private static final String TAG = RequestDispatcherImpl.class.getSimpleName();
     private static final Bundle EMPTY_BUNDLE = new Bundle();
 
     private final RequestRegistrar<RequestHandler> mRequestRegistrar;
@@ -60,43 +60,33 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         void onRequest(@NonNull Bundle payload, @NonNull RequestCompletioner requestCompletioner);
     }
 
-    /**
-     * Dispatch a request
-     *
-     * @param name    The name of the request to dispatch
-     * @param id      The id of the request
-     * @param payload The payload of the request as a ReadableMap
-     * @param promise A promise to fulfil upon request completion
-     */
     @Override
-    public void dispatchRequest(@NonNull String name,
-                                @NonNull String id,
-                                @NonNull ReadableMap payload,
-                                @NonNull final Promise promise) {
-        Bundle payloadBundle = Arguments.toBundle(payload);
-
+    public void dispatchRequest(@NonNull String name, @NonNull final String id, @NonNull Bundle data, @NonNull final Promise promise) {
+        Logger.d(TAG, "dispatching request(id=%s) locally, with promise(%s)", id, promise);
         RequestHandler requestHandler = mRequestRegistrar.getRequestHandler(name);
-
         if (requestHandler == null) {
             promise.reject("ENOHANDLER", "No registered request handler for request name " + name);
             return;
         }
 
-        requestHandler.onRequest((payloadBundle != null ? payloadBundle : EMPTY_BUNDLE),
+        requestHandler.onRequest(data,
                 new RequestCompletioner() {
                     @Override
                     public void error(@NonNull String code, @NonNull String message) {
+                        Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), errorCode(%s)", id, promise, code);
                         promise.reject(code, message);
                     }
 
                     @Override
                     public void success(@NonNull Bundle bundle) {
-                        promise.resolve(Arguments.fromBundle(bundle));
+                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), responseBundle(%s)", id, promise, bundle);
+                        promise.resolve(bundle);
                     }
 
                     @Override
                     public void success() {
-                        promise.resolve(Arguments.createMap());
+                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), with empty bundle", id, promise);
+                        promise.resolve(EMPTY_BUNDLE);
                     }
                 });
     }

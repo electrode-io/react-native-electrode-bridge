@@ -8,7 +8,8 @@ import android.support.annotation.Nullable;
 
 public class Position implements Parcelable {
 
-    private static final String KEY_BUNDLE_POSITION = "position";
+    private static final String KEY_BUNDLE_ID = "className";
+    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
 
     @Nullable
     public static Position fromBundle(@Nullable Bundle bundle) {
@@ -16,16 +17,16 @@ public class Position implements Parcelable {
             return null;
         }
 
-        Parcelable parcelable = bundle.getParcelable(KEY_BUNDLE_POSITION);
-        if (parcelable instanceof Position) {
-            return (Position) parcelable;
-        } else {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
             return null;
         }
+
+        return new Builder().lat(bundle.getDouble("lat")).lng(bundle.getDouble("lng")).build();
     }
 
-    private final Integer lat;
-    private final Integer lng;
+    private final Double lat;
+    private final Double lng;
 
     private Position(Builder builder) {
         this.lat = builder.lat;
@@ -33,8 +34,10 @@ public class Position implements Parcelable {
     }
 
     private Position(Parcel in) {
-        lat = in.readInt();
-        lng = in.readInt();
+        Bundle bundle = in.readBundle();
+
+        lat = bundle.getDouble("lat");
+        lng = bundle.getDouble("lng");
     }
 
     public static final Creator<Position> CREATOR = new Creator<Position>() {
@@ -50,12 +53,12 @@ public class Position implements Parcelable {
     };
 
     @Nullable
-    public Integer getLat() {
+    public Double getLat() {
         return lat;
     }
 
     @Nullable
-    public Integer getLng() {
+    public Double getLng() {
         return lng;
     }
 
@@ -67,32 +70,38 @@ public class Position implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(lat);
-        dest.writeInt(lng);
+        dest.writeBundle(toBundle());
     }
 
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_BUNDLE_POSITION, this);
+        if (lat != null) {
+            bundle.putDouble("lat", lat);
+        }
+
+        if (lng != null) {
+            bundle.putDouble("lng", lng);
+        }
+        bundle.putString(KEY_BUNDLE_ID, VALUE_BUNDLE_ID);
         return bundle;
     }
 
     public static class Builder {
-        private Integer lat;
-        private Integer lng;
+        private Double lat;
+        private Double lng;
 
         public Builder() {
         }
 
         @NonNull
-        public Builder lat(@Nullable Integer lat) {
+        public Builder lat(@Nullable Double lat) {
             this.lat = lat;
             return this;
         }
 
         @NonNull
-        public Builder lng(@Nullable Integer lng) {
+        public Builder lng(@Nullable Double lng) {
             this.lng = lng;
             return this;
         }

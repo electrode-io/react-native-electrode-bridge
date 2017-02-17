@@ -14,11 +14,10 @@ import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
+import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -190,72 +189,52 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
      */
     @SuppressWarnings("unused")
     public void sendRequest(
-            @NonNull ElectrodeBridgeRequest request,
+            @NonNull final ElectrodeBridgeRequest request,
             @NonNull final RequestCompletionListener completionListener) {
         final String id = getUUID();
+        logRequest(request, id);
 
         final Promise promise = new PromiseImpl(new Callback() {
             @Override
             public void invoke(final Object... args) {
+                Object obj = args[0];
+
+                final Bundle bundle;
+                if (obj instanceof Bundle) {
+                    bundle = (Bundle) obj;
+                } else if (obj instanceof ReadableMap) {
+                    bundle = BridgeArguments.responseBundle((ReadableMap) obj, BRIDGE_MSG_DATA);
+                } else {
+                    throw new IllegalArgumentException("Response object type not supported: " + (obj != null ? obj.getClass() : null));
+                }
+
+                logResponse(bundle, id, request);
+
+                if (!removePromiseFromPendingList(id)) {
+                    return;
+                }
+
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        ReadableMap data = (ReadableMap) args[0];
-                        Bundle bundle = new Bundle();
-
-                        if (data != null) {
-                            switch (data.getType(BRIDGE_MSG_DATA)) {
-                                case Array: {
-                                    ReadableArray readableArray = data.getArray(BRIDGE_MSG_DATA);
-                                    if (readableArray.size() != 0) {
-                                        switch (readableArray.getType(0)) {
-                                            case String:
-                                                bundle.putStringArray("rsp", ArgumentsEx.toStringArray(readableArray));
-                                                break;
-                                            case Boolean:
-                                                bundle.putBooleanArray("rsp", ArgumentsEx.toBooleanArray(readableArray));
-                                                break;
-                                            case Number:
-                                                // Can be int or double
-                                                bundle.putDoubleArray("rsp", ArgumentsEx.toDoubleArray(readableArray));
-                                                break;
-                                            case Map:
-                                                bundle.putParcelableArray("rsp", ArgumentsEx.toBundleArray(readableArray));
-                                                break;
-                                            case Array:
-                                                // Don't support array of arrays yet
-                                                break;
-                                        }
-                                    }
-                                }
-                                break;
-                                case Map:
-                                    bundle.putBundle("rsp", ArgumentsEx.toBundle(data.getMap(BRIDGE_MSG_DATA)));
-                                    break;
-                                case Boolean:
-                                    bundle.putBoolean("rsp", data.getBoolean(BRIDGE_MSG_DATA));
-                                    break;
-                                case Number:
-                                    // can be int or double
-                                    bundle.putDouble("rsp", data.getDouble(BRIDGE_MSG_DATA));
-                                    break;
-                                case String:
-                                    bundle.putString("rsp", data.getString(BRIDGE_MSG_DATA));
-                                    break;
-                                case Null:
-                                    break;
-                            }
-                        }
+                        completionListener.onSuccess(bundle);
                     }
                 });
             }
         }, new Callback() {
             @Override
             public void invoke(final Object... args) {
+                final WritableMap writableMap = (WritableMap) args[0];
+
+                logFailure(writableMap.getString("code"), writableMap.getString("message"), id, request);
+
+                if (!removePromiseFromPendingList(id)) {
+                    return;
+                }
+
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        WritableMap writableMap = (WritableMap) args[0];
                         completionListener.onError(
                                 writableMap.getString("code"),
                                 writableMap.getString("message"));
@@ -269,38 +248,43 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             public void run() {
-                Promise promise = pendingPromiseByRequestId.remove(id);
-                if (promise != null) {
+                Logger.d(TAG, "Checking timeout for request(%s)", id);
+                if (pendingPromiseByRequestId.containsKey(id)) {
+                    Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, promise);
                     promise.reject("EREQUESTTIMEOUT", "Request timeout");
+                } else {
+                    Logger.d(TAG, "Ignoring timeout, request(%d) already completed", id);
                 }
             }
         }, request.getTimeoutMs());
 
-        Log.d(TAG, String.format("Sending request[name:%s id:%s]", request.getName(), id));
-
         if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.JS)) {
-            WritableMap message = buildMessage(
-                    id, request.getName(), Arguments.fromBundle(request.getData()));
-
+            WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
             mReactContextWrapper.emitEvent(BRIDE_REQUEST, message);
         } else if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.NATIVE)) {
-            dispatchRequest(request.getName(), id, Arguments.fromBundle(request.getData()), promise);
+            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise);
         }
     }
 
-    /**
-     * Dispatch a request on the native side
-     *
-     * @param name    The name of the request
-     * @param id      The request id
-     * @param data    The request data
-     * @param promise A promise to reject or resolve the request asynchronously
-     */
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
-        Log.d(TAG, String.format("dispatchRequest[name:%s id:%s]", name, id));
-        mRequestDispatcher.dispatchRequest(name, id, data, promise);
+    private boolean removePromiseFromPendingList(String id) {
+        Promise p = pendingPromiseByRequestId.remove(id);
+        if (p == null) {
+            Logger.d(TAG, "Looks like the request(%s) already timed out, ignore the response received", id);
+            return false;
+        }
+        return true;
+    }
+
+    private void logRequest(@NonNull ElectrodeBridgeRequest bridgeRequest, @NonNull String id) {
+        Logger.d(TAG, ">>>>>>>> id = %s, Sending request(%s)", id, bridgeRequest);
+    }
+
+    private void logResponse(@NonNull Bundle responseBundle, @NonNull String id, ElectrodeBridgeRequest request) {
+        Logger.d(TAG, "<<<<<<<< id = %s, Received response(%s) for request(%s)", id, responseBundle, request);
+    }
+
+    private void logFailure(@NonNull String code, @NonNull String message, @NonNull String id, ElectrodeBridgeRequest request) {
+        Logger.d(TAG, "<<<<<<<< id = %s, Received failure(code=%s, message=%s) for request(%s)", id, code, message, request);
     }
 
     /**

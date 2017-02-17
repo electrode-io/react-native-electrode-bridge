@@ -132,7 +132,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
      */
     public interface RequestDispatcher {
         /**
-         * Dispatch a request
+         * Dispatch a request to the handler registered on native side.
          *
          * @param name    The name of the request to dispatch
          * @param id      The request id
@@ -141,7 +141,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
          */
         void dispatchRequest(@NonNull String name,
                              @NonNull String id,
-                             @NonNull ReadableMap data,
+                             @NonNull Bundle data,
                              @NonNull Promise promise);
     }
 

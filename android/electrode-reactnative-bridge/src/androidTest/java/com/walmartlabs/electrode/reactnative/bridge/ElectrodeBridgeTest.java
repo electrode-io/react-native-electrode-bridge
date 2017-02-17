@@ -2,7 +2,7 @@ package com.walmartlabs.electrode.reactnative.bridge;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Response;
-import com.walmartlabs.electrode.reactnative.sample.api.PersonBridgeRequests;
+import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -12,7 +12,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
     public void testSampleRequest() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        PersonBridgeRequests.getUserNameRequest(new Response<String>() {
+        PersonApi.requests().getUserName(new Response<String>() {
             @Override
             public void onSuccess(String obj) {
                 fail();
@@ -35,8 +35,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         final Status result = new Status.Builder(true).log(true).build();
         final Person person = new Person.Builder("John", 05).build();
 
-
-        PersonBridgeRequests.registerGetStatusRequestHandler(new RequestHandlerEx<Person, Status>() {
+        PersonApi.requests().registerGetStatusRequestHandler(new RequestHandlerEx<Person, Status>() {
             @Override
             public void handleRequest(Person payload, Response<Status> response) {
                 assertEquals(person.getName(), payload.getName());
@@ -46,7 +45,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         });
 
 
-        PersonBridgeRequests.getStatusRequest(person, new Response<Status>() {
+        PersonApi.requests().getStatus(person, new Response<Status>() {
             @Override
             public void onSuccess(Status obj) {
                 assertNotNull(obj);

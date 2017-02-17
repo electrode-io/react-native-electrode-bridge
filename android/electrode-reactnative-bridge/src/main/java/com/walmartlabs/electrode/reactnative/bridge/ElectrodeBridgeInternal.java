@@ -253,7 +253,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                     Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, promise);
                     promise.reject("EREQUESTTIMEOUT", "Request timeout");
                 } else {
-                    Logger.d(TAG, "Ignoring timeout, request(%d) already completed", id);
+                    Logger.d(TAG, "Ignoring timeout, request(%s) already completed", id);
                 }
             }
         }, request.getTimeoutMs());

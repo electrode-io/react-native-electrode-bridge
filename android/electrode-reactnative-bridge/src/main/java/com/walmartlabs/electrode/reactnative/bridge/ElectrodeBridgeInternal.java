@@ -47,7 +47,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
 
     private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
     private final EventRegistrar<EventDispatcherImpl.EventListener> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<RequestDispatcherImpl.RequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
 
@@ -154,7 +154,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
     /**
      * @return The request handler registrar
      */
-    public RequestRegistrar<RequestDispatcherImpl.RequestHandler> requestRegistrar() {
+    public RequestRegistrar<ElectrodeBridgeRequestHandler> requestRegistrar() {
         return mRequestRegistrar;
     }
 

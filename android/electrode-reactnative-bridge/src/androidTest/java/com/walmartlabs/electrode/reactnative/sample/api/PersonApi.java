@@ -2,7 +2,7 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
 
-import com.walmartlabs.electrode.reactnative.bridge.RequestDispatcherImpl;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.EventListener;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
@@ -78,14 +78,14 @@ public final class PersonApi {
         /***
          * Registers a handler that returns the current user when {@link #getPerson(Response)} is invoked through client(Native or JS side).
          *
-         * @param handler {@link RequestDispatcherImpl.RequestHandler}
+         * @param handler {@link ElectrodeBridgeRequestHandler}
          */
         void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler);
 
         /**
          * Registers a handler  that returns the user status when {@link #getStatus(Person, Response)} is invoked through client(Native or JS side).
          *
-         * @param handler {@link RequestDispatcherImpl.RequestHandler}
+         * @param handler {@link ElectrodeBridgeRequestHandler}
          */
         void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler);
 

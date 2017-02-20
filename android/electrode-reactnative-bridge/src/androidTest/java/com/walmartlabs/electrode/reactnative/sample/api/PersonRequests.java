@@ -3,6 +3,7 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest;
 import com.walmartlabs.electrode.reactnative.bridge.RequestCompletionListener;
@@ -28,7 +29,7 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_PERSON, new RequestDispatcherImpl.RequestHandler() {
+        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_PERSON, new ElectrodeBridgeRequestHandler() {
             @Override
             public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
                 handler.handleRequest(new Response<Person>() {
@@ -49,7 +50,7 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_STATUS, new RequestDispatcherImpl.RequestHandler() {
+        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_STATUS, new ElectrodeBridgeRequestHandler() {
             @Override
             public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
 

@@ -7,6 +7,7 @@ import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
+import com.walmartlabs.electrode.reactnative.bridge.FailureMessage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -39,8 +40,8 @@ final class PersonRequests implements PersonApi.Requests {
                     }
 
                     @Override
-                    public void onFailure(@NonNull String code, @NonNull String message) {
-                        responseListener.onFailure(code, message);
+                    public void onFailure(@NonNull FailureMessage failureMessage) {
+                        responseListener.onFailure(failureMessage);
                     }
                 });
             }
@@ -57,8 +58,8 @@ final class PersonRequests implements PersonApi.Requests {
 
                 handler.handleRequest(payload, new ElectrodeBridgeResponseListener<Status>() {
                     @Override
-                    public void onFailure(@NonNull String code, @NonNull String message) {
-                        responseListener.onFailure(code, message);
+                    public void onFailure(@NonNull FailureMessage failureMessage) {
+                        responseListener.onFailure(failureMessage);
                     }
 
                     @Override
@@ -85,8 +86,8 @@ final class PersonRequests implements PersonApi.Requests {
             }
 
             @Override
-            public void onFailure(@NonNull String code, @NonNull String message) {
-                response.onFailure(code, message);
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                response.onFailure(failureMessage);
             }
         });
     }
@@ -109,8 +110,8 @@ final class PersonRequests implements PersonApi.Requests {
             }
 
             @Override
-            public void onFailure(@NonNull String code, @NonNull String message) {
-                response.onFailure(code, message);
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                response.onFailure(failureMessage);
             }
         });
     }
@@ -131,8 +132,8 @@ final class PersonRequests implements PersonApi.Requests {
             }
 
             @Override
-            public void onFailure(@NonNull String code, @NonNull String message) {
-                response.onFailure(code, message);
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                response.onFailure(failureMessage);
             }
 
         });

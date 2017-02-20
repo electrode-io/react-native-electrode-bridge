@@ -9,10 +9,9 @@ public interface ElectrodeBridgeResponseListener<TRsp> {
     /**
      * Error response
      *
-     * @param code    The error code
-     * @param message The error message
+     * @param failureMessage {@link FailureMessage} with failure details.
      */
-    void onFailure(@NonNull String code, @NonNull String message);
+    void onFailure(@NonNull FailureMessage failureMessage);
 
     /**
      * Successful response

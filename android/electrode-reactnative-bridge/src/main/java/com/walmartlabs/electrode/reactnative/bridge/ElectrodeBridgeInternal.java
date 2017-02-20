@@ -235,9 +235,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        responseListener.onFailure(
-                                writableMap.getString("code"),
-                                writableMap.getString("message"));
+                        responseListener.onFailure(BridgeFailureMessage.create(writableMap.getString("code"), writableMap.getString("message")));
                     }
                 });
             }

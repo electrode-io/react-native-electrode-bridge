@@ -7,6 +7,8 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import java.util.concurrent.CountDownLatch;
 
+import javax.annotation.Nonnull;
+
 public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
     public void testSampleRequest() {
@@ -18,9 +20,10 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
             }
 
             @Override
-            public void onFailure(String code, String message) {
-                assertNotNull(code);
-                assertNotNull(message);
+            public void onFailure(@Nonnull FailureMessage failureMessage) {
+                assertNotNull(failureMessage);
+                assertNotNull(failureMessage.getCode());
+                assertNotNull(failureMessage.getMessage());
                 countDownLatch.countDown();
             }
         });
@@ -54,7 +57,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
             }
 
             @Override
-            public void onFailure(String code, String message) {
+            public void onFailure(@Nonnull FailureMessage failureMessage) {
                 fail();
             }
         });

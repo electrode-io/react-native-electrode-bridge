@@ -13,9 +13,9 @@ import java.util.Map;
  * Facade to ElectrodeBridgeInternal.
  * Handles queuing every method calls until react native is ready.
  */
-public class ElectrodeBridge {
+public class ElectrodeBridgeHolder {
 
-    private static final String TAG = ElectrodeBridge.class.getSimpleName();
+    private static final String TAG = ElectrodeBridgeHolder.class.getSimpleName();
 
     private static boolean isReactNativeReady;
 

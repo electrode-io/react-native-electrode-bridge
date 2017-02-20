@@ -3,7 +3,7 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridge;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest;
 import com.walmartlabs.electrode.reactnative.bridge.RequestCompletionListener;
 import com.walmartlabs.electrode.reactnative.bridge.RequestDispatcherImpl;
@@ -28,7 +28,7 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
-        ElectrodeBridge.registerRequestHandler(EVENT_GET_PERSON, new RequestDispatcherImpl.RequestHandler() {
+        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_PERSON, new RequestDispatcherImpl.RequestHandler() {
             @Override
             public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
                 handler.handleRequest(new Response<Person>() {
@@ -49,7 +49,7 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler) {
-        ElectrodeBridge.registerRequestHandler(EVENT_GET_STATUS, new RequestDispatcherImpl.RequestHandler() {
+        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_STATUS, new RequestDispatcherImpl.RequestHandler() {
             @Override
             public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
 
@@ -77,7 +77,7 @@ final class PersonRequests implements PersonApi.Requests {
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
                 .build();
 
-        ElectrodeBridge.sendRequest(req, new RequestCompletionListener() {
+        ElectrodeBridgeHolder.sendRequest(req, new RequestCompletionListener() {
             @Override
             public void onSuccess(Bundle bundle) {
                 Person payload = Person.fromBundle(bundle);
@@ -100,7 +100,7 @@ final class PersonRequests implements PersonApi.Requests {
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.NATIVE)
                 .build();
 
-        ElectrodeBridge.sendRequest(req, new RequestCompletionListener() {
+        ElectrodeBridgeHolder.sendRequest(req, new RequestCompletionListener() {
             @Override
             public void onSuccess(Bundle bundle) {
                 Status payload = Status.fromBundle(bundle);
@@ -122,7 +122,7 @@ final class PersonRequests implements PersonApi.Requests {
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
                 .build();
 
-        ElectrodeBridge.sendRequest(req, new RequestCompletionListener() {
+        ElectrodeBridgeHolder.sendRequest(req, new RequestCompletionListener() {
             @Override
             public void onSuccess(Bundle bundle) {
                 response.onSuccess(bundle.getString("userName"));

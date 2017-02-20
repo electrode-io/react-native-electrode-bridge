@@ -32,7 +32,7 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         }
 
         requestHandler.onRequest(data,
-                new ElectrodeBridgeResponseListener() {
+                new ElectrodeBridgeResponseListener<Bundle>() {
                     @Override
                     public void error(@NonNull String code, @NonNull String message) {
                         Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), errorCode(%s)", id, promise, code);
@@ -43,12 +43,6 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
                     public void success(@NonNull Bundle bundle) {
                         Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), responseBundle(%s)", id, promise, bundle);
                         promise.resolve(bundle);
-                    }
-
-                    @Override
-                    public void success() {
-                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), with empty bundle", id, promise);
-                        promise.resolve(EMPTY_BUNDLE);
                     }
                 });
     }

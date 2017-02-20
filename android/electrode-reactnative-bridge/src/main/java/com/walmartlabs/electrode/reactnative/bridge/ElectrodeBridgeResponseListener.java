@@ -1,12 +1,11 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 /**
- * Provide methods to report request completion
+ * Provide methods to report response for a request.
  */
-public interface ElectrodeBridgeResponseListener {
+public interface ElectrodeBridgeResponseListener<T> {
     /**
      * Error response
      *
@@ -18,12 +17,7 @@ public interface ElectrodeBridgeResponseListener {
     /**
      * Successful response
      *
-     * @param bundle A bundle containing the response data
+     * @param responseData response object{@link T}
      */
-    void success(@NonNull Bundle bundle);
-
-    /**
-     * Successful response
-     */
-    void success();
+    void success(@NonNull T responseData);
 }

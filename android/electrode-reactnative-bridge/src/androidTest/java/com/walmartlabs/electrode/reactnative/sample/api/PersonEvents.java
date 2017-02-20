@@ -3,7 +3,7 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridge;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEvent;
 import com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.EventListener;
@@ -20,7 +20,7 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonAddedEventListener(@NonNull final EventListener<Person> eventListener) {
-        ElectrodeBridge.registerEventListener(REQUEST_PERSON_ADDED, new EventDispatcherImpl.EventListener() {
+        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_ADDED, new EventDispatcherImpl.EventListener() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 Person payload = Person.fromBundle(bundle);
@@ -31,7 +31,7 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonNameUpdatedEventListener(@NonNull final EventListener<String> eventListener) {
-        ElectrodeBridge.registerEventListener(REQUEST_PERSON_NAME_UPDATED, new EventDispatcherImpl.EventListener() {
+        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_NAME_UPDATED, new EventDispatcherImpl.EventListener() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 String payload = bundle.getString("personNameUpdated");
@@ -44,7 +44,7 @@ final class PersonEvents implements PersonApi.Events {
     @Override
     public void emitEventPersonAdded(@NonNull Person person) {
         Bundle bundle = person.toBundle();
-        ElectrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_ADDED)
+        ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_ADDED)
                 .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.JS)
                 .withData(bundle)
                 .build());
@@ -54,7 +54,7 @@ final class PersonEvents implements PersonApi.Events {
     public void emitEventPersonNameUpdated(@NonNull String updatedName) {
         Bundle bundle = new Bundle();
         bundle.putString("updatedName", updatedName);
-        ElectrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_NAME_UPDATED)
+        ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_NAME_UPDATED)
                 .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.JS)
                 .withData(bundle)
                 .build());

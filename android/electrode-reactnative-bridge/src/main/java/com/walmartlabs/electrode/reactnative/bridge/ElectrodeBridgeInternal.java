@@ -47,7 +47,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
 
     private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
     private final EventRegistrar<EventDispatcherImpl.EventListener> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<RequestDispatcherImpl.RequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
 
@@ -154,7 +154,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
     /**
      * @return The request handler registrar
      */
-    public RequestRegistrar<RequestDispatcherImpl.RequestHandler> requestRegistrar() {
+    public RequestRegistrar<ElectrodeBridgeRequestHandler> requestRegistrar() {
         return mRequestRegistrar;
     }
 
@@ -185,12 +185,12 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
      * Sends a request
      *
      * @param request            The request to send
-     * @param completionListener Listener to be called upon request completion
+     * @param responseListener Listener to be called upon request completion
      */
     @SuppressWarnings("unused")
     public void sendRequest(
             @NonNull final ElectrodeBridgeRequest request,
-            @NonNull final RequestCompletionListener completionListener) {
+            @NonNull final ElectrodeBridgeResponseListener responseListener) {
         final String id = getUUID();
         logRequest(request, id);
 
@@ -217,7 +217,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        completionListener.onSuccess(bundle);
+                        responseListener.onSuccess(bundle);
                     }
                 });
             }
@@ -235,7 +235,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        completionListener.onError(
+                        responseListener.onFailure(
                                 writableMap.getString("code"),
                                 writableMap.getString("message"));
                     }

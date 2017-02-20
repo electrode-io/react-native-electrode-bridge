@@ -13,9 +13,9 @@ import java.util.Map;
  * Facade to ElectrodeBridgeInternal.
  * Handles queuing every method calls until react native is ready.
  */
-public class ElectrodeBridge {
+public class ElectrodeBridgeHolder {
 
-    private static final String TAG = ElectrodeBridge.class.getSimpleName();
+    private static final String TAG = ElectrodeBridgeHolder.class.getSimpleName();
 
     private static boolean isReactNativeReady;
 
@@ -28,9 +28,9 @@ public class ElectrodeBridge {
     // This solution does not really scale in the sense that if the user sends a 1000 requests
     // upon native app start, it can become problematic. But I don't see why a user would do that
     // unless it's a bug in its app
-    private static final HashMap<String, RequestDispatcherImpl.RequestHandler> mQueuedRequestHandlersRegistration = new HashMap<>();
+    private static final HashMap<String, ElectrodeBridgeRequestHandler> mQueuedRequestHandlersRegistration = new HashMap<>();
     private static final HashMap<String, EventDispatcherImpl.EventListener> mQueuedEventListenersRegistration = new HashMap<>();
-    private static final HashMap<ElectrodeBridgeRequest, RequestCompletionListener> mQueuedRequests = new HashMap<>();
+    private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener> mQueuedRequests = new HashMap<>();
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
 
     static {
@@ -66,19 +66,19 @@ public class ElectrodeBridge {
      * Sends a request
      *
      * @param request            The request to send
-     * @param completionListener Listener to be called upon request completion
+     * @param responseListener Listener to be called upon request completion
      */
     @SuppressWarnings("unused")
     public static void sendRequest(
             @NonNull ElectrodeBridgeRequest request,
-            @NonNull final RequestCompletionListener completionListener) {
+            @NonNull final ElectrodeBridgeResponseListener responseListener) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing request. Will send once react native initialization is complete.");
-            mQueuedRequests.put(request, completionListener);
+            mQueuedRequests.put(request, responseListener);
             return;
         }
 
-        ElectrodeBridgeInternal.instance().sendRequest(request, completionListener);
+        ElectrodeBridgeInternal.instance().sendRequest(request, responseListener);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ElectrodeBridge {
     @SuppressWarnings("unused")
     @NonNull
     public static void registerRequestHandler(@NonNull String name,
-                                              @NonNull RequestDispatcherImpl.RequestHandler requestHandler) {
+                                              @NonNull ElectrodeBridgeRequestHandler requestHandler) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing request handler registration. Will register once react native initialization is complete.");
             mQueuedRequestHandlersRegistration.put(name, requestHandler);
@@ -120,7 +120,7 @@ public class ElectrodeBridge {
     }
 
     private static void registerQueuedRequestHandlers() {
-        for (Map.Entry<String, RequestDispatcherImpl.RequestHandler> entry : mQueuedRequestHandlersRegistration.entrySet()) {
+        for (Map.Entry<String, ElectrodeBridgeRequestHandler> entry : mQueuedRequestHandlersRegistration.entrySet()) {
             try {
                 ElectrodeBridgeInternal.instance().requestRegistrar().registerRequestHandler(entry.getKey(), entry.getValue());
             } catch (Exception e) {
@@ -142,7 +142,7 @@ public class ElectrodeBridge {
     }
 
     private static void sendQueuedRequests() {
-        for (Map.Entry<ElectrodeBridgeRequest, RequestCompletionListener> entry : mQueuedRequests.entrySet()) {
+        for (Map.Entry<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener> entry : mQueuedRequests.entrySet()) {
             try {
                 ElectrodeBridgeInternal.instance().sendRequest(entry.getKey(), entry.getValue());
             } catch (Exception e) {

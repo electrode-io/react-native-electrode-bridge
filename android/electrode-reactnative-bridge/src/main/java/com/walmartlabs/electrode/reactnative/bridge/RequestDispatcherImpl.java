@@ -11,82 +11,38 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
     private static final String TAG = RequestDispatcherImpl.class.getSimpleName();
     private static final Bundle EMPTY_BUNDLE = new Bundle();
 
-    private final RequestRegistrar<RequestHandler> mRequestRegistrar;
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler> mRequestRegistrar;
 
     /**
      * Initialize a new RequestDispatcherImpl instance
      *
      * @param requestRegistrar The request registrar to use for this dispatcher
      */
-    public RequestDispatcherImpl(RequestRegistrar<RequestHandler> requestRegistrar) {
+    public RequestDispatcherImpl(RequestRegistrar<ElectrodeBridgeRequestHandler> requestRegistrar) {
         mRequestRegistrar = requestRegistrar;
-    }
-
-    /**
-     * Provide methods to report request completion
-     */
-    public interface RequestCompletioner {
-        /**
-         * Error response
-         *
-         * @param code    The error code
-         * @param message The error message
-         */
-        void error(@NonNull String code, @NonNull String message);
-
-        /**
-         * Successful response
-         *
-         * @param bundle A bundle containing the response data
-         */
-        void success(@NonNull Bundle bundle);
-
-        /**
-         * Successful response
-         */
-        void success();
-    }
-
-    /**
-     * Provide method to be notified of incoming request
-     */
-    public interface RequestHandler {
-        /**
-         * Called whenever a request matching this handler is received
-         *
-         * @param payload             The payload of the request as a Bundle
-         * @param requestCompletioner An instance of RequestCompletioner
-         */
-        void onRequest(@NonNull Bundle payload, @NonNull RequestCompletioner requestCompletioner);
     }
 
     @Override
     public void dispatchRequest(@NonNull String name, @NonNull final String id, @NonNull Bundle data, @NonNull final Promise promise) {
         Logger.d(TAG, "dispatching request(id=%s) locally, with promise(%s)", id, promise);
-        RequestHandler requestHandler = mRequestRegistrar.getRequestHandler(name);
+        ElectrodeBridgeRequestHandler requestHandler = mRequestRegistrar.getRequestHandler(name);
         if (requestHandler == null) {
             promise.reject("ENOHANDLER", "No registered request handler for request name " + name);
             return;
         }
 
         requestHandler.onRequest(data,
-                new RequestCompletioner() {
+                new ElectrodeBridgeResponseListener<Bundle>() {
                     @Override
-                    public void error(@NonNull String code, @NonNull String message) {
+                    public void onFailure(@NonNull String code, @NonNull String message) {
                         Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), errorCode(%s)", id, promise, code);
                         promise.reject(code, message);
                     }
 
                     @Override
-                    public void success(@NonNull Bundle bundle) {
+                    public void onSuccess(@NonNull Bundle bundle) {
                         Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), responseBundle(%s)", id, promise, bundle);
                         promise.resolve(bundle);
-                    }
-
-                    @Override
-                    public void success() {
-                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), with empty bundle", id, promise);
-                        promise.resolve(EMPTY_BUNDLE);
                     }
                 });
     }

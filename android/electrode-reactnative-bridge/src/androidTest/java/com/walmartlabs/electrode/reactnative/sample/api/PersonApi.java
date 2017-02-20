@@ -2,11 +2,11 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
 
-import com.walmartlabs.electrode.reactnative.bridge.RequestDispatcherImpl;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.EventListener;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.Response;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -76,16 +76,16 @@ public final class PersonApi {
         final String EVENT_GET_USER_NAME = "com.apisample.ern.apisample.get.user.name";
 
         /***
-         * Registers a handler that returns the current user when {@link #getPerson(Response)} is invoked through client(Native or JS side).
+         * Registers a handler that returns the current user when {@link #getPerson(ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
-         * @param handler {@link RequestDispatcherImpl.RequestHandler}
+         * @param handler {@link ElectrodeBridgeRequestHandler}
          */
         void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler);
 
         /**
-         * Registers a handler  that returns the user status when {@link #getStatus(Person, Response)} is invoked through client(Native or JS side).
+         * Registers a handler  that returns the user status when {@link #getStatus(Person, ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
-         * @param handler {@link RequestDispatcherImpl.RequestHandler}
+         * @param handler {@link ElectrodeBridgeRequestHandler}
          */
         void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler);
 
@@ -93,23 +93,23 @@ public final class PersonApi {
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
-         * The response will be issued via provided {@link Response<Person>#onSuccess({@link Person})} or {@link Response#onError(String, String)} call backs based on the result.
+         * The response will be issued via provided {@link ElectrodeBridgeResponseListener<Person>#onSuccess({@link Person})} or {@link ElectrodeBridgeResponseListener#onFailure(String, String)} call backs based on the result.
          *
-         * @param response {@link Response<Person>} Request listener as a call back to be called once the operation is completed.
+         * @param response {@link ElectrodeBridgeResponseListener<Person>} Request listener as a call back to be called once the operation is completed.
          */
-        void getPerson(@NonNull final Response<Person> response);
+        void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> response);
 
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
-         * The response will be issued via provided {@link Response<Status>#onSuccess({@link Status})} or {@link Response#onError(String, String)} call backs based on the result.
+         * The response will be issued via provided {@link ElectrodeBridgeResponseListener<Status>#onSuccess({@link Status})} or {@link ElectrodeBridgeResponseListener#onFailure(String, String)} call backs based on the result.
          *
-         * @param response {@link Response<Status>} Request listener as a call back to be called once the operation is completed.
+         * @param response {@link ElectrodeBridgeResponseListener<Status>} Request listener as a call back to be called once the operation is completed.
          */
-        void getStatus(@NonNull Person person, @NonNull final Response<Status> response);
+        void getStatus(@NonNull Person person, @NonNull final ElectrodeBridgeResponseListener<Status> response);
 
 
-        void getUserName(@NonNull final Response<String> response);
+        void getUserName(@NonNull final ElectrodeBridgeResponseListener<String> response);
 
     }
 

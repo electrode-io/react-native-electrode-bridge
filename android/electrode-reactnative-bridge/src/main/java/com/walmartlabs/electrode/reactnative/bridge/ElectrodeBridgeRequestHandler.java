@@ -13,5 +13,5 @@ public interface ElectrodeBridgeRequestHandler {
      * @param payload             The payload of the request as a Bundle
      * @param requestCompletioner An instance of RequestCompletioner
      */
-    void onRequest(@NonNull Bundle payload, @NonNull RequestDispatcherImpl.RequestCompletioner requestCompletioner);
+    void onRequest(@NonNull Bundle payload, @NonNull ElectrodeBridgeResponseListener requestCompletioner);
 }

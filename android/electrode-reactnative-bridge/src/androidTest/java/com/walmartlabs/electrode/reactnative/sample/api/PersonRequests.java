@@ -6,8 +6,8 @@ import android.support.annotation.NonNull;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
 import com.walmartlabs.electrode.reactnative.bridge.RequestCompletionListener;
-import com.walmartlabs.electrode.reactnative.bridge.RequestDispatcherImpl;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Response;
@@ -31,7 +31,7 @@ final class PersonRequests implements PersonApi.Requests {
     public void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
         ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_PERSON, new ElectrodeBridgeRequestHandler() {
             @Override
-            public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
+            public void onRequest(Bundle bundle, final ElectrodeBridgeResponseListener requestCompletioner) {
                 handler.handleRequest(new Response<Person>() {
                     @Override
                     public void onSuccess(Person obj) {
@@ -52,7 +52,7 @@ final class PersonRequests implements PersonApi.Requests {
     public void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler) {
         ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_STATUS, new ElectrodeBridgeRequestHandler() {
             @Override
-            public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
+            public void onRequest(Bundle bundle, final ElectrodeBridgeResponseListener requestCompletioner) {
 
                 Person payload = Person.fromBundle(bundle);
 

@@ -22,31 +22,6 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         mRequestRegistrar = requestRegistrar;
     }
 
-    /**
-     * Provide methods to report request completion
-     */
-    public interface RequestCompletioner {
-        /**
-         * Error response
-         *
-         * @param code    The error code
-         * @param message The error message
-         */
-        void error(@NonNull String code, @NonNull String message);
-
-        /**
-         * Successful response
-         *
-         * @param bundle A bundle containing the response data
-         */
-        void success(@NonNull Bundle bundle);
-
-        /**
-         * Successful response
-         */
-        void success();
-    }
-
     @Override
     public void dispatchRequest(@NonNull String name, @NonNull final String id, @NonNull Bundle data, @NonNull final Promise promise) {
         Logger.d(TAG, "dispatching request(id=%s) locally, with promise(%s)", id, promise);
@@ -57,7 +32,7 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         }
 
         requestHandler.onRequest(data,
-                new RequestCompletioner() {
+                new ElectrodeBridgeResponseListener() {
                     @Override
                     public void error(@NonNull String code, @NonNull String message) {
                         Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), errorCode(%s)", id, promise, code);

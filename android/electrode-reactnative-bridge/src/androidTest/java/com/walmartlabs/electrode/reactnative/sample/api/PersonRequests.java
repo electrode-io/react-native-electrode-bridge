@@ -31,17 +31,17 @@ final class PersonRequests implements PersonApi.Requests {
     public void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
         ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_PERSON, new ElectrodeBridgeRequestHandler() {
             @Override
-            public void onRequest(Bundle bundle, final ElectrodeBridgeResponseListener requestCompletioner) {
+            public void onRequest(Bundle bundle, final ElectrodeBridgeResponseListener responseListener) {
                 handler.handleRequest(new Response<Person>() {
                     @Override
                     public void onSuccess(Person obj) {
                         Bundle bundle = obj.toBundle();
-                        requestCompletioner.success(bundle);
+                        responseListener.onSuccess(bundle);
                     }
 
                     @Override
                     public void onError(String code, String message) {
-                        requestCompletioner.error(code, message);
+                        responseListener.onFailure(code, message);
                     }
                 });
             }
@@ -60,12 +60,12 @@ final class PersonRequests implements PersonApi.Requests {
                     @Override
                     public void onSuccess(Status obj) {
                         Bundle bundle = obj.toBundle();
-                        requestCompletioner.success(bundle);
+                        requestCompletioner.onSuccess(bundle);
                     }
 
                     @Override
                     public void onError(String code, String message) {
-                        requestCompletioner.error(code, message);
+                        requestCompletioner.onFailure(code, message);
                     }
                 });
             }

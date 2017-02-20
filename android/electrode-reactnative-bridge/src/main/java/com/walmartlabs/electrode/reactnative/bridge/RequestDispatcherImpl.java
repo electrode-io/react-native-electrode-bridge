@@ -34,13 +34,13 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         requestHandler.onRequest(data,
                 new ElectrodeBridgeResponseListener<Bundle>() {
                     @Override
-                    public void error(@NonNull String code, @NonNull String message) {
+                    public void onFailure(@NonNull String code, @NonNull String message) {
                         Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), errorCode(%s)", id, promise, code);
                         promise.reject(code, message);
                     }
 
                     @Override
-                    public void success(@NonNull Bundle bundle) {
+                    public void onSuccess(@NonNull Bundle bundle) {
                         Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), responseBundle(%s)", id, promise, bundle);
                         promise.resolve(bundle);
                     }

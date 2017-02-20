@@ -12,12 +12,12 @@ public interface ElectrodeBridgeResponseListener<T> {
      * @param code    The error code
      * @param message The error message
      */
-    void error(@NonNull String code, @NonNull String message);
+    void onFailure(@NonNull String code, @NonNull String message);
 
     /**
      * Successful response
      *
      * @param responseData response object{@link T}
      */
-    void success(@NonNull T responseData);
+    void onSuccess(@NonNull T responseData);
 }

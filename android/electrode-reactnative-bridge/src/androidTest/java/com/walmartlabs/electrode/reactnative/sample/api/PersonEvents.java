@@ -12,16 +12,14 @@ import com.walmartlabs.electrode.reactnative.sample.model.Person;
 /**
  * Class that holds all event actions that can be performed on Person module.
  */
-public final class PersonBridgeEvents {
-    private static final String REQUEST_PERSON_ADDED = "com.apisample.ern.apisample.person.added";
-    private static final String REQUEST_PERSON_NAME_UPDATED = "com.apisample.ern.apisample.person.name.updated";
+final class PersonEvents implements PersonApi.Events {
 
-    /**
-     * Registers an event listener to the bridge for event{@link #REQUEST_PERSON_ADDED}. Event listener's {@link EventListener#onEvent(Object)} will be invoked when the event happens.
-     *
-     * @param eventListener {@link EventListener}
-     */
-    public static final void registerPersonAddedEventListener(@NonNull final EventListener<Person> eventListener) {
+    PersonEvents() {
+
+    }
+
+    @Override
+    public void addPersonAddedEventListener(@NonNull final EventListener<Person> eventListener) {
         ElectrodeBridge.registerEventListener(REQUEST_PERSON_ADDED, new EventDispatcherImpl.EventListener() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
@@ -31,12 +29,8 @@ public final class PersonBridgeEvents {
         });
     }
 
-    /**
-     * Registers an event listener to the bridge for event{@link #REQUEST_PERSON_NAME_UPDATED}. Event listener's {@link EventListener#onEvent(Object)} will be invoked when the event happens.
-     *
-     * @param eventListener {@link EventListener}
-     */
-    public static final void registerPersonNameUpdatedEventListener(@NonNull final EventListener<String> eventListener) {
+    @Override
+    public void addPersonNameUpdatedEventListener(@NonNull final EventListener<String> eventListener) {
         ElectrodeBridge.registerEventListener(REQUEST_PERSON_NAME_UPDATED, new EventDispatcherImpl.EventListener() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
@@ -46,12 +40,9 @@ public final class PersonBridgeEvents {
         });
     }
 
-    /**
-     * Calling this method will emit an event {@link #REQUEST_PERSON_ADDED} to all the registered {@link com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl.EventListener}(s).
-     *
-     * @param person {@link Person}
-     */
-    public static void emitEventPersonAdded(@NonNull Person person) {
+
+    @Override
+    public void emitEventPersonAdded(@NonNull Person person) {
         Bundle bundle = person.toBundle();
         ElectrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_ADDED)
                 .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.JS)
@@ -59,12 +50,8 @@ public final class PersonBridgeEvents {
                 .build());
     }
 
-    /**
-     * Calling this method will emit an event {@link #REQUEST_PERSON_NAME_UPDATED} to all the registered {@link com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl.EventListener}(s).
-     *
-     * @param updatedName {@link String}
-     */
-    public static void emitEventPersonNameUpdated(@NonNull String updatedName) {
+    @Override
+    public void emitEventPersonNameUpdated(@NonNull String updatedName) {
         Bundle bundle = new Bundle();
         bundle.putString("updatedName", updatedName);
         ElectrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_NAME_UPDATED)

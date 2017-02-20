@@ -7,10 +7,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-/**
- * Created by d0g00g4 on 2/14/17.
- */
-
 public class ReactContextWrapperInternal implements ReactContextWrapper {
 
     private final ReactApplicationContext mReactApplicationContext;

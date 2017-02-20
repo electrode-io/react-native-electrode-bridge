@@ -10,8 +10,6 @@ import com.facebook.react.bridge.WritableMap;
  * A wrapper that is used inside the bridge to communicate to react native modules.
  * <p>
  * This wrapper helps to provide multiple implementations to the bridge for mock support
- * <p>
- * Created by d0g00g4 on 2/14/17.
  */
 
 interface ReactContextWrapper {

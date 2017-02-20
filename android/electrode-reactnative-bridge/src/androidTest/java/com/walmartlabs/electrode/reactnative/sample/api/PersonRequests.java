@@ -20,18 +20,14 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
  * <p>
  * This class provides all the request actions that can be performed on Person.
  */
-public final class PersonBridgeRequests {
+final class PersonRequests implements PersonApi.Requests {
 
-    private static final String EVENT_GET_PERSON = "com.apisample.ern.apisample.get.person";
-    private static final String EVENT_GET_STATUS = "com.apisample.ern.apisample.get.status";
-    private static final String EVENT_GET_USER_NAME = "com.apisample.ern.apisample.get.user.name";
+    PersonRequests() {
 
-    /***
-     * Registers a handler that returns the current user when {@link #getPersonRequest(Response)} is invoked through client(Native or JS side).
-     *
-     * @param handler {@link RequestDispatcherImpl.RequestHandler}
-     */
-    public static void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
+    }
+
+    @Override
+    public void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
         ElectrodeBridge.registerRequestHandler(EVENT_GET_PERSON, new RequestDispatcherImpl.RequestHandler() {
             @Override
             public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
@@ -51,12 +47,8 @@ public final class PersonBridgeRequests {
         });
     }
 
-    /**
-     * Registers a handler  that returns the user status when {@link #getStatusRequest(Person, Response)} is invoked through client(Native or JS side).
-     *
-     * @param handler {@link RequestDispatcherImpl.RequestHandler}
-     */
-    public static void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler) {
+    @Override
+    public void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler) {
         ElectrodeBridge.registerRequestHandler(EVENT_GET_STATUS, new RequestDispatcherImpl.RequestHandler() {
             @Override
             public void onRequest(Bundle bundle, final RequestDispatcherImpl.RequestCompletioner requestCompletioner) {
@@ -79,15 +71,8 @@ public final class PersonBridgeRequests {
         });
     }
 
-
-    /**
-     * Calling this method will trigger a bridge request to call the registered handler for a response.
-     * <p>
-     * The response will be issued via provided {@link Response<Person>#onSuccess({@link Person})} or {@link Response#onError(String, String)} call backs based on the result.
-     *
-     * @param response {@link Response<Person>} Request listener as a call back to be called once the operation is completed.
-     */
-    public static void getPersonRequest(@NonNull final Response<Person> response) {
+    @Override
+    public void getPerson(@NonNull final Response<Person> response) {
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_PERSON)
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
                 .build();
@@ -106,14 +91,9 @@ public final class PersonBridgeRequests {
         });
     }
 
-    /**
-     * Calling this method will trigger a bridge request to call the registered handler for a response.
-     * <p>
-     * The response will be issued via provided {@link Response<Status>#onSuccess({@link Status})} or {@link Response#onError(String, String)} call backs based on the result.
-     *
-     * @param response {@link Response<Status>} Request listener as a call back to be called once the operation is completed.
-     */
-    public static void getStatusRequest(@NonNull Person person, @NonNull final Response<Status> response) {
+
+    @Override
+    public void getStatus(@NonNull Person person, @NonNull final Response<Status> response) {
         Bundle bundle = person.toBundle();
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_STATUS)
                 .withData(bundle)
@@ -134,7 +114,9 @@ public final class PersonBridgeRequests {
         });
     }
 
-    public static void getUserNameRequest(@NonNull final Response<String> response) {
+
+    @Override
+    public void getUserName(@NonNull final Response<String> response) {
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_USER_NAME)
                 .withData(Bundle.EMPTY)
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)

@@ -7,9 +7,6 @@ import android.util.Log;
  * <p/>
  * By default the log level is set to {@link LogLevel#ERROR}, if you want to override the log level call {@link Logger#overrideLogLevel(LogLevel)}
  * To turnOff logging, call {@link Logger#overrideLogLevel(LogLevel)} with {@link LogLevel#OFF}
- * <p/>
- * <p/>
- * Created by d0g00g4 on 2/13/17
  */
 public final class Logger {
 

@@ -20,10 +20,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by d0g00g4 on 2/14/17.
- */
-
 public class BaseBridgeTestCase extends InstrumentationTestCase {
 
     @Override

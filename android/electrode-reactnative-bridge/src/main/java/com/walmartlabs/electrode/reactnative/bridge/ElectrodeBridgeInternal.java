@@ -185,12 +185,12 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
      * Sends a request
      *
      * @param request            The request to send
-     * @param completionListener Listener to be called upon request completion
+     * @param responseListener Listener to be called upon request completion
      */
     @SuppressWarnings("unused")
     public void sendRequest(
             @NonNull final ElectrodeBridgeRequest request,
-            @NonNull final RequestCompletionListener completionListener) {
+            @NonNull final ElectrodeBridgeResponseListener responseListener) {
         final String id = getUUID();
         logRequest(request, id);
 
@@ -217,7 +217,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        completionListener.onSuccess(bundle);
+                        responseListener.onSuccess(bundle);
                     }
                 });
             }
@@ -235,7 +235,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
-                        completionListener.onError(
+                        responseListener.onFailure(
                                 writableMap.getString("code"),
                                 writableMap.getString("message"));
                     }

@@ -1,7 +1,6 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.Response;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
@@ -12,14 +11,14 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
     public void testSampleRequest() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        PersonApi.requests().getUserName(new Response<String>() {
+        PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
             @Override
             public void onSuccess(String obj) {
                 fail();
             }
 
             @Override
-            public void onError(String code, String message) {
+            public void onFailure(String code, String message) {
                 assertNotNull(code);
                 assertNotNull(message);
                 countDownLatch.countDown();
@@ -37,7 +36,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
         PersonApi.requests().registerGetStatusRequestHandler(new RequestHandlerEx<Person, Status>() {
             @Override
-            public void handleRequest(Person payload, Response<Status> response) {
+            public void handleRequest(Person payload, ElectrodeBridgeResponseListener<Status> response) {
                 assertEquals(person.getName(), payload.getName());
                 assertEquals(person.getMonth(), payload.getMonth());
                 response.onSuccess(result);
@@ -45,7 +44,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         });
 
 
-        PersonApi.requests().getStatus(person, new Response<Status>() {
+        PersonApi.requests().getStatus(person, new ElectrodeBridgeResponseListener<Status>() {
             @Override
             public void onSuccess(Status obj) {
                 assertNotNull(obj);
@@ -55,7 +54,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
             }
 
             @Override
-            public void onError(String code, String message) {
+            public void onFailure(String code, String message) {
                 fail();
             }
         });

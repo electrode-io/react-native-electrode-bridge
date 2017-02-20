@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 /**
  * Provide methods to report response for a request.
  */
-public interface ElectrodeBridgeResponseListener<T> {
+public interface ElectrodeBridgeResponseListener<TRsp> {
     /**
      * Error response
      *
@@ -17,7 +17,7 @@ public interface ElectrodeBridgeResponseListener<T> {
     /**
      * Successful response
      *
-     * @param responseData response object{@link T}
+     * @param responseData response object{@link TRsp}
      */
-    void onSuccess(@NonNull T responseData);
+    void onSuccess(@NonNull TRsp responseData);
 }

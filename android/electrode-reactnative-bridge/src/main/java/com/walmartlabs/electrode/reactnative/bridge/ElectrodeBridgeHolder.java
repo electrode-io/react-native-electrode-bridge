@@ -19,6 +19,8 @@ public final class ElectrodeBridgeHolder {
 
     private static boolean isReactNativeReady;
 
+    private static ElectrodeBridge electrodeBridge;
+
     // We queue requests/events as long as react native initialization is not complete.
     // Indeed, if a client of the bridge calls `sendRequest` upon it's application start,
     // it will throw an exception due to the fact that react native initialization is not
@@ -38,12 +40,14 @@ public final class ElectrodeBridgeHolder {
             @Override
             public void onReactNativeReady() {
                 isReactNativeReady = true;
+                electrodeBridge = ElectrodeBridgeInternal.instance();
                 registerQueuedEventListeners();
                 registerQueuedRequestHandlers();
                 sendQueuedRequests();
                 emitQueuedEvents();
             }
         });
+
     }
 
     /**
@@ -59,7 +63,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        ElectrodeBridgeInternal.instance().emitEvent(event);
+        electrodeBridge.emitEvent(event);
     }
 
     /**
@@ -78,7 +82,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        ElectrodeBridgeInternal.instance().sendRequest(request, responseListener);
+        electrodeBridge.sendRequest(request, responseListener);
     }
 
     /**
@@ -97,7 +101,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        ElectrodeBridgeInternal.instance().requestRegistrar().registerRequestHandler(name, requestHandler);
+        electrodeBridge.registerRequestHandler(name, requestHandler);
     }
 
     /**
@@ -108,21 +112,21 @@ public final class ElectrodeBridgeHolder {
      * @return A UUID to pass back to unregisterEventListener
      */
     @SuppressWarnings("unused")
-    public static void registerEventListener(@NonNull String name,
-                                             @NonNull ElectrodeBridgeEventListener eventListener) {
+    public static void addEventListener(@NonNull String name,
+                                        @NonNull ElectrodeBridgeEventListener eventListener) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing event handler registration. Will register once react native initialization is complete.");
             mQueuedEventListenersRegistration.put(name, eventListener);
             return;
         }
 
-        ElectrodeBridgeInternal.instance().eventRegistrar().registerEventListener(name, eventListener);
+        electrodeBridge.addEventListener(name, eventListener);
     }
 
     private static void registerQueuedRequestHandlers() {
         for (Map.Entry<String, ElectrodeBridgeRequestHandler> entry : mQueuedRequestHandlersRegistration.entrySet()) {
             try {
-                ElectrodeBridgeInternal.instance().requestRegistrar().registerRequestHandler(entry.getKey(), entry.getValue());
+               electrodeBridge.registerRequestHandler(entry.getKey(), entry.getValue());
             } catch (Exception e) {
                 Log.e(TAG, "Failed registering queued request handler registration");
             }
@@ -133,7 +137,7 @@ public final class ElectrodeBridgeHolder {
     private static void registerQueuedEventListeners() {
         for (Map.Entry<String, ElectrodeBridgeEventListener> entry : mQueuedEventListenersRegistration.entrySet()) {
             try {
-                ElectrodeBridgeInternal.instance().eventRegistrar().registerEventListener(entry.getKey(), entry.getValue());
+                electrodeBridge.addEventListener(entry.getKey(), entry.getValue());
             } catch (Exception e) {
                 Log.e(TAG, "Failed registering queued event listener registration");
             }
@@ -144,7 +148,7 @@ public final class ElectrodeBridgeHolder {
     private static void sendQueuedRequests() {
         for (Map.Entry<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener> entry : mQueuedRequests.entrySet()) {
             try {
-                ElectrodeBridgeInternal.instance().sendRequest(entry.getKey(), entry.getValue());
+                electrodeBridge.sendRequest(entry.getKey(), entry.getValue());
             } catch (Exception e) {
                 Log.e(TAG, "Failed sending queued request");
             }
@@ -155,7 +159,7 @@ public final class ElectrodeBridgeHolder {
     private static void emitQueuedEvents() {
         for (ElectrodeBridgeEvent event : mQueuedEvents) {
             try {
-                ElectrodeBridgeInternal.instance().emitEvent(event);
+                electrodeBridge.emitEvent(event);
             } catch (Exception e) {
                 Log.e(TAG, "Failed sending queued event");
             }

@@ -22,7 +22,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
+public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements ElectrodeBridge {
 
     private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
 
@@ -158,12 +158,24 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
         return mRequestRegistrar;
     }
 
+    @NonNull
+    @Override
+    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener eventListener) {
+        return mEventRegistrar.registerEventListener(name, eventListener);
+    }
+
+    @Override
+    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler requestHandler) {
+        mRequestRegistrar.registerRequestHandler(name, requestHandler);
+    }
+
     /**
      * Emits an event with some data to the JS react native side
      *
      * @param event The event to emit
      */
     @SuppressWarnings("unused")
+    @Override
     public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
         String id = getUUID();
         WritableMap message = buildMessage(id, event.getName(), Arguments.fromBundle(event.getData()));
@@ -188,6 +200,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule {
      * @param responseListener Listener to be called upon request completion
      */
     @SuppressWarnings("unused")
+    @Override
     public void sendRequest(
             @NonNull final ElectrodeBridgeRequest request,
             @NonNull final ElectrodeBridgeResponseListener responseListener) {

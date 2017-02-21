@@ -19,7 +19,7 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonAddedEventListener(@NonNull final ElectrodeBridgeEventListener<Person> eventListener) {
-        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_ADDED, new ElectrodeBridgeEventListener<Bundle>() {
+        ElectrodeBridgeHolder.addEventListener(REQUEST_PERSON_ADDED, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 Person payload = Person.fromBundle(bundle);
@@ -30,7 +30,7 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonNameUpdatedEventListener(@NonNull final ElectrodeBridgeEventListener<String> eventListener) {
-        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_NAME_UPDATED, new ElectrodeBridgeEventListener<Bundle>() {
+        ElectrodeBridgeHolder.addEventListener(REQUEST_PERSON_NAME_UPDATED, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 String payload = bundle.getString("personNameUpdated");

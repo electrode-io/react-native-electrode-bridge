@@ -13,7 +13,7 @@ import java.util.Map;
  * Facade to ElectrodeBridgeInternal.
  * Handles queuing every method calls until react native is ready.
  */
-public class ElectrodeBridgeHolder {
+public final class ElectrodeBridgeHolder {
 
     private static final String TAG = ElectrodeBridgeHolder.class.getSimpleName();
 
@@ -29,7 +29,7 @@ public class ElectrodeBridgeHolder {
     // upon native app start, it can become problematic. But I don't see why a user would do that
     // unless it's a bug in its app
     private static final HashMap<String, ElectrodeBridgeRequestHandler> mQueuedRequestHandlersRegistration = new HashMap<>();
-    private static final HashMap<String, EventDispatcherImpl.EventListener> mQueuedEventListenersRegistration = new HashMap<>();
+    private static final HashMap<String, ElectrodeBridgeEventListener> mQueuedEventListenersRegistration = new HashMap<>();
     private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener> mQueuedRequests = new HashMap<>();
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
 
@@ -109,7 +109,7 @@ public class ElectrodeBridgeHolder {
      */
     @SuppressWarnings("unused")
     public static void registerEventListener(@NonNull String name,
-                                             @NonNull EventDispatcherImpl.EventListener eventListener) {
+                                             @NonNull ElectrodeBridgeEventListener eventListener) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing event handler registration. Will register once react native initialization is complete.");
             mQueuedEventListenersRegistration.put(name, eventListener);
@@ -131,7 +131,7 @@ public class ElectrodeBridgeHolder {
     }
 
     private static void registerQueuedEventListeners() {
-        for (Map.Entry<String, EventDispatcherImpl.EventListener> entry : mQueuedEventListenersRegistration.entrySet()) {
+        for (Map.Entry<String, ElectrodeBridgeEventListener> entry : mQueuedEventListenersRegistration.entrySet()) {
             try {
                 ElectrodeBridgeInternal.instance().eventRegistrar().registerEventListener(entry.getKey(), entry.getValue());
             } catch (Exception e) {

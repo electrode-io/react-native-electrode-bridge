@@ -2,9 +2,9 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
 
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEventListener;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.EventListener;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -41,28 +41,28 @@ public final class PersonApi {
         String REQUEST_PERSON_NAME_UPDATED = "com.apisample.ern.apisample.person.name.updated";
 
         /**
-         * Registers an event listener to the bridge for event{@link #REQUEST_PERSON_ADDED}. Event listener's {@link EventListener#onEvent(Object)} will be invoked when the event happens.
+         * Adds an event listener to the bridge for event{@link #REQUEST_PERSON_ADDED}. Event listener's {@link ElectrodeBridgeEventListener#onEvent(Object)} will be invoked when the event happens.
          *
-         * @param eventListener {@link EventListener}
+         * @param eventListener {@link ElectrodeBridgeEventListener}
          */
-        void addPersonAddedEventListener(@NonNull final EventListener<Person> eventListener);
+        void addPersonAddedEventListener(@NonNull final ElectrodeBridgeEventListener<Person> eventListener);
 
         /**
-         * Registers an event listener to the bridge for event{@link #REQUEST_PERSON_NAME_UPDATED}. Event listener's {@link EventListener#onEvent(Object)} will be invoked when the event happens.
+         * Adds an event listener to the bridge for event{@link #REQUEST_PERSON_NAME_UPDATED}. Event listener's {@link ElectrodeBridgeEventListener#onEvent(Object)} will be invoked when the event happens.
          *
-         * @param eventListener {@link EventListener}
+         * @param eventListener {@link ElectrodeBridgeEventListener}
          */
-        void addPersonNameUpdatedEventListener(@NonNull final EventListener<String> eventListener);
+        void addPersonNameUpdatedEventListener(@NonNull final ElectrodeBridgeEventListener<String> eventListener);
 
         /**
-         * Calling this method will emit an event {@link #REQUEST_PERSON_ADDED} to all the registered {@link com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl.EventListener}(s).
+         * Calling this method will emit an event {@link #REQUEST_PERSON_ADDED} to all the registered {@link ElectrodeBridgeEventListener}(s).
          *
          * @param person {@link Person}
          */
         void emitEventPersonAdded(@NonNull Person person);
 
         /**
-         * Calling this method will emit an event {@link #REQUEST_PERSON_NAME_UPDATED} to all the registered {@link com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl.EventListener}(s).
+         * Calling this method will emit an event {@link #REQUEST_PERSON_NAME_UPDATED} to all the registered {@link ElectrodeBridgeEventListener}(s).
          *
          * @param updatedName {@link String}
          */

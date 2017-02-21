@@ -3,10 +3,9 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEvent;
-import com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.EventListener;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEventListener;
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 
 /**
@@ -19,8 +18,8 @@ final class PersonEvents implements PersonApi.Events {
     }
 
     @Override
-    public void addPersonAddedEventListener(@NonNull final EventListener<Person> eventListener) {
-        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_ADDED, new EventDispatcherImpl.EventListener() {
+    public void addPersonAddedEventListener(@NonNull final ElectrodeBridgeEventListener<Person> eventListener) {
+        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_ADDED, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 Person payload = Person.fromBundle(bundle);
@@ -30,8 +29,8 @@ final class PersonEvents implements PersonApi.Events {
     }
 
     @Override
-    public void addPersonNameUpdatedEventListener(@NonNull final EventListener<String> eventListener) {
-        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_NAME_UPDATED, new EventDispatcherImpl.EventListener() {
+    public void addPersonNameUpdatedEventListener(@NonNull final ElectrodeBridgeEventListener<String> eventListener) {
+        ElectrodeBridgeHolder.registerEventListener(REQUEST_PERSON_NAME_UPDATED, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 String payload = bundle.getString("personNameUpdated");

@@ -9,23 +9,11 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 @SuppressWarnings("unused")
 public class EventDispatcherImpl implements ElectrodeBridgeInternal.EventDispatcher {
 
-    private final EventRegistrar<EventListener> mEventRegistrar;
+    private final EventRegistrar<ElectrodeBridgeEventListener> mEventRegistrar;
     private static final Bundle EMPTY_BUNDLE = new Bundle();
 
-    public EventDispatcherImpl(EventRegistrar<EventListener> eventRegistrar) {
+    public EventDispatcherImpl(EventRegistrar<ElectrodeBridgeEventListener> eventRegistrar) {
         mEventRegistrar = eventRegistrar;
-    }
-
-    /**
-     * Provide method to be notified of incoming event
-     */
-    public interface EventListener {
-        /**
-         * Called whenever an event matching this event listener is received
-         *
-         * @param payload The event payload
-         */
-        void onEvent(@NonNull Bundle payload);
     }
 
     /**
@@ -37,7 +25,7 @@ public class EventDispatcherImpl implements ElectrodeBridgeInternal.EventDispatc
      */
     @Override
     public void dispatchEvent(@NonNull String id, @NonNull String name, @NonNull ReadableMap payload) {
-        for (EventListener eventListener : mEventRegistrar.getEventListeners(name)) {
+        for (ElectrodeBridgeEventListener eventListener : mEventRegistrar.getEventListeners(name)) {
             Bundle bundle = ArgumentsEx.toBundle(payload);
 
             eventListener.onEvent(bundle != null ? bundle : EMPTY_BUNDLE);

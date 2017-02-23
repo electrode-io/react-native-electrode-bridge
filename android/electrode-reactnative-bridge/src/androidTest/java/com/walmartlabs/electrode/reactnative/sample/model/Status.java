@@ -6,10 +6,12 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class Status implements Parcelable {
+import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
+
+public class Status implements Parcelable, Bridgeable {
 
     private static final String KEY_BUNDLE_ID = "className";
-    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
+    private static final String VALUE_BUNDLE_ID = Status.class.getSimpleName();
 
     @Nullable
     public static Status fromBundle(@Nullable Bundle bundle) {
@@ -39,7 +41,10 @@ public class Status implements Parcelable {
     }
 
     private Status(Parcel in) {
-        Bundle bundle = in.readBundle();
+        this(in.readBundle());
+    }
+
+    public Status(Bundle bundle) {
         member = bundle.getBoolean("member");
         log = bundle.getBoolean("log");
     }

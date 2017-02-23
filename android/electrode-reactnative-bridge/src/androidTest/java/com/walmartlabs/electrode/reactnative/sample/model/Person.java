@@ -6,9 +6,18 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class Person implements Parcelable {
+import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
+
+public class Person implements Parcelable, Bridgeable {
     private static final String KEY_BUNDLE_ID = "className";
     private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
+
+    private String name;
+    private Number month;
+    private Integer age;
+    private Status status;
+    private Position position;
+    private BirthYear birthYear;
 
     @Nullable
     public static Person fromBundle(@Nullable Bundle bundle) {
@@ -32,12 +41,9 @@ public class Person implements Parcelable {
                 .build();
     }
 
-    private final String name;
-    private final Number month;
-    private final Integer age;
-    private final Status status;
-    private final Position position;
-    private final BirthYear birthYear;
+    private Person() {
+
+    }
 
     private Person(Builder builder) {
         this.name = builder.name;
@@ -49,7 +55,14 @@ public class Person implements Parcelable {
     }
 
     protected Person(Parcel in) {
-        Bundle bundle = in.readBundle();
+        this(in.readBundle());
+    }
+
+    public Person(@NonNull Bundle bundle) {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
+            throw new IllegalArgumentException("Looks like the given bundle does not include Bridgeable.KEY_BUNDLE_ID entry. Your bundle should include this entry with your class.getSimpleName as the value for successfully constructing this object");
+        }
         this.name = bundle.getString("name");
         this.month = bundle.getInt("month");
         this.age = bundle.containsKey("age") ? bundle.getInt("age") : null;
@@ -110,6 +123,7 @@ public class Person implements Parcelable {
         return birthYear;
     }
 
+    @Override
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();

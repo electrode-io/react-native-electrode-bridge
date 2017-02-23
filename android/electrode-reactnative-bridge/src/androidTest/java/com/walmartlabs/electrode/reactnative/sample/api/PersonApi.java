@@ -2,11 +2,11 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
 
+import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEventListener;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.EventListener;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
+import com.walmartlabs.electrode.reactnative.bridge.FailureMessage;
+import com.walmartlabs.electrode.reactnative.bridge.None;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -37,32 +37,32 @@ public final class PersonApi {
 
     public interface Events {
 
-        String REQUEST_PERSON_ADDED = "com.apisample.ern.apisample.person.added";
-        String REQUEST_PERSON_NAME_UPDATED = "com.apisample.ern.apisample.person.name.updated";
+        String EVENT_PERSON_ADDED = "com.apisample.ern.apisample.person.added";
+        String EVENT_PERSON_NAME_UPDATED = "com.apisample.ern.apisample.person.name.updated";
 
         /**
-         * Registers an event listener to the bridge for event{@link #REQUEST_PERSON_ADDED}. Event listener's {@link EventListener#onEvent(Object)} will be invoked when the event happens.
+         * Adds an event listener to the bridge for event{@link #EVENT_PERSON_ADDED}. Event listener's {@link ElectrodeBridgeEventListener#onEvent(Object)} will be invoked when the event happens.
          *
-         * @param eventListener {@link EventListener}
+         * @param eventListener {@link ElectrodeBridgeEventListener}
          */
-        void addPersonAddedEventListener(@NonNull final EventListener<Person> eventListener);
+        void addPersonAddedEventListener(@NonNull final ElectrodeBridgeEventListener<Person> eventListener);
 
         /**
-         * Registers an event listener to the bridge for event{@link #REQUEST_PERSON_NAME_UPDATED}. Event listener's {@link EventListener#onEvent(Object)} will be invoked when the event happens.
+         * Adds an event listener to the bridge for event{@link #EVENT_PERSON_NAME_UPDATED}. Event listener's {@link ElectrodeBridgeEventListener#onEvent(Object)} will be invoked when the event happens.
          *
-         * @param eventListener {@link EventListener}
+         * @param eventListener {@link ElectrodeBridgeEventListener}
          */
-        void addPersonNameUpdatedEventListener(@NonNull final EventListener<String> eventListener);
+        void addPersonNameUpdatedEventListener(@NonNull final ElectrodeBridgeEventListener<String> eventListener);
 
         /**
-         * Calling this method will emit an event {@link #REQUEST_PERSON_ADDED} to all the registered {@link com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl.EventListener}(s).
+         * Calling this method will emit an event {@link #EVENT_PERSON_ADDED} to all the registered {@link ElectrodeBridgeEventListener}(s).
          *
          * @param person {@link Person}
          */
         void emitEventPersonAdded(@NonNull Person person);
 
         /**
-         * Calling this method will emit an event {@link #REQUEST_PERSON_NAME_UPDATED} to all the registered {@link com.walmartlabs.electrode.reactnative.bridge.EventDispatcherImpl.EventListener}(s).
+         * Calling this method will emit an event {@link #EVENT_PERSON_NAME_UPDATED} to all the registered {@link ElectrodeBridgeEventListener}(s).
          *
          * @param updatedName {@link String}
          */
@@ -71,29 +71,32 @@ public final class PersonApi {
 
     public interface Requests {
 
-        final String EVENT_GET_PERSON = "com.apisample.ern.apisample.get.person";
-        final String EVENT_GET_STATUS = "com.apisample.ern.apisample.get.status";
-        final String EVENT_GET_USER_NAME = "com.apisample.ern.apisample.get.user.name";
+        String REQUEST_GET_PERSON = "com.apisample.ern.apisample.get.person";
+        String REQUEST_GET_STATUS = "com.apisample.ern.apisample.get.status";
+        String REQUEST_GET_USER_NAME = "com.apisample.ern.apisample.get.user.name";
+        String REQUEST_GET_AGE = "com.apisample.ern.apisample.get.age";
 
         /***
          * Registers a handler that returns the current user when {@link #getPerson(ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
          * @param handler {@link ElectrodeBridgeRequestHandler}
          */
-        void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler);
+        void registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler);
 
         /**
          * Registers a handler  that returns the user status when {@link #getStatus(Person, ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
          * @param handler {@link ElectrodeBridgeRequestHandler}
          */
-        void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler);
+        void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler);
+
+        void registerGetAgeRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<String, Integer> handler);
 
 
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
-         * The response will be issued via provided {@link ElectrodeBridgeResponseListener<Person>#onSuccess({@link Person})} or {@link ElectrodeBridgeResponseListener#onFailure(String, String)} call backs based on the result.
+         * The response will be issued via provided {@link ElectrodeBridgeResponseListener<Person>#onSuccess({@link Person})} or {@link ElectrodeBridgeResponseListener#onFailure(FailureMessage)} call backs based on the result.
          *
          * @param response {@link ElectrodeBridgeResponseListener<Person>} Request listener as a call back to be called once the operation is completed.
          */
@@ -102,7 +105,7 @@ public final class PersonApi {
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
-         * The response will be issued via provided {@link ElectrodeBridgeResponseListener<Status>#onSuccess({@link Status})} or {@link ElectrodeBridgeResponseListener#onFailure(String, String)} call backs based on the result.
+         * The response will be issued via provided {@link ElectrodeBridgeResponseListener<Status>#onSuccess({@link Status})} or {@link ElectrodeBridgeResponseListener#onFailure(FailureMessage)} call backs based on the result.
          *
          * @param response {@link ElectrodeBridgeResponseListener<Status>} Request listener as a call back to be called once the operation is completed.
          */
@@ -110,6 +113,8 @@ public final class PersonApi {
 
 
         void getUserName(@NonNull final ElectrodeBridgeResponseListener<String> response);
+
+        void getAge(@NonNull String name, @NonNull final ElectrodeBridgeResponseListener<Integer> responseListener);
 
     }
 

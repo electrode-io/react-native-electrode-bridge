@@ -1,14 +1,13 @@
 package com.walmartlabs.electrode.reactnative.sample.api;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandler;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
+import com.walmartlabs.electrode.reactnative.bridge.None;
+import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerProcessor;
+import com.walmartlabs.electrode.reactnative.bridge.RequestProcessor;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -26,115 +25,39 @@ final class PersonRequests implements PersonApi.Requests {
     }
 
     @Override
-    public void registerGetPersonRequestHandler(@NonNull final RequestHandler<Person> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_PERSON, new ElectrodeBridgeRequestHandler() {
-            @Override
-            public void onRequest(Bundle bundle, final ElectrodeBridgeResponseListener responseListener) {
-                handler.handleRequest(new ElectrodeBridgeResponseListener<Person>() {
-
-                    @Override
-                    public void onSuccess(Person obj) {
-                        Bundle bundle = obj.toBundle();
-                        responseListener.onSuccess(bundle);
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull String code, @NonNull String message) {
-                        responseListener.onFailure(code, message);
-                    }
-                });
-            }
-        });
+    public void registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler) {
+        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_PERSON, new RequestHandlerProcessor<>(None.class, Person.class, handler));
     }
 
     @Override
-    public void registerGetStatusRequestHandler(@NonNull final RequestHandlerEx<Person, Status> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(EVENT_GET_STATUS, new ElectrodeBridgeRequestHandler() {
-            @Override
-            public void onRequest(Bundle bundle, final ElectrodeBridgeResponseListener responseListener) {
-
-                Person payload = Person.fromBundle(bundle);
-
-                handler.handleRequest(payload, new ElectrodeBridgeResponseListener<Status>() {
-                    @Override
-                    public void onFailure(@NonNull String code, @NonNull String message) {
-                        responseListener.onFailure(code, message);
-                    }
-
-                    @Override
-                    public void onSuccess(Status obj) {
-                        Bundle bundle = obj.toBundle();
-                        responseListener.onSuccess(bundle);
-                    }
-                });
-            }
-        });
+    public void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler) {
+        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_STATUS, new RequestHandlerProcessor<>(Person.class, Status.class, handler));
     }
 
     @Override
-    public void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> response) {
-        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_PERSON)
-                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
-                .build();
+    public void registerGetAgeRequestHandler(@NonNull ElectrodeBridgeRequestHandler<String, Integer> handler) {
+        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_AGE, new RequestHandlerProcessor<>(String.class, Integer.class, handler));
+    }
 
-        ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<Bundle>() {
-            @Override
-            public void onSuccess(Bundle bundle) {
-                Person payload = Person.fromBundle(bundle);
-                response.onSuccess(payload);
-            }
-
-            @Override
-            public void onFailure(@NonNull String code, @NonNull String message) {
-                response.onFailure(code, message);
-            }
-        });
+    @Override
+    public void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
+        new RequestProcessor<>(REQUEST_GET_STATUS, null, Person.class, responseListener).execute();
     }
 
 
     @Override
-    public void getStatus(@NonNull Person person, @NonNull final ElectrodeBridgeResponseListener<Status> response) {
-        Bundle bundle = person.toBundle();
-        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_STATUS)
-                .withData(bundle)
-                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.NATIVE)
-                .build();
-
-        ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<Bundle>() {
-
-            @Override
-            public void onSuccess(Bundle bundle) {
-                Status payload = Status.fromBundle(bundle);
-                response.onSuccess(payload);
-            }
-
-            @Override
-            public void onFailure(@NonNull String code, @NonNull String message) {
-                response.onFailure(code, message);
-            }
-        });
+    public void getStatus(@NonNull Person person, @NonNull final ElectrodeBridgeResponseListener<Status> responseListener) {
+        new RequestProcessor<>(REQUEST_GET_STATUS, person, Status.class, responseListener).execute();
     }
 
 
     @Override
-    public void getUserName(@NonNull final ElectrodeBridgeResponseListener<String> response) {
-        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(EVENT_GET_USER_NAME)
-                .withData(Bundle.EMPTY)
-                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.JS)
-                .build();
+    public void getUserName(@NonNull final ElectrodeBridgeResponseListener<String> responseListener) {
+        new RequestProcessor<None, String>(REQUEST_GET_USER_NAME, null, String.class, responseListener).execute();
+    }
 
-        ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<Bundle>() {
-
-            @Override
-            public void onSuccess(Bundle bundle) {
-                response.onSuccess(bundle.getString("userName"));
-            }
-
-            @Override
-            public void onFailure(@NonNull String code, @NonNull String message) {
-                response.onFailure(code, message);
-            }
-
-        });
+    @Override
+    public void getAge(@NonNull String name, @NonNull final ElectrodeBridgeResponseListener<Integer> responseListener) {
+        new RequestProcessor<>(REQUEST_GET_AGE, name, Integer.class, responseListener).execute();
     }
 }

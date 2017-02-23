@@ -34,9 +34,9 @@ public class RequestDispatcherImpl implements ElectrodeBridgeInternal.RequestDis
         requestHandler.onRequest(data,
                 new ElectrodeBridgeResponseListener<Bundle>() {
                     @Override
-                    public void onFailure(@NonNull String code, @NonNull String message) {
-                        Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), errorCode(%s)", id, promise, code);
-                        promise.reject(code, message);
+                    public void onFailure(@NonNull FailureMessage failureMessage) {
+                        Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), failureMessage(%s)", id, promise, failureMessage);
+                        promise.reject(failureMessage.getCode(), failureMessage.getMessage());
                     }
 
                     @Override

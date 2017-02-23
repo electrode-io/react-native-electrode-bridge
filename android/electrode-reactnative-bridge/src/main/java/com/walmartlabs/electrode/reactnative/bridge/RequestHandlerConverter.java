@@ -22,7 +22,7 @@ public class RequestHandlerConverter<TReq, TResp> implements ElectrodeBridgeRequ
 
     @Override
     public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
-        Logger.d(TAG, "inside onRequest of converter, with payload(%s)", payload);
+        Logger.d(TAG, "inside onRequest of RequestHandlerConverter, with payload(%s)", payload);
         TReq request = null;
 
         if (payload != null) {
@@ -48,7 +48,7 @@ public class RequestHandlerConverter<TReq, TResp> implements ElectrodeBridgeRequ
 
             @Override
             public void onSuccess(TResp obj) {
-                Logger.d(TAG, "Received successful response(%s) inside converter, now lets try to convert to real object", obj);
+                Logger.d(TAG, "Received successful response(%s) from handler, now lets try to convert to real object for the response listener", obj);
                 Bundle bundle;
                 if (Bridgeable.class.isAssignableFrom(respClazz)) {
                     bundle = ((Bridgeable) obj).toBundle();

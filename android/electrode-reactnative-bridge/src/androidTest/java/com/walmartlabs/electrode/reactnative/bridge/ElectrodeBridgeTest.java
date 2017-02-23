@@ -89,6 +89,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
             @Override
             public void onSuccess(@Nullable Integer responseData) {
                 assertNotNull(responseData);
+                assertSame(30, responseData);
                 countDownLatch.countDown();
             }
         });

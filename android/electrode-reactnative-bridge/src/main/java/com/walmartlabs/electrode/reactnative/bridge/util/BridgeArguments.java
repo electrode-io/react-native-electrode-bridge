@@ -107,27 +107,40 @@ public class BridgeArguments {
             }
             Logger.w(TAG, "Could not find a constructor that takes in a Bundle param for class(%s)", clazz);
         } catch (ClassNotFoundException e) {
-            Logger.w(TAG, "FromBundle failed to execute(%s)", e.getCause());
+            logException(e);
         } catch (InstantiationException e) {
-            Logger.w(TAG, "FromBundle failed to execute(%s)", e.getCause());
+            logException(e);
         } catch (IllegalAccessException e) {
-            Logger.w(TAG, "FromBundle failed to execute(%s)", e.getCause());
+            logException(e);
         } catch (InvocationTargetException e) {
-            Logger.w(TAG, "FromBundle failed to execute(%s)", e.getCause());
+            logException(e);
         }
 
         Logger.d(TAG, "FromBundle failed to execute");
         return null;
     }
 
+    private static void logException(Exception e) {
+        Logger.w(TAG, "FromBundle failed to execute(%s)", e.getMessage() != null ? e.getMessage()  :e.getCause());
+    }
+
     public static Object getPrimitiveFromBundleForRequest(@NonNull Bundle payload, @NonNull Class reqClazz) {
+        return getPrimitiveFromBundle(payload, reqClazz, "req");
+    }
+
+    public static Object getPrimitiveFromBundleForResponse(@NonNull Bundle payload, @NonNull Class reqClazz) {
+        return getPrimitiveFromBundle(payload, reqClazz, "rsp");
+    }
+
+    @NonNull
+    private static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull String key) {
         Object value = null;
         if (String.class.isAssignableFrom(reqClazz)) {
-            value = payload.getString("req");
+            value = payload.getString(key);
         } else if (Integer.class.isAssignableFrom(reqClazz)) {
-            value = payload.getInt("req");
+            value = payload.getInt(key);
         } else if (Boolean.class.isAssignableFrom(reqClazz)) {
-            value = payload.getBoolean("req");
+            value = payload.getBoolean(key);
         }
 
         if (reqClazz.isInstance(value)) {
@@ -138,13 +151,22 @@ public class BridgeArguments {
     }
 
     public static Bundle getBundleFromPrimitiveForResponse(@NonNull Object respObj, @NonNull Class respClass) {
+        return getBundleForPrimitive(respObj, respClass, "rsp");
+    }
+
+    public static Bundle getBundleFromPrimitiveForRequest(@NonNull Object respObj, @NonNull Class respClass) {
+        return getBundleForPrimitive(respObj, respClass, "req");
+    }
+
+    @NonNull
+    private static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, String key) {
         Bundle bundle = new Bundle();
         if (String.class.isAssignableFrom(respClass)) {
-            bundle.putString("rsp", (String) respObj);
+            bundle.putString(key, (String) respObj);
         } else if (Integer.class.isAssignableFrom(respClass)) {
-            bundle.putInt("rsp", (Integer) respObj);
+            bundle.putInt(key, (Integer) respObj);
         } else if (Boolean.class.isAssignableFrom(respClass)) {
-            bundle.putBoolean("rsp", (Boolean) respObj);
+            bundle.putBoolean(key, (Boolean) respObj);
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + respClass + " is not implemented yet");
         }

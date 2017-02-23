@@ -11,7 +11,7 @@ import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 public class BirthYear implements Parcelable,Bridgeable {
 
     private static final String KEY_BUNDLE_ID = "className";
-    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
+    private static final String VALUE_BUNDLE_ID = BirthYear.class.getSimpleName();
 
     @Nullable
     public static BirthYear fromBundle(@Nullable Bundle bundle) {
@@ -45,7 +45,7 @@ public class BirthYear implements Parcelable,Bridgeable {
         this(in.readBundle());
     }
 
-    private BirthYear(Bundle bundle) {
+    public BirthYear(Bundle bundle) {
         month = bundle.getInt("month");
         year = bundle.getInt("year");
     }

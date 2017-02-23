@@ -11,7 +11,7 @@ import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 public class Status implements Parcelable, Bridgeable {
 
     private static final String KEY_BUNDLE_ID = "className";
-    private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
+    private static final String VALUE_BUNDLE_ID = Status.class.getSimpleName();
 
     @Nullable
     public static Status fromBundle(@Nullable Bundle bundle) {
@@ -44,7 +44,7 @@ public class Status implements Parcelable, Bridgeable {
         this(in.readBundle());
     }
 
-    private Status(Bundle bundle) {
+    public Status(Bundle bundle) {
         member = bundle.getBoolean("member");
         log = bundle.getBoolean("log");
     }

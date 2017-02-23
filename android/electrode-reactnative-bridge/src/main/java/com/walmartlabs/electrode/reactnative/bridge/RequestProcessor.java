@@ -31,16 +31,8 @@ public class RequestProcessor<TReq, TResp> {
 
     public void execute() {
         Logger.d(TAG, "Request processor started processing request(%s)", requestName);
-        Bundle data;
-        if (requestPayload == null) {
-            data = Bundle.EMPTY;
-        } else {
-            if (requestPayload instanceof Bridgeable) {
-                data = ((Bridgeable) requestPayload).toBundle();
-            } else {
-                data = BridgeArguments.getBundleFromPrimitiveForRequest(requestPayload, requestPayload.getClass());
-            }
-        }
+        Bundle data = BridgeArguments.generateRequestBundle(requestPayload);
+
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(requestName)
                 .withData(data)
                 .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.NATIVE)//FIXME: remove dispatch mode.
@@ -54,19 +46,11 @@ public class RequestProcessor<TReq, TResp> {
 
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
-                TResp response = null;
-                if (responseData != null) {
-                    if (Bridgeable.class.isAssignableFrom(responseClass)) {
-                        response = BridgeArguments.bridgeableFromBundle(responseData, responseClass);
-                    } else {
-                        response = (TResp) BridgeArguments.getPrimitiveFromBundleForResponse(responseData, responseClass);
-                    }
-                }
+                TResp response = BridgeArguments.responseObjectFromBundle(responseData, responseClass);
                 Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
                 responseListener.onSuccess(response);
             }
         });
 
     }
-
 }

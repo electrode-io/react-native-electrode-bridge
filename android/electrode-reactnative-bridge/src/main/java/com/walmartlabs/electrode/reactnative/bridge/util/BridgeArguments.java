@@ -76,6 +76,52 @@ public class BridgeArguments {
         return bundle;
     }
 
+    /**
+     * Returns a bundle representation of the passed object. Object should be a primitive wrapper or {@link Bridgeable}
+     *
+     * @param requestPayload
+     * @return Bundle, if the requestPayload is null {@link Bundle#EMPTY} will be returned
+     */
+    @NonNull
+    public static Bundle generateRequestBundle(@Nullable Object requestPayload) {
+        if (requestPayload == null) {
+            return Bundle.EMPTY;
+        }
+
+        Bundle data;
+        if (requestPayload instanceof Bridgeable) {
+            data = ((Bridgeable) requestPayload).toBundle();
+        } else {
+            data = BridgeArguments.getBundleFromPrimitiveForRequest(requestPayload, requestPayload.getClass());
+        }
+
+        return data;
+    }
+
+
+    /**
+     * Forms T from a given bundle.
+     *
+     * @param responseBundle     {@link Bundle}
+     * @param responseObjectType responseObjectTypeClass
+     * @param <T>                responseObjectType
+     * @return
+     */
+    @Nullable
+    public static <T> T responseObjectFromBundle(@Nullable Bundle responseBundle, @NonNull Class<T> responseObjectType) {
+        T response = null;
+        if (responseBundle != null
+                && !responseBundle.isEmpty()) {
+            if (Bridgeable.class.isAssignableFrom(responseObjectType)) {
+                response = BridgeArguments.bridgeableFromBundle(responseBundle, responseObjectType);
+            } else {
+                response = (T) BridgeArguments.getPrimitiveFromBundleForResponse(responseBundle, responseObjectType);
+            }
+        }
+        return response;
+    }
+
+
     @Nullable
     public static <T> T bridgeableFromBundle(@NonNull Bundle bundle, @NonNull Class<T> clazz) {
         Logger.d(TAG, "entering bridgeableFromBundle with bundle(%s) for class(%s)", bundle, clazz);
@@ -121,7 +167,7 @@ public class BridgeArguments {
     }
 
     private static void logException(Exception e) {
-        Logger.w(TAG, "FromBundle failed to execute(%s)", e.getMessage() != null ? e.getMessage()  :e.getCause());
+        Logger.w(TAG, "FromBundle failed to execute(%s)", e.getMessage() != null ? e.getMessage() : e.getCause());
     }
 
     public static Object getPrimitiveFromBundleForRequest(@NonNull Bundle payload, @NonNull Class reqClazz) {

@@ -7,14 +7,22 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
-public class RequestHandlerConverter<TReq, TResp> implements ElectrodeBridgeRequestHandler<Bundle, Bundle> {
-    private final String TAG = RequestHandlerConverter.class.getSimpleName();
+/**
+ * Class that handles a native request handler.
+ * This class is responsible for converting the received bundle to a full fledged object before sending the request to the registered request handler
+ * and also takes care of converting the response object to bundle.
+ *
+ * @param <TReq>
+ * @param <TResp>
+ */
+public class RequestHandlerProcessor<TReq, TResp> implements ElectrodeBridgeRequestHandler<Bundle, Bundle> {
+    private final String TAG = RequestHandlerProcessor.class.getSimpleName();
 
     private final Class<TReq> reqClazz;
     private final Class<TResp> respClazz;
     private final ElectrodeBridgeRequestHandler<TReq, TResp> handler;
 
-    public RequestHandlerConverter(@NonNull Class<TReq> reqClazz, @NonNull Class<TResp> respClazz, @NonNull ElectrodeBridgeRequestHandler<TReq, TResp> handler) {
+    public RequestHandlerProcessor(@NonNull Class<TReq> reqClazz, @NonNull Class<TResp> respClazz, @NonNull ElectrodeBridgeRequestHandler<TReq, TResp> handler) {
         this.reqClazz = reqClazz;
         this.respClazz = respClazz;
         this.handler = handler;
@@ -22,7 +30,7 @@ public class RequestHandlerConverter<TReq, TResp> implements ElectrodeBridgeRequ
 
     @Override
     public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
-        Logger.d(TAG, "inside onRequest of RequestHandlerConverter, with payload(%s)", payload);
+        Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
         TReq request = null;
 
         if (payload != null) {

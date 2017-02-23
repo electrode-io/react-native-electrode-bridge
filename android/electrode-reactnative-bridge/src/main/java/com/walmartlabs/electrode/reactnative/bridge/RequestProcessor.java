@@ -7,10 +7,6 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
-/**
- * Created by d0g00g4 on 2/22/17.
- */
-
 public class RequestProcessor<TReq, TResp> {
     private final String TAG = RequestProcessor.class.getSimpleName();
 

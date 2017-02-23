@@ -6,7 +6,7 @@ import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
 import com.walmartlabs.electrode.reactnative.bridge.None;
-import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerConverter;
+import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerProcessor;
 import com.walmartlabs.electrode.reactnative.bridge.RequestProcessor;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
@@ -26,17 +26,17 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_PERSON, new RequestHandlerConverter<>(None.class, Person.class, handler));
+        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_PERSON, new RequestHandlerProcessor<>(None.class, Person.class, handler));
     }
 
     @Override
     public void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_STATUS, new RequestHandlerConverter<>(Person.class, Status.class, handler));
+        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_STATUS, new RequestHandlerProcessor<>(Person.class, Status.class, handler));
     }
 
     @Override
     public void registerGetAgeRequestHandler(@NonNull ElectrodeBridgeRequestHandler<String, Integer> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_AGE, new RequestHandlerConverter<>(String.class, Integer.class, handler));
+        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_AGE, new RequestHandlerProcessor<>(String.class, Integer.class, handler));
     }
 
     @Override

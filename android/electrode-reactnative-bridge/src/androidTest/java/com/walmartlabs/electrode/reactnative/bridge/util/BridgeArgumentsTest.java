@@ -10,9 +10,6 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import junit.framework.TestCase;
 
-/**
- * Created by d0g00g4 on 2/21/17.
- */
 public class BridgeArgumentsTest extends TestCase {
 
     @Override

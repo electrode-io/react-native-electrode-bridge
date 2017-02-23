@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class Position implements Parcelable {
+import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
+
+public class Position implements Parcelable,Bridgeable {
 
     private static final String KEY_BUNDLE_ID = "className";
     private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
@@ -34,8 +36,10 @@ public class Position implements Parcelable {
     }
 
     private Position(Parcel in) {
-        Bundle bundle = in.readBundle();
+        this(in.readBundle());
+    }
 
+    private Position(Bundle bundle) {
         lat = bundle.getDouble("lat");
         lng = bundle.getDouble("lng");
     }

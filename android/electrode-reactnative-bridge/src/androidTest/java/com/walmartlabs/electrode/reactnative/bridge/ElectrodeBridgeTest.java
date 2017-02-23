@@ -1,6 +1,8 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import com.walmartlabs.electrode.reactnative.bridge.helpers.RequestHandlerEx;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
@@ -37,12 +39,12 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         final Status result = new Status.Builder(true).log(true).build();
         final Person person = new Person.Builder("John", 05).build();
 
-        PersonApi.requests().registerGetStatusRequestHandler(new RequestHandlerEx<Person, Status>() {
+        PersonApi.requests().registerGetStatusRequestHandler(new ElectrodeBridgeRequestHandler<Person, Status>() {
             @Override
-            public void handleRequest(Person payload, ElectrodeBridgeResponseListener<Status> response) {
+            public void onRequest(@Nullable Person payload, @NonNull ElectrodeBridgeResponseListener<Status> responseListener) {
                 assertEquals(person.getName(), payload.getName());
                 assertEquals(person.getMonth(), payload.getMonth());
-                response.onSuccess(result);
+                responseListener.onSuccess(result);
             }
         });
 
@@ -63,5 +65,35 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         });
 
         waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testPrimitiveTypesForRequestAndResponse() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        PersonApi.requests().registerGetAgeRequestHandler(new ElectrodeBridgeRequestHandler<String, Integer>() {
+            @Override
+            public void onRequest(@Nullable String payload, @NonNull ElectrodeBridgeResponseListener<Integer> responseListener) {
+                assertNotNull(payload);
+                assertNotNull(responseListener);
+                responseListener.onSuccess(30);
+                countDownLatch.countDown();
+            }
+        });
+
+
+        PersonApi.requests().getAge("deepu", new ElectrodeBridgeResponseListener<Integer>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable Integer responseData) {
+                assertNotNull(responseData);
+                countDownLatch.countDown();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+
     }
 }

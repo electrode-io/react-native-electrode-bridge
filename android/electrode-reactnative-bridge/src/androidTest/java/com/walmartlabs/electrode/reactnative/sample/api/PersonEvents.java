@@ -19,10 +19,10 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonAddedEventListener(@NonNull final ElectrodeBridgeEventListener<Person> eventListener) {
-        ElectrodeBridgeHolder.addEventListener(REQUEST_PERSON_ADDED, new ElectrodeBridgeEventListener<Bundle>() {
+        ElectrodeBridgeHolder.addEventListener(EVENT_PERSON_ADDED, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
-                Person payload = Person.fromBundle(bundle);
+                Person payload = new Person(bundle);
                 eventListener.onEvent(payload);
             }
         });
@@ -30,7 +30,7 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonNameUpdatedEventListener(@NonNull final ElectrodeBridgeEventListener<String> eventListener) {
-        ElectrodeBridgeHolder.addEventListener(REQUEST_PERSON_NAME_UPDATED, new ElectrodeBridgeEventListener<Bundle>() {
+        ElectrodeBridgeHolder.addEventListener(EVENT_PERSON_NAME_UPDATED, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@NonNull Bundle bundle) {
                 String payload = bundle.getString("personNameUpdated");
@@ -43,7 +43,7 @@ final class PersonEvents implements PersonApi.Events {
     @Override
     public void emitEventPersonAdded(@NonNull Person person) {
         Bundle bundle = person.toBundle();
-        ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_ADDED)
+        ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(EVENT_PERSON_ADDED)
                 .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.JS)
                 .withData(bundle)
                 .build());
@@ -53,7 +53,7 @@ final class PersonEvents implements PersonApi.Events {
     public void emitEventPersonNameUpdated(@NonNull String updatedName) {
         Bundle bundle = new Bundle();
         bundle.putString("updatedName", updatedName);
-        ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(REQUEST_PERSON_NAME_UPDATED)
+        ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(EVENT_PERSON_NAME_UPDATED)
                 .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.JS)
                 .withData(bundle)
                 .build());

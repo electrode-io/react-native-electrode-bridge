@@ -41,7 +41,7 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
-        new RequestProcessor<>(REQUEST_GET_STATUS, null, Person.class, responseListener).execute();
+        new RequestProcessor<>(REQUEST_GET_PERSON, null, Person.class, responseListener).execute();
     }
 
 

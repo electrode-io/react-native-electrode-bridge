@@ -9,37 +9,14 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
 public class Person implements Parcelable, Bridgeable {
-    private static final String KEY_BUNDLE_ID = "className";
     private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
 
     private String name;
-    private Number month;
+    private Integer month;
     private Integer age;
     private Status status;
     private Position position;
     private BirthYear birthYear;
-
-    @Nullable
-    public static Person fromBundle(@Nullable Bundle bundle) {
-        if (bundle == null) {
-            return null;
-        }
-        if (!bundle.containsKey(KEY_BUNDLE_ID)
-                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
-            return null;
-        }
-        //Validate to make sure all required fields are available
-        if (!bundle.containsKey("name")
-                || !bundle.containsKey("month")) {
-            return null;
-        }
-        return new Builder(bundle.getString("name"), bundle.getInt("month"))
-                .age(bundle.containsKey("age") ? bundle.getInt("age") : null)
-                .status(bundle.containsKey("status") ? Status.fromBundle(bundle.getBundle("status")) : null)
-                .position(bundle.containsKey("position") ? Position.fromBundle(bundle.getBundle("position")) : null)
-                .birthYear(bundle.containsKey("birthYear") ? BirthYear.fromBundle(bundle.getBundle("birthYear")) : null)
-                .build();
-    }
 
     private Person() {
 
@@ -66,9 +43,9 @@ public class Person implements Parcelable, Bridgeable {
         this.name = bundle.getString("name");
         this.month = bundle.getInt("month");
         this.age = bundle.containsKey("age") ? bundle.getInt("age") : null;
-        this.status = bundle.containsKey("status") ? Status.fromBundle(bundle.getBundle("status")) : null;
-        this.position = bundle.containsKey("position") ? Position.fromBundle(bundle.getBundle("position")) : null;
-        this.birthYear = bundle.containsKey("birthYear") ? BirthYear.fromBundle(bundle.getBundle("birthYear")) : null;
+        this.status = bundle.containsKey("status") ? new Status(bundle.getBundle("status")) : null;
+        this.position = bundle.containsKey("position") ? new Position(bundle.getBundle("position")) : null;
+        this.birthYear = bundle.containsKey("birthYear") ? new BirthYear(bundle.getBundle("birthYear")) : null;
     }
 
     public static final Creator<Person> CREATOR = new Creator<Person>() {
@@ -128,7 +105,7 @@ public class Person implements Parcelable, Bridgeable {
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("month", month.intValue());
+        bundle.putInt("month", month);
         if (age != null) {
             bundle.putInt("age", age);
         }

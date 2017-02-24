@@ -10,28 +10,7 @@ import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
 public class BirthYear implements Parcelable,Bridgeable {
 
-    private static final String KEY_BUNDLE_ID = "className";
     private static final String VALUE_BUNDLE_ID = BirthYear.class.getSimpleName();
-
-    @Nullable
-    public static BirthYear fromBundle(@Nullable Bundle bundle) {
-        if (bundle == null) {
-            return null;
-        }
-
-        if (!bundle.containsKey(KEY_BUNDLE_ID)
-                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
-            return null;
-        }
-
-        //Validate to make sure all required fields are available
-        if (!bundle.containsKey("month")
-                || !bundle.containsKey("year")) {
-            return null;
-        }
-
-        return new Builder(bundle.getInt("month"), bundle.getInt("year")).build();
-    }
 
     private final Integer month;
     private final Integer year;
@@ -46,6 +25,10 @@ public class BirthYear implements Parcelable,Bridgeable {
     }
 
     public BirthYear(Bundle bundle) {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
+            throw new IllegalArgumentException("Looks like the given bundle does not include Bridgeable.KEY_BUNDLE_ID entry. Your bundle should include this entry with your class.getSimpleName as the value for successfully constructing this object");
+        }
         month = bundle.getInt("month");
         year = bundle.getInt("year");
     }

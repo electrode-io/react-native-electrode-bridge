@@ -13,25 +13,6 @@ public class Status implements Parcelable, Bridgeable {
     private static final String KEY_BUNDLE_ID = "className";
     private static final String VALUE_BUNDLE_ID = Status.class.getSimpleName();
 
-    @Nullable
-    public static Status fromBundle(@Nullable Bundle bundle) {
-        if (bundle == null) {
-            return null;
-        }
-
-        if (!bundle.containsKey(KEY_BUNDLE_ID)
-                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
-            return null;
-        }
-
-        //Validate to make sure all required fields are available
-        if (!bundle.containsKey("member")) {
-            return null;
-        }
-
-        return new Builder(bundle.getBoolean("member")).log(bundle.getBoolean("log")).build();
-    }
-
     private final Boolean member;
     private final Boolean log;
 
@@ -45,6 +26,10 @@ public class Status implements Parcelable, Bridgeable {
     }
 
     public Status(Bundle bundle) {
+        if (!bundle.containsKey(KEY_BUNDLE_ID)
+                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
+            throw new IllegalArgumentException("Looks like the given bundle does not include Bridgeable.KEY_BUNDLE_ID entry. Your bundle should include this entry with your class.getSimpleName as the value for successfully constructing this object");
+        }
         member = bundle.getBoolean("member");
         log = bundle.getBoolean("log");
     }
@@ -110,7 +95,7 @@ public class Status implements Parcelable, Bridgeable {
         public Builder(@NonNull Boolean member) {
             this.member = member;
         }
-
+    
         @NonNull
         public Builder log(@Nullable Boolean log) {
             this.log = log;

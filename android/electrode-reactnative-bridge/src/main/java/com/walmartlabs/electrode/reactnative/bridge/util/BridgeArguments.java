@@ -226,4 +226,31 @@ public class BridgeArguments {
         return bundle;
     }
 
+    public static Number hackNumberHandling(@NonNull Bundle bundle, String key, @NonNull Class<?> outputClass) {
+        Number output = null;
+
+        Object obj = bundle.get(key);
+
+        if (obj != null) {
+            if (outputClass.isAssignableFrom(obj.getClass())) {
+                if (outputClass.isAssignableFrom(Double.class)) {
+                    output = bundle.getDouble(key);
+                } else if (outputClass.isAssignableFrom(Integer.class)) {
+                    output = bundle.getInt(key);
+                } else {
+                    throw new IllegalArgumentException("Should never reach here.");
+                }
+            } else {
+                if (outputClass.isAssignableFrom(Double.class)) {
+                    output = bundle.getInt(key);
+                } else if (outputClass.isAssignableFrom(Integer.class)) {
+                    output = bundle.getDouble(key);
+                } else {
+                    throw new IllegalArgumentException("Should never reach here.");
+                }
+            }
+        }
+        return output;
+    }
+
 }

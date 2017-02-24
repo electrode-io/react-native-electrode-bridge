@@ -3,6 +3,7 @@ package com.walmartlabs.electrode.reactnative.bridge.util;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -179,7 +180,8 @@ public class BridgeArguments {
     }
 
     @NonNull
-    private static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull String key) {
+    @VisibleForTesting
+    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull String key) {
         Object value = null;
         if (String.class.isAssignableFrom(reqClazz)) {
             value = payload.getString(key);
@@ -187,6 +189,8 @@ public class BridgeArguments {
             value = payload.getInt(key);
         } else if (Boolean.class.isAssignableFrom(reqClazz)) {
             value = payload.getBoolean(key);
+        } else if (String[].class.isAssignableFrom(reqClazz)) {
+            value = payload.getStringArray(key);
         }
 
         if (reqClazz.isInstance(value)) {
@@ -205,7 +209,8 @@ public class BridgeArguments {
     }
 
     @NonNull
-    private static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, String key) {
+    @VisibleForTesting
+    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, String key) {
         Bundle bundle = new Bundle();
         if (String.class.isAssignableFrom(respClass)) {
             bundle.putString(key, (String) respObj);
@@ -213,6 +218,8 @@ public class BridgeArguments {
             bundle.putInt(key, (Integer) respObj);
         } else if (Boolean.class.isAssignableFrom(respClass)) {
             bundle.putBoolean(key, (Boolean) respObj);
+        } else if(String[].class.isAssignableFrom(respClass)) {
+            bundle.putStringArray(key, (String[]) respObj);
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + respClass + " is not implemented yet");
         }

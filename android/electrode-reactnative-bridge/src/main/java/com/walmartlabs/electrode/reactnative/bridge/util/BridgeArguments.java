@@ -85,6 +85,10 @@ public class BridgeArguments {
      */
     @NonNull
     public static Bundle generateRequestBundle(@Nullable Object requestPayload) {
+        return generateRequestBundle(requestPayload, false);
+    }
+
+    public static Bundle generateRequestBundle(@Nullable Object requestPayload, boolean isEvent) {
         if (requestPayload == null) {
             return Bundle.EMPTY;
         }
@@ -92,6 +96,8 @@ public class BridgeArguments {
         Bundle data;
         if (requestPayload instanceof Bridgeable) {
             data = ((Bridgeable) requestPayload).toBundle();
+        } else if (isEvent) {
+            data = BridgeArguments.getBundleFromPrimitiveForEvent(requestPayload, requestPayload.getClass());
         } else {
             data = BridgeArguments.getBundleFromPrimitiveForRequest(requestPayload, requestPayload.getClass());
         }
@@ -110,11 +116,17 @@ public class BridgeArguments {
      */
     @Nullable
     public static <T> T responseObjectFromBundle(@Nullable Bundle responseBundle, @NonNull Class<T> responseObjectType) {
+        return responseObjectFromBundle(responseBundle, responseObjectType, false);
+    }
+
+    public static <T> T responseObjectFromBundle(@Nullable Bundle responseBundle, @NonNull Class<T> responseObjectType, boolean isEvent) {
         T response = null;
         if (responseBundle != null
                 && !responseBundle.isEmpty()) {
             if (Bridgeable.class.isAssignableFrom(responseObjectType)) {
                 response = BridgeArguments.bridgeableFromBundle(responseBundle, responseObjectType);
+            } else if (isEvent) {
+                response = (T) BridgeArguments.getPrimitiveFromBundleForEvent(responseBundle, responseObjectType);
             } else {
                 response = (T) BridgeArguments.getPrimitiveFromBundleForResponse(responseBundle, responseObjectType);
             }
@@ -179,6 +191,10 @@ public class BridgeArguments {
         return getPrimitiveFromBundle(payload, reqClazz, "rsp");
     }
 
+    public static Object getPrimitiveFromBundleForEvent(@NonNull Bundle payload, @NonNull Class reqClazz) {
+        return getPrimitiveFromBundle(payload, reqClazz, "event");
+    }
+
     @NonNull
     @VisibleForTesting
     static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull String key) {
@@ -204,8 +220,12 @@ public class BridgeArguments {
         return getBundleForPrimitive(respObj, respClass, "rsp");
     }
 
-    public static Bundle getBundleFromPrimitiveForRequest(@NonNull Object respObj, @NonNull Class respClass) {
+    private static Bundle getBundleFromPrimitiveForRequest(@NonNull Object respObj, @NonNull Class respClass) {
         return getBundleForPrimitive(respObj, respClass, "req");
+    }
+
+    private static Bundle getBundleFromPrimitiveForEvent(@NonNull Object respObj, @NonNull Class respClass) {
+        return getBundleForPrimitive(respObj, respClass, "event");
     }
 
     @NonNull

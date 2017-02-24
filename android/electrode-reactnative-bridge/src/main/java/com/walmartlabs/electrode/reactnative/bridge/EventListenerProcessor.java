@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 /**
@@ -13,7 +14,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  */
 
 public class EventListenerProcessor<T> implements ElectrodeBridgeEventListener<Bundle> {
-
+    private static final String TAG = EventListenerProcessor.class.getSimpleName();
 
     private final Class<T> eventPayLoadClass;
     private final ElectrodeBridgeEventListener<T> eventListener;
@@ -25,7 +26,8 @@ public class EventListenerProcessor<T> implements ElectrodeBridgeEventListener<B
 
     @Override
     public void onEvent(@Nullable Bundle eventPayload) {
-        T result = BridgeArguments.responseObjectFromBundle(eventPayload, eventPayLoadClass);
+        Logger.d(TAG, "Processing final result for the event with payload bundle(%s)", eventPayload);
+        T result = BridgeArguments.responseObjectFromBundle(eventPayload, eventPayLoadClass, true);
         eventListener.onEvent(result);
     }
 

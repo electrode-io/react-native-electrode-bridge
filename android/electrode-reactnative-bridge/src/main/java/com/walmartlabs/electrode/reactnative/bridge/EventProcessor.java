@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 /**
@@ -13,6 +14,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  */
 
 public class EventProcessor<T> {
+    private static final String TAG = EventProcessor.class.getSimpleName();
 
     private final T eventPayload;
     private final String eventName;
@@ -23,8 +25,10 @@ public class EventProcessor<T> {
     }
 
     public void execute() {
-        Bundle data = BridgeArguments.generateRequestBundle(eventPayload);
+        Logger.d(TAG, "EventProcessor is emitting event(%s), with payload(%s)", eventName, eventPayload);
+        Bundle data = BridgeArguments.generateRequestBundle(eventPayload, true);
         ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(eventName)
+                .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.NATIVE)
                 .withData(data)
                 .build());
     }

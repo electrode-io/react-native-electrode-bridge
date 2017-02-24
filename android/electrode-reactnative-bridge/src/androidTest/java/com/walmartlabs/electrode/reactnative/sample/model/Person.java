@@ -7,6 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
+import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
+
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.hackNumberHandling;
 
 public class Person implements Parcelable, Bridgeable {
     private static final String VALUE_BUNDLE_ID = Person.class.getSimpleName();
@@ -41,8 +44,8 @@ public class Person implements Parcelable, Bridgeable {
             throw new IllegalArgumentException("Looks like the given bundle does not include Bridgeable.KEY_BUNDLE_ID entry. Your bundle should include this entry with your class.getSimpleName as the value for successfully constructing this object");
         }
         this.name = bundle.getString("name");
-        this.month = bundle.getInt("month");
-        this.age = bundle.containsKey("age") ? bundle.getInt("age") : null;
+        this.month = hackNumberHandling(bundle, "month", Integer.class).intValue();
+        this.age = bundle.containsKey("age") ? hackNumberHandling(bundle, "age", Integer.class).intValue() : null;
         this.status = bundle.containsKey("status") ? new Status(bundle.getBundle("status")) : null;
         this.position = bundle.containsKey("position") ? new Position(bundle.getBundle("position")) : null;
         this.birthYear = bundle.containsKey("birthYear") ? new BirthYear(bundle.getBundle("birthYear")) : null;

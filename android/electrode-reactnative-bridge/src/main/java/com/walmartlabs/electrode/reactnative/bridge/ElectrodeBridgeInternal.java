@@ -161,6 +161,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     @NonNull
     @Override
     public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener eventListener) {
+        Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
         return mEventRegistrar.registerEventListener(name, eventListener);
     }
 
@@ -308,10 +309,11 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     @ReactMethod
     @SuppressWarnings("unused")
     public void dispatchEvent(final String name, final String id, final ReadableMap data) {
-        Log.d(TAG, String.format("onEvent[name:%s id:%s]", name, id));
+        Logger.d(TAG, "inside dispatchEvent - onEvent[name:%s id:%s]", name, id);
 
         // This event represents a bridge response
         if (name.equals(BRIDGE_RESPONSE)) {
+            Logger.d(TAG, "Handling bridge response event");
             // Get id of associated request
             String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
             Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
@@ -348,6 +350,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
                 promise.reject(new UnsupportedOperationException());
             }
         } else {
+            Logger.d(TAG, "Handling regular event");
             mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                 @Override
                 public void run() {

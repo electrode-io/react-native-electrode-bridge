@@ -95,6 +95,38 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         });
 
         waitForCountDownToFinishOrFail(countDownLatch);
+    }
 
+
+    public void testEventsForModelObject() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Person person = new Person.Builder("chris", 20).build();
+        PersonApi.events().addPersonAddedEventListener(new ElectrodeBridgeEventListener<Person>() {
+            @Override
+            public void onEvent(@Nullable Person eventPayload) {
+                assertNotNull(eventPayload);
+                assertEquals(person.getName(), eventPayload.getName());
+                assertEquals(person.getMonth(), eventPayload.getMonth());
+                countDownLatch.countDown();
+            }
+        });
+        PersonApi.events().emitEventPersonAdded(person);
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testEventsForModelPrimitiveWrapper() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final String personName = "chris";
+        PersonApi.events().addPersonNameUpdatedEventListener(new ElectrodeBridgeEventListener<String>() {
+            @Override
+            public void onEvent(@Nullable String eventPayload) {
+                assertNotNull(eventPayload);
+                assertEquals(personName, eventPayload);
+                countDownLatch.countDown();
+            }
+        });
+
+        PersonApi.events().emitEventPersonNameUpdated(personName);
+        waitForCountDownToFinishOrFail(countDownLatch);
     }
 }

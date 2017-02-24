@@ -95,7 +95,7 @@ public class Status implements Parcelable, Bridgeable {
         public Builder(@NonNull Boolean member) {
             this.member = member;
         }
-    
+
         @NonNull
         public Builder log(@Nullable Boolean log) {
             this.log = log;

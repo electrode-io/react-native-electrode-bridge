@@ -35,7 +35,6 @@ public class RequestProcessor<TReq, TResp> {
 
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(requestName)
                 .withData(data)
-                .withDispatchMode(ElectrodeBridgeRequest.DispatchMode.NATIVE)//FIXME: remove dispatch mode.
                 .build();
 
         ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<Bundle>() {

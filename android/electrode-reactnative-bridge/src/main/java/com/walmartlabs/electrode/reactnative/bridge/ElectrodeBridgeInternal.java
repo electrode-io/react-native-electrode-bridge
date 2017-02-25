@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
@@ -142,6 +143,13 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
                              @NonNull String id,
                              @NonNull Bundle data,
                              @NonNull Promise promise);
+
+        void dispatchJSOriginatingRequest(@NonNull String name,
+                                          @NonNull String id,
+                                          @NonNull Bundle data,
+                                          @NonNull Promise promise);
+
+        boolean canHandleRequest(@NonNull String name);
     }
 
     /**
@@ -224,9 +232,9 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
 
                 logResponse(bundle, id, request);
 
-                if (!removePromiseFromPendingList(id)) {
-                    return;
-                }
+                // Already done when receiving a response event type in dispatchEvent
+                // is that needed here ?
+                removePromiseFromPendingList(id);
 
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
@@ -242,9 +250,9 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
 
                 logFailure(writableMap.getString("code"), writableMap.getString("message"), id, request);
 
-                if (!removePromiseFromPendingList(id)) {
-                    return;
-                }
+                // Already done when receiving a response event type in dispatchEvent
+                // is that needed here ?
+                removePromiseFromPendingList(id);
 
                 mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                     @Override
@@ -270,11 +278,11 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
             }
         }, request.getTimeoutMs());
 
-        if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.JS)) {
+        if (mRequestDispatcher.canHandleRequest(request.getName())) {
+            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise);
+        } else {
             WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
             mReactContextWrapper.emitEvent(BRIDE_REQUEST, message);
-        } else if (request.getDispatchMode().equals(ElectrodeBridgeRequest.DispatchMode.NATIVE)) {
-            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise);
         }
     }
 
@@ -297,6 +305,21 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
 
     private void logFailure(@NonNull String code, @NonNull String message, @NonNull String id, ElectrodeBridgeRequest request) {
         Logger.d(TAG, "<<<<<<<< id = %s, Received failure(code=%s, message=%s) for request(%s)", id, code, message, request);
+    }
+
+    /**
+     * Dispatch a request on the native side
+     *
+     * @param name    The name of the request
+     * @param id      The request id
+     * @param data    The request data
+     * @param promise A promise to reject or resolve the request asynchronously
+     */
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
+        Log.d(TAG, String.format("dispatchRequest[name:%s id:%s]", name, id));
+        mRequestDispatcher.dispatchJSOriginatingRequest(name, id, ArgumentsEx.toBundle(data), promise);
     }
 
     /**

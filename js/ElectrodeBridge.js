@@ -52,7 +52,7 @@ class ElectrodeBridge extends EventEmitter {
         } = {} /*: Object */ ) {
         switch (dispatchMode) {
             case DispatchMode.NATIVE:
-                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), data);
+                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), { event: data });
                 break;
             case DispatchMode.JS:
                 this.emit(name, data);
@@ -166,7 +166,7 @@ class ElectrodeBridge extends EventEmitter {
 
         this.requestHandlerByRequestName[name](data)
             .then((data) => {
-                this._sendSuccessResponseToNative(id, data)
+                this._sendSuccessResponseToNative(id, data: { rsp: data })
             })
             .catch((err) => {
                 this._sendErrorResponseToNative(id, {

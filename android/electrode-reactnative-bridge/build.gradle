@@ -14,7 +14,7 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
-            pom.version = '1.2.1'
+            pom.version = '1.2.2'
             pom.artifactId = 'react-native-electrode-bridge'
             pom.groupId = 'com.walmartlabs.ern'
             repository(url: "http://mobilebuild.homeoffice.wal-mart.com:8081/nexus/content/repositories/hosted") {
@@ -51,5 +51,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.facebook.react:react-native:0.38.0'
+    compile 'com.facebook.react:react-native:0.40.0'
 }

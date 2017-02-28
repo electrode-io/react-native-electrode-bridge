@@ -20,6 +20,22 @@ import java.lang.reflect.InvocationTargetException;
 
 public class BridgeArguments {
 
+    public enum Type {
+        REQUEST("req"),
+        RESPONSE("rsp"),
+        EVENT("event");
+
+        private String key;
+
+        Type(@NonNull String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+    }
+
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
     /**
@@ -77,66 +93,45 @@ public class BridgeArguments {
         return bundle;
     }
 
+
     /**
-     * Returns a bundle representation of the passed object. Object should be a primitive wrapper or {@link Bridgeable}
-     *
-     * @param requestPayload
-     * @return Bundle, if the requestPayload is null {@link Bundle#EMPTY} will be returned
+     * @param object
+     * @param type
+     * @return Bundle representation of the given object. If the passed object is a primitive wrapper a bundle with one item will be generated and the
      */
     @NonNull
-    public static Bundle generateRequestBundle(@Nullable Object requestPayload) {
-        return generateRequestBundle(requestPayload, false);
-    }
-
-    public static Bundle generateRequestBundle(@Nullable Object requestPayload, boolean isEvent) {
-        if (requestPayload == null) {
+    public static Bundle generateBundle(@Nullable Object object, @NonNull Type type) {
+        if (object == null) {
             return Bundle.EMPTY;
         }
-
         Bundle data;
-        if (requestPayload instanceof Bridgeable) {
-            data = ((Bridgeable) requestPayload).toBundle();
-        } else if (isEvent) {
-            data = BridgeArguments.getBundleFromPrimitiveForEvent(requestPayload, requestPayload.getClass());
+        if (object instanceof Bridgeable) {
+            data = ((Bridgeable) object).toBundle();
         } else {
-            data = BridgeArguments.getBundleFromPrimitiveForRequest(requestPayload, requestPayload.getClass());
+            data = BridgeArguments.getBundleForPrimitive(object, object.getClass(), type);
         }
 
         return data;
     }
 
-
-    /**
-     * Forms T from a given bundle.
-     *
-     * @param responseBundle     {@link Bundle}
-     * @param responseObjectType responseObjectTypeClass
-     * @param <T>                responseObjectType
-     * @return
-     */
     @Nullable
-    public static <T> T responseObjectFromBundle(@Nullable Bundle responseBundle, @NonNull Class<T> responseObjectType) {
-        return responseObjectFromBundle(responseBundle, responseObjectType, false);
-    }
-
-    public static <T> T responseObjectFromBundle(@Nullable Bundle responseBundle, @NonNull Class<T> responseObjectType, boolean isEvent) {
+    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass, @NonNull Type type) {
         T response = null;
-        if (responseBundle != null
-                && !responseBundle.isEmpty()) {
-            if (Bridgeable.class.isAssignableFrom(responseObjectType)) {
-                response = BridgeArguments.bridgeableFromBundle(responseBundle, responseObjectType);
-            } else if (isEvent) {
-                response = (T) BridgeArguments.getPrimitiveFromBundleForEvent(responseBundle, responseObjectType);
+        if (payload != null
+                && !payload.isEmpty()) {
+            if (Bridgeable.class.isAssignableFrom(returnClass)) {
+                response = BridgeArguments.bridgeableFromBundle(payload, returnClass);
             } else {
-                response = (T) BridgeArguments.getPrimitiveFromBundleForResponse(responseBundle, responseObjectType);
+                response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass, type);
             }
         }
         return response;
     }
 
 
+    @VisibleForTesting
     @Nullable
-    public static <T> T bridgeableFromBundle(@NonNull Bundle bundle, @NonNull Class<T> clazz) {
+    static <T> T bridgeableFromBundle(@NonNull Bundle bundle, @NonNull Class<T> clazz) {
         Logger.d(TAG, "entering bridgeableFromBundle with bundle(%s) for class(%s)", bundle, clazz);
 
         if (!bundle.containsKey(Bridgeable.KEY_BUNDLE_ID)
@@ -183,30 +178,18 @@ public class BridgeArguments {
         Logger.w(TAG, "FromBundle failed to execute(%s)", e.getMessage() != null ? e.getMessage() : e.getCause());
     }
 
-    public static Object getPrimitiveFromBundleForRequest(@NonNull Bundle payload, @NonNull Class reqClazz) {
-        return getPrimitiveFromBundle(payload, reqClazz, "req");
-    }
-
-    public static Object getPrimitiveFromBundleForResponse(@NonNull Bundle payload, @NonNull Class reqClazz) {
-        return getPrimitiveFromBundle(payload, reqClazz, "rsp");
-    }
-
-    public static Object getPrimitiveFromBundleForEvent(@NonNull Bundle payload, @NonNull Class reqClazz) {
-        return getPrimitiveFromBundle(payload, reqClazz, "event");
-    }
-
     @NonNull
     @VisibleForTesting
-    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull String key) {
+    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull Type type) {
         Object value = null;
         if (String.class.isAssignableFrom(reqClazz)) {
-            value = payload.getString(key);
+            value = payload.getString(type.key);
         } else if (Integer.class.isAssignableFrom(reqClazz)) {
-            value = payload.getInt(key);
+            value = payload.getInt(type.key);
         } else if (Boolean.class.isAssignableFrom(reqClazz)) {
-            value = payload.getBoolean(key);
+            value = payload.getBoolean(type.key);
         } else if (String[].class.isAssignableFrom(reqClazz)) {
-            value = payload.getStringArray(key);
+            value = payload.getStringArray(type.key);
         }
 
         if (reqClazz.isInstance(value)) {
@@ -216,30 +199,18 @@ public class BridgeArguments {
         }
     }
 
-    public static Bundle getBundleFromPrimitiveForResponse(@NonNull Object respObj, @NonNull Class respClass) {
-        return getBundleForPrimitive(respObj, respClass, "rsp");
-    }
-
-    private static Bundle getBundleFromPrimitiveForRequest(@NonNull Object respObj, @NonNull Class respClass) {
-        return getBundleForPrimitive(respObj, respClass, "req");
-    }
-
-    private static Bundle getBundleFromPrimitiveForEvent(@NonNull Object respObj, @NonNull Class respClass) {
-        return getBundleForPrimitive(respObj, respClass, "event");
-    }
-
     @NonNull
     @VisibleForTesting
-    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, String key) {
+    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, Type type) {
         Bundle bundle = new Bundle();
         if (String.class.isAssignableFrom(respClass)) {
-            bundle.putString(key, (String) respObj);
+            bundle.putString(type.key, (String) respObj);
         } else if (Integer.class.isAssignableFrom(respClass)) {
-            bundle.putInt(key, (Integer) respObj);
+            bundle.putInt(type.key, (Integer) respObj);
         } else if (Boolean.class.isAssignableFrom(respClass)) {
-            bundle.putBoolean(key, (Boolean) respObj);
-        } else if(String[].class.isAssignableFrom(respClass)) {
-            bundle.putStringArray(key, (String[]) respObj);
+            bundle.putBoolean(type.key, (Boolean) respObj);
+        } else if (String[].class.isAssignableFrom(respClass)) {
+            bundle.putStringArray(type.key, (String[]) respObj);
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + respClass + " is not implemented yet");
         }

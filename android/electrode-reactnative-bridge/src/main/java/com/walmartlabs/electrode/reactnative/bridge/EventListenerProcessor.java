@@ -31,7 +31,7 @@ public class EventListenerProcessor<T> {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 Logger.d(TAG, "Processing final result for the event with payload bundle(%s)", eventPayload);
-                T result = BridgeArguments.responseObjectFromBundle(eventPayload, eventPayLoadClass, true);
+                T result = BridgeArguments.generateObject(eventPayload, eventPayLoadClass, BridgeArguments.Type.EVENT);
                 eventListener.onEvent(result);
             }
         };

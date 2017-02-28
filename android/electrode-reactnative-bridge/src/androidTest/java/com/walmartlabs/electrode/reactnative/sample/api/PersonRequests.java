@@ -26,17 +26,17 @@ final class PersonRequests implements PersonApi.Requests {
 
     @Override
     public void registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_PERSON, new RequestHandlerProcessor<>(None.class, Person.class, handler));
+        new RequestHandlerProcessor<>(REQUEST_GET_PERSON, None.class, Person.class, handler).execute();
     }
 
     @Override
     public void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_STATUS, new RequestHandlerProcessor<>(Person.class, Status.class, handler));
+        new RequestHandlerProcessor<>(REQUEST_GET_STATUS, Person.class, Status.class, handler).execute();
     }
 
     @Override
     public void registerGetAgeRequestHandler(@NonNull ElectrodeBridgeRequestHandler<String, Integer> handler) {
-        ElectrodeBridgeHolder.registerRequestHandler(REQUEST_GET_AGE, new RequestHandlerProcessor<>(String.class, Integer.class, handler));
+        new RequestHandlerProcessor<>(REQUEST_GET_AGE, String.class, Integer.class, handler).execute();
     }
 
     @Override

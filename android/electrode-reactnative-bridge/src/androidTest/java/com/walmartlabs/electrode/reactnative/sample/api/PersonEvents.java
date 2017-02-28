@@ -3,7 +3,6 @@ package com.walmartlabs.electrode.reactnative.sample.api;
 import android.support.annotation.NonNull;
 
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEventListener;
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.EventListenerProcessor;
 import com.walmartlabs.electrode.reactnative.bridge.EventProcessor;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -19,12 +18,12 @@ final class PersonEvents implements PersonApi.Events {
 
     @Override
     public void addPersonAddedEventListener(@NonNull final ElectrodeBridgeEventListener<Person> eventListener) {
-        ElectrodeBridgeHolder.addEventListener(EVENT_PERSON_ADDED, new EventListenerProcessor<>(Person.class, eventListener));
+        new EventListenerProcessor<>(EVENT_PERSON_ADDED, Person.class, eventListener).execute();
     }
 
     @Override
     public void addPersonNameUpdatedEventListener(@NonNull final ElectrodeBridgeEventListener<String> eventListener) {
-        ElectrodeBridgeHolder.addEventListener(EVENT_PERSON_NAME_UPDATED, new EventListenerProcessor<>(String.class, eventListener));
+        new EventListenerProcessor<>(EVENT_PERSON_NAME_UPDATED, String.class, eventListener).execute();
     }
 
 

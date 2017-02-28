@@ -15,57 +15,66 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <TReq>
  * @param <TResp>
  */
-public class RequestHandlerProcessor<TReq, TResp> implements ElectrodeBridgeRequestHandler<Bundle, Bundle> {
+public class RequestHandlerProcessor<TReq, TResp> {
     private final String TAG = RequestHandlerProcessor.class.getSimpleName();
 
+    private final String requestName;
     private final Class<TReq> reqClazz;
     private final Class<TResp> respClazz;
     private final ElectrodeBridgeRequestHandler<TReq, TResp> handler;
 
-    public RequestHandlerProcessor(@NonNull Class<TReq> reqClazz, @NonNull Class<TResp> respClazz, @NonNull ElectrodeBridgeRequestHandler<TReq, TResp> handler) {
+    public RequestHandlerProcessor(@NonNull String requestName, @NonNull Class<TReq> reqClazz, @NonNull Class<TResp> respClazz, @NonNull ElectrodeBridgeRequestHandler<TReq, TResp> handler) {
+        this.requestName = requestName;
         this.reqClazz = reqClazz;
         this.respClazz = respClazz;
         this.handler = handler;
     }
 
-    @Override
-    public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
-        Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
-        TReq request = null;
-
-        if (payload != null) {
-            if (Bridgeable.class.isAssignableFrom(reqClazz)) {
-                request = BridgeArguments.bridgeableFromBundle(payload, reqClazz);
-            } else {
-                Object obj = BridgeArguments.getPrimitiveFromBundleForRequest(payload, reqClazz);
-                if (reqClazz.isInstance(obj)) {
-                    request = (TReq) obj;
-                } else {
-                    throw new IllegalArgumentException("The payload type" + payload.getClass() + " is not supported yet.! ");
-                }
-            }
-        }
-
-        Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, payload);
-
-        handler.onRequest(request, new ElectrodeBridgeResponseListener<TResp>() {
-            @Override
-            public void onFailure(@NonNull FailureMessage failureMessage) {
-                responseListener.onFailure(failureMessage);
-            }
+    public void execute() {
+        final ElectrodeBridgeRequestHandler intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Bundle>() {
 
             @Override
-            public void onSuccess(TResp obj) {
-                Logger.d(TAG, "Received successful response(%s) from handler, now lets try to convert to real object for the response listener", obj);
-                Bundle bundle;
-                if (Bridgeable.class.isAssignableFrom(respClazz)) {
-                    bundle = ((Bridgeable) obj).toBundle();
-                } else {
-                    bundle = BridgeArguments.getBundleFromPrimitiveForResponse(obj, respClazz);
+            public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
+                Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
+                TReq request = null;
+
+                if (payload != null) {
+                    if (Bridgeable.class.isAssignableFrom(reqClazz)) {
+                        request = BridgeArguments.bridgeableFromBundle(payload, reqClazz);
+                    } else {
+                        Object obj = BridgeArguments.getPrimitiveFromBundleForRequest(payload, reqClazz);
+                        if (reqClazz.isInstance(obj)) {
+                            request = (TReq) obj;
+                        } else {
+                            throw new IllegalArgumentException("The payload type" + payload.getClass() + " is not supported yet.! ");
+                        }
+                    }
                 }
-                Logger.d(TAG, "Bundle(%s) generated from response(%s) ", bundle, obj);
-                responseListener.onSuccess(bundle);
+
+                Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, payload);
+
+                handler.onRequest(request, new ElectrodeBridgeResponseListener<TResp>() {
+                    @Override
+                    public void onFailure(@NonNull FailureMessage failureMessage) {
+                        responseListener.onFailure(failureMessage);
+                    }
+
+                    @Override
+                    public void onSuccess(TResp obj) {
+                        Logger.d(TAG, "Received successful response(%s) from handler, now lets try to convert to real object for the response listener", obj);
+                        Bundle bundle;
+                        if (Bridgeable.class.isAssignableFrom(respClazz)) {
+                            bundle = ((Bridgeable) obj).toBundle();
+                        } else {
+                            bundle = BridgeArguments.getBundleFromPrimitiveForResponse(obj, respClazz);
+                        }
+                        Logger.d(TAG, "Bundle(%s) generated from response(%s) ", bundle, obj);
+                        responseListener.onSuccess(bundle);
+                    }
+                });
             }
-        });
+        };
+        ElectrodeBridgeHolder.registerRequestHandler(requestName, intermediateRequestHandler);
     }
+
 }

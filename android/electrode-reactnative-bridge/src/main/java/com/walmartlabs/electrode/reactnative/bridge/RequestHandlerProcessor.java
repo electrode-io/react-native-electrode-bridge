@@ -36,20 +36,7 @@ public class RequestHandlerProcessor<TReq, TResp> {
             @Override
             public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
                 Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
-                TReq request = null;
-
-                if (payload != null) {
-                    if (Bridgeable.class.isAssignableFrom(reqClazz)) {
-                        request = BridgeArguments.bridgeableFromBundle(payload, reqClazz);
-                    } else {
-                        Object obj = BridgeArguments.getPrimitiveFromBundleForRequest(payload, reqClazz);
-                        if (reqClazz.isInstance(obj)) {
-                            request = (TReq) obj;
-                        } else {
-                            throw new IllegalArgumentException("The payload type" + payload.getClass() + " is not supported yet.! ");
-                        }
-                    }
-                }
+                TReq request = BridgeArguments.generateObject(payload, reqClazz, BridgeArguments.Type.REQUEST);
 
                 Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, payload);
 
@@ -62,14 +49,7 @@ public class RequestHandlerProcessor<TReq, TResp> {
                     @Override
                     public void onSuccess(TResp obj) {
                         Logger.d(TAG, "Received successful response(%s) from handler, now lets try to convert to real object for the response listener", obj);
-                        Bundle bundle;
-                        if (Bridgeable.class.isAssignableFrom(respClazz)) {
-                            bundle = ((Bridgeable) obj).toBundle();
-                        } else {
-                            bundle = BridgeArguments.getBundleFromPrimitiveForResponse(obj, respClazz);
-                        }
-                        Logger.d(TAG, "Bundle(%s) generated from response(%s) ", bundle, obj);
-                        responseListener.onSuccess(bundle);
+                        responseListener.onSuccess(BridgeArguments.generateBundle(obj, BridgeArguments.Type.RESPONSE));
                     }
                 });
             }

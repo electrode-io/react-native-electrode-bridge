@@ -10,6 +10,8 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import junit.framework.TestCase;
 
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.Type.REQUEST;
+
 public class BridgeArgumentsTest extends TestCase {
 
     @Override
@@ -59,11 +61,11 @@ public class BridgeArgumentsTest extends TestCase {
 
     public void testBundleToPrimitiveAndViceVersaForString() {
         String[] expectedArray = {"ONE", "TWO", "THREE", "FOUR", "FIVE"};
-        Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class, "test");
+        Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class, REQUEST);
         assertNotNull(bundle);
-        assertNotNull(bundle.get("test"));
+        assertNotNull(bundle.get(REQUEST.getKey()));
 
-        String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class, "test");
+        String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class, REQUEST);
         assertNotNull(actualArray);
         assertEquals(expectedArray.length, actualArray.length);
 

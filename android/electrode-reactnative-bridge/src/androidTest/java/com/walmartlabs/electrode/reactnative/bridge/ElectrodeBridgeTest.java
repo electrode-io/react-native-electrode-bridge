@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 
 public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
-    public void testSampleRequest() {
+    public void testSampleRequestNativeToNativeFailure() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
             @Override
@@ -34,7 +34,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
     }
 
 
-    public void testRegisterGetStatusRequestHandler() {
+    public void testRegisterGetStatusRequestHandlerNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Status result = new Status.Builder(true).log(true).build();
         final Person person = new Person.Builder("John", 05).build();
@@ -67,7 +67,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-    public void testPrimitiveTypesForRequestAndResponse() {
+    public void testPrimitiveTypesForRequestAndResponseNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         PersonApi.requests().registerGetAgeRequestHandler(new ElectrodeBridgeRequestHandler<String, Integer>() {
             @Override
@@ -98,7 +98,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
     }
 
 
-    public void testEventsForModelObject() {
+    public void testEventsForModelObjectNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Person person = new Person.Builder("chris", 20).build();
         PersonApi.events().addPersonAddedEventListener(new ElectrodeBridgeEventListener<Person>() {
@@ -114,7 +114,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-    public void testEventsForModelPrimitiveWrapper() {
+    public void testEventsForModelPrimitiveWrapperNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final String personName = "chris";
         PersonApi.events().addPersonNameUpdatedEventListener(new ElectrodeBridgeEventListener<String>() {

@@ -10,9 +10,6 @@ import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
 public class Status implements Parcelable, Bridgeable {
 
-    private static final String KEY_BUNDLE_ID = "className";
-    private static final String VALUE_BUNDLE_ID = Status.class.getSimpleName();
-
     private final Boolean member;
     private final Boolean log;
 
@@ -26,10 +23,6 @@ public class Status implements Parcelable, Bridgeable {
     }
 
     public Status(Bundle bundle) {
-        if (!bundle.containsKey(KEY_BUNDLE_ID)
-                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
-            throw new IllegalArgumentException("Looks like the given bundle does not include Bridgeable.KEY_BUNDLE_ID entry. Your bundle should include this entry with your class.getSimpleName as the value for successfully constructing this object");
-        }
         member = bundle.getBoolean("member");
         log = bundle.getBoolean("log");
     }
@@ -84,7 +77,6 @@ public class Status implements Parcelable, Bridgeable {
         if (log != null) {
             bundle.putBoolean("log", log);
         }
-        bundle.putString(KEY_BUNDLE_ID, VALUE_BUNDLE_ID);
         return bundle;
     }
 

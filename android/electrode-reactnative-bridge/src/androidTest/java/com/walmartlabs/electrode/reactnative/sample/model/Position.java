@@ -10,8 +10,6 @@ import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
 public class Position implements Parcelable,Bridgeable {
 
-    private static final String VALUE_BUNDLE_ID = Position.class.getSimpleName();
-
     private final Double lat;
     private final Double lng;
 
@@ -25,10 +23,6 @@ public class Position implements Parcelable,Bridgeable {
     }
 
     public Position(Bundle bundle) {
-        if (!bundle.containsKey(KEY_BUNDLE_ID)
-                || !(VALUE_BUNDLE_ID).equals(bundle.getString(KEY_BUNDLE_ID))) {
-            throw new IllegalArgumentException("Looks like the given bundle does not include Bridgeable.KEY_BUNDLE_ID entry. Your bundle should include this entry with your class.getSimpleName as the value for successfully constructing this object");
-        }
         lat = bundle.getDouble("lat");
         lng = bundle.getDouble("lng");
     }
@@ -76,7 +70,6 @@ public class Position implements Parcelable,Bridgeable {
         if (lng != null) {
             bundle.putDouble("lng", lng);
         }
-        bundle.putString(KEY_BUNDLE_ID, VALUE_BUNDLE_ID);
         return bundle;
     }
 

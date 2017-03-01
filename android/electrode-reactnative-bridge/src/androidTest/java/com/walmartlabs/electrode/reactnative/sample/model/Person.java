@@ -32,7 +32,7 @@ public class Person implements Parcelable, Bridgeable {
         this.birthYear = builder.birthYear;
     }
 
-    protected Person(Parcel in) {
+    private Person(Parcel in) {
         this(in.readBundle());
     }
 

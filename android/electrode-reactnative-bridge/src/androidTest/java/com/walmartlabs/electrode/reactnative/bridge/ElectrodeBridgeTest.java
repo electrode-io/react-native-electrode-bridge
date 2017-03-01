@@ -3,17 +3,22 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Nonnull;
 
+import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_MSG_DATA;
+
 public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
-    public void testSampleRequest() {
+    public void testSampleRequestNativeToNativeFailure() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
             @Override
@@ -33,8 +38,42 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    public void testSampleRequestNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String expectedResult = "Richard Mercille";
 
-    public void testRegisterGetStatusRequestHandler() {
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_USER_NAME, new MockElectrodeEventListener() {
+            @Override
+            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertEquals(PersonApi.Requests.REQUEST_GET_USER_NAME, eventName);
+                assertNotNull(message);
+                WritableMap response = Arguments.createMap();
+                response.putString(BRIDGE_MSG_DATA, expectedResult);
+                jsResponseDispatcher.dispatchResponse(response);
+                countDownLatch.countDown();
+            }
+        });
+
+        PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
+            @Override
+            public void onSuccess(String obj) {
+                assertNotNull(expectedResult, obj);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onFailure(@Nonnull FailureMessage failureMessage) {
+                fail();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+
+    }
+
+
+    public void testRegisterGetStatusRequestHandlerNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Status result = new Status.Builder(true).log(true).build();
         final Person person = new Person.Builder("John", 05).build();
@@ -67,7 +106,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-    public void testPrimitiveTypesForRequestAndResponse() {
+    public void testPrimitiveTypesForRequestAndResponseNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         PersonApi.requests().registerGetAgeRequestHandler(new ElectrodeBridgeRequestHandler<String, Integer>() {
             @Override
@@ -98,7 +137,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
     }
 
 
-    public void testEventsForModelObject() {
+    public void testEventsForModelObjectNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Person person = new Person.Builder("chris", 20).build();
         PersonApi.events().addPersonAddedEventListener(new ElectrodeBridgeEventListener<Person>() {
@@ -114,7 +153,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-    public void testEventsForModelPrimitiveWrapper() {
+    public void testEventsForModelPrimitiveWrapperNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final String personName = "chris";
         PersonApi.events().addPersonNameUpdatedEventListener(new ElectrodeBridgeEventListener<String>() {

@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BaseBridgeTestCase extends InstrumentationTestCase {
 
+    public static final int REQUEST_TIMEOUT_SECONDS = 10;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -106,7 +108,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
 
     void waitForCountDownToFinishOrFail(CountDownLatch countDown) {
         try {
-            assertTrue(countDown.await(1000, TimeUnit.SECONDS));
+            assertTrue(countDown.await(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
             fail();
         }

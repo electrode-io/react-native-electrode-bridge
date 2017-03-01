@@ -27,17 +27,17 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
 
     private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
 
-    private static final String BRIDGE_EVENT = "electrode.bridge.event";
-    private static final String BRIDE_REQUEST = "electrode.bridge.request";
-    private static final String BRIDGE_RESPONSE = "electrode.bridge.response";
-    private static final String BRIDGE_RESPONSE_ERROR = "error";
-    private static final String BRIDGE_RESPONSE_ERROR_CODE = "code";
-    private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
-    private static final String BRIDGE_MSG_DATA = "data";
-    private static final String BRIDGE_MSG_NAME = "name";
-    private static final String BRIDGE_MSG_ID = "id";
-    private static final String BRIDGE_REQUEST_ID = "requestId";
-    private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
+    public static final String BRIDGE_EVENT = "electrode.bridge.event";
+    public static final String BRIDE_REQUEST = "electrode.bridge.request";
+    public static final String BRIDGE_RESPONSE = "electrode.bridge.response";
+    public static final String BRIDGE_RESPONSE_ERROR = "error";
+    public static final String BRIDGE_RESPONSE_ERROR_CODE = "code";
+    public static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
+    public static final String BRIDGE_MSG_DATA = "data";
+    public static final String BRIDGE_MSG_NAME = "name";
+    public static final String BRIDGE_MSG_ID = "id";
+    public static final String BRIDGE_REQUEST_ID = "requestId";
+    public static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
 
     private final ReactContextWrapper mReactContextWrapper;
     private final EventDispatcher mEventDispatcher;

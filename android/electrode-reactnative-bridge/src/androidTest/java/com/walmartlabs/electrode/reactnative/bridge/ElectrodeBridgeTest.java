@@ -3,13 +3,18 @@ package com.walmartlabs.electrode.reactnative.bridge;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Nonnull;
+
+import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_MSG_DATA;
 
 public class ElectrodeBridgeTest extends BaseBridgeTestCase {
 
@@ -31,6 +36,40 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         });
 
         waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testSampleRequestNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String expectedResult = "Richard Mercille";
+
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_USER_NAME, new MockElectrodeEventListener() {
+            @Override
+            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertEquals(PersonApi.Requests.REQUEST_GET_USER_NAME, eventName);
+                assertNotNull(message);
+                WritableMap response = Arguments.createMap();
+                response.putString(BRIDGE_MSG_DATA, expectedResult);
+                jsResponseDispatcher.dispatchResponse(response);
+                countDownLatch.countDown();
+            }
+        });
+
+        PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
+            @Override
+            public void onSuccess(String obj) {
+                assertNotNull(expectedResult, obj);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onFailure(@Nonnull FailureMessage failureMessage) {
+                fail();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+
     }
 
 

@@ -134,12 +134,6 @@ public class BridgeArguments {
     static <T> T bridgeableFromBundle(@NonNull Bundle bundle, @NonNull Class<T> clazz) {
         Logger.d(TAG, "entering bridgeableFromBundle with bundle(%s) for class(%s)", bundle, clazz);
 
-        if (!bundle.containsKey(Bridgeable.KEY_BUNDLE_ID)
-                || !(clazz.getSimpleName().equals(bundle.getString(Bridgeable.KEY_BUNDLE_ID)))) {
-            Logger.w(TAG, "Looks like the given bundle(%s) does not include KEY_BUNDLE_ID entry, expected(%s) != actual(%s)", bundle, clazz.getSimpleName(), bundle.getString(Bridgeable.KEY_BUNDLE_ID));
-            return null;
-        }
-
         try {
             Class clz = Class.forName(clazz.getName());
             Constructor[] constructors = clz.getDeclaredConstructors();

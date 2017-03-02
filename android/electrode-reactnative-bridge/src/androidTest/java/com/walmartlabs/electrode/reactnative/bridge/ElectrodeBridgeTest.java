@@ -1,10 +1,12 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
@@ -38,7 +40,7 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-    public void testSampleRequestNativeToJS() {
+    public void testSampleRequestNativeToJSSuccess() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "Richard Mercille";
 
@@ -104,6 +106,53 @@ public class ElectrodeBridgeTest extends BaseBridgeTestCase {
         });
 
         waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testGetStatusRequestHandlerNativeToJSSuccess() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Person actualPerson = new Person.Builder("John", 05).build();
+        final Status result = new Status.Builder(true).log(true).build();
+
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_STATUS, new MockElectrodeEventListener() {
+            @Override
+            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertEquals(PersonApi.Requests.REQUEST_GET_STATUS, eventName);
+                assertNotNull(message);
+                Bundle personBundle = BridgeArguments.responseBundle(message, ElectrodeBridgeInternal.BRIDGE_MSG_DATA);
+                assertNotNull(personBundle);
+                Person person = BridgeArguments.generateObject(personBundle, Person.class, BridgeArguments.Type.RESPONSE);
+                assertNotNull(person);
+                assertEquals(actualPerson.getName(), person.getName());
+                assertEquals(actualPerson.getMonth(), person.getMonth());
+
+                WritableMap statusMap = Arguments.createMap();
+                statusMap.putBoolean("member", result.getMember());
+                statusMap.putBoolean("log", result.getLog());
+
+                WritableMap result = Arguments.createMap();
+                result.putMap(BRIDGE_MSG_DATA, statusMap);
+                jsResponseDispatcher.dispatchResponse(result);
+            }
+        });
+
+
+        PersonApi.requests().getStatus(actualPerson, new ElectrodeBridgeResponseListener<Status>() {
+            @Override
+            public void onSuccess(Status obj) {
+                assertNotNull(obj);
+                assertEquals(result.getLog(), obj.getLog());
+                assertEquals(result.getMember(), obj.getMember());
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onFailure(@Nonnull FailureMessage failureMessage) {
+                fail();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
     }
 
     public void testPrimitiveTypesForRequestAndResponseNativeToNative() {

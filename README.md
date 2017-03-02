@@ -182,14 +182,16 @@ protected List<ReactPackage> getPackages() {
 }
 ```
 
-Then, access to API methods is provided through static methods of the `ElectrodeBridge` class.
+Then, access to API methods is provided through static methods of the `ElectrodeBridgeHolder` class.
 
-#### ElectrodeBridge.sendRequest
+`ElectrodeBridge` can deal with any `PrimitiveWrapper` and `Bridgeable` as the request and response types.
+
+#### ElectrodeBridgeHolder.sendRequest
 
 ```java
 void sendRequest(
   @NonNull ElectrodeBridgeRequest request,
-  @NonNull RequestCompletionListener completionListener);
+  @NonNull ElectrodeBridgeResponseListener responseListener);
 ```
 
 Sends a request through the bridge.
@@ -200,35 +202,29 @@ Sends a request through the bridge.
 
 - `completionListener` : An instance of `RequestCompletionListener` to be notified of the response.
 
+To make is easier to construct a request and send it via bridge the `RequestProcessor` class can be used
+
 Example usage :
 
 ```java
-Bundle data = new Bundle();
-data.putInt("someInt", mRand.nextInt());
 
-ElectrodeBridgeRequest request =
-  new ElectrodeBridgeRequest.Builder("my.request.name")
-    // Optional bundle containing the payload data (Default: no data)
-    .withData(data)
-    // Optional timeout in ms (Default: 5000)
-    .withTimeout(8000)
-    // Optional dispatch mode (Default: RequestDispatchMode.JS)
-    .withDispatchMode(RequestDispatchMode.NATIVE)  
-    .build();
+new RequestProcessor<>("my.request.name", <input data>, <ExpectedResponse>.class, new ElectrodeBridgeResponseListener<ExpectedResponse>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+              //Handle failure
+            }
 
-ElectrodeBridge.sendRequest(request, new RequestCompletionListener() {
-  @Override
-  public void onSuccess(@NonNull Bundle payload) {
-      // Do whatever you need to do with the response
-      // Bundle will be empty if not payload data in the response
-  }
-
-  @Override
-  public void onError(@NonNull String code, @NonNull String message) {
-      // Error !
-  }
-});
+            @Override
+            public void onSuccess(@Nullable ExpectedResponse responseData) {
+              // Do whatever you need to do with the response
+            }
+        }).execute();
 ```
+The `RequestProcessor` takes care of generating a `ElectrodeBridgeRequest` and sending it over to the `ElectrodeBridge`
+
+In case of a request not expecting any `ExpectedResponse` use `None` to indicate the same.
+
+`<input data>`:  can be null.
 
 #### ElectrodeBridge.emitEvent
 
@@ -242,62 +238,57 @@ Emits an event through the bridge.
 
 - `event` : An event instance created using `ElectrodeBridgeEvent.Builder`
 
+To make is easier to construct an event and emit it via bridge the `EventProcessor` class can be used
+
+
 Example usage :
 
 ```java
-Bundle data = new Bundle();
-data.putInt("someInt", mRand.nextInt());
 
-ElectrodeBridgeEvent event =
-  new ElectrodeBridgeEvent.Builder("my.event.name")
-    // Optional bundle containing the payload data (Default: no data)
-    .withData(data)
-    // Optional dispatch mode (Default: RequestDispatchMode.JS)
-    .withDispatchMode(RequestDispatchMode.NATIVE)  
-    .build();
+new EventProcessor<>("my.event.name", <data>).execute();
 
-ElectrodeBridge.emitEvent(event);
 ```
+
+`<data>` can be null
 
 #### ElectrodeBridge.registerRequestHandler
 
 ```java
 UUID registerRequestHandler(
   @NonNull String name,
-  @NonNull RequestHandler requestHandler);
+  @NonNull ElectrodeBridgeRequestHandler requestHandler);
 ```
 
 Registers a handler that can handle a specific request `name`.  
-As for the JS API, please note that if an handler already exists for the specific request name (on the side you are making the call) the method will throw an error. Current implementation only allows one request handler to be associated to a given request name.
+When a request is fired, for example from JS side, `ElectrodeBridge` first looks for a registered request handler on JS side, if not found bridge will forward the request to Native side.
 
 *Mandatory*
 
 - `name` : The name of the request this handler can handle
 
-- `requestHandler` an instance of `RequestHandler` that should take care of handling the request and completing it.
+- `requestHandler` an instance of `ElectrodeBridgeRequestHandler` that should take care of handling the request and completing it.
+
+To make is easier to construct a request handler and register it to the bridge a `RequestHandlerProcessor` class can be used
 
 Example usage :
 
 ```java
-ElectrodeBridge.registerRequestHandler("awesomerequest.name",
-    new RequestHandler() {
-      @Override
-      public void onRequest(Bundle data,
-                            RequestCompletioner requestCompletioner) {
-        // Handle the request (sync or async) and call completion methods once done
-        requestCompletioner.success();              // Without response data
-        // requestCompletioner.success(bundle);     // With response data
-        // requestCompletion.error(code, message);  // With error
-      }
-  });
+new RequestHandlerProcessor<>("my.request.name", <ExpectedRequest>.class, <ExpectedResponse>.class, new ElectrodeBridgeRequestHandler<ExpectedRequest, ExpectedResponse>() {
+           @Override
+           public void onRequest(@Nullable ExpectedRequest payload, @NonNull ElectrodeBridgeResponseListener<ExpectedResponse> responseListener) {
+             // Handle the request (sync or async) and call one of the completion methods once done
+             requestCompletioner.onSuccess(expectedResponse); OR            
+             requestCompletion.onFailure(failureMessage);  // With error
+           }
+       }).execute();
 ```
 
 #### ElectrodeBridge.registerEventListener
 
 ```java
-UUID registerEventHandler(
-  @NonNull String type,
-  @NonNull EventListener eventListener);
+void addEventListener(
+  @NonNull String eventName,
+  @NonNull ElectrodeBridgeEventListener eventListener);
 )
 ```
 
@@ -305,19 +296,20 @@ UUID registerEventHandler(
 
 - `name` : The name of the event that this listener is interested in
 
-- `eventListener` an instance of `EventListener` that should take care of handling the event.
+- `eventListener` an instance of `ElectrodeBridgeEventListener` that is interested in knowing when an event is emitted.
 
 Example usage :
 
 ```java
-ElectrodeBridge.registerEventHandler("awesomeevent.name",
-  new EventListener() {
-    @Override
-    public void onEvent(Bundle data) {
-      // Do what you need to do
-    }
-  })
+new EventListenerProcessor<>("my.event.name", <ExpectedEvent>.class, new ElectrodeBridgeEventListener<ExpectedEvent>() {
+            @Override
+            public void onEvent(@Nullable ExpectedEvent eventPayload) {
+                //Do what you need to do now.
+            }
+        }).execute();
 ```
+
+Note: Multiple event listeners can be registered for the same event.
 
 ### Android remarks
 

@@ -231,7 +231,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             public void run() {
                 Logger.d(TAG, "Checking timeout for request(%s)", id);
                 if (pendingPromiseByRequestId.containsKey(id)) {
-                    Promise p = pendingPromiseByRequestId.remove(id);
+                    Promise p = pendingPromiseByRequestId.get(id);
                     Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, p);
                     p.reject("EREQUESTTIMEOUT", "Request timeout");
                 } else {
@@ -315,7 +315,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         Promise promise = pendingPromiseByRequestId.get(parentRequestId);
 
         if (promise == null) {
-            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", parentRequestId);
+            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's timed-out ??", parentRequestId);
         } else {
             if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
                 Logger.d(TAG, "Handling error response");

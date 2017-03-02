@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.PromiseImpl;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
@@ -154,6 +157,42 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
+    }
+
+    public void testGetStatusRequestHandlerJSToNativeSuccess() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Person person = new Person.Builder("John", 05).build();
+        final Status result = new Status.Builder(true).log(true).build();
+        PersonApi.requests().registerGetStatusRequestHandler(new ElectrodeBridgeRequestHandler<Person, Status>() {
+            @Override
+            public void onRequest(@Nullable Person payload, @NonNull ElectrodeBridgeResponseListener<Status> responseListener) {
+                assertEquals(person.getName(), payload.getName());
+                assertEquals(person.getMonth(), payload.getMonth());
+                responseListener.onSuccess(result);
+            }
+        });
+
+        WritableMap inputPerson = Arguments.createMap();
+        inputPerson.putString("name", person.getName());
+        inputPerson.putInt("month", person.getMonth());
+
+        ElectrodeBridgeInternal.instance().dispatchRequest(PersonApi.Requests.REQUEST_GET_STATUS, "dummy.id.get.user.status", inputPerson, new PromiseImpl(new Callback() {
+            @Override
+            public void invoke(Object... args) {
+                assertNotNull(args);
+                assertTrue(args.length == 1);
+                Object actualResult = args[0];
+                assertTrue(actualResult instanceof ReadableMap);
+                assertSame(result.getMember(), ((ReadableMap) actualResult).getBoolean("member"));
+                assertSame(result.getLog(), ((ReadableMap) actualResult).getBoolean("log"));
+            }
+        }, new Callback() {
+            @Override
+            public void invoke(Object... args) {
+                fail();
+            }
+        }));
+
     }
 
     public void testPrimitiveTypesForRequestAndResponseNativeToNative() {

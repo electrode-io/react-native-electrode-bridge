@@ -164,7 +164,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
         if (mRequestDispatcher.canHandleRequest(request.getName())) {
             Logger.d(TAG, "Sending request(id=%s) to local handler", id);
-            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise);
+            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise, false);
         } else {
             Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", id);
             WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
@@ -274,7 +274,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     @SuppressWarnings("unused")
     public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
         Logger.d(TAG, "Inside dispatchRequest: Received a request[name:%s id:%s] from JS side", name, id);
-        mRequestDispatcher.dispatchRequest(name, id, ArgumentsEx.toBundle(data), promise);
+        mRequestDispatcher.dispatchRequest(name, id, ArgumentsEx.toBundle(data), promise, true);
     }
 
     /**

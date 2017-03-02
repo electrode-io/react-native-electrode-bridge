@@ -88,10 +88,10 @@ public class ArgumentsEx {
    * @param readableMap the {@link WritableMap} to convert.
    * @return the converted {@link Bundle}.
    */
-  @Nullable
+  @NonNull
   public static Bundle toBundle(@Nullable ReadableMap readableMap) {
     if (readableMap == null) {
-      return null;
+      return Bundle.EMPTY;
     }
 
     ReadableMapKeySetIterator iterator = readableMap.keySetIterator();

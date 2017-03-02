@@ -26,7 +26,7 @@ import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeIntern
 
 public class BaseBridgeTestCase extends InstrumentationTestCase {
 
-    public static final int REQUEST_TIMEOUT_SECONDS = 10;
+    private static final int REQUEST_TIMEOUT_SECONDS = 10;
 
     @Override
     protected void setUp() throws Exception {

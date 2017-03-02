@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 
 import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_MSG_DATA;
 
-public class ElectrodeBridgeTest extends BaseBridgeTestCase {
+public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
     public void testSampleRequestNativeToNativeFailure() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);

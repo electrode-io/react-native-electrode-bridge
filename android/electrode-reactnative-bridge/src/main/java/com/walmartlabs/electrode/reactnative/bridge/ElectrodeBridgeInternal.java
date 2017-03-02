@@ -144,10 +144,6 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
                              @NonNull Bundle data,
                              @NonNull Promise promise);
 
-        void dispatchJSOriginatingRequest(@NonNull String name,
-                                          @NonNull String id,
-                                          @NonNull Bundle data,
-                                          @NonNull Promise promise);
 
         boolean canHandleRequest(@NonNull String name);
     }
@@ -330,7 +326,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     @SuppressWarnings("unused")
     public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
         Logger.d(TAG, "Inside dispatchRequest: Received a request[name:%s id:%s] from JS side", name, id);
-        mRequestDispatcher.dispatchJSOriginatingRequest(name, id, ArgumentsEx.toBundle(data), promise);
+        mRequestDispatcher.dispatchRequest(name, id, ArgumentsEx.toBundle(data), promise);
     }
 
     /**

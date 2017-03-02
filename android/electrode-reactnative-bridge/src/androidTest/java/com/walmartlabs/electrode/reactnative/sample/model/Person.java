@@ -12,21 +12,8 @@ import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.
 
 public class Person implements Parcelable, Bridgeable {
 
-    public static final Creator<Person> CREATOR = new Creator<Person>() {
-        @Override
-        public Person createFromParcel(Parcel in) {
-            return new Person(in);
-        }
-
-        @Override
-        public Person[] newArray(int size) {
-            return new Person[size];
-        }
-    };
-    @NonNull
     private String name;
     private Integer age;
-    @NonNull
     private Integer month;
     private Status status;
     private Position position;
@@ -49,6 +36,12 @@ public class Person implements Parcelable, Bridgeable {
     }
 
     public Person(@NonNull Bundle bundle) {
+        if (bundle.get("name") == null) {
+            throw new IllegalArgumentException("name property is required");
+        }
+        if (bundle.get("month") == null) {
+            throw new IllegalArgumentException("month property is required");
+        }
         this.name = bundle.getString("name");
         this.age = getNumberValue(bundle, "age") == null ? null : getNumberValue(bundle, "age").intValue();
         this.month = getNumberValue(bundle, "month") == null ? null : getNumberValue(bundle, "month").intValue();
@@ -56,6 +49,18 @@ public class Person implements Parcelable, Bridgeable {
         this.position = bundle.containsKey("position") ? new Position(bundle.getBundle("position")) : null;
         this.birthYear = bundle.containsKey("birthYear") ? new BirthYear(bundle.getBundle("birthYear")) : null;
     }
+
+    public static final Creator<Person> CREATOR = new Creator<Person>() {
+        @Override
+        public Person createFromParcel(Parcel in) {
+            return new Person(in);
+        }
+
+        @Override
+        public Person[] newArray(int size) {
+            return new Person[size];
+        }
+    };
 
     @NonNull
     public String getName() {
@@ -130,8 +135,8 @@ public class Person implements Parcelable, Bridgeable {
 
     public static class Builder {
         private final String name;
-        private final Integer month;
         private Integer age;
+        private final Integer month;
         private Status status;
         private Position position;
         private BirthYear birthYear;

@@ -12,18 +12,6 @@ import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.
 
 public class Position implements Parcelable, Bridgeable {
 
-    public static final Creator<Position> CREATOR = new Creator<Position>() {
-        @Override
-        public Position createFromParcel(Parcel in) {
-            return new Position(in);
-        }
-
-        @Override
-        public Position[] newArray(int size) {
-            return new Position[size];
-        }
-    };
-    @NonNull
     private Double lat;
     private Double lng;
 
@@ -40,9 +28,24 @@ public class Position implements Parcelable, Bridgeable {
     }
 
     public Position(@NonNull Bundle bundle) {
+        if (bundle.get("lat") == null) {
+            throw new IllegalArgumentException("lat property is required");
+        }
         this.lat = bundle.getDouble("lat");
         this.lng = bundle.containsKey("lng") ? bundle.getDouble("lng") : null;
     }
+
+    public static final Creator<Position> CREATOR = new Creator<Position>() {
+        @Override
+        public Position createFromParcel(Parcel in) {
+            return new Position(in);
+        }
+
+        @Override
+        public Position[] newArray(int size) {
+            return new Position[size];
+        }
+    };
 
     @NonNull
     public Double getLat() {

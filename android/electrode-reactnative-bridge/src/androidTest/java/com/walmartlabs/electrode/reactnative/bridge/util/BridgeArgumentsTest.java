@@ -10,6 +10,8 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.Type.REQUEST;
 
 public class BridgeArgumentsTest extends TestCase {
@@ -60,7 +62,7 @@ public class BridgeArgumentsTest extends TestCase {
 
     public void testFromBundleWithEmptyBundle() {
         Person personCopy = BridgeArguments.bridgeableFromBundle(Bundle.EMPTY, Person.class);
-        assertNotNull(personCopy);
+        assertNull(personCopy);
     }
 
     public void testFromBundleWithNullBundle() {

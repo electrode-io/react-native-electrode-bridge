@@ -12,20 +12,7 @@ import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.
 
 public class BirthYear implements Parcelable, Bridgeable {
 
-    public static final Creator<BirthYear> CREATOR = new Creator<BirthYear>() {
-        @Override
-        public BirthYear createFromParcel(Parcel in) {
-            return new BirthYear(in);
-        }
-
-        @Override
-        public BirthYear[] newArray(int size) {
-            return new BirthYear[size];
-        }
-    };
-    @NonNull
     private Integer month;
-    @NonNull
     private Integer year;
 
     private BirthYear() {
@@ -41,9 +28,27 @@ public class BirthYear implements Parcelable, Bridgeable {
     }
 
     public BirthYear(@NonNull Bundle bundle) {
+        if (bundle.get("month") == null) {
+            throw new IllegalArgumentException("month property is required");
+        }
+        if (bundle.get("year") == null) {
+            throw new IllegalArgumentException("year property is required");
+        }
         this.month = getNumberValue(bundle, "month") == null ? null : getNumberValue(bundle, "month").intValue();
         this.year = getNumberValue(bundle, "year") == null ? null : getNumberValue(bundle, "year").intValue();
     }
+
+    public static final Creator<BirthYear> CREATOR = new Creator<BirthYear>() {
+        @Override
+        public BirthYear createFromParcel(Parcel in) {
+            return new BirthYear(in);
+        }
+
+        @Override
+        public BirthYear[] newArray(int size) {
+            return new BirthYear[size];
+        }
+    };
 
     @NonNull
     public Integer getMonth() {

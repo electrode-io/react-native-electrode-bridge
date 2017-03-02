@@ -12,19 +12,7 @@ import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.
 
 public class Status implements Parcelable, Bridgeable {
 
-    public static final Creator<Status> CREATOR = new Creator<Status>() {
-        @Override
-        public Status createFromParcel(Parcel in) {
-            return new Status(in);
-        }
-
-        @Override
-        public Status[] newArray(int size) {
-            return new Status[size];
-        }
-    };
     private Boolean log;
-    @NonNull
     private Boolean member;
 
     private Status() {
@@ -40,9 +28,24 @@ public class Status implements Parcelable, Bridgeable {
     }
 
     public Status(@NonNull Bundle bundle) {
+        if (bundle.get("member") == null) {
+            throw new IllegalArgumentException("member property is required");
+        }
         this.log = bundle.containsKey("log") ? bundle.getBoolean("log") : null;
         this.member = bundle.getBoolean("member");
     }
+
+    public static final Creator<Status> CREATOR = new Creator<Status>() {
+        @Override
+        public Status createFromParcel(Parcel in) {
+            return new Status(in);
+        }
+
+        @Override
+        public Status[] newArray(int size) {
+            return new Status[size];
+        }
+    };
 
     /**
      * Log ???
@@ -86,8 +89,8 @@ public class Status implements Parcelable, Bridgeable {
     }
 
     public static class Builder {
-        private final Boolean member;
         private Boolean log;
+        private final Boolean member;
 
         public Builder(@NonNull Boolean member) {
             this.member = member;

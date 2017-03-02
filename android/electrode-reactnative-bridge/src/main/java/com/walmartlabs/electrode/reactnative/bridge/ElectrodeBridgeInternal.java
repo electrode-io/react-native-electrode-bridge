@@ -110,20 +110,6 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
         return "ElectrodeBridge";
     }
 
-    /**
-     * @return The event listener register
-     */
-    public EventRegistrar<ElectrodeBridgeEventListener> eventRegistrar() {
-        return mEventRegistrar;
-    }
-
-    /**
-     * @return The request handler registrar
-     */
-    public RequestRegistrar<ElectrodeBridgeRequestHandler> requestRegistrar() {
-        return mRequestRegistrar;
-    }
-
     @NonNull
     @Override
     public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener eventListener) {

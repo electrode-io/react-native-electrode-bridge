@@ -63,6 +63,11 @@ public class BridgeArgumentsTest extends TestCase {
         assertNotNull(personCopy);
     }
 
+    public void testFromBundleWithNullBundle() {
+        Person personCopy = BridgeArguments.bridgeableFromBundle(null, Person.class);
+        assertNull(personCopy);
+    }
+
     public void testBundleToPrimitiveAndViceVersaForString() {
         String[] expectedArray = {"ONE", "TWO", "THREE", "FOUR", "FIVE"};
         Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class, REQUEST);

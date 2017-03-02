@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.sample.model;
 
-
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,10 +8,22 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
-import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getIntegerValue;
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
 
 public class Position implements Parcelable, Bridgeable {
 
+    public static final Creator<Position> CREATOR = new Creator<Position>() {
+        @Override
+        public Position createFromParcel(Parcel in) {
+            return new Position(in);
+        }
+
+        @Override
+        public Position[] newArray(int size) {
+            return new Position[size];
+        }
+    };
+    @NonNull
     private Double lat;
     private Double lng;
 
@@ -28,22 +39,10 @@ public class Position implements Parcelable, Bridgeable {
         this(in.readBundle());
     }
 
-    public Position(Bundle bundle) {
+    public Position(@NonNull Bundle bundle) {
         this.lat = bundle.getDouble("lat");
         this.lng = bundle.containsKey("lng") ? bundle.getDouble("lng") : null;
     }
-
-    public static final Creator<Position> CREATOR = new Creator<Position>() {
-        @Override
-        public Position createFromParcel(Parcel in) {
-            return new Position(in);
-        }
-
-        @Override
-        public Position[] newArray(int size) {
-            return new Position[size];
-        }
-    };
 
     @NonNull
     public Double getLat() {

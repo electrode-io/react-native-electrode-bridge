@@ -8,11 +8,24 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
-import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getIntegerValue;
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
 
 public class BirthYear implements Parcelable, Bridgeable {
 
+    public static final Creator<BirthYear> CREATOR = new Creator<BirthYear>() {
+        @Override
+        public BirthYear createFromParcel(Parcel in) {
+            return new BirthYear(in);
+        }
+
+        @Override
+        public BirthYear[] newArray(int size) {
+            return new BirthYear[size];
+        }
+    };
+    @NonNull
     private Integer month;
+    @NonNull
     private Integer year;
 
     private BirthYear() {
@@ -27,22 +40,10 @@ public class BirthYear implements Parcelable, Bridgeable {
         this(in.readBundle());
     }
 
-    public BirthYear(Bundle bundle) {
-        this.month = getIntegerValue(bundle, "month") == null ? null : getIntegerValue(bundle, "month").intValue();
-        this.year = getIntegerValue(bundle, "year") == null ? null : getIntegerValue(bundle, "year").intValue();
+    public BirthYear(@NonNull Bundle bundle) {
+        this.month = getNumberValue(bundle, "month") == null ? null : getNumberValue(bundle, "month").intValue();
+        this.year = getNumberValue(bundle, "year") == null ? null : getNumberValue(bundle, "year").intValue();
     }
-
-    public static final Creator<BirthYear> CREATOR = new Creator<BirthYear>() {
-        @Override
-        public BirthYear createFromParcel(Parcel in) {
-            return new BirthYear(in);
-        }
-
-        @Override
-        public BirthYear[] newArray(int size) {
-            return new BirthYear[size];
-        }
-    };
 
     @NonNull
     public Integer getMonth() {

@@ -20,22 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 
 public class BridgeArguments {
 
-    public enum Type {
-        REQUEST("req"),
-        RESPONSE("rsp"),
-        EVENT("event");
-
-        private String key;
-
-        Type(@NonNull String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
-    }
-
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
     /**
@@ -93,7 +77,6 @@ public class BridgeArguments {
         return bundle;
     }
 
-
     /**
      * @param object
      * @param type
@@ -127,7 +110,6 @@ public class BridgeArguments {
         }
         return response;
     }
-
 
     @VisibleForTesting
     @Nullable
@@ -211,7 +193,7 @@ public class BridgeArguments {
         return bundle;
     }
 
-    public static Number getIntegerValue(@NonNull Bundle bundle, String key) {
+    public static Number getNumberValue(@NonNull Bundle bundle, String key) {
         Number output = null;
         if (bundle != null && bundle.containsKey(key)) {
             Object obj = bundle.get(key);
@@ -224,5 +206,21 @@ public class BridgeArguments {
             }
         }
         return output;
+    }
+
+    public enum Type {
+        REQUEST("req"),
+        RESPONSE("rsp"),
+        EVENT("event");
+
+        private String key;
+
+        Type(@NonNull String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
     }
 }

@@ -74,7 +74,7 @@ public class BridgeArguments {
                 }
                 break;
                 case Map:
-                    bundle.putBundle("rsp", ArgumentsEx.toBundle(data.getMap(dataKey)));
+                    bundle = ArgumentsEx.toBundle(data.getMap(dataKey));
                     break;
                 case Boolean:
                     bundle.putBoolean("rsp", data.getBoolean(dataKey));

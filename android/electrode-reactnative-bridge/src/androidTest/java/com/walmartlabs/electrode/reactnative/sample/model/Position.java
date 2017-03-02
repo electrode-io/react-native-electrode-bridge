@@ -1,5 +1,6 @@
 package com.walmartlabs.electrode.reactnative.sample.model;
 
+
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,10 +9,15 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
-public class Position implements Parcelable,Bridgeable {
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getIntegerValue;
 
-    private final Double lat;
-    private final Double lng;
+public class Position implements Parcelable, Bridgeable {
+
+    private Double lat;
+    private Double lng;
+
+    private Position() {
+    }
 
     private Position(Builder builder) {
         this.lat = builder.lat;
@@ -23,8 +29,8 @@ public class Position implements Parcelable,Bridgeable {
     }
 
     public Position(Bundle bundle) {
-        lat = bundle.getDouble("lat");
-        lng = bundle.getDouble("lng");
+        this.lat = bundle.getDouble("lat");
+        this.lng = bundle.containsKey("lng") ? bundle.getDouble("lng") : null;
     }
 
     public static final Creator<Position> CREATOR = new Creator<Position>() {
@@ -39,7 +45,7 @@ public class Position implements Parcelable,Bridgeable {
         }
     };
 
-    @Nullable
+    @NonNull
     public Double getLat() {
         return lat;
     }
@@ -63,27 +69,19 @@ public class Position implements Parcelable,Bridgeable {
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        if (lat != null) {
-            bundle.putDouble("lat", lat);
-        }
-
-        if (lng != null) {
+        bundle.putDouble("lat", lat);
+        if(lng != null) {
             bundle.putDouble("lng", lng);
         }
         return bundle;
     }
 
     public static class Builder {
-        private Double lat;
+        private final Double lat;
         private Double lng;
 
-        public Builder() {
-        }
-
-        @NonNull
-        public Builder lat(@Nullable Double lat) {
+        public Builder(@NonNull Double lat) {
             this.lat = lat;
-            return this;
         }
 
         @NonNull

@@ -33,7 +33,7 @@ public class BridgeArgumentsTest extends TestCase {
     public void testFromBundleSuccess1() {
         Status status = new Status.Builder(true).log(false).build();
         BirthYear birthYear = new BirthYear.Builder(01, 2000).build();
-        Position position = new Position.Builder().build();
+        Position position = new Position.Builder(20.12).lng(12.20).build();
 
         Person person = new Person.Builder("Richard", 10)
                 .age(18)
@@ -51,12 +51,16 @@ public class BridgeArgumentsTest extends TestCase {
         assertEquals(person.getStatus().getLog(), personCopy.getStatus().getLog());
         assertEquals(person.getStatus().getMember(), personCopy.getStatus().getMember());
         assertNotNull(person.getBirthYear());
+        assertEquals(person.getBirthYear().getMonth(), personCopy.getBirthYear().getMonth());
+        assertEquals(person.getBirthYear().getYear(), personCopy.getBirthYear().getYear());
         assertNotNull(person.getPosition());
+        assertEquals(person.getPosition().getLat(), personCopy.getPosition().getLat());
+        assertEquals(person.getPosition().getLng(), personCopy.getPosition().getLng());
     }
 
     public void testFromBundleWithEmptyBundle() {
         Person personCopy = BridgeArguments.bridgeableFromBundle(Bundle.EMPTY, Person.class);
-        assertNull(personCopy);
+        assertNotNull(personCopy);
     }
 
     public void testBundleToPrimitiveAndViceVersaForString() {

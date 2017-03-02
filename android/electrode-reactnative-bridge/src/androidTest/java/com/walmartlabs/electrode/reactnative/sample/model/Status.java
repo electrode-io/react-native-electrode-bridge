@@ -8,14 +8,19 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getIntegerValue;
+
 public class Status implements Parcelable, Bridgeable {
 
-    private final Boolean member;
-    private final Boolean log;
+    private Boolean log;
+    private Boolean member;
+
+    private Status() {
+    }
 
     private Status(Builder builder) {
-        this.member = builder.member;
         this.log = builder.log;
+        this.member = builder.member;
     }
 
     private Status(Parcel in) {
@@ -23,8 +28,8 @@ public class Status implements Parcelable, Bridgeable {
     }
 
     public Status(Bundle bundle) {
-        member = bundle.getBoolean("member");
-        log = bundle.getBoolean("log");
+        this.log = bundle.containsKey("log") ? bundle.getBoolean("log") : null;
+        this.member = bundle.getBoolean("member");
     }
 
     public static final Creator<Status> CREATOR = new Creator<Status>() {
@@ -73,10 +78,10 @@ public class Status implements Parcelable, Bridgeable {
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        bundle.putBoolean("member", member);
-        if (log != null) {
+        if(log != null) {
             bundle.putBoolean("log", log);
         }
+        bundle.putBoolean("member", member);
         return bundle;
     }
 

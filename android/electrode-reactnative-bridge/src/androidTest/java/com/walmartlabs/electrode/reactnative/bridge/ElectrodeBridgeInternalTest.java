@@ -9,6 +9,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
+import com.walmartlabs.electrode.reactnative.sample.model.Position;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import java.util.UUID;
@@ -188,13 +189,16 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
     public void testEventsForModelObjectNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        final Person person = new Person.Builder("chris", 20).build();
+        final Position position = new Position.Builder(98.89).lng(89.99).build();
+        final Person person = new Person.Builder("chris", 20).position(position).build();
         PersonApi.events().addPersonAddedEventListener(new ElectrodeBridgeEventListener<Person>() {
             @Override
             public void onEvent(@Nullable Person eventPayload) {
                 assertNotNull(eventPayload);
                 assertEquals(person.getName(), eventPayload.getName());
                 assertEquals(person.getMonth(), eventPayload.getMonth());
+                assertEquals(person.getPosition().getLng(), eventPayload.getPosition().getLng());
+                assertEquals(person.getPosition().getLat(), eventPayload.getPosition().getLat());
                 countDownLatch.countDown();
             }
         });

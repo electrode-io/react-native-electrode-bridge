@@ -8,25 +8,24 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
-import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.hackNumberHandling;
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
 
 public class Person implements Parcelable, Bridgeable {
 
     private String name;
-    private Integer month;
     private Integer age;
+    private Integer month;
     private Status status;
     private Position position;
     private BirthYear birthYear;
 
     private Person() {
-
     }
 
     private Person(Builder builder) {
         this.name = builder.name;
-        this.month = builder.month;
         this.age = builder.age;
+        this.month = builder.month;
         this.status = builder.status;
         this.position = builder.position;
         this.birthYear = builder.birthYear;
@@ -37,9 +36,15 @@ public class Person implements Parcelable, Bridgeable {
     }
 
     public Person(@NonNull Bundle bundle) {
+        if (bundle.get("name") == null) {
+            throw new IllegalArgumentException("name property is required");
+        }
+        if (bundle.get("month") == null) {
+            throw new IllegalArgumentException("month property is required");
+        }
         this.name = bundle.getString("name");
-        this.month = hackNumberHandling(bundle, "month", Integer.class).intValue();
-        this.age = bundle.containsKey("age") ? hackNumberHandling(bundle, "age", Integer.class).intValue() : null;
+        this.age = getNumberValue(bundle, "age") == null ? null : getNumberValue(bundle, "age").intValue();
+        this.month = getNumberValue(bundle, "month") == null ? null : getNumberValue(bundle, "month").intValue();
         this.status = bundle.containsKey("status") ? new Status(bundle.getBundle("status")) : null;
         this.position = bundle.containsKey("position") ? new Position(bundle.getBundle("position")) : null;
         this.birthYear = bundle.containsKey("birthYear") ? new BirthYear(bundle.getBundle("birthYear")) : null;
@@ -62,19 +67,19 @@ public class Person implements Parcelable, Bridgeable {
         return name;
     }
 
+    @Nullable
+    public Integer getAge() {
+        return age;
+    }
+
     /**
      * Month hired
      *
      * @return Integer
      */
     @NonNull
-    public Number getMonth() {
+    public Integer getMonth() {
         return month;
-    }
-
-    @Nullable
-    public Integer getAge() {
-        return age;
     }
 
     /**
@@ -97,26 +102,6 @@ public class Person implements Parcelable, Bridgeable {
         return birthYear;
     }
 
-    @Override
-    @NonNull
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putString("name", name);
-        bundle.putInt("month", month);
-        if (age != null) {
-            bundle.putInt("age", age);
-        }
-        if (status != null) {
-            bundle.putParcelable("status", status.toBundle());
-        }
-        if (position != null) {
-            bundle.putParcelable("position", position.toBundle());
-        }
-        if (birthYear != null) {
-            bundle.putParcelable("birthYear", birthYear.toBundle());
-        }
-        return bundle;
-    }
 
     @Override
     public int describeContents() {
@@ -128,10 +113,30 @@ public class Person implements Parcelable, Bridgeable {
         dest.writeBundle(toBundle());
     }
 
+    @NonNull
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        if(age != null) {
+            bundle.putInt("age", age);
+        }
+        bundle.putInt("month", month);
+        if(status != null) {
+            bundle.putParcelable("status", status.toBundle());
+        }
+        if(position != null) {
+            bundle.putParcelable("position", position.toBundle());
+        }
+        if(birthYear != null) {
+            bundle.putParcelable("birthYear", birthYear.toBundle());
+        }
+        return bundle;
+    }
+
     public static class Builder {
         private final String name;
-        private final Integer month;
         private Integer age;
+        private final Integer month;
         private Status status;
         private Position position;
         private BirthYear birthYear;

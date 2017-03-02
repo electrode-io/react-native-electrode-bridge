@@ -8,10 +8,15 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
-public class BirthYear implements Parcelable,Bridgeable {
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
 
-    private final Integer month;
-    private final Integer year;
+public class BirthYear implements Parcelable, Bridgeable {
+
+    private Integer month;
+    private Integer year;
+
+    private BirthYear() {
+    }
 
     private BirthYear(Builder builder) {
         this.month = builder.month;
@@ -22,9 +27,15 @@ public class BirthYear implements Parcelable,Bridgeable {
         this(in.readBundle());
     }
 
-    public BirthYear(Bundle bundle) {
-        month = bundle.getInt("month");
-        year = bundle.getInt("year");
+    public BirthYear(@NonNull Bundle bundle) {
+        if (bundle.get("month") == null) {
+            throw new IllegalArgumentException("month property is required");
+        }
+        if (bundle.get("year") == null) {
+            throw new IllegalArgumentException("year property is required");
+        }
+        this.month = getNumberValue(bundle, "month") == null ? null : getNumberValue(bundle, "month").intValue();
+        this.year = getNumberValue(bundle, "year") == null ? null : getNumberValue(bundle, "year").intValue();
     }
 
     public static final Creator<BirthYear> CREATOR = new Creator<BirthYear>() {

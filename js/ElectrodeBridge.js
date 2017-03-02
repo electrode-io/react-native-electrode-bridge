@@ -20,6 +20,10 @@ const ERROR_NO_REQUEST_HANDLER = {
     message: `No registered request handler`
 }
 
+function isObject(x) {
+  return x === Object(x);
+}
+
 class ElectrodeBridge extends EventEmitter {
 
     constructor() {
@@ -31,6 +35,20 @@ class ElectrodeBridge extends EventEmitter {
             this._onRequestFromNative.bind(this));
 
         this.requestHandlerByRequestName = {};
+    }
+
+    buildPayloadObj(data, primitiveKey) {
+      if (isObject(data)) {
+        if (Array.isArray(data)) {  
+          return { [primitiveKey]: data }
+        } else {
+          return data;
+        }
+      } else if ((data === null) || (data === undefined)) {
+        return {};
+      } else {
+        return { [primitiveKey]: data }
+      }
     }
 
     //============================================================================
@@ -52,13 +70,13 @@ class ElectrodeBridge extends EventEmitter {
         } = {} /*: Object */ ) {
         switch (dispatchMode) {
             case DispatchMode.NATIVE:
-                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), { event: data });
+                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), this.buildPayloadObj(data, "event"));
                 break;
             case DispatchMode.JS:
                 this.emit(name, data);
                 break;
             case DispatchMode.GLOBAL:
-                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), data);
+                NativeModules.ElectrodeBridge.dispatchEvent(name, uuid.v4(), this.buildPayloadObj(data, "event"));
                 this.emit(name, data);
                 break;
         }
@@ -82,10 +100,10 @@ class ElectrodeBridge extends EventEmitter {
         let requestPromise;
         switch (dispatchMode) {
             case DispatchMode.NATIVE:
-                requestPromise = NativeModules.ElectrodeBridge.dispatchRequest(name, uuid.v4(), data);
+                requestPromise = NativeModules.ElectrodeBridge.dispatchRequest(name, uuid.v4(), this.buildPayloadObj(data, "req"));
                 break;
             case DispatchMode.JS:
-                requestPromise = this._dispatchJsOriginatingRequest(name, uuid.v4(), data);
+                requestPromise = this._dispatchJsOriginatingRequest(name, uuid.v4(), this.buildPayloadObj(data, "req"));
                 break;
             default:
                 throw new Error(`Unknown dispatchMode : ${dispatchMode}`);
@@ -95,7 +113,7 @@ class ElectrodeBridge extends EventEmitter {
             setTimeout(reject, timeout, ERROR_REQUEST_TIMEOUT);
         });
 
-        return Promise.race([requestPromise, timeoutPromise]);
+        return Promise.race([requestPromise.then((data) => { return (data && data.rsp) ? data.rsp : data }), timeoutPromise]);
     }
 
     /**
@@ -136,7 +154,7 @@ class ElectrodeBridge extends EventEmitter {
      * @param {Object} event - The raw event received
      */
     _onEventFromNative(event /*: ElectrodeBridgeMessage */ ) {
-        this.emit(event.name, event.data);
+        this.emit(event.name, event.data.event ? event.data.event : event.data);
     }
 
     /**
@@ -164,9 +182,9 @@ class ElectrodeBridge extends EventEmitter {
             return;
         }
 
-        this.requestHandlerByRequestName[name](data)
+        this.requestHandlerByRequestName[name](data.req ? data.req : data)
             .then((data) => {
-                this._sendSuccessResponseToNative(id, data: { rsp: data })
+                this._sendSuccessResponseToNative(id, data ? data : {})
             })
             .catch((err) => {
                 this._sendErrorResponseToNative(id, {
@@ -190,7 +208,7 @@ class ElectrodeBridge extends EventEmitter {
         if (!this.requestHandlerByRequestName[name]) {
             throw ERROR_NO_REQUEST_HANDLER;
         }
-        return this.requestHandlerByRequestName[name](data);
+        return this.requestHandlerByRequestName[name](data.req ? data.req : data);
     }
 
     /**

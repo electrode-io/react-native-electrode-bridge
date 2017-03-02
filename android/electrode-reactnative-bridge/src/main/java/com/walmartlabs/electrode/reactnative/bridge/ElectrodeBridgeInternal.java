@@ -205,18 +205,32 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     /**
      * Sends a request
      *
-     * @param request            The request to send
+     * @param request          The request to send
      * @param responseListener Listener to be called upon request completion
      */
     @SuppressWarnings("unused")
     @Override
-    public void sendRequest(
-            @NonNull final ElectrodeBridgeRequest request,
-            @NonNull final ElectrodeBridgeResponseListener responseListener) {
+    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener responseListener) {
         final String id = getUUID();
         logRequest(request, id);
 
-        final Promise promise = new PromiseImpl(new Callback() {
+        final Promise promise = createPromiseForRequest(request, responseListener, id);
+
+        startTimeOutCheckForRequest(request, id);
+
+        if (mRequestDispatcher.canHandleRequest(request.getName())) {
+            Logger.d(TAG, "Sending request(id=%s) to local handler", id);
+            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise);
+        } else {
+            Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", id);
+            WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
+            mReactContextWrapper.emitEvent(BRIDE_REQUEST, message);
+        }
+    }
+
+    @NonNull
+    private Promise createPromiseForRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener responseListener, @NonNull final String id) {
+        Promise promise = new PromiseImpl(new Callback() {
             @Override
             public void invoke(final Object... args) {
                 Object obj = args[0];
@@ -262,49 +276,46 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
                 });
             }
         });
-
         pendingPromiseByRequestId.put(id, promise);
 
+        return promise;
+    }
+
+    private void startTimeOutCheckForRequest(@NonNull ElectrodeBridgeRequest request, final String id) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             public void run() {
                 Logger.d(TAG, "Checking timeout for request(%s)", id);
                 if (pendingPromiseByRequestId.containsKey(id)) {
-                    Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, promise);
-                    promise.reject("EREQUESTTIMEOUT", "Request timeout");
+                    Promise p = pendingPromiseByRequestId.remove(id);
+                    Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, p);
+                    p.reject("EREQUESTTIMEOUT", "Request timeout");
                 } else {
                     Logger.d(TAG, "Ignoring timeout, request(%s) already completed", id);
                 }
             }
         }, request.getTimeoutMs());
-
-        if (mRequestDispatcher.canHandleRequest(request.getName())) {
-            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise);
-        } else {
-            WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
-            mReactContextWrapper.emitEvent(BRIDE_REQUEST, message);
-        }
     }
 
     private boolean removePromiseFromPendingList(String id) {
         Promise p = pendingPromiseByRequestId.remove(id);
         if (p == null) {
-            Logger.d(TAG, "Looks like the request(%s) already timed out, ignore the response received", id);
+            Logger.d(TAG, "Looks like the request(%s) already completed/timed out, ignore the response received", id);
             return false;
         }
         return true;
     }
 
     private void logRequest(@NonNull ElectrodeBridgeRequest bridgeRequest, @NonNull String id) {
-        Logger.d(TAG, ">>>>>>>> id = %s, Sending request(%s)", id, bridgeRequest);
+        Logger.d(TAG, "--> --> --> --> --> id = %s, Sending request(%s)", id, bridgeRequest);
     }
 
     private void logResponse(@NonNull Bundle responseBundle, @NonNull String id, ElectrodeBridgeRequest request) {
-        Logger.d(TAG, "<<<<<<<< id = %s, Received response(%s) for request(%s)", id, responseBundle, request);
+        Logger.d(TAG, "<-- <-- <-- <-- <-- id = %s, Received response(%s) for request(%s)", id, responseBundle, request);
     }
 
     private void logFailure(@NonNull String code, @NonNull String message, @NonNull String id, ElectrodeBridgeRequest request) {
-        Logger.d(TAG, "<<<<<<<< id = %s, Received failure(code=%s, message=%s) for request(%s)", id, code, message, request);
+        Logger.d(TAG, "<-- <-- <-- <-- <-- id = %s, Received failure(code=%s, message=%s) for request(%s)", id, code, message, request);
     }
 
     /**
@@ -318,7 +329,7 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     @ReactMethod
     @SuppressWarnings("unused")
     public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
-        Log.d(TAG, String.format("dispatchRequest[name:%s id:%s]", name, id));
+        Logger.d(TAG, "Inside dispatchRequest: Received a request[name:%s id:%s] from JS side", name, id);
         mRequestDispatcher.dispatchJSOriginatingRequest(name, id, ArgumentsEx.toBundle(data), promise);
     }
 
@@ -332,54 +343,56 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     @ReactMethod
     @SuppressWarnings("unused")
     public void dispatchEvent(final String name, final String id, final ReadableMap data) {
-        Logger.d(TAG, "inside dispatchEvent - onEvent[name:%s id:%s]", name, id);
+        Logger.d(TAG, "Inside dispatchEvent: Received an event[name:%s id:%s] from JS side", name, id);
 
-        // This event represents a bridge response
         if (name.equals(BRIDGE_RESPONSE)) {
-            Logger.d(TAG, "Handling bridge response event");
-            // Get id of associated request
-            String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
-            Log.d(TAG, String.format("Received response [id:%s]", parentRequestId));
-            // Get the pending promise of the associated request
-            Promise promise = pendingPromiseByRequestId.remove(parentRequestId);
-            // If this is an error response
-            // Reject the pending promise with error code and message
-            if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
-                String errorMessage = data
-                        .getMap(BRIDGE_RESPONSE_ERROR)
-                        .getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
+            handleResponse(data);
+        } else {
+            handleEvent(name, id, data);
+        }
+    }
 
-                String errorCode = UNKNOWN_ERROR_CODE;
-                if (data.getMap(BRIDGE_RESPONSE_ERROR)
-                        .hasKey(BRIDGE_RESPONSE_ERROR_CODE)) {
-                    errorCode = data
-                            .getMap(BRIDGE_RESPONSE_ERROR)
-                            .getString(BRIDGE_RESPONSE_ERROR_CODE);
+    private void handleEvent(final String name, final String id, final ReadableMap data) {
+        Logger.d(TAG, "Handling event(%s)", name);
+        mReactContextWrapper.runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                mEventDispatcher.dispatchEvent(id, name, data);
+            }
+        });
+    }
+
+    private void handleResponse(ReadableMap data) {
+        Logger.d(TAG, "Handling bridge response");
+        // Get id of associated request
+        String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
+        Log.d(TAG, String.format("Received response for request[id:%s]", parentRequestId));
+
+        Promise promise = pendingPromiseByRequestId.get(parentRequestId);
+
+        if (promise == null) {
+            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", parentRequestId);
+        } else {
+            if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
+                Logger.d(TAG, "Handling error response");
+                ReadableMap errorMap = data.getMap(BRIDGE_RESPONSE_ERROR);
+                String errorMessage = errorMap.getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
+
+                String errorCode;
+                if (errorMap.hasKey(BRIDGE_RESPONSE_ERROR_CODE)) {
+                    errorCode = errorMap.getString(BRIDGE_RESPONSE_ERROR_CODE);
+                } else {
+                    errorCode = UNKNOWN_ERROR_CODE;
                 }
                 promise.reject(errorCode, errorMessage);
-            }
-            // If this is a success response with a payload
-            // Resolve the promise with the data
-            else if (data.hasKey(BRIDGE_MSG_DATA)) {
+
+            } else if (data.hasKey(BRIDGE_MSG_DATA)) {
+                Logger.d(TAG, "Handling success response with data");
                 promise.resolve(data);
-            }
-            // If this is a success response without a payload
-            // Resolve the promise with null
-            else if (!data.hasKey(BRIDGE_MSG_DATA)) {
+            } else {
+                Logger.d(TAG, "Handling success response with NO data");
                 promise.resolve(null);
             }
-            // Unknown type of response :S
-            else {
-                promise.reject(new UnsupportedOperationException());
-            }
-        } else {
-            Logger.d(TAG, "Handling regular event");
-            mReactContextWrapper.runOnUiQueueThread(new Runnable() {
-                @Override
-                public void run() {
-                    mEventDispatcher.dispatchEvent(id, name, data);
-                }
-            });
         }
     }
 

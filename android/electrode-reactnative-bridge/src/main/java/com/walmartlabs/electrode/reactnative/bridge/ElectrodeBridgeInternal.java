@@ -23,21 +23,21 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements ElectrodeBridge {
+class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements ElectrodeBridge {
 
     private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
 
-    public static final String BRIDGE_EVENT = "electrode.bridge.event";
-    public static final String BRIDE_REQUEST = "electrode.bridge.request";
-    public static final String BRIDGE_RESPONSE = "electrode.bridge.response";
-    public static final String BRIDGE_RESPONSE_ERROR = "error";
-    public static final String BRIDGE_RESPONSE_ERROR_CODE = "code";
-    public static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
-    public static final String BRIDGE_MSG_DATA = "data";
-    public static final String BRIDGE_MSG_NAME = "name";
-    public static final String BRIDGE_MSG_ID = "id";
-    public static final String BRIDGE_REQUEST_ID = "requestId";
-    public static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
+    private static final String BRIDGE_EVENT = "electrode.bridge.event";
+    static final String BRIDE_REQUEST = "electrode.bridge.request";
+    static final String BRIDGE_RESPONSE = "electrode.bridge.response";
+    private static final String BRIDGE_RESPONSE_ERROR = "error";
+    private static final String BRIDGE_RESPONSE_ERROR_CODE = "code";
+    private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
+    static final String BRIDGE_MSG_DATA = "data";
+    private static final String BRIDGE_MSG_NAME = "name";
+    static final String BRIDGE_MSG_ID = "id";
+    static final String BRIDGE_REQUEST_ID = "requestId";
+    private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
 
     private final ReactContextWrapper mReactContextWrapper;
     private final EventDispatcher mEventDispatcher;
@@ -70,18 +70,18 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
      * @param reactApplicationContext The react application context
      * @return The singleton instance of ElectrodeBridgeInternal
      */
-    public static ElectrodeBridgeInternal create(ReactApplicationContext reactApplicationContext) {
+    static ElectrodeBridgeInternal create(ReactApplicationContext reactApplicationContext) {
         return create(new ReactContextWrapperInternal(reactApplicationContext));
     }
 
     /**
      * Creates the ElectrodeBridgeInternal singleton
      *
-     * @param reactContextWrapper
+     * @param reactContextWrapper {@link ReactContextWrapper}
      * @return The singleton instance of ElectrodeBridgeInternal
      */
     @VisibleForTesting
-    static ElectrodeBridgeInternal create(ReactContextWrapper reactContextWrapper) {
+    static ElectrodeBridgeInternal create(@NonNull ReactContextWrapper reactContextWrapper) {
         Logger.d(TAG, "Creating ElectrodeBridgeInternal instance");
         synchronized (ElectrodeBridgeInternal.class) {
             if (sInstance == null) {

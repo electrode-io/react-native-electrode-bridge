@@ -8,24 +8,24 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
-public class RequestDispatcherImpl implements RequestDispatcher {
+class RequestDispatcherImpl implements RequestDispatcher {
     private static final String TAG = RequestDispatcherImpl.class.getSimpleName();
 
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler> mRequestRegistrar;
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Bundle>> mRequestRegistrar;
 
     /**
      * Initialize a new RequestDispatcherImpl instance
      *
      * @param requestRegistrar The request registrar to use for this dispatcher
      */
-    public RequestDispatcherImpl(@NonNull RequestRegistrar<ElectrodeBridgeRequestHandler> requestRegistrar) {
+    RequestDispatcherImpl(@NonNull RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Bundle>> requestRegistrar) {
         mRequestRegistrar = requestRegistrar;
     }
 
     @Override
-    public void dispatchRequest(@NonNull String requestName, @NonNull final String requestId, @NonNull Bundle requestData, @NonNull final Promise callBackPromise, final boolean isJs) {
+    public void dispatchRequest(@NonNull String requestName, @NonNull final String requestId, @Nullable Bundle requestData, @NonNull final Promise callBackPromise, final boolean isJs) {
         Logger.d(TAG, "dispatching request(id=%s) locally, with promise(%s)", requestId, callBackPromise);
-        ElectrodeBridgeRequestHandler requestHandler = mRequestRegistrar.getRequestHandler(requestName);
+        ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler = mRequestRegistrar.getRequestHandler(requestName);
         if (requestHandler == null) {
             callBackPromise.reject("ENOHANDLER", "No registered request handler for request name " + requestName);
             return;

@@ -1,5 +1,6 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import java.util.UUID;
@@ -15,7 +16,7 @@ public interface ElectrodeBridge {
      * @param request          The ElectrodeBridgeRequest that will contain the request name,data, destination mode, and timeout
      * @param responseListener the response call back listener to issue success or failure of the {@param request}.
      */
-    void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener responseListener);
+    void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener);
 
     /**
      * Registere the request handler, which will be used to handle any
@@ -23,7 +24,7 @@ public interface ElectrodeBridge {
      * @param name           name of the request
      * @param requestHandler call back to be issued for a given request.
      */
-    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler requestHandler);
+    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler);
 
     /**
      * Emits an event with some data to the all the even listeners.
@@ -40,6 +41,6 @@ public interface ElectrodeBridge {
      * @return A UUID to pass back to unregisterEventListener
      */
     @NonNull
-    UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener eventListener);
+    UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener);
 
 }

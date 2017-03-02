@@ -47,8 +47,8 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     private static ElectrodeBridgeInternal sInstance;
 
     private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
-    private final EventRegistrar<ElectrodeBridgeEventListener> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar = new EventRegistrarImpl<>();
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Bundle>> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
 
@@ -112,13 +112,13 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
     @NonNull
     @Override
-    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener eventListener) {
+    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
         return mEventRegistrar.registerEventListener(name, eventListener);
     }
 
     @Override
-    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler requestHandler) {
+    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler) {
         mRequestRegistrar.registerRequestHandler(name, requestHandler);
     }
 
@@ -154,7 +154,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
      */
     @SuppressWarnings("unused")
     @Override
-    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener responseListener) {
+    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
         final String id = getUUID();
         logRequest(request, id);
 

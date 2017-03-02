@@ -1,5 +1,6 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -75,7 +76,7 @@ public final class ElectrodeBridgeHolder {
     @SuppressWarnings("unused")
     public static void sendRequest(
             @NonNull ElectrodeBridgeRequest request,
-            @NonNull final ElectrodeBridgeResponseListener responseListener) {
+            @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing request. Will send once react native initialization is complete.");
             mQueuedRequests.put(request, responseListener);
@@ -94,7 +95,7 @@ public final class ElectrodeBridgeHolder {
     @SuppressWarnings("unused")
     @NonNull
     public static void registerRequestHandler(@NonNull String name,
-                                              @NonNull ElectrodeBridgeRequestHandler requestHandler) {
+                                              @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing request handler registration. Will register once react native initialization is complete.");
             mQueuedRequestHandlersRegistration.put(name, requestHandler);
@@ -113,7 +114,7 @@ public final class ElectrodeBridgeHolder {
      */
     @SuppressWarnings("unused")
     public static void addEventListener(@NonNull String name,
-                                        @NonNull ElectrodeBridgeEventListener eventListener) {
+                                        @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing event handler registration. Will register once react native initialization is complete.");
             mQueuedEventListenersRegistration.put(name, eventListener);

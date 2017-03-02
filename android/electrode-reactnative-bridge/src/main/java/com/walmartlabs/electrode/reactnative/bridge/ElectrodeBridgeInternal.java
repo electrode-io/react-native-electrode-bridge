@@ -111,23 +111,6 @@ public class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implemen
     }
 
     /**
-     * Provides a method to dispatch an event
-     */
-    public interface EventDispatcher {
-        /**
-         * Dispatch an event
-         *
-         * @param id   The event id
-         * @param name The name of the event to dispatch
-         * @param data The data of the event as a ReadableMap
-         */
-        void dispatchEvent(@NonNull String id,
-                           @NonNull String name,
-                           @NonNull ReadableMap data);
-
-    }
-
-    /**
      * Provides a method to dispatch a request
      */
     public interface RequestDispatcher {

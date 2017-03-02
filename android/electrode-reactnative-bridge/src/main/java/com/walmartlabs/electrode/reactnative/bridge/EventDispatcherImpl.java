@@ -8,7 +8,7 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 @SuppressWarnings("unused")
-public class EventDispatcherImpl implements ElectrodeBridgeInternal.EventDispatcher {
+public class EventDispatcherImpl implements EventDispatcher {
 
     private static final String TAG = EventDispatcherImpl.class.getSimpleName();
 

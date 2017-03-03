@@ -180,7 +180,9 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
                 Object obj = args[0];
 
                 final Bundle bundle;
-                if (obj instanceof Bundle) {
+                if(obj == null){
+                    bundle = Bundle.EMPTY;
+                } else if (obj instanceof Bundle) {
                     bundle = (Bundle) obj;
                 } else if (obj instanceof ReadableMap) {
                     bundle = BridgeArguments.responseBundle((ReadableMap) obj, BRIDGE_MSG_DATA);

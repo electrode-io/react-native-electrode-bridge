@@ -42,8 +42,9 @@ class RequestDispatcherImpl implements RequestDispatcher {
                     @Override
                     public void onSuccess(@Nullable Bundle bundle) {
                         Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), responseBundle(%s), isJS(%s)", requestId, callBackPromise, bundle, isJs);
+                        bundle = bundle != null ? bundle : Bundle.EMPTY;
                         if (isJs) {
-                            callBackPromise.resolve(Arguments.fromBundle(bundle != null ? bundle : Bundle.EMPTY));
+                            callBackPromise.resolve(Arguments.fromBundle(bundle));
                         } else {
                             callBackPromise.resolve(bundle);
                         }

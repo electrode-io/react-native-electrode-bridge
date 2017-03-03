@@ -8,9 +8,6 @@ import com.walmartlabs.electrode.reactnative.sample.model.Position;
 
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Created by d0g00g4 on 3/2/17.
- */
 public class EventProcessorTest extends BaseBridgeTestCase {
 
     public void testEventsForModelObjectNativeToNative() {

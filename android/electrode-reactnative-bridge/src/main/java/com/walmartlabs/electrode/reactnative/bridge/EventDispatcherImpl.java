@@ -12,10 +12,10 @@ public class EventDispatcherImpl implements EventDispatcher {
 
     private static final String TAG = EventDispatcherImpl.class.getSimpleName();
 
-    private final EventRegistrar<ElectrodeBridgeEventListener> mEventRegistrar;
+    private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar;
     private static final Bundle EMPTY_BUNDLE = new Bundle();
 
-    public EventDispatcherImpl(EventRegistrar<ElectrodeBridgeEventListener> eventRegistrar) {
+    public EventDispatcherImpl(EventRegistrar<ElectrodeBridgeEventListener<Bundle>> eventRegistrar) {
         mEventRegistrar = eventRegistrar;
     }
 
@@ -28,7 +28,7 @@ public class EventDispatcherImpl implements EventDispatcher {
      */
     @Override
     public void dispatchEvent(@NonNull String id, @NonNull String name, @NonNull ReadableMap payload) {
-        for (ElectrodeBridgeEventListener eventListener : mEventRegistrar.getEventListeners(name)) {
+        for (ElectrodeBridgeEventListener<Bundle> eventListener : mEventRegistrar.getEventListeners(name)) {
             Bundle bundle = ArgumentsEx.toBundle(payload);
             Logger.d(TAG, "Event dispatcher is dispatching event(%s), id(%s) to listener(%s)", name, id, eventListener);
             eventListener.onEvent(bundle != null ? bundle : EMPTY_BUNDLE);

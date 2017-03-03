@@ -47,8 +47,8 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     private static ElectrodeBridgeInternal sInstance;
 
     private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
-    private final EventRegistrar<ElectrodeBridgeEventListener> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar = new EventRegistrarImpl<>();
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Bundle>> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
 
@@ -112,13 +112,13 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
     @NonNull
     @Override
-    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener eventListener) {
+    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
         return mEventRegistrar.registerEventListener(name, eventListener);
     }
 
     @Override
-    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler requestHandler) {
+    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler) {
         mRequestRegistrar.registerRequestHandler(name, requestHandler);
     }
 
@@ -154,7 +154,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
      */
     @SuppressWarnings("unused")
     @Override
-    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener responseListener) {
+    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
         final String id = getUUID();
         logRequest(request, id);
 
@@ -231,7 +231,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             public void run() {
                 Logger.d(TAG, "Checking timeout for request(%s)", id);
                 if (pendingPromiseByRequestId.containsKey(id)) {
-                    Promise p = pendingPromiseByRequestId.remove(id);
+                    Promise p = pendingPromiseByRequestId.get(id);
                     Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, p);
                     p.reject("EREQUESTTIMEOUT", "Request timeout");
                 } else {
@@ -315,7 +315,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         Promise promise = pendingPromiseByRequestId.get(parentRequestId);
 
         if (promise == null) {
-            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", parentRequestId);
+            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's timed-out ??", parentRequestId);
         } else {
             if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
                 Logger.d(TAG, "Handling error response");

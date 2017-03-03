@@ -10,8 +10,6 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import junit.framework.TestCase;
 
-import org.junit.Test;
-
 import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.Type.REQUEST;
 
 public class BridgeArgumentsTest extends TestCase {

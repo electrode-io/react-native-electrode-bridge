@@ -8,7 +8,6 @@ public class ElectrodeBridgeRequest {
     private final String mName;
     private final Bundle mData;
     private final int mTimeoutMs;
-    private DispatchMode mDispatchMode;
 
     public enum DispatchMode {
         JS, NATIVE, GLOBAL
@@ -18,7 +17,6 @@ public class ElectrodeBridgeRequest {
         mName = requestBuilder.mName;
         mData = requestBuilder.mData;
         mTimeoutMs = requestBuilder.mTimeoutMs;
-        mDispatchMode = requestBuilder.mDispatchMode;
     }
 
     /**
@@ -42,16 +40,9 @@ public class ElectrodeBridgeRequest {
         return this.mTimeoutMs;
     }
 
-    /**
-     * @return The dispatch mode of this request
-     */
-    public DispatchMode getDispatchMode() {
-        return this.mDispatchMode;
-    }
-
     @Override
     public String toString() {
-        return mName + ", data: " + (mData != null ? mData : "<empty>") + ", dispatchMode:" + mDispatchMode;
+        return mName + ", data: " + (mData != null ? mData : "<empty>");
     }
 
     public static class Builder {

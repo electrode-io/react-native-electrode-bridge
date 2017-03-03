@@ -18,10 +18,13 @@ import java.lang.reflect.InvocationTargetException;
  * This class contains utility methods for bridge
  */
 
-public class BridgeArguments {
+public final class BridgeArguments {
 
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
+    /**
+     * Represents the types of arguments that is sent across the bridge.
+     */
     public enum Type {
         REQUEST("req"),
         RESPONSE("rsp"),
@@ -45,50 +48,53 @@ public class BridgeArguments {
      */
     @NonNull
     public static Bundle responseBundle(@NonNull ReadableMap data, @NonNull String dataKey) {
-        Bundle bundle;
-        bundle = new Bundle();
-        if (data != null) {
-            switch (data.getType(dataKey)) {
-                case Array: {
-                    ReadableArray readableArray = data.getArray(dataKey);
-                    if (readableArray.size() != 0) {
-                        switch (readableArray.getType(0)) {
-                            case String:
-                                bundle.putStringArray("rsp", ArgumentsEx.toStringArray(readableArray));
-                                break;
-                            case Boolean:
-                                bundle.putBooleanArray("rsp", ArgumentsEx.toBooleanArray(readableArray));
-                                break;
-                            case Number:
-                                // Can be int or double
-                                bundle.putDoubleArray("rsp", ArgumentsEx.toDoubleArray(readableArray));
-                                break;
-                            case Map:
-                                bundle.putParcelableArray("rsp", ArgumentsEx.toBundleArray(readableArray));
-                                break;
-                            case Array:
-                                // Don't support array of arrays yet
-                                break;
-                        }
+        final String responseKey = Type.RESPONSE.key;
+        Bundle bundle = new Bundle();
+        if (data.getType(dataKey) == null) {
+            throw new IllegalArgumentException("Given readable map doesn't have expected entry with key(" + dataKey + ")");
+        }
+        switch (data.getType(dataKey)) {
+            case Array: {
+                ReadableArray readableArray = data.getArray(dataKey);
+                if (readableArray.size() != 0) {
+                    switch (readableArray.getType(0)) {
+                        case String:
+                            bundle.putStringArray(responseKey, ArgumentsEx.toStringArray(readableArray));
+                            break;
+                        case Boolean:
+                            bundle.putBooleanArray(responseKey, ArgumentsEx.toBooleanArray(readableArray));
+                            break;
+                        case Number:
+                            // Can be int or double
+                            bundle.putDoubleArray(responseKey, ArgumentsEx.toDoubleArray(readableArray));
+                            break;
+                        case Map:
+                            bundle.putParcelableArray(responseKey, ArgumentsEx.toBundleArray(readableArray));
+                            break;
+                        case Array:
+                        default:
+                            throw new UnsupportedOperationException("Don't support conversion of this type(" + readableArray.getType(0) + ") yet");
                     }
                 }
-                break;
-                case Map:
-                    bundle = ArgumentsEx.toBundle(data.getMap(dataKey));
-                    break;
-                case Boolean:
-                    bundle.putBoolean("rsp", data.getBoolean(dataKey));
-                    break;
-                case Number:
-                    // can be int or double
-                    bundle.putDouble("rsp", data.getDouble(dataKey));
-                    break;
-                case String:
-                    bundle.putString("rsp", data.getString(dataKey));
-                    break;
-                case Null:
-                    break;
             }
+            break;
+            case Map:
+                bundle.putBundle(responseKey, ArgumentsEx.toBundle(data.getMap(dataKey)));
+                break;
+            case Boolean:
+                bundle.putBoolean(responseKey, data.getBoolean(dataKey));
+                break;
+            case Number:
+                // can be int or double
+                bundle.putDouble(responseKey, data.getDouble(dataKey));
+                break;
+            case String:
+                bundle.putString(responseKey, data.getString(dataKey));
+                break;
+            case Null:
+                break;
+            default:
+                throw new UnsupportedOperationException("Don't support conversion of this type(" + data.getType(dataKey) + ") yet");
         }
         return bundle;
     }
@@ -125,6 +131,11 @@ public class BridgeArguments {
             }
 
             if (Bridgeable.class.isAssignableFrom(returnClass)) {
+
+                if (payload.getBundle(type.key) == null) {
+                    throw new IllegalArgumentException("Value for key(" + type.key + ") should be a bundle, looks like it is not.");
+                }
+
                 response = BridgeArguments.bridgeableFromBundle(payload.getBundle(type.key), returnClass);
             } else {
                 response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass, type);

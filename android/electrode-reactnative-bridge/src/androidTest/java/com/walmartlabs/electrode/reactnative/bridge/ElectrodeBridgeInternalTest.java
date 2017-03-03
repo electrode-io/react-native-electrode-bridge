@@ -148,8 +148,8 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
     }
 
 
-    public void testEmitEventWithData() {
-        final String TEST_EVENT_NAME = "testEmitEventWithData";
+    public void testEmitEventWithSimpleDataFromNative() {
+        final String TEST_EVENT_NAME = "testEmitEventWithSimpleDataFromNative";
         final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
         final String TEST_EVENT_VALUE = "this is a test event";
         final Bundle eventBundle = new Bundle();
@@ -184,8 +184,34 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
         removeMockEventListener(uuid);
     }
 
-    public void testEmitEventWithComplexData() {
-        final String TEST_EVENT_NAME = "testEmitEvent";
+    public void testEmitEventWithSimpleDataFromJS() {
+        final String TEST_EVENT_NAME = "testEmitEventWithSimpleDataFromJS";
+        final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
+        final String TEST_EVENT_VALUE = "this is a test event";
+        final WritableMap eventMap = Arguments.createMap();
+        eventMap.putString(TEST_EVENT_KEY, TEST_EVENT_VALUE);
+
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        final ElectrodeBridge electrodeBridge = ElectrodeBridgeInternal.instance();
+        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+            @Override
+            public void onEvent(@Nullable Bundle eventPayload) {
+                assertNotNull(eventPayload);
+                assertTrue(eventPayload.containsKey(TEST_EVENT_KEY));
+                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(TEST_EVENT_KEY));
+                countDownLatch.countDown();
+            }
+        });
+
+
+        ElectrodeBridgeInternal.instance().dispatchEvent(TEST_EVENT_NAME, null, eventMap);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testEmitEventWithComplexDataFromNative() {
+        final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromNative";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
         final Bundle eventBundle = person.toBundle();
 
@@ -219,6 +245,29 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
+    }
+
+    public void testEmitEventWithComplexDataFromJS() {
+        final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromJS";
+        final Person person = new Person.Builder("Richard Lemaire", 10).build();
+        final WritableMap eventMap = Arguments.fromBundle(person.toBundle());
+
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        final ElectrodeBridge electrodeBridge = ElectrodeBridgeInternal.instance();
+        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+            @Override
+            public void onEvent(@Nullable Bundle eventPayload) {
+                assertNotNull(eventPayload);
+                assertNotNull(eventPayload.getString("name"));
+                assertEquals(person.getName(), eventPayload.getString("name"));
+                countDownLatch.countDown();
+            }
+        });
+
+        ElectrodeBridgeInternal.instance().dispatchEvent(TEST_EVENT_NAME, null, eventMap);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
     }
 
     public void testEmitEventWithNoData() {

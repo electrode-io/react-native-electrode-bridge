@@ -22,6 +22,22 @@ public class BridgeArguments {
 
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
+    public enum Type {
+        REQUEST("req"),
+        RESPONSE("rsp"),
+        EVENT("event");
+
+        private String key;
+
+        Type(@NonNull String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+    }
+
     /**
      * @param data    {@link ReadableMap} received from JS side.
      * @param dataKey Data entry key
@@ -206,21 +222,5 @@ public class BridgeArguments {
             }
         }
         return output;
-    }
-
-    public enum Type {
-        REQUEST("req"),
-        RESPONSE("rsp"),
-        EVENT("event");
-
-        private String key;
-
-        Type(@NonNull String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
     }
 }

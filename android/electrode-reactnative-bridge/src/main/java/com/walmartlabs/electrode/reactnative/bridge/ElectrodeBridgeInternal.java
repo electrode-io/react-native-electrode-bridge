@@ -27,7 +27,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
     private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
 
-    private static final String BRIDGE_EVENT = "electrode.bridge.event";
+    static final String BRIDGE_EVENT = "electrode.bridge.event";
     static final String BRIDE_REQUEST = "electrode.bridge.request";
     static final String BRIDGE_RESPONSE = "electrode.bridge.response";
     private static final String BRIDGE_RESPONSE_ERROR = "error";
@@ -135,14 +135,8 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
         Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), id));
 
-        if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.JS) {
-            mReactContextWrapper.emitEvent(BRIDGE_EVENT, message);
-        } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.NATIVE) {
-            dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
-        } else if (event.getDispatchMode() == ElectrodeBridgeEvent.DispatchMode.GLOBAL) {
-            mReactContextWrapper.emitEvent(BRIDGE_EVENT, message);
-            dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
-        }
+        mReactContextWrapper.emitEvent(BRIDGE_EVENT, message);
+        dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
     }
 
 

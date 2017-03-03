@@ -28,7 +28,6 @@ public class EventProcessor<T> {
         Logger.d(TAG, "EventProcessor is emitting event(%s), with payload(%s)", eventName, eventPayload);
         Bundle data = BridgeArguments.generateBundle(eventPayload, BridgeArguments.Type.EVENT);
         ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(eventName)
-                .withDispatchMode(ElectrodeBridgeEvent.DispatchMode.NATIVE)
                 .withData(data)
                 .build());
     }

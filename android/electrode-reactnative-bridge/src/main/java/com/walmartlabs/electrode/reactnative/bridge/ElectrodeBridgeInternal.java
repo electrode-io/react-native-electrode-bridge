@@ -28,7 +28,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
 
     static final String BRIDGE_EVENT = "electrode.bridge.event";
-    static final String BRIDE_REQUEST = "electrode.bridge.request";
+    static final String BRIDGE_REQUEST = "electrode.bridge.request";
     static final String BRIDGE_RESPONSE = "electrode.bridge.response";
     private static final String BRIDGE_RESPONSE_ERROR = "error";
     private static final String BRIDGE_RESPONSE_ERROR_CODE = "code";
@@ -162,7 +162,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         } else {
             Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", id);
             WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
-            mReactContextWrapper.emitEvent(BRIDE_REQUEST, message);
+            mReactContextWrapper.emitEvent(BRIDGE_REQUEST, message);
         }
     }
 

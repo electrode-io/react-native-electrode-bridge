@@ -114,7 +114,6 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         return new ReactContextWrapper() {
             @Override
             public void emitEvent(@NonNull String eventName, @Nullable WritableMap message) {
-                assertEquals(ElectrodeBridgeInternal.BRIDE_REQUEST, eventName);
                 assertNotNull(message);
                 assertNotNull(message.getString("name"));
                 handleContextWrapperEmitEvent(message.getString("name"), message);

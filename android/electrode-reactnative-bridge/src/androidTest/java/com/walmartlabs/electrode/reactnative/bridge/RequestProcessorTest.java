@@ -170,19 +170,22 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             }
         });
 
+        WritableMap request = Arguments.createMap();
         WritableMap inputPerson = Arguments.createMap();
         inputPerson.putString("name", person.getName());
         inputPerson.putInt("month", person.getMonth());
+        request.putMap(BridgeArguments.Type.REQUEST.getKey(), inputPerson);
 
-        ElectrodeBridgeInternal.instance().dispatchRequest(PersonApi.Requests.REQUEST_GET_STATUS, "dummy.id.get.user.status", inputPerson, new PromiseImpl(new Callback() {
+        ElectrodeBridgeInternal.instance().dispatchRequest(PersonApi.Requests.REQUEST_GET_STATUS, "dummy.id.get.user.status", request, new PromiseImpl(new Callback() {
             @Override
             public void invoke(Object... args) {
                 assertNotNull(args);
                 assertTrue(args.length == 1);
                 Object actualResult = args[0];
                 assertTrue(actualResult instanceof ReadableMap);
-                assertSame(result.getMember(), ((ReadableMap) actualResult).getBoolean("member"));
-                assertSame(result.getLog(), ((ReadableMap) actualResult).getBoolean("log"));
+                ReadableMap response = ((ReadableMap) actualResult).getMap("rsp");
+                assertSame(result.getMember(), response.getBoolean("member"));
+                assertSame(result.getLog(), response.getBoolean("log"));
             }
         }, new Callback() {
             @Override

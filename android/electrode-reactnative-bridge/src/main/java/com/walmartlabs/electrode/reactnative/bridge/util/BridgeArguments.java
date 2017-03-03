@@ -105,7 +105,8 @@ public class BridgeArguments {
         }
         Bundle data;
         if (object instanceof Bridgeable) {
-            data = ((Bridgeable) object).toBundle();
+            data = new Bundle();
+            data.putBundle(type.key, ((Bridgeable) object).toBundle());
         } else {
             data = BridgeArguments.getBundleForPrimitive(object, object.getClass(), type);
         }
@@ -118,8 +119,13 @@ public class BridgeArguments {
         T response = null;
         if (payload != null
                 && !payload.isEmpty()) {
+
+            if (payload.get(type.key) == null) {
+                throw new IllegalArgumentException("Cannot find key(" + type.key + ") in given bundle:" + payload);
+            }
+
             if (Bridgeable.class.isAssignableFrom(returnClass)) {
-                response = BridgeArguments.bridgeableFromBundle(payload, returnClass);
+                response = BridgeArguments.bridgeableFromBundle(payload.getBundle(type.key), returnClass);
             } else {
                 response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass, type);
             }

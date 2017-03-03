@@ -5,16 +5,10 @@ import android.os.Bundle;
 public class ElectrodeBridgeEvent {
     private final String mName;
     private final Bundle mData;
-    private final DispatchMode mDispatchMode;
-
-    public enum DispatchMode {
-        JS, NATIVE, GLOBAL
-    }
 
     private ElectrodeBridgeEvent(Builder eventBuilder) {
         mName = eventBuilder.mName;
         mData = eventBuilder.mData;
-        mDispatchMode = eventBuilder.mDispatchMode;
     }
 
     /**
@@ -31,17 +25,9 @@ public class ElectrodeBridgeEvent {
         return mData;
     }
 
-    /**
-     * @return The dispatch mode of this event
-     */
-    public DispatchMode getDispatchMode() {
-        return mDispatchMode;
-    }
-
     public static class Builder {
         private final String mName;
         private Bundle mData;
-        private DispatchMode mDispatchMode;
 
         /**
          * Initializes a new event builder
@@ -61,17 +47,6 @@ public class ElectrodeBridgeEvent {
          */
         public Builder withData(Bundle data) {
             this.mData = data;
-            return this;
-        }
-
-        /**
-         * Specifies the dispatch mode
-         *
-         * @param dispatchMode The dispatch mode to use
-         * @return Current builder instance for chaining
-         */
-        public Builder withDispatchMode(DispatchMode dispatchMode) {
-            this.mDispatchMode = dispatchMode;
             return this;
         }
 

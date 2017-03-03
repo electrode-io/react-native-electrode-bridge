@@ -7,9 +7,12 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
+import com.walmartlabs.electrode.reactnative.sample.model.Person;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+
+import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_MSG_DATA;
 
 public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
@@ -142,5 +145,83 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
+    }
+
+
+    public void testEmitEventWithData() {
+        final String TEST_EVENT_NAME = "testEmitEventWithData";
+        final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
+        final String TEST_EVENT_VALUE = "this is a test event";
+        final Bundle eventBundle = new Bundle();
+        eventBundle.putString(TEST_EVENT_KEY, TEST_EVENT_VALUE);
+
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        final ElectrodeBridge electrodeBridge = ElectrodeBridgeInternal.instance();
+        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+            @Override
+            public void onEvent(@Nullable Bundle eventPayload) {
+                assertNotNull(eventPayload);
+                assertTrue(eventPayload.containsKey(TEST_EVENT_KEY));
+                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(TEST_EVENT_KEY));
+                countDownLatch.countDown();
+            }
+        });
+
+        UUID uuid = addMockEventListener(TEST_EVENT_NAME, new MockElectrodeEventListener() {
+            @Override
+            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertEquals(TEST_EVENT_NAME, eventName);
+                assertNotNull(message);
+                assertTrue(message.hasKey(BRIDGE_MSG_DATA));
+                assertEquals(TEST_EVENT_VALUE, message.getMap(BRIDGE_MSG_DATA).getString(TEST_EVENT_KEY));
+                countDownLatch.countDown();
+            }
+        });
+
+        electrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(eventBundle).build());
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+    }
+
+    public void testEmitEventWithComplexData() {
+        final String TEST_EVENT_NAME = "testEmitEvent";
+        final Person person = new Person.Builder("Richard Lemaire", 10).build();
+        final Bundle eventBundle = person.toBundle();
+
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        final ElectrodeBridge electrodeBridge = ElectrodeBridgeInternal.instance();
+        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+            @Override
+            public void onEvent(@Nullable Bundle eventPayload) {
+                assertNotNull(eventPayload);
+                assertNotNull(eventPayload.getString("name"));
+                assertEquals(person.getName(), eventPayload.getString("name"));
+                assertEquals(person.getMonth(), BridgeArguments.getNumberValue(eventBundle, "month"));
+                countDownLatch.countDown();
+            }
+        });
+
+        UUID uuid = addMockEventListener(TEST_EVENT_NAME, new MockElectrodeEventListener() {
+            @Override
+            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertEquals(TEST_EVENT_NAME, eventName);
+                assertNotNull(message);
+                assertTrue(message.hasKey(BRIDGE_MSG_DATA));
+                assertEquals(person.getName(), message.getMap(BRIDGE_MSG_DATA).getString("name"));
+                assertEquals(person.getMonth(), Integer.valueOf((int) message.getMap(BRIDGE_MSG_DATA).getDouble("month")));
+                countDownLatch.countDown();
+            }
+        });
+
+        electrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(eventBundle).build());
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+    }
+
+    public void testEmitEventWithNoData() {
+
     }
 }

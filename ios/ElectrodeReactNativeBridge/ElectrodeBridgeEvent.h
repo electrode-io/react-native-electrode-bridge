@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "ElectrodeBridge.h"
+#import "ElectrodeBridgeHolder.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - ElectrodeBridgeEvent

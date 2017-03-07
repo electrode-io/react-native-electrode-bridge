@@ -13,6 +13,7 @@
 
 @interface ElectrodeBridgeHolder ()
 @property (nonatomic, strong) NSMutableArray *listenerBlocks;
+@property (nonatomic, weak) id<ElectrodeBridgeInterface> bridge;
 @end
 
 
@@ -29,17 +30,22 @@
   return sharedInstance;
 }
 
++ (NSArray *)electrodeModules
+{
+    return @[[[ElectrodeBridge alloc] init]];
+}
+
 - (ElectrodeEventRegistrar *)eventRegistrar
 {
   return self.bridge.eventRegistrar;
 }
 
-- (void)setBridge:(ElectrodeBridge *)bridge
+- (void)setBridge:(id)bridge
 {
   _bridge = bridge;
   
   // Let everyone know we have a bridge if not nil
-  if (bridge)
+  if (bridge && [bridge isKindOfClass:[ElectrodeBridge class]])
   {
     for (ElectrodeBridgeHolderListener listener in _listenerBlocks)
     {
@@ -48,7 +54,7 @@
   }
 }
 
-- (void)registerStartupListener:(ElectrodeBridgeHolderListener)listenerBlock
+- (void)setOnBridgeReadyListener:(ElectrodeBridgeHolderListener)listenerBlock
 {
   if (self.bridge)
   {
@@ -70,9 +76,18 @@
   return [self.bridge.eventRegistrar registerEventListener:name eventListener:eventListener];
 }
 
-- (NSString *)registerRequestHandler:(NSString *)name requestHandler:(id<ElectrodeRequestHandler>)handler error:(NSError **)error
+- (NSString *)registerRequestHandler:(NSString *)name requestHandler:(id<ElectrodeRequestHandler>)requestHandler error:(NSError **)error
 {
-  return [self.bridge.requestRegistrar registerRequestHandler:name requestHandler:handler error:error];
+  return [self.bridge.requestRegistrar registerRequestHandler:name requestHandler:requestHandler error:error];
 }
 
+- (void)sendRequest:(ElectrodeBridgeRequest *)request completionListener:(id<ElectrodeRequestCompletionListener>)completionListener
+{
+    [self.bridge sendRequest:request completionListener:completionListener];
+}
+
+- (void)emitEvent:(ElectrodeBridgeEvent *)event
+{
+    [self.bridge emitEvent:event];
+}
 @end

@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "57EEDC3C610D5A7992FCA91D2876900ED8DD53F1+++BFA0B2B",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "57EEDC3C610D5A7992FCA91D2876900ED8DD53F1+++BFA0B2B" : 9223372036854775807,
+    "9EBAFF008C637BFD759BE0283AF0ABBC6FFAD298+++464466A" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "4F5DEE45-5B44-4C20-A277-6E14DCEA50F5",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "57EEDC3C610D5A7992FCA91D2876900ED8DD53F1+++BFA0B2B" : "ElectrodeContainer\/",
+    "9EBAFF008C637BFD759BE0283AF0ABBC6FFAD298+++464466A" : "..\/.."
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "ElectrodeReactNativeBridge",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "ElectrodeContainer\/Libraries\/ElectrodeReactNativeBridge\/ElectrodeReactNativeBridge.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "gecgithub01.walmart.com:cgarvin\/ElectrodeContainer.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "57EEDC3C610D5A7992FCA91D2876900ED8DD53F1+++BFA0B2B"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "gecgithub01.walmart.com:Electrode-Mobile-Platform\/platform-demo.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9EBAFF008C637BFD759BE0283AF0ABBC6FFAD298+++464466A"
+    }
+  ]
+}

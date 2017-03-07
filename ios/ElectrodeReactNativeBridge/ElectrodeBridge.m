@@ -12,9 +12,9 @@
 #import "ElectrodeEventDispatcher.h"
 #import "ElectrodeEventRegistrar.h"
 #import "ElectrodeBridgeEvent.h"
-#import "RCTLog.h"
-#import "RCTBridge.h"
-#import "RCTEventDispatcher.h"
+#import <React/RCTLog.h>
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeRequestDispatcher.h"
 #import "ElectrodeBridgeRequest.h"
@@ -53,7 +53,7 @@ typedef void (^ElectrodeBridgeRequestBlock)();
   {
     self.eventDispatcher = [[ElectrodeEventDispatcher alloc] init];
     self.requestDispatcher = [[ElectrodeRequestDispatcher alloc] init];
-    [ElectrodeBridgeHolder sharedInstance].bridge = self;
+    [[ElectrodeBridgeHolder sharedInstance] setBridge:self];
     self.syncQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     self.requestListeners = [[NSMutableDictionary alloc] init];
   }
@@ -116,8 +116,12 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
       }
       else if ([data objectForKey:EBBridgeMsgData])
       { // Grab the handler and accept it
+        
+        // Verify we aren't sending an empty object back
+        id dataToSend = [self objectIsEmpty:[data objectForKey:EBBridgeMsgData]] ? nil : data;
+        
         dispatch_async(dispatch_get_main_queue(), ^{
-          [listener onSuccess:[data objectForKey:EBBridgeMsgData]];
+          [listener onSuccess:dataToSend];
         });
       }
       else
@@ -134,6 +138,34 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
   }
 }
 
+- (BOOL)objectIsEmpty:(id)object
+{
+    BOOL isEmpty = YES;
+    if ([object isKindOfClass:[NSArray class]])
+    {
+        if ([(NSArray *)object count] > 0)
+        {
+            isEmpty = NO;
+        }
+    }
+    else if ([object isKindOfClass:[NSDictionary class]])
+    {
+        if ([(NSDictionary *)object allKeys].count > 0)
+        {
+            isEmpty = NO;
+        }
+    }
+    else if ([object isKindOfClass:[NSString class]])
+    {
+        if ([(NSString *)object length] > 0)
+        {
+            isEmpty = NO;
+        }
+    }
+    
+    return isEmpty;
+}
+
 - (NSString *)getUUID
 {
   return [[NSUUID UUID] UUIDString];
@@ -145,7 +177,7 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
   NSString *eventID = [self getUUID];
   RCTLogInfo(@"Emitting event[name:%@ id:%@", event.name, eventID);
   
-  if (event.dispatchMode == JS || event.dispatchMode == GLOBAL)
+  if (event.dispatchMode == EBDispatchModeJS || event.dispatchMode == EBDispatchModeGlobal)
   { // Handle JS
 
     NSDictionary *body = nil;
@@ -167,21 +199,21 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
                                                  body:body];
   }
   
-  if (event.dispatchMode == NATIVE || event.dispatchMode == GLOBAL)
+  if (event.dispatchMode == EBDispatchModeNative || event.dispatchMode == EBDispatchModeGlobal)
   { // Handle Native dispatches
     [_eventDispatcher dispatchEvent:event.name id:eventID data:event.data];
   }
 }
 
 - (void)sendRequest:(ElectrodeBridgeRequest *)request
- completionListener:(id<ElectrodeRequestCompletionListener>)listener
+ completionListener:(id<ElectrodeRequestCompletionListener>)completionListener
 {
   NSString *requestID = [self getUUID];
 
   RCTLogInfo(@"Sending request[name:%@ id:%@", request.name, requestID);
   
   // Add the request listener since it could be executed later by JS responding
-  [self addRequestListener:listener forUUID:requestID];
+  [self addRequestListener:completionListener forUUID:requestID];
   
   // Add the timeout handler
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(request.timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -196,7 +228,7 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
   });
   
   // Dispatch to JS or Native depending which was selected
-  if (request.dispatchMode == JS)
+  if (request.dispatchMode == EBDispatchModeJS)
   {
     NSDictionary *body = nil;
     if (request.data)
@@ -228,11 +260,11 @@ RCT_EXPORT_METHOD(dispatchEvent:(NSString *)event
          
          if (!error)
          {
-           [listener onSuccess:data];
+           [completionListener onSuccess:data];
          }
          else
          {
-           [listener onError:error.domain message:error.localizedDescription];
+           [completionListener onError:error.domain message:error.localizedDescription];
          }
        }
      }];

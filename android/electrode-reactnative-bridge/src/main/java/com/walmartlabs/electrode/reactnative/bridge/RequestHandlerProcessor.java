@@ -31,7 +31,7 @@ public class RequestHandlerProcessor<TReq, TResp> {
     }
 
     public void execute() {
-        final ElectrodeBridgeRequestHandler intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Bundle>() {
+        final ElectrodeBridgeRequestHandler<Bundle, Bundle> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Bundle>() {
 
             @Override
             public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {

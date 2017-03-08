@@ -16,10 +16,6 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
     private final int mTimeoutMs;
     private boolean isJsInitiated;
 
-    public enum DispatchMode {
-        JS, NATIVE, GLOBAL
-    }
-
     @Nullable
     public static ElectrodeBridgeRequest create(@NonNull ReadableMap messageMap) {
         ElectrodeBridgeRequest bridgeMessage = null;
@@ -70,7 +66,6 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
         private Bundle mData;
         private int mTimeoutMs;
         private String mId;
-        private DispatchMode mDispatchMode;
 
         /**
          * Initializes a new request builder
@@ -81,7 +76,6 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
             mName = name;
             mTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS;
             mData = Bundle.EMPTY;
-            mDispatchMode = DispatchMode.JS;
         }
 
         /**
@@ -113,17 +107,6 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
 
         public Builder id(String id) {
             mId = id;
-            return this;
-        }
-
-        /**
-         * Specifies the dispatch mode
-         *
-         * @param dispatchMode The dispatch mode to use
-         * @return Current builder instance for chaining
-         */
-        public Builder withDispatchMode(DispatchMode dispatchMode) {
-            this.mDispatchMode = dispatchMode;
             return this;
         }
 

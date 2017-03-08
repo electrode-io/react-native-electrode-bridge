@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 public class ElectrodeBridgeEvent extends BridgeMessage {
 
@@ -16,12 +15,12 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
     @Nullable
     public static ElectrodeBridgeEvent create(@NonNull ReadableMap messageMap) {
         ElectrodeBridgeEvent bridgeMessage = null;
-        if (isValid(messageMap, BridgeArguments.Type.EVENT)) {
+        if (isValid(messageMap, BridgeMessage.Type.EVENT)) {
             String eventName = messageMap.getString(BRIDGE_MSG_NAME);
             String eventId = messageMap.getString(BRIDGE_MSG_ID);
             Bundle data = null;
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                String eventKey = BridgeArguments.Type.EVENT.getKey();
+                String eventKey = BridgeMessage.Type.EVENT.getKey();
                 if (messageMap.getMap(BRIDGE_MSG_DATA).hasKey(eventKey)) {
                     data = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_DATA));
                 } else {
@@ -38,7 +37,7 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
     }
 
     private ElectrodeBridgeEvent(Builder eventBuilder) {
-        super(eventBuilder.mName, eventBuilder.mId == null ? getUUID() : eventBuilder.mId, BridgeArguments.Type.EVENT, eventBuilder.mData);
+        super(eventBuilder.mName, eventBuilder.mId == null ? getUUID() : eventBuilder.mId, BridgeMessage.Type.EVENT, eventBuilder.mData);
     }
 
     public static class Builder {
@@ -70,8 +69,8 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
         public Builder withData(Bundle data) {
             if (data != null
                     && !data.isEmpty()
-                    && !data.containsKey(BridgeArguments.Type.EVENT.getKey())) {
-                throw new IllegalArgumentException("The event data should be put inside " + BridgeArguments.Type.EVENT.getKey() + " key");
+                    && !data.containsKey(BridgeMessage.Type.EVENT.getKey())) {
+                throw new IllegalArgumentException("The event data should be put inside " + BridgeMessage.Type.EVENT.getKey() + " key");
             }
             this.mData = data;
             return this;

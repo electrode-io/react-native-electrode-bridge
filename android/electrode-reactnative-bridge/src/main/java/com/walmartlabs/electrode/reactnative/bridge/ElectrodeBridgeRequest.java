@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 public class ElectrodeBridgeRequest extends BridgeMessage {
     private static final String TAG = ElectrodeBridgeRequest.class.getSimpleName();
@@ -19,12 +18,12 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
     @Nullable
     public static ElectrodeBridgeRequest create(@NonNull ReadableMap messageMap) {
         ElectrodeBridgeRequest bridgeMessage = null;
-        if (isValid(messageMap, BridgeArguments.Type.REQUEST)) {
+        if (isValid(messageMap, BridgeMessage.Type.REQUEST)) {
             String eventName = messageMap.getString(BRIDGE_MSG_NAME);
             String eventId = messageMap.getString(BRIDGE_MSG_ID);
             Bundle data = null;
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                String requestKey = BridgeArguments.Type.REQUEST.getKey();
+                String requestKey = BridgeMessage.Type.REQUEST.getKey();
                 if (messageMap.getMap(BRIDGE_MSG_DATA).hasKey(requestKey)) {
                     data = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_DATA));
                 } else {
@@ -40,7 +39,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
     }
 
     private ElectrodeBridgeRequest(Builder requestBuilder) {
-        super(requestBuilder.mName, requestBuilder.mId == null ? getUUID() : requestBuilder.mId, BridgeArguments.Type.REQUEST, requestBuilder.mData);
+        super(requestBuilder.mName, requestBuilder.mId == null ? getUUID() : requestBuilder.mId, BridgeMessage.Type.REQUEST, requestBuilder.mData);
         mTimeoutMs = requestBuilder.mTimeoutMs;
 
     }
@@ -98,8 +97,8 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
         public Builder withData(Bundle data) {
             if (data != null
                     && !data.isEmpty()
-                    && !data.containsKey(BridgeArguments.Type.REQUEST.getKey())) {
-                throw new IllegalArgumentException("The request data should be put inside " + BridgeArguments.Type.REQUEST.getKey() + " key");
+                    && !data.containsKey(BridgeMessage.Type.REQUEST.getKey())) {
+                throw new IllegalArgumentException("The request data should be put inside " + BridgeMessage.Type.REQUEST.getKey() + " key");
             }
             this.mData = data;
             return this;

@@ -7,11 +7,39 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 import java.util.UUID;
 
 public class BridgeMessage {
+
+    /**
+     * Represents the types of arguments that is sent across the bridge.
+     */
+    public enum Type {
+        REQUEST("req"),
+        RESPONSE("rsp"),
+        EVENT("event");
+
+        private String key;
+
+        Type(@NonNull String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        @Nullable
+        public static Type getType(@NonNull String key) {
+            for (Type type : Type.values()) {
+                if (type.key.equalsIgnoreCase(key)) {
+                    return type;
+                }
+            }
+            return null;
+        }
+    }
 
     private static final String TAG = BridgeMessage.class.getSimpleName();
 
@@ -22,11 +50,11 @@ public class BridgeMessage {
 
     private final String name;
     private final String id;
-    private final BridgeArguments.Type type;
+    private final Type type;
     private final Bundle data;
 
 
-    public BridgeMessage(@NonNull String name, @NonNull String id, @NonNull BridgeArguments.Type type, @Nullable Bundle data) {
+    public BridgeMessage(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Bundle data) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -44,7 +72,7 @@ public class BridgeMessage {
     }
 
     @NonNull
-    public BridgeArguments.Type getType() {
+    public Type getType() {
         return type;
     }
 
@@ -72,9 +100,9 @@ public class BridgeMessage {
         return name + ", data: " + (data != null ? data : "<empty>") + " type: " + type;
     }
 
-    static boolean isValid(final ReadableMap data, BridgeArguments.Type type) {
+    static boolean isValid(final ReadableMap data, Type type) {
         return isValid(data)
-                && BridgeArguments.Type.getType(data.getString(BRIDGE_MSG_TYPE)) == type;
+                && Type.getType(data.getString(BRIDGE_MSG_TYPE)) == type;
     }
 
     static boolean isValid(final ReadableMap data) {

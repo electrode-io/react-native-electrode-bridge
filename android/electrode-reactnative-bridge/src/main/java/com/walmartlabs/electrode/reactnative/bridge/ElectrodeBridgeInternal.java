@@ -13,7 +13,6 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -191,7 +190,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     @ReactMethod
     public void dispatchEvent(@NonNull final ReadableMap data) {
         Logger.d(TAG, "received event from JS(data=%s)", data);
-        BridgeArguments.Type type = BridgeArguments.Type.getType(data.getString(BridgeMessage.BRIDGE_MSG_TYPE));
+        BridgeMessage.Type type = BridgeMessage.Type.getType(data.getString(BridgeMessage.BRIDGE_MSG_TYPE));
         if (type != null) {
             switch (type) {
                 case EVENT:

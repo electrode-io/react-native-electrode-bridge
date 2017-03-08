@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
-
 /**
  * Created by d0g00g4 on 3/6/17.
  */
@@ -18,7 +16,7 @@ public class BridgeTransaction {
 
 
     public BridgeTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
-        if (request.getType() != BridgeArguments.Type.REQUEST) {
+        if (request.getType() != BridgeMessage.Type.REQUEST) {
             throw new IllegalArgumentException("BridgeTransaction constrictor expects a request type, did you accidentally pass in a different type(" + request.getType() + ") ? ");
         }
         this.request = request;

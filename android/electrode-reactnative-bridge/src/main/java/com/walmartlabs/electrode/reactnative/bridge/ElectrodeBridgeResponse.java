@@ -9,7 +9,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 public class ElectrodeBridgeResponse extends BridgeMessage {
 
@@ -29,14 +28,14 @@ public class ElectrodeBridgeResponse extends BridgeMessage {
     @Nullable
     public static ElectrodeBridgeResponse create(@NonNull ReadableMap messageMap) {
         ElectrodeBridgeResponse bridgeResponse = null;
-        if (isValid(messageMap, BridgeArguments.Type.RESPONSE)) {
+        if (isValid(messageMap, BridgeMessage.Type.RESPONSE)) {
             String eventName = messageMap.getString(BRIDGE_MSG_NAME);
             String eventId = messageMap.getString(BRIDGE_MSG_ID);
-            BridgeArguments.Type type = BridgeArguments.Type.getType(messageMap.getString(BRIDGE_MSG_TYPE));
+            Type type = BridgeMessage.Type.getType(messageMap.getString(BRIDGE_MSG_TYPE));
 
             Bundle data = null;
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                String responseKey = BridgeArguments.Type.RESPONSE.getKey();
+                String responseKey = BridgeMessage.Type.RESPONSE.getKey();
                 if (messageMap.getMap(BRIDGE_MSG_DATA).hasKey(responseKey)) {
                     data = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_DATA));
                 } else {
@@ -70,15 +69,15 @@ public class ElectrodeBridgeResponse extends BridgeMessage {
     public static ElectrodeBridgeResponse createResponseForRequest(@NonNull ElectrodeBridgeRequest request, @Nullable Bundle responseData, @Nullable FailureMessage failureMessage) {
         if (responseData != null
                 && !responseData.isEmpty()
-                && !responseData.containsKey(BridgeArguments.Type.RESPONSE.getKey())) {
+                && !responseData.containsKey(BridgeMessage.Type.RESPONSE.getKey())) {
             throw new IllegalArgumentException("The response data should be put inside 'rsp' key");
         }
-        return new ElectrodeBridgeResponse(request.getName(), request.getId(), BridgeArguments.Type.RESPONSE, responseData, failureMessage);
+        return new ElectrodeBridgeResponse(request.getName(), request.getId(), BridgeMessage.Type.RESPONSE, responseData, failureMessage);
     }
 
     private final FailureMessage failureMessage;
 
-    private ElectrodeBridgeResponse(@NonNull String name, @NonNull String id, @NonNull BridgeArguments.Type type, @Nullable Bundle data, @Nullable FailureMessage failureMessage) {
+    private ElectrodeBridgeResponse(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Bundle data, @Nullable FailureMessage failureMessage) {
         super(name, id, type, data);
         this.failureMessage = failureMessage;
     }

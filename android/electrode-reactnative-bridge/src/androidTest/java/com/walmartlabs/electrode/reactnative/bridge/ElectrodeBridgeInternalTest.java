@@ -49,7 +49,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
                 assertNotNull(payload);
                 assertTrue(payload.isEmpty());
                 assertNotNull(responseListener);
-                responseListener.onSuccess(BridgeArguments.generateBundle(expectedResult, BridgeArguments.Type.RESPONSE));
+                responseListener.onSuccess(BridgeArguments.generateBundle(expectedResult, BridgeMessage.Type.RESPONSE));
                 countDownLatch.countDown();
             }
         });
@@ -159,7 +159,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
     public void testEmitEventWithSimpleDataFromNative() {
         final String TEST_EVENT_NAME = "testEmitEventWithData";
-        final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
+        final String TEST_EVENT_KEY = BridgeMessage.Type.EVENT.getKey();
         final String TEST_EVENT_VALUE = "this is a test event";
         final Bundle eventBundle = new Bundle();
         eventBundle.putString(TEST_EVENT_KEY, TEST_EVENT_VALUE);
@@ -205,7 +205,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
     public void testEmitEventWithSimpleDataFromJS() {
         final String TEST_EVENT_NAME = "testEmitEventWithSimpleDataFromJS";
-        final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
+        final String TEST_EVENT_KEY = BridgeMessage.Type.EVENT.getKey();
         final String TEST_EVENT_VALUE = "this is a test event";
         final WritableMap simpleData = Arguments.createMap();
         simpleData.putString(TEST_EVENT_KEY, TEST_EVENT_VALUE);
@@ -234,7 +234,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
         final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromNative";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
         final Bundle personBundle = new Bundle();
-        personBundle.putBundle(BridgeArguments.Type.EVENT.getKey(), person.toBundle());
+        personBundle.putBundle(BridgeMessage.Type.EVENT.getKey(), person.toBundle());
 
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -243,7 +243,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
-                Bundle resultBundle = eventPayload.getBundle(BridgeArguments.Type.EVENT.getKey());
+                Bundle resultBundle = eventPayload.getBundle(BridgeMessage.Type.EVENT.getKey());
                 assertNotNull(resultBundle);
                 assertEquals(person.getName(), resultBundle.getString("name"));
                 assertEquals(person.getMonth(), BridgeArguments.getNumberValue(resultBundle, "month"));
@@ -267,8 +267,8 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
                 assertNotNull(event);
                 assertEquals(TEST_EVENT_NAME, event.getString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME));
                 assertTrue(event.hasKey(BRIDGE_MSG_DATA));
-                assertTrue(event.getMap(BRIDGE_MSG_DATA).hasKey(BridgeArguments.Type.EVENT.getKey()));
-                ReadableMap personMap = event.getMap(BRIDGE_MSG_DATA).getMap(BridgeArguments.Type.EVENT.getKey());
+                assertTrue(event.getMap(BRIDGE_MSG_DATA).hasKey(BridgeMessage.Type.EVENT.getKey()));
+                ReadableMap personMap = event.getMap(BRIDGE_MSG_DATA).getMap(BridgeMessage.Type.EVENT.getKey());
                 assertEquals(person.getName(), personMap.getString("name"));
                 assertEquals(person.getMonth(), Integer.valueOf((int) personMap.getDouble("month")));
                 countDownLatch.countDown();
@@ -285,7 +285,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
         final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromJS";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
         Bundle personEventBundle = new Bundle();
-        personEventBundle.putBundle(BridgeArguments.Type.EVENT.getKey(), person.toBundle());
+        personEventBundle.putBundle(BridgeMessage.Type.EVENT.getKey(), person.toBundle());
 
         final WritableMap personMap = Arguments.fromBundle(personEventBundle);
         final WritableMap eventMap = createTestEventMap(TEST_EVENT_NAME, personMap);
@@ -297,7 +297,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
-                Bundle eventData = eventPayload.getBundle(BridgeArguments.Type.EVENT.getKey());
+                Bundle eventData = eventPayload.getBundle(BridgeMessage.Type.EVENT.getKey());
                 assertNotNull(eventData);
                 assertNotNull(eventData.getString("name"));
                 assertEquals(person.getName(), eventData.getString("name"));

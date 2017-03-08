@@ -42,7 +42,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "Richard Mercille";
         final WritableMap expectedResultMap = Arguments.createMap();
-        expectedResultMap.putString(BridgeArguments.Type.RESPONSE.getKey(), expectedResult);
+        expectedResultMap.putString(BridgeMessage.Type.RESPONSE.getKey(), expectedResult);
 
         UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_USER_NAME, new BaseBridgeTestCase.MockElectrodeEventListener() {
             @Override
@@ -131,7 +131,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
                 Bundle personBundle = BridgeArguments.responseBundle(request, ElectrodeBridgeRequest.BRIDGE_MSG_DATA);
                 assertNotNull(personBundle);
-                Person person = BridgeArguments.generateObject(personBundle, Person.class, BridgeArguments.Type.RESPONSE);
+                Person person = BridgeArguments.generateObject(personBundle, Person.class, BridgeMessage.Type.RESPONSE);
                 assertNotNull(person);
                 assertEquals(actualPerson.getName(), person.getName());
                 assertEquals(actualPerson.getMonth(), person.getMonth());
@@ -197,7 +197,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
-                ReadableMap responseMap = response.getMap(BridgeMessage.BRIDGE_MSG_DATA).getMap(BridgeArguments.Type.RESPONSE.getKey());
+                ReadableMap responseMap = response.getMap(BridgeMessage.BRIDGE_MSG_DATA).getMap(BridgeMessage.Type.RESPONSE.getKey());
                 assertSame(result.getMember(), responseMap.getBoolean("member"));
                 assertSame(result.getLog(), responseMap.getBoolean("log"));
                 countDownLatch.countDown();
@@ -213,12 +213,12 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         inputPerson.putString("name", person.getName());
         inputPerson.putInt("month", person.getMonth());
         WritableMap requestMap = Arguments.createMap();
-        requestMap.putMap(BridgeArguments.Type.REQUEST.getKey(), inputPerson);
+        requestMap.putMap(BridgeMessage.Type.REQUEST.getKey(), inputPerson);
 
         WritableMap request = Arguments.createMap();
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_ID, ElectrodeBridgeRequest.getUUID());
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME, PersonApi.Requests.REQUEST_GET_STATUS);
-        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeArguments.Type.REQUEST.getKey());
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
         request.putMap(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, requestMap);
 
         ElectrodeBridgeInternal.instance().dispatchEvent(request);

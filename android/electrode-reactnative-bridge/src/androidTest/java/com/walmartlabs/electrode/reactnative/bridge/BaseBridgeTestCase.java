@@ -16,7 +16,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +138,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
      */
     private void mockJsEventHandler(@Nullable final ReadableMap inputMessage) {
         assertNotNull(inputMessage);
-        BridgeArguments.Type type = BridgeArguments.Type.getType(inputMessage.getString(BridgeMessage.BRIDGE_MSG_TYPE));
+        BridgeMessage.Type type = BridgeMessage.Type.getType(inputMessage.getString(BridgeMessage.BRIDGE_MSG_TYPE));
         assertNotNull(type);
         String eventName = inputMessage.getString(BridgeMessage.BRIDGE_MSG_NAME);
         assertNotNull(eventName);
@@ -157,7 +156,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
                             WritableMap finalResponse = Arguments.createMap();
                             finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_ID, inputMessage.getString(ElectrodeBridgeRequest.BRIDGE_MSG_ID));
                             finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_NAME, inputMessage.getString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME));
-                            finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_TYPE, BridgeArguments.Type.RESPONSE.getKey());
+                            finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_TYPE, BridgeMessage.Type.RESPONSE.getKey());
                             if (responseData != null) {
                                 if (responseData.hasKey(ElectrodeBridgeResponse.BRIDGE_MSG_DATA)) {
                                     //This is used for response coming wth primitives instead of complex objects.
@@ -201,7 +200,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         WritableMap eventMap = Arguments.createMap();
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_ID, ElectrodeBridgeEvent.getUUID());
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME, TEST_EVENT_NAME);
-        eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_TYPE, BridgeArguments.Type.EVENT.getKey());
+        eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_TYPE, BridgeMessage.Type.EVENT.getKey());
         if (data != null) {
             eventMap.putMap(ElectrodeBridgeEvent.BRIDGE_MSG_DATA, data);
         }

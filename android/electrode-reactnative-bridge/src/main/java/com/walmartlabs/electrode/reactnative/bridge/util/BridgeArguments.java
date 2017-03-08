@@ -7,6 +7,7 @@ import android.support.annotation.VisibleForTesting;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
@@ -23,42 +24,13 @@ public final class BridgeArguments {
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
     /**
-     * Represents the types of arguments that is sent across the bridge.
-     */
-    public enum Type {
-        REQUEST("req"),
-        RESPONSE("rsp"),
-        EVENT("event");
-
-        private String key;
-
-        Type(@NonNull String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        @Nullable
-        public static Type getType(@NonNull String key) {
-            for (Type type : Type.values()) {
-                if (type.key.equalsIgnoreCase(key)) {
-                    return type;
-                }
-            }
-            return null;
-        }
-    }
-
-    /**
      * @param data    {@link ReadableMap} received from JS side.
      * @param dataKey Data entry key
      * @return Bundle, if an entry is not found for dataKey
      */
     @NonNull
     public static Bundle responseBundle(@NonNull ReadableMap data, @NonNull String dataKey) {
-        final String responseKey = Type.RESPONSE.key;
+        final String responseKey = BridgeMessage.Type.RESPONSE.getKey();
         Bundle bundle = new Bundle();
         if (data.getType(dataKey) == null) {
             throw new IllegalArgumentException("Given readable map doesn't have expected entry with key(" + dataKey + ")");
@@ -115,14 +87,14 @@ public final class BridgeArguments {
      * @return Bundle representation of the given object. If the passed object is a primitive wrapper a bundle with one item will be generated and the
      */
     @NonNull
-    public static Bundle generateBundle(@Nullable Object object, @NonNull Type type) {
+    public static Bundle generateBundle(@Nullable Object object, @NonNull BridgeMessage.Type type) {
         if (object == null) {
             return Bundle.EMPTY;
         }
         Bundle data;
         if (object instanceof Bridgeable) {
             data = new Bundle();
-            data.putBundle(type.key, ((Bridgeable) object).toBundle());
+            data.putBundle(type.getKey(), ((Bridgeable) object).toBundle());
         } else {
             data = BridgeArguments.getBundleForPrimitive(object, object.getClass(), type);
         }
@@ -131,22 +103,23 @@ public final class BridgeArguments {
     }
 
     @Nullable
-    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass, @NonNull Type type) {
+    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass, @NonNull BridgeMessage.Type type) {
         T response = null;
         if (payload != null
                 && !payload.isEmpty()) {
+            String key = type.getKey();
 
-            if (payload.get(type.key) == null) {
-                throw new IllegalArgumentException("Cannot find key(" + type.key + ") in given bundle:" + payload);
+            if (payload.get(key) == null) {
+                throw new IllegalArgumentException("Cannot find key(" + key + ") in given bundle:" + payload);
             }
 
             if (Bridgeable.class.isAssignableFrom(returnClass)) {
 
-                if (payload.getBundle(type.key) == null) {
-                    throw new IllegalArgumentException("Value for key(" + type.key + ") should be a bundle, looks like it is not.");
+                if (payload.getBundle(key) == null) {
+                    throw new IllegalArgumentException("Value for key(" + key + ") should be a bundle, looks like it is not.");
                 }
 
-                response = BridgeArguments.bridgeableFromBundle(payload.getBundle(type.key), returnClass);
+                response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
             } else {
                 response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass, type);
             }
@@ -199,16 +172,16 @@ public final class BridgeArguments {
 
     @NonNull
     @VisibleForTesting
-    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull Type type) {
+    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull BridgeMessage.Type type) {
         Object value = null;
         if (String.class.isAssignableFrom(reqClazz)) {
-            value = payload.getString(type.key);
+            value = payload.getString(type.getKey());
         } else if (Integer.class.isAssignableFrom(reqClazz)) {
-            value = payload.getInt(type.key);
+            value = payload.getInt(type.getKey());
         } else if (Boolean.class.isAssignableFrom(reqClazz)) {
-            value = payload.getBoolean(type.key);
+            value = payload.getBoolean(type.getKey());
         } else if (String[].class.isAssignableFrom(reqClazz)) {
-            value = payload.getStringArray(type.key);
+            value = payload.getStringArray(type.getKey());
         }
 
         if (reqClazz.isInstance(value)) {
@@ -220,16 +193,16 @@ public final class BridgeArguments {
 
     @NonNull
     @VisibleForTesting
-    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, Type type) {
+    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, BridgeMessage.Type type) {
         Bundle bundle = new Bundle();
         if (String.class.isAssignableFrom(respClass)) {
-            bundle.putString(type.key, (String) respObj);
+            bundle.putString(type.getKey(), (String) respObj);
         } else if (Integer.class.isAssignableFrom(respClass)) {
-            bundle.putInt(type.key, (Integer) respObj);
+            bundle.putInt(type.getKey(), (Integer) respObj);
         } else if (Boolean.class.isAssignableFrom(respClass)) {
-            bundle.putBoolean(type.key, (Boolean) respObj);
+            bundle.putBoolean(type.getKey(), (Boolean) respObj);
         } else if (String[].class.isAssignableFrom(respClass)) {
-            bundle.putStringArray(type.key, (String[]) respObj);
+            bundle.putStringArray(type.getKey(), (String[]) respObj);
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + respClass + " is not implemented yet");
         }

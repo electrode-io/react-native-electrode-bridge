@@ -4,19 +4,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
@@ -27,18 +22,6 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
     private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
 
-    static final String BRIDGE_EVENT = "electrode.bridge.event";
-    static final String BRIDGE_REQUEST = "electrode.bridge.request";
-    static final String BRIDGE_RESPONSE = "electrode.bridge.response";
-    private static final String BRIDGE_RESPONSE_ERROR = "error";
-    private static final String BRIDGE_RESPONSE_ERROR_CODE = "code";
-    private static final String BRIDGE_RESPONSE_ERROR_MESSAGE = "message";
-    static final String BRIDGE_MSG_DATA = "data";
-    private static final String BRIDGE_MSG_NAME = "name";
-    static final String BRIDGE_MSG_ID = "id";
-    static final String BRIDGE_REQUEST_ID = "requestId";
-    private static final String UNKNOWN_ERROR_CODE = "EUNKNOWN";
-
     private final ReactContextWrapper mReactContextWrapper;
     private final EventDispatcher mEventDispatcher;
     private final RequestDispatcher mRequestDispatcher;
@@ -46,7 +29,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     // Singleton instance of the bridge
     private static ElectrodeBridgeInternal sInstance;
 
-    private final ConcurrentHashMap<String, Promise> pendingPromiseByRequestId = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, BridgeTransaction> pendingTransactions = new ConcurrentHashMap<>();
     private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar = new EventRegistrarImpl<>();
     private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Bundle>> mRequestRegistrar = new RequestRegistrarImpl<>();
 
@@ -96,7 +79,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
      */
     public static ElectrodeBridgeInternal instance() {
         if (sInstance == null) {
-            throw new IllegalStateException("Bridge singleton has not been created. Make sure to call create first.");
+            throw new IllegalStateException("Bridge singleton has not been created. Make sure to call createMessage first.");
         }
         return sInstance;
     }
@@ -130,13 +113,11 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     @SuppressWarnings("unused")
     @Override
     public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
-        String id = getUUID();
-        WritableMap message = buildMessage(id, event.getName(), Arguments.fromBundle(event.getData()));
 
-        Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), id));
+        Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), event.getId()));
 
-        mReactContextWrapper.emitEvent(BRIDGE_EVENT, message);
-        dispatchEvent(event.getName(), id, Arguments.fromBundle(event.getData()));
+        notifyReactEventListeners(event);
+        notifyLocalEventListeners(event);
     }
 
 
@@ -149,204 +130,196 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     @SuppressWarnings("unused")
     @Override
     public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
-        final String id = getUUID();
-        logRequest(request, id);
-
-        final Promise promise = createPromiseForRequest(request, responseListener, id);
-
-        startTimeOutCheckForRequest(request, id);
-
-        if (mRequestDispatcher.canHandleRequest(request.getName())) {
-            Logger.d(TAG, "Sending request(id=%s) to local handler", id);
-            mRequestDispatcher.dispatchRequest(request.getName(), id, request.getData(), promise, false);
-        } else {
-            Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", id);
-            WritableMap message = buildMessage(id, request.getName(), Arguments.fromBundle(request.getData()));
-            mReactContextWrapper.emitEvent(BRIDGE_REQUEST, message);
-        }
+        handleRequest(request, responseListener);
     }
 
     @NonNull
-    private Promise createPromiseForRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener responseListener, @NonNull final String id) {
-        Promise promise = new PromiseImpl(new Callback() {
-            @Override
-            public void invoke(final Object... args) {
-                Object obj = args[0];
-
-                final Bundle bundle;
-                if(obj == null){
-                    bundle = Bundle.EMPTY;
-                } else if (obj instanceof Bundle) {
-                    bundle = (Bundle) obj;
-                } else if (obj instanceof ReadableMap) {
-                    bundle = BridgeArguments.responseBundle((ReadableMap) obj, BRIDGE_MSG_DATA);
-                } else {
-                    throw new IllegalArgumentException("Response object type not supported: " + (obj != null ? obj.getClass() : null));
-                }
-
-                logResponse(bundle, id, request);
-
-                // Already done when receiving a response event type in dispatchEvent
-                // is that needed here ?
-                removePromiseFromPendingList(id);
-
-                mReactContextWrapper.runOnUiQueueThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        responseListener.onSuccess(bundle);
-                    }
-                });
-            }
-        }, new Callback() {
-            @Override
-            public void invoke(final Object... args) {
-                final WritableMap writableMap = (WritableMap) args[0];
-
-                logFailure(writableMap.getString("code"), writableMap.getString("message"), id, request);
-
-                // Already done when receiving a response event type in dispatchEvent
-                // is that needed here ?
-                removePromiseFromPendingList(id);
-
-                mReactContextWrapper.runOnUiQueueThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        responseListener.onFailure(BridgeFailureMessage.create(writableMap.getString("code"), writableMap.getString("message")));
-                    }
-                });
-            }
-        });
-        pendingPromiseByRequestId.put(id, promise);
-
-        return promise;
+    private BridgeTransaction createTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
+        final BridgeTransaction bridgeTransaction = new BridgeTransaction(request, responseListener);
+        pendingTransactions.put(request.getId(), bridgeTransaction);
+        startTimeOutCheckForTransaction(bridgeTransaction);
+        return bridgeTransaction;
     }
 
-    private void startTimeOutCheckForRequest(@NonNull ElectrodeBridgeRequest request, final String id) {
+    private void startTimeOutCheckForTransaction(@NonNull final BridgeTransaction transaction) {
+        final String id = transaction.getRequest().getId();
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             public void run() {
-                Logger.d(TAG, "Checking timeout for request(%s)", id);
-                if (pendingPromiseByRequestId.containsKey(id)) {
-                    Promise p = pendingPromiseByRequestId.get(id);
-                    Logger.d(TAG, "request(%s) timed out, reject promise(%s)", id, p);
-                    p.reject("EREQUESTTIMEOUT", "Request timeout");
+                Logger.d(TAG, "Checking timeout for request(id=%s)", id);
+                if (pendingTransactions.containsKey(id)) {
+                    BridgeTransaction bridgeTransaction = pendingTransactions.get(id);
+                    Logger.d(TAG, "request(id=%s) timed out", id);
+                    bridgeTransaction.setResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
+                    completeTransaction(transaction);
                 } else {
-                    Logger.d(TAG, "Ignoring timeout, request(%s) already completed", id);
+                    Logger.d(TAG, "Ignoring timeout, request(id=%s) already completed", id);
                 }
             }
-        }, request.getTimeoutMs());
+        }, transaction.getRequest().getTimeoutMs());
     }
 
-    private boolean removePromiseFromPendingList(String id) {
-        Promise p = pendingPromiseByRequestId.remove(id);
-        if (p == null) {
-            Logger.d(TAG, "Looks like the request(%s) already completed/timed out, ignore the response received", id);
-            return false;
-        }
-        return true;
-    }
-
-    private void logRequest(@NonNull ElectrodeBridgeRequest bridgeRequest, @NonNull String id) {
-        Logger.d(TAG, "--> --> --> --> --> id = %s, Sending request(%s)", id, bridgeRequest);
-    }
-
-    private void logResponse(@NonNull Bundle responseBundle, @NonNull String id, ElectrodeBridgeRequest request) {
-        Logger.d(TAG, "<-- <-- <-- <-- <-- id = %s, Received response(%s) for request(%s)", id, responseBundle, request);
-    }
-
-    private void logFailure(@NonNull String code, @NonNull String message, @NonNull String id, ElectrodeBridgeRequest request) {
-        Logger.d(TAG, "<-- <-- <-- <-- <-- id = %s, Received failure(code=%s, message=%s) for request(%s)", id, code, message, request);
-    }
-
-    /**
-     * Dispatch a request on the native side
-     *
-     * @param name    The name of the request
-     * @param id      The request id
-     * @param data    The request data
-     * @param promise A promise to reject or resolve the request asynchronously
-     */
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void dispatchRequest(String name, String id, ReadableMap data, Promise promise) {
-        Logger.d(TAG, "Inside dispatchRequest: Received a request[name:%s id:%s] from JS side", name, id);
-        mRequestDispatcher.dispatchRequest(name, id, ArgumentsEx.toBundle(data), promise, true);
-    }
-
-    /**
-     * Dispatch an event on the native side
-     *
-     * @param name The name of the event
-     * @param id   The id of the event
-     * @param data The event data
-     */
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void dispatchEvent(final String name, final String id, final ReadableMap data) {
-        Logger.d(TAG, "Inside dispatchEvent: Received an event[name:%s id:%s] from JS side", name, id);
-
-        if (name.equals(BRIDGE_RESPONSE)) {
-            handleResponse(data);
-        } else {
-            handleEvent(name, id, data);
-        }
-    }
-
-    private void handleEvent(final String name, final String id, final ReadableMap data) {
-        Logger.d(TAG, "Handling event(%s)", name);
-        mReactContextWrapper.runOnUiQueueThread(new Runnable() {
+    private void dispatchRequestToLocalHandler(@NonNull final BridgeTransaction transaction) {
+        Logger.d(TAG, "Sending request(id=%s) to local handler", transaction.getRequest().getId());
+        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
-            public void run() {
-                mEventDispatcher.dispatchEvent(id, name, data);
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                transaction.setResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, failureMessage));
+                completeTransaction(transaction);
+            }
+
+            @Override
+            public void onSuccess(@Nullable Bundle responseData) {
+                transaction.setResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), responseData, null));
+                completeTransaction(transaction);
             }
         });
     }
 
-    private void handleResponse(ReadableMap data) {
-        Logger.d(TAG, "Handling bridge response");
-        // Get id of associated request
-        String parentRequestId = data.getString(BRIDGE_REQUEST_ID);
-        Log.d(TAG, String.format("Received response for request[id:%s]", parentRequestId));
+    private void dispatchRequestToReact(@NonNull BridgeTransaction bridgeTransaction) {
+        Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", bridgeTransaction.getId());
+        mReactContextWrapper.emitEvent(bridgeTransaction.getRequest());
+    }
 
-        Promise promise = pendingPromiseByRequestId.get(parentRequestId);
+    /**
+     * This method is used by react native to dispatch an event on the native side.
+     * <p>
+     * This could be a REQUEST, RESPONSE, or an EVENT
+     *
+     * @param data The event data
+     */
+    @ReactMethod
+    public void dispatchEvent(@NonNull final ReadableMap data) {
+        Logger.d(TAG, "received event from JS(data=%s)", data);
+        BridgeArguments.Type type = BridgeArguments.Type.getType(data.getString(BridgeMessage.BRIDGE_MSG_TYPE));
+        if (type != null) {
+            switch (type) {
+                case EVENT:
+                    ElectrodeBridgeEvent event = ElectrodeBridgeEvent.create(data);
+                    if (event != null) {
+                        Logger.d(TAG, "Received event is a regular EVENT(name=%s), will notify all event listeners.", event.getName());
+                        notifyLocalEventListeners(event);
+                    } else {
+                        throw new IllegalArgumentException("Unable to construct event from data");
+                    }
+                    break;
+                case REQUEST:
+                    ElectrodeBridgeRequest request = ElectrodeBridgeRequest.create(data);
+                    if (request != null) {
+                        Logger.d(TAG, "Received event is a REQUEST(name=%s), will look for a request handler and forward this request", request.getName());
+                        handleRequest(request, null);
+                    } else {
+                        throw new IllegalArgumentException("Unable to construct request from data");
+                    }
 
-        if (promise == null) {
-            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's timed-out ??", parentRequestId);
-        } else {
-            if (data.hasKey(BRIDGE_RESPONSE_ERROR)) {
-                Logger.d(TAG, "Handling error response");
-                ReadableMap errorMap = data.getMap(BRIDGE_RESPONSE_ERROR);
-                String errorMessage = errorMap.getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
+                    break;
+                case RESPONSE:
+                    ElectrodeBridgeResponse response = ElectrodeBridgeResponse.create(data);
+                    if (response != null) {
+                        Logger.d(TAG, "Received event is a RESPONSE for a request(name=%s, id=%s)", response.getName(), response.getId());
+                        handleResponse(response);
+                    } else {
+                        throw new IllegalArgumentException("Unable to construct a response from data");
+                    }
 
-                String errorCode;
-                if (errorMap.hasKey(BRIDGE_RESPONSE_ERROR_CODE)) {
-                    errorCode = errorMap.getString(BRIDGE_RESPONSE_ERROR_CODE);
-                } else {
-                    errorCode = UNKNOWN_ERROR_CODE;
-                }
-                promise.reject(errorCode, errorMessage);
-
-            } else if (data.hasKey(BRIDGE_MSG_DATA)) {
-                Logger.d(TAG, "Handling success response with data");
-                promise.resolve(data);
-            } else {
-                Logger.d(TAG, "Handling success response with NO data");
-                promise.resolve(null);
+                    break;
             }
+        } else {
+            throw new IllegalArgumentException("Unable to identify request type. Should never reach here.");
         }
     }
 
-    private String getUUID() {
-        return UUID.randomUUID().toString();
+    private void notifyLocalEventListeners(@NonNull final ElectrodeBridgeEvent event) {
+        mReactContextWrapper.runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                mEventDispatcher.dispatchEvent(event);
+            }
+        });
     }
 
-    private WritableMap buildMessage(String id, String name, WritableMap data) {
-        WritableMap writableMap = Arguments.createMap();
-        writableMap.putString(BRIDGE_MSG_ID, id);
-        writableMap.putString(BRIDGE_MSG_NAME, name);
-        writableMap.putMap(BRIDGE_MSG_DATA, data);
+    private void notifyReactEventListeners(@NonNull ElectrodeBridgeEvent event) {
+        mReactContextWrapper.emitEvent(event);
+    }
 
-        return writableMap;
+    private void handleRequest(@NonNull final ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
+        logRequest(request);
+
+        if (responseListener == null && !request.isJsInitiated()) {
+            throw new IllegalArgumentException("A response lister is required for a non-JS initiated request");
+        }
+
+        final BridgeTransaction bridgeTransaction = createTransaction(request, responseListener);
+
+        if (mRequestDispatcher.canHandleRequest(request.getName())) {
+            dispatchRequestToLocalHandler(bridgeTransaction);
+        } else if (!request.isJsInitiated()) {//GOTCHA: Should not send a request back JS if it was initiated from JS side.
+            dispatchRequestToReact(bridgeTransaction);
+        } else {
+            ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, BridgeFailureMessage.create("ENOHANDLER", "No registered request handler found for " + request.getName()));
+            bridgeTransaction.setResponse(response);
+            completeTransaction(bridgeTransaction);
+        }
+    }
+
+    private void handleResponse(@NonNull ElectrodeBridgeResponse bridgeResponse) {
+        Logger.d(TAG, "Handling bridge response");
+        BridgeTransaction transaction = pendingTransactions.get(bridgeResponse.getId());
+        if (transaction != null) {
+            transaction.setResponse(bridgeResponse);
+            completeTransaction(transaction);
+        } else {
+            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", bridgeResponse.getId());
+        }
+
+    }
+
+    private void completeTransaction(@NonNull final BridgeTransaction transaction) {
+        if (transaction.getResponse() == null) {
+            throw new IllegalArgumentException("Cannot complete transaction, a transaction can only be completed with a valid response.");
+        }
+        Logger.d(TAG, "completing transaction(%s)", transaction.getId());
+
+        pendingTransactions.remove(transaction.getId());
+
+        final ElectrodeBridgeResponse response = transaction.getResponse();
+        logResponse(response);
+
+        if (transaction.isJsInitiated()) {
+            Logger.d(TAG, "Completing by emitting event to JS since the request was initiated from JS side.");
+            mReactContextWrapper.emitEvent(response);
+        } else {
+            if (transaction.getFinalResponseListener() != null) {
+                Logger.d(TAG, "Completing by issuing a call back to local response listener.");
+                if (response.getFailureMessage() != null) {
+                    mReactContextWrapper.runOnUiQueueThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            transaction.getFinalResponseListener().onFailure(response.getFailureMessage());
+                        }
+                    });
+                } else {
+                    mReactContextWrapper.runOnUiQueueThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            transaction.getFinalResponseListener().onSuccess(response.getData());
+                        }
+                    });
+                }
+            } else {
+                throw new IllegalArgumentException("Should never reach here, a response listener should always be set for a local transaction");
+            }
+
+        }
+
+    }
+
+    private void logRequest(@NonNull ElectrodeBridgeRequest request) {
+        Logger.d(TAG, "--> --> --> --> -->Sending request(id=%s, name=%s)", request.getId(), request.getName());
+    }
+
+    private void logResponse(ElectrodeBridgeResponse response) {
+        Logger.d(TAG, "<-- <-- <-- <-- <-- Response(id=%s, name=%s, data=%s, error=%s) received", response.getId(), response.getName(), response.getData(), response.getFailureMessage());
     }
 
     public interface ReactNativeReadyListener {

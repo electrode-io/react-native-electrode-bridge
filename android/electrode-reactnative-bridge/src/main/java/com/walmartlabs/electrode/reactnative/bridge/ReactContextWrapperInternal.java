@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
@@ -16,10 +17,10 @@ public class ReactContextWrapperInternal implements ReactContextWrapper {
     }
 
     @Override
-    public void emitEvent(@NonNull String eventName, @Nullable WritableMap message) {
+    public void emitEvent(@NonNull BridgeMessage event) {
         mReactApplicationContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, message);
+                .emit(event.getName(), event.map());
     }
 
     @Override

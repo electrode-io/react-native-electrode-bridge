@@ -7,22 +7,22 @@ import android.support.annotation.Nullable;
 import android.test.InstrumentationTestCase;
 
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
+import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_MSG_ID;
-import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_REQUEST_ID;
 
 public class BaseBridgeTestCase extends InstrumentationTestCase {
 
@@ -113,10 +113,10 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     private ReactContextWrapper getReactContextWrapper(final ReactApplicationContext reactContext) {
         return new ReactContextWrapper() {
             @Override
-            public void emitEvent(@NonNull String eventName, @Nullable WritableMap message) {
-                assertNotNull(message);
-                assertNotNull(message.getString("name"));
-                handleContextWrapperEmitEvent(message.getString("name"), message);
+            public void emitEvent(@NonNull BridgeMessage event) {
+                assertNotNull(event);
+                assertNotNull(event.getName());
+                mockJsEventHandler(event.map());
             }
 
             @Override
@@ -135,20 +135,45 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     /**
      * This is mainly exposed to mock a JS side event handling. This is called when {@link ElectrodeBridge} emits en event to JS side to handle a request or event.
      *
-     * @param eventName {@link String}
-     * @param message   {@link WritableMap}
+     * @param inputMessage {@link WritableMap}
      */
-    private void handleContextWrapperEmitEvent(@NonNull String eventName, @Nullable final WritableMap message) {
+    private void mockJsEventHandler(@Nullable final ReadableMap inputMessage) {
+        assertNotNull(inputMessage);
+        BridgeArguments.Type type = BridgeArguments.Type.getType(inputMessage.getString(BridgeMessage.BRIDGE_MSG_TYPE));
+        assertNotNull(type);
+        String eventName = inputMessage.getString(BridgeMessage.BRIDGE_MSG_NAME);
+        assertNotNull(eventName);
+
         for (MockElectrodeEventListener listener : mockEventRegistrar.getEventListeners(eventName)) {
-            listener.onEvent(eventName, message, new MockJsResponseDispatcher() {
-                @Override
-                public void dispatchResponse(@NonNull WritableMap response) {
-                    assertNotNull(message);
-                    assertNotNull(message.getString(BRIDGE_MSG_ID));
-                    response.putString(BRIDGE_REQUEST_ID, message.getString(BRIDGE_MSG_ID));
-                    ElectrodeBridgeInternal.instance().dispatchEvent(ElectrodeBridgeInternal.BRIDGE_RESPONSE, null, response);
-                }
-            });
+
+            switch (type) {
+                case EVENT:
+                    listener.onEvent(inputMessage);
+                    break;
+                case REQUEST:
+                    listener.onRequest(inputMessage, new MockJsResponseDispatcher() {
+                        @Override
+                        public void dispatchResponse(@Nullable WritableMap responseData) {
+                            WritableMap finalResponse = Arguments.createMap();
+                            finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_ID, inputMessage.getString(ElectrodeBridgeRequest.BRIDGE_MSG_ID));
+                            finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_NAME, inputMessage.getString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME));
+                            finalResponse.putString(ElectrodeBridgeResponse.BRIDGE_MSG_TYPE, BridgeArguments.Type.RESPONSE.getKey());
+                            if (responseData != null) {
+                                if (responseData.hasKey(ElectrodeBridgeResponse.BRIDGE_MSG_DATA)) {
+                                    //This is used for response coming wth primitives instead of complex objects.
+                                    finalResponse.merge(responseData);
+                                } else {
+                                    finalResponse.putMap(ElectrodeBridgeResponse.BRIDGE_MSG_DATA, responseData);
+                                }
+                            }
+                            ElectrodeBridgeInternal.instance().dispatchEvent(finalResponse);
+                        }
+                    });
+                    break;
+                case RESPONSE:
+                    listener.onResponse(inputMessage);
+                    break;
+            }
         }
     }
 
@@ -161,15 +186,47 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         return uuid;
     }
 
-    void removeMockEventListener(UUID uuid){
+    void removeMockEventListener(UUID uuid) {
         mockEventRegistrar.unregisterEventListener(uuid);
     }
 
     /**
-     * This interface is a mock representation of JS side receiving an event. A call to {@link MockElectrodeEventListener#onEvent(String, WritableMap, MockJsResponseDispatcher)} ensures that that the given request will be delivered to JS side.
+     * Creates a MAP representation of a event coming from JS side with the given name and data.
+     *
+     * @param TEST_EVENT_NAME {@link String}
+     * @param data            {@link WritableMap}
+     * @return WritableMap
+     */
+    WritableMap createTestEventMap(String TEST_EVENT_NAME, @Nullable WritableMap data) {
+        WritableMap eventMap = Arguments.createMap();
+        eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_ID, ElectrodeBridgeEvent.getUUID());
+        eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME, TEST_EVENT_NAME);
+        eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_TYPE, BridgeArguments.Type.EVENT.getKey());
+        if (data != null) {
+            eventMap.putMap(ElectrodeBridgeEvent.BRIDGE_MSG_DATA, data);
+        }
+        return eventMap;
+    }
+
+
+    /**
+     * This interface is a mock representation of JS side receiving an event.
      */
     interface MockElectrodeEventListener {
-        void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher);
+        /**
+         * Mocks JS side receiving a request
+         */
+        void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher);
+
+        /**
+         * Mocks JS side receiving a response
+         */
+        void onResponse(ReadableMap response);
+
+        /**
+         * Mocks JS side receiving an event
+         */
+        void onEvent(ReadableMap event);
     }
 
     interface MockJsResponseDispatcher {

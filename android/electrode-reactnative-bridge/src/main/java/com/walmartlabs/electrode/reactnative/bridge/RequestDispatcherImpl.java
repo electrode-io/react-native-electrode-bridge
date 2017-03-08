@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Promise;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 class RequestDispatcherImpl implements RequestDispatcher {
@@ -23,34 +21,33 @@ class RequestDispatcherImpl implements RequestDispatcher {
     }
 
     @Override
-    public void dispatchRequest(@NonNull String requestName, @NonNull final String requestId, @Nullable Bundle requestData, @NonNull final Promise callBackPromise, final boolean isJs) {
-        Logger.d(TAG, "dispatching request(id=%s) locally, with promise(%s)", requestId, callBackPromise);
+    public void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
+        final String requestId = bridgeRequest.getId();
+        final String requestName = bridgeRequest.getName();
+
+        Logger.d(TAG, "dispatching request(id=%s) locally", requestId);
         ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler = mRequestRegistrar.getRequestHandler(requestName);
         if (requestHandler == null) {
-            callBackPromise.reject("ENOHANDLER", "No registered request handler for request name " + requestName);
+            responseListener.onFailure(BridgeFailureMessage.create("ENOHANDLER", "No registered request handler for request name " + requestName));
             return;
         }
 
-        requestHandler.onRequest(requestData,
+        requestHandler.onRequest(bridgeRequest.getData(),
                 new ElectrodeBridgeResponseListener<Bundle>() {
                     @Override
                     public void onFailure(@NonNull FailureMessage failureMessage) {
-                        Logger.d(TAG, "resolving FAILED request(id=%s),  promise(%s), failureMessage(%s)", requestId, callBackPromise, failureMessage);
-                        callBackPromise.reject(failureMessage.getCode(), failureMessage.getMessage());
+                        Logger.d(TAG, "resolving FAILED request(id=%s),  failureMessage(%s)", requestId, failureMessage);
+                        responseListener.onFailure(failureMessage);
                     }
 
                     @Override
                     public void onSuccess(@Nullable Bundle bundle) {
-                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s),  promise(%s), responseBundle(%s), isJS(%s)", requestId, callBackPromise, bundle, isJs);
-                        bundle = bundle != null ? bundle : Bundle.EMPTY;
-                        if (isJs) {
-                            callBackPromise.resolve(Arguments.fromBundle(bundle));
-                        } else {
-                            callBackPromise.resolve(bundle);
-                        }
+                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s), responseBundle(%s)", requestId, bundle);
+                        responseListener.onSuccess(bundle);
                     }
                 });
     }
+
 
     @Override
     public boolean canHandleRequest(@NonNull String name) {

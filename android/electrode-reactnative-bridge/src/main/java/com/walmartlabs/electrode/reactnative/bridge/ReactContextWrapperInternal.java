@@ -23,7 +23,7 @@ public class ReactContextWrapperInternal implements ReactContextWrapper {
         Logger.d(TAG, "emitting event(id=%s, name=%s, type=%s) to JS", event.getId(), event.getName(), event.getType());
         mReactApplicationContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(event.getName(), event.map());
+                .emit("electrode.bridge.message", event.map());
     }
 
     @Override

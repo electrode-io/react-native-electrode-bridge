@@ -113,7 +113,6 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     @SuppressWarnings("unused")
     @Override
     public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
-
         Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), event.getId()));
 
         notifyReactEventListeners(event);
@@ -146,6 +145,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             public void run() {
+
                 Logger.d(TAG, "Checking timeout for request(id=%s)", id);
                 if (pendingTransactions.containsKey(id)) {
                     BridgeTransaction bridgeTransaction = pendingTransactions.get(id);
@@ -197,7 +197,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
                 case EVENT:
                     ElectrodeBridgeEvent event = ElectrodeBridgeEvent.create(data);
                     if (event != null) {
-                        Logger.d(TAG, "Received event is a regular EVENT(name=%s), will notify all event listeners.", event.getName());
+                        Logger.d(TAG, "Received event is a regular EVENT(name=%s), will notify local event listeners.", event.getName());
                         notifyLocalEventListeners(event);
                     } else {
                         throw new IllegalArgumentException("Unable to construct event from data");
@@ -256,6 +256,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         } else if (!request.isJsInitiated()) {//GOTCHA: Should not send a request back JS if it was initiated from JS side.
             dispatchRequestToReact(bridgeTransaction);
         } else {
+            Logger.d(TAG, "No handler available to handle the request(id=%s, name=%s). Will fail the request", request.getId(), request.getName());
             ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, BridgeFailureMessage.create("ENOHANDLER", "No registered request handler found for " + request.getName()));
             bridgeTransaction.setResponse(response);
             completeTransaction(bridgeTransaction);
@@ -269,7 +270,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             transaction.setResponse(bridgeResponse);
             completeTransaction(transaction);
         } else {
-            Logger.i(TAG, "Response will be ignored as the promise for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", bridgeResponse.getId());
+            Logger.i(TAG, "Response will be ignored as the transaction for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", bridgeResponse.getId());
         }
 
     }
@@ -290,8 +291,8 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             mReactContextWrapper.emitEvent(response);
         } else {
             if (transaction.getFinalResponseListener() != null) {
-                Logger.d(TAG, "Completing by issuing a call back to local response listener.");
                 if (response.getFailureMessage() != null) {
+                    Logger.d(TAG, "Completing by issuing a failure call back to local response listener.");
                     mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                         @Override
                         public void run() {
@@ -299,6 +300,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
                         }
                     });
                 } else {
+                    Logger.d(TAG, "Completing by issuing a success call back to local response listener.");
                     mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                         @Override
                         public void run() {
@@ -315,7 +317,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     }
 
     private void logRequest(@NonNull ElectrodeBridgeRequest request) {
-        Logger.d(TAG, "--> --> --> --> -->Sending request(id=%s, name=%s)", request.getId(), request.getName());
+        Logger.d(TAG, "--> --> --> --> --> Request(id=%s, name=%s, isJS=%s)", request.getId(), request.getName(), request.isJsInitiated());
     }
 
     private void logResponse(ElectrodeBridgeResponse response) {

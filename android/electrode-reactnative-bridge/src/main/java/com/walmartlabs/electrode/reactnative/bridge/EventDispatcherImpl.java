@@ -20,9 +20,8 @@ public class EventDispatcherImpl implements EventDispatcher {
     @Override
     public void dispatchEvent(@NonNull ElectrodeBridgeEvent bridgeEvent) {
         for (ElectrodeBridgeEventListener<Bundle> eventListener : mEventRegistrar.getEventListeners(bridgeEvent.getName())) {
-            Bundle bundle = bridgeEvent.getData();
             Logger.d(TAG, "Event dispatcher is dispatching event(%s), id(%s) to listener(%s)", bridgeEvent.getName(), bridgeEvent.getName(), eventListener);
-            eventListener.onEvent(bundle != null ? bundle : EMPTY_BUNDLE);
+            eventListener.onEvent(bridgeEvent.getData());
         }
     }
 }

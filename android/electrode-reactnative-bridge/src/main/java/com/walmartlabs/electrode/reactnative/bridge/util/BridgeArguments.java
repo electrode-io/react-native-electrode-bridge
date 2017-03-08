@@ -39,6 +39,16 @@ public final class BridgeArguments {
         public String getKey() {
             return key;
         }
+
+        @Nullable
+        public static Type getType(@NonNull String key) {
+            for (Type type : Type.values()) {
+                if (type.key.equalsIgnoreCase(key)) {
+                    return type;
+                }
+            }
+            return null;
+        }
     }
 
     /**

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +33,9 @@ public final class ElectrodeBridgeHolder {
     // This solution does not really scale in the sense that if the user sends a 1000 requests
     // upon native app start, it can become problematic. But I don't see why a user would do that
     // unless it's a bug in its app
-    private static final HashMap<String, ElectrodeBridgeRequestHandler> mQueuedRequestHandlersRegistration = new HashMap<>();
-    private static final HashMap<String, ElectrodeBridgeEventListener> mQueuedEventListenersRegistration = new HashMap<>();
-    private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener> mQueuedRequests = new HashMap<>();
+    private static final HashMap<String, ElectrodeBridgeRequestHandler<Bundle, Object>> mQueuedRequestHandlersRegistration = new HashMap<>();
+    private static final HashMap<String, ElectrodeBridgeEventListener<Bundle>> mQueuedEventListenersRegistration = new HashMap<>();
+    private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener<Bundle>> mQueuedRequests = new HashMap<>();
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
 
     static {
@@ -59,7 +61,7 @@ public final class ElectrodeBridgeHolder {
     @SuppressWarnings("unused")
     public static void emitEvent(@NonNull ElectrodeBridgeEvent event) {
         if (!isReactNativeReady) {
-            Log.d(TAG, "Queuing event. Will emit once react native initialization is complete.");
+            Logger.d(TAG, "Queuing event. Will emit once react native initialization is complete.");
             mQueuedEvents.add(event);
             return;
         }
@@ -70,7 +72,7 @@ public final class ElectrodeBridgeHolder {
     /**
      * Sends a request
      *
-     * @param request            The request to send
+     * @param request          The request to send
      * @param responseListener Listener to be called upon request completion
      */
     @SuppressWarnings("unused")
@@ -78,7 +80,7 @@ public final class ElectrodeBridgeHolder {
             @NonNull ElectrodeBridgeRequest request,
             @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
         if (!isReactNativeReady) {
-            Log.d(TAG, "Queuing request. Will send once react native initialization is complete.");
+            Logger.d(TAG, "Queuing request(%s). Will send once react native initialization is complete.", request);
             mQueuedRequests.put(request, responseListener);
             return;
         }
@@ -97,7 +99,7 @@ public final class ElectrodeBridgeHolder {
     public static void registerRequestHandler(@NonNull String name,
                                               @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler) {
         if (!isReactNativeReady) {
-            Log.d(TAG, "Queuing request handler registration. Will register once react native initialization is complete.");
+            Logger.d(TAG, "Queuing request handler registration for request(name=%s). Will register once react native initialization is complete.", name);
             mQueuedRequestHandlersRegistration.put(name, requestHandler);
             return;
         }
@@ -116,7 +118,7 @@ public final class ElectrodeBridgeHolder {
     public static void addEventListener(@NonNull String name,
                                         @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         if (!isReactNativeReady) {
-            Log.d(TAG, "Queuing event handler registration. Will register once react native initialization is complete.");
+            Logger.d(TAG, "Queuing event handler registration for event(name=%s). Will register once react native initialization is complete.", name);
             mQueuedEventListenersRegistration.put(name, eventListener);
             return;
         }
@@ -125,45 +127,29 @@ public final class ElectrodeBridgeHolder {
     }
 
     private static void registerQueuedRequestHandlers() {
-        for (Map.Entry<String, ElectrodeBridgeRequestHandler> entry : mQueuedRequestHandlersRegistration.entrySet()) {
-            try {
-               electrodeBridge.registerRequestHandler(entry.getKey(), entry.getValue());
-            } catch (Exception e) {
-                Log.e(TAG, "Failed registering queued request handler registration");
-            }
+        for (Map.Entry<String, ElectrodeBridgeRequestHandler<Bundle, Object>> entry : mQueuedRequestHandlersRegistration.entrySet()) {
+            electrodeBridge.registerRequestHandler(entry.getKey(), entry.getValue());
         }
         mQueuedRequestHandlersRegistration.clear();
     }
 
     private static void registerQueuedEventListeners() {
-        for (Map.Entry<String, ElectrodeBridgeEventListener> entry : mQueuedEventListenersRegistration.entrySet()) {
-            try {
-                electrodeBridge.addEventListener(entry.getKey(), entry.getValue());
-            } catch (Exception e) {
-                Log.e(TAG, "Failed registering queued event listener registration");
-            }
+        for (Map.Entry<String, ElectrodeBridgeEventListener<Bundle>> entry : mQueuedEventListenersRegistration.entrySet()) {
+            electrodeBridge.addEventListener(entry.getKey(), entry.getValue());
         }
         mQueuedEventListenersRegistration.clear();
     }
 
     private static void sendQueuedRequests() {
-        for (Map.Entry<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener> entry : mQueuedRequests.entrySet()) {
-            try {
-                electrodeBridge.sendRequest(entry.getKey(), entry.getValue());
-            } catch (Exception e) {
-                Log.e(TAG, "Failed sending queued request");
-            }
+        for (Map.Entry<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener<Bundle>> entry : mQueuedRequests.entrySet()) {
+            electrodeBridge.sendRequest(entry.getKey(), entry.getValue());
         }
         mQueuedRequests.clear();
     }
 
     private static void emitQueuedEvents() {
         for (ElectrodeBridgeEvent event : mQueuedEvents) {
-            try {
-                electrodeBridge.emitEvent(event);
-            } catch (Exception e) {
-                Log.e(TAG, "Failed sending queued event");
-            }
+            electrodeBridge.emitEvent(event);
         }
         mQueuedEvents.clear();
     }

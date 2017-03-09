@@ -112,7 +112,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     @SuppressWarnings("unused")
     @Override
     public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
-        Log.d(TAG, String.format("Emitting event[name:%s id:%s]", event.getName(), event.getId()));
+        Logger.d(TAG, "Emitting event[name:%s id:%s]", event.getName(), event.getId());
 
         notifyReactEventListeners(event);
         notifyLocalEventListeners(event);

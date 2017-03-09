@@ -131,49 +131,6 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         handleRequest(request, responseListener);
     }
 
-    @NonNull
-    private BridgeTransaction createTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
-        final BridgeTransaction bridgeTransaction = new BridgeTransaction(request, responseListener);
-        pendingTransactions.put(request.getId(), bridgeTransaction);
-        startTimeOutCheckForTransaction(bridgeTransaction);
-        return bridgeTransaction;
-    }
-
-    private void startTimeOutCheckForTransaction(@NonNull final BridgeTransaction transaction) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                Logger.d(TAG, "Checking timeout for request(id=%s)", transaction.getRequest().getId());
-                handleResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
-            }
-        }, transaction.getRequest().getTimeoutMs());
-    }
-
-    private void dispatchRequestToLocalHandler(@NonNull final BridgeTransaction transaction) {
-        Logger.d(TAG, "Sending request(id=%s) to local handler", transaction.getRequest().getId());
-
-        final ElectrodeBridgeRequest request = transaction.getRequest();
-        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Object>() {
-            @Override
-            public void onFailure(@NonNull FailureMessage failureMessage) {
-                ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, failureMessage);
-                handleResponse(response);
-            }
-
-            @Override
-            public void onSuccess(@Nullable Object responseData) {
-                ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, responseData, null);
-                handleResponse(response);
-            }
-        });
-
-    }
-
-    private void dispatchRequestToReact(@NonNull BridgeTransaction bridgeTransaction) {
-        Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", bridgeTransaction.getId());
-        mReactContextWrapper.emitEvent(bridgeTransaction.getRequest());
-    }
-
     /**
      * This method is used by react native to dispatch an event on the native side.
      * <p>
@@ -222,19 +179,6 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         }
     }
 
-    private void notifyLocalEventListeners(@NonNull final ElectrodeBridgeEvent event) {
-        mReactContextWrapper.runOnUiQueueThread(new Runnable() {
-            @Override
-            public void run() {
-                mEventDispatcher.dispatchEvent(event);
-            }
-        });
-    }
-
-    private void notifyReactEventListeners(@NonNull ElectrodeBridgeEvent event) {
-        mReactContextWrapper.emitEvent(event);
-    }
-
     private void handleRequest(@NonNull final ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
         logRequest(request);
 
@@ -254,6 +198,49 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
         }
     }
 
+    @NonNull
+    private BridgeTransaction createTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
+        final BridgeTransaction bridgeTransaction = new BridgeTransaction(request, responseListener);
+        pendingTransactions.put(request.getId(), bridgeTransaction);
+        startTimeOutCheckForTransaction(bridgeTransaction);
+        return bridgeTransaction;
+    }
+
+    private void startTimeOutCheckForTransaction(@NonNull final BridgeTransaction transaction) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                Logger.d(TAG, "Checking timeout for request(id=%s)", transaction.getRequest().getId());
+                handleResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
+            }
+        }, transaction.getRequest().getTimeoutMs());
+    }
+
+    private void dispatchRequestToLocalHandler(@NonNull final BridgeTransaction transaction) {
+        Logger.d(TAG, "Sending request(id=%s) to local handler", transaction.getRequest().getId());
+
+        final ElectrodeBridgeRequest request = transaction.getRequest();
+        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Object>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, failureMessage);
+                handleResponse(response);
+            }
+
+            @Override
+            public void onSuccess(@Nullable Object responseData) {
+                ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, responseData, null);
+                handleResponse(response);
+            }
+        });
+
+    }
+
+    private void dispatchRequestToReact(@NonNull BridgeTransaction bridgeTransaction) {
+        Logger.d(TAG, "Sending request(id=%s) over to JS side as there is no local request handler available", bridgeTransaction.getId());
+        mReactContextWrapper.emitEvent(bridgeTransaction.getRequest());
+    }
+
     private void handleResponse(@NonNull ElectrodeBridgeResponse bridgeResponse) {
         Logger.d(TAG, "Handling bridge response");
         BridgeTransaction transaction = pendingTransactions.get(bridgeResponse.getId());
@@ -264,6 +251,19 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             Logger.i(TAG, "Response(id=%s, name=%s) will be ignored as the transaction for this request has already been removed from the queue. Perhaps it's already timed-out or completed", bridgeResponse.getId(), bridgeResponse.getName());
         }
 
+    }
+
+    private void notifyLocalEventListeners(@NonNull final ElectrodeBridgeEvent event) {
+        mReactContextWrapper.runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                mEventDispatcher.dispatchEvent(event);
+            }
+        });
+    }
+
+    private void notifyReactEventListeners(@NonNull ElectrodeBridgeEvent event) {
+        mReactContextWrapper.emitEvent(event);
     }
 
     private void completeTransaction(@NonNull final BridgeTransaction transaction) {

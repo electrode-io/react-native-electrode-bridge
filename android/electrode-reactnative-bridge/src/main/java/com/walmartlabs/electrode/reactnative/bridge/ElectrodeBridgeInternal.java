@@ -161,13 +161,21 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     private void dispatchRequestToLocalHandler(@NonNull final BridgeTransaction transaction) {
         Logger.d(TAG, "Sending request(id=%s) to local handler", transaction.getRequest().getId());
 
-        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseHandler() {
+        final ElectrodeBridgeRequest request = transaction.getRequest();
+        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Object>() {
             @Override
-            public void onResponse(@NonNull ElectrodeBridgeResponse response) {
-                transaction.setResponse(response);
-                completeTransaction(transaction);
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, failureMessage);
+                handleResponse(response);
+            }
+
+            @Override
+            public void onSuccess(@Nullable Object responseData) {
+                ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, responseData, null);
+                handleResponse(response);
             }
         });
+
     }
 
     private void dispatchRequestToReact(@NonNull BridgeTransaction bridgeTransaction) {

@@ -65,7 +65,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        electrodeBridge.emitEvent(event);
+        electrodeBridge.sendEvent(event);
     }
 
     /**
@@ -148,7 +148,7 @@ public final class ElectrodeBridgeHolder {
 
     private static void emitQueuedEvents() {
         for (ElectrodeBridgeEvent event : mQueuedEvents) {
-            electrodeBridge.emitEvent(event);
+            electrodeBridge.sendEvent(event);
         }
         mQueuedEvents.clear();
     }

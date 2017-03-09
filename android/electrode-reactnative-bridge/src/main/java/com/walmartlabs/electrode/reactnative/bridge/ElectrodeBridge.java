@@ -27,11 +27,11 @@ public interface ElectrodeBridge {
     void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler);
 
     /**
-     * Emits an event with some data to the all the even listeners.
+     * Sends an event with some data to the all the even listeners.
      *
      * @param event The event to emit
      */
-    void emitEvent(@NonNull ElectrodeBridgeEvent event);
+    void sendEvent(@NonNull ElectrodeBridgeEvent event);
 
     /**
      * Adds an event listener for the passed event

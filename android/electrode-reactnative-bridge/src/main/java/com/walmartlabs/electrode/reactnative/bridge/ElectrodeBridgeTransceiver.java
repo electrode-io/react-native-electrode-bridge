@@ -110,7 +110,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
      */
     @SuppressWarnings("unused")
     @Override
-    public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
+    public void sendEvent(@NonNull ElectrodeBridgeEvent event) {
         Logger.d(TAG, "Emitting event[name:%s id:%s]", event.getName(), event.getId());
 
         notifyReactEventListeners(event);

@@ -56,7 +56,8 @@ public final class BridgeArguments {
             String key = BridgeMessage.BRIDGE_MSG_DATA;
 
             if (payload.get(key) == null) {
-                throw new IllegalArgumentException("Cannot find key(" + key + ") in given bundle:" + payload);
+                Logger.d(TAG, "Cannot find key(%s) in given bundle:%s", key, payload);
+                return null;
             }
 
             if (Bridgeable.class.isAssignableFrom(returnClass)) {

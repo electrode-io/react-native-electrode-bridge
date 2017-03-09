@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -300,5 +301,92 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
     public void testEmitEventWithNoData() {
 
+    }
+
+    public void testGetEmptyArrayFromJsToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        addMockEventListener("getEmptyArray", new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                String[] emptyArray = new String[0];
+                WritableMap map = Arguments.createMap();
+                WritableArray array = Arguments.fromArray(emptyArray);
+                map.putArray(BRIDGE_MSG_DATA, array);
+                jsResponseDispatcher.dispatchResponse(map);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+
+        ElectrodeBridgeRequest request = new ElectrodeBridgeRequest.Builder("getEmptyArray").build();
+        ElectrodeBridgeInternal.instance().sendRequest(request, new ElectrodeBridgeResponseListener<Bundle>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+
+            }
+
+            @Override
+            public void onSuccess(@Nullable Bundle responseData) {
+                countDownLatch.countDown();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testGetArrayFromJsToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String[] stringArray = {"one", "two", "three"};
+        addMockEventListener("getEmptyArray", new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                WritableMap map = Arguments.createMap();
+                WritableArray array = Arguments.fromArray(stringArray);
+                map.putArray(BRIDGE_MSG_DATA, array);
+                jsResponseDispatcher.dispatchResponse(map);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+
+        ElectrodeBridgeRequest request = new ElectrodeBridgeRequest.Builder("getEmptyArray").build();
+        ElectrodeBridgeInternal.instance().sendRequest(request, new ElectrodeBridgeResponseListener<Bundle>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+
+            }
+
+            @Override
+            public void onSuccess(@Nullable Bundle responseData) {
+                assertNotNull(responseData);
+                String[] response = responseData.getStringArray(BRIDGE_MSG_DATA);
+                assertNotNull(response);
+                assertEquals(stringArray.length, response.length);
+                countDownLatch.countDown();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
     }
 }

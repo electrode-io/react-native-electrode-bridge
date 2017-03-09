@@ -21,7 +21,7 @@ class RequestDispatcherImpl implements RequestDispatcher {
     }
 
     @Override
-    public void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseHandler responseHandler) {
+    public void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseListener<Object> responseListener) {
         final String requestId = bridgeRequest.getId();
         final String requestName = bridgeRequest.getName();
 
@@ -29,26 +29,10 @@ class RequestDispatcherImpl implements RequestDispatcher {
         ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler = mRequestRegistrar.getRequestHandler(requestName);
         if (requestHandler == null) {
             FailureMessage failureMessage = BridgeFailureMessage.create("ENOHANDLER", "No registered request handler for request name " + requestName);
-            responseHandler.onResponse(ElectrodeBridgeResponse.createResponseForRequest(bridgeRequest, null, failureMessage));
+            responseListener.onFailure(failureMessage);
             return;
         }
-
-        requestHandler.onRequest(bridgeRequest.bundle(),
-                new ElectrodeBridgeResponseListener<Object>() {
-                    @Override
-                    public void onFailure(@NonNull FailureMessage failureMessage) {
-                        Logger.d(TAG, "resolving FAILED request(id=%s),  failureMessage(%s)", requestId, failureMessage);
-                        ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(bridgeRequest, null, failureMessage);
-                        responseHandler.onResponse(response);
-                    }
-
-                    @Override
-                    public void onSuccess(@Nullable Object data) {
-                        Logger.d(TAG, "resolving SUCCESSFUL request(id=%s), responseObj(%s)", requestId, data);
-                        ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(bridgeRequest, data, null);
-                        responseHandler.onResponse(response);
-                    }
-                });
+        requestHandler.onRequest(bridgeRequest.bundle(),responseListener);
     }
 
 

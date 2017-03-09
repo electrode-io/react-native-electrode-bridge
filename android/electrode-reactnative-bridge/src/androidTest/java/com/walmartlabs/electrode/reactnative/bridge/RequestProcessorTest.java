@@ -255,4 +255,28 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    public void testGetPersonRequestSentFromJsWithEmptyDataInRequest() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        ElectrodeBridgeInternal electrodeBridgeInternal = ElectrodeBridgeInternal.instance();
+
+        PersonApi.requests().registerGetPersonRequestHandler(new ElectrodeBridgeRequestHandler<None, Person>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<Person> responseListener) {
+                assertNull(payload);
+                countDownLatch.countDown();
+            }
+        });
+
+
+        WritableMap map = Arguments.createMap();
+        map.putString(BridgeMessage.BRIDGE_MSG_ID, "492a3aa7-49f6-4a57-929d-757bdf5db49d");
+        map.putString(BridgeMessage.BRIDGE_MSG_NAME, PersonApi.Requests.REQUEST_GET_PERSON);
+        map.putString(BridgeMessage.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
+
+        electrodeBridgeInternal.dispatchEvent(map);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
 }

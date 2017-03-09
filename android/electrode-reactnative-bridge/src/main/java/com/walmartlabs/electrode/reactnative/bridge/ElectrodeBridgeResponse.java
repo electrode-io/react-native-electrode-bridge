@@ -29,31 +29,7 @@ public class ElectrodeBridgeResponse extends BridgeMessage {
     public static ElectrodeBridgeResponse create(@NonNull ReadableMap messageMap) {
         ElectrodeBridgeResponse bridgeResponse = null;
         if (isValid(messageMap, BridgeMessage.Type.RESPONSE)) {
-            String eventName = messageMap.getString(BRIDGE_MSG_NAME);
-            String eventId = messageMap.getString(BRIDGE_MSG_ID);
-            Type type = BridgeMessage.Type.getType(messageMap.getString(BRIDGE_MSG_TYPE));
-
-            Bundle data = null;
-            if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                data = ArgumentsEx.toBundle(messageMap, BRIDGE_MSG_DATA);
-            }
-
-            FailureMessage failureMessage = null;
-            if (messageMap.hasKey(BRIDGE_MSG_ERROR)) {
-                Bundle error = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_ERROR));
-                if (!error.isEmpty()) {
-                    String code = error.getString(BRIDGE_RESPONSE_ERROR_CODE);
-                    String message = error.getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
-                    failureMessage = BridgeFailureMessage.create(code != null ? code : UNKNOWN_ERROR_CODE, message != null ? message : "Unknown error");
-                }
-            }
-
-            if (type != null) {
-                bridgeResponse = new ElectrodeBridgeResponse(eventName, eventId, type, data, failureMessage);
-            } else {
-                Logger.w(TAG, "Message type(%s) not supported, cannot construct com.walmartlabs.electrode.reactnative.bridge.BridgeMessage", messageMap.getString(BRIDGE_MSG_TYPE));
-            }
-
+            bridgeResponse = new ElectrodeBridgeResponse(messageMap);
         } else {
             Logger.w(TAG, "Unable to createMessage a bridge message, invalid data received(%s)", messageMap);
         }
@@ -67,17 +43,36 @@ public class ElectrodeBridgeResponse extends BridgeMessage {
 
     private final FailureMessage failureMessage;
 
+    private ElectrodeBridgeResponse(ReadableMap messageMap) {
+        super(messageMap);
+        Bundle error;
+        if (messageMap.hasKey(BRIDGE_MSG_ERROR)
+                && !(error = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_ERROR))).isEmpty()) {
+            String code = error.getString(BRIDGE_RESPONSE_ERROR_CODE);
+            String message = error.getString(BRIDGE_RESPONSE_ERROR_MESSAGE);
+            failureMessage = BridgeFailureMessage.create(code != null ? code : UNKNOWN_ERROR_CODE, message != null ? message : "Unknown error");
+        } else {
+            failureMessage = null;
+        }
+    }
+
     private ElectrodeBridgeResponse(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Object data, @Nullable FailureMessage failureMessage) {
         super(name, id, type, data);
         this.failureMessage = failureMessage;
     }
 
+    /**
+     * Returns a failure message if the response has failed, null if the response was successful
+     *
+     * @return FailureMessage
+     */
     @Nullable
     public FailureMessage getFailureMessage() {
         return failureMessage;
     }
 
     @NonNull
+    @Override
     public WritableMap map() {
         WritableMap writableMap = super.map();
         if (failureMessage != null) {

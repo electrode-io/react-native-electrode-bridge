@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 public interface RequestDispatcher {
 
-    void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseHandler responseHandler);
+    void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseListener<Object> responseListener);
 
     /**
      * Checks to see if a request handler is available for given request

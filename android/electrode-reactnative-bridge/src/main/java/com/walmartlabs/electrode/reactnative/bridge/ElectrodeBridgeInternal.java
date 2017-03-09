@@ -140,20 +140,11 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     }
 
     private void startTimeOutCheckForTransaction(@NonNull final BridgeTransaction transaction) {
-        final String id = transaction.getRequest().getId();
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             public void run() {
-
-                Logger.d(TAG, "Checking timeout for request(id=%s)", id);
-                if (pendingTransactions.containsKey(id)) {
-                    BridgeTransaction bridgeTransaction = pendingTransactions.get(id);
-                    Logger.d(TAG, "request(id=%s) timed out", id);
-                    bridgeTransaction.setResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
-                    completeTransaction(transaction);
-                } else {
-                    Logger.d(TAG, "Ignoring timeout, request(id=%s) already completed", id);
-                }
+                Logger.d(TAG, "Checking timeout for request(id=%s)", transaction.getRequest().getId());
+                handleResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
             }
         }, transaction.getRequest().getTimeoutMs());
     }
@@ -259,9 +250,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             dispatchRequestToReact(bridgeTransaction);
         } else {
             Logger.d(TAG, "No handler available to handle the request(id=%s, name=%s). Will fail the request", request.getId(), request.getName());
-            ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, BridgeFailureMessage.create("ENOHANDLER", "No registered request handler found for " + request.getName()));
-            bridgeTransaction.setResponse(response);
-            completeTransaction(bridgeTransaction);
+            handleResponse(ElectrodeBridgeResponse.createResponseForRequest(request, null, BridgeFailureMessage.create("ENOHANDLER", "No registered request handler found for " + request.getName())));
         }
     }
 
@@ -272,7 +261,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
             transaction.setResponse(bridgeResponse);
             completeTransaction(transaction);
         } else {
-            Logger.i(TAG, "Response will be ignored as the transaction for this request(id=%s) has already been removed from the queue. Perhaps it's already timed-out ??", bridgeResponse.getId());
+            Logger.i(TAG, "Response(id=%s, name=%s) will be ignored as the transaction for this request has already been removed from the queue. Perhaps it's already timed-out or completed", bridgeResponse.getId(), bridgeResponse.getName());
         }
 
     }

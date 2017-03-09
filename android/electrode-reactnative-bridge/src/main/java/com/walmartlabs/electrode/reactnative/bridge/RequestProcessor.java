@@ -31,7 +31,7 @@ public class RequestProcessor<TReq, TResp> {
 
     public void execute() {
         Logger.d(TAG, "Request processor started processing request(%s)", requestName);
-        Bundle data = BridgeArguments.generateBundle(requestPayload);
+        Bundle data = BridgeArguments.generateDataBundle(requestPayload);
 
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(requestName)
                 .withData(data)

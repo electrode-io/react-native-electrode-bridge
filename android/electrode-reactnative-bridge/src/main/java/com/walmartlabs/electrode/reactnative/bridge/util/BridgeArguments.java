@@ -22,10 +22,10 @@ public final class BridgeArguments {
 
     /**
      * @param object
-     * @return Bundle representation of the given object. If the passed object is a primitive wrapper a bundle with one item will be generated and the
+     * @return Bundle representation of the given object. The output bundle will put the object inside key = {@link BridgeMessage#BRIDGE_MSG_DATA}
      */
     @NonNull
-    public static Bundle generateBundle(@Nullable Object object) {
+    public static Bundle generateDataBundle(@Nullable Object object) {
         if (object == null) {
             return Bundle.EMPTY;
         }
@@ -40,6 +40,14 @@ public final class BridgeArguments {
         return data;
     }
 
+    /**
+     * Looks for an entry with key = {@link BridgeMessage#BRIDGE_MSG_DATA} inside the bundle and then tries to convert the value to either a primitive wrapper or {@link Bridgeable}
+     *
+     * @param payload     {@link Bundle}
+     * @param returnClass {@link Class}
+     * @param <T>         return type
+     * @return T
+     */
     @Nullable
     public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
         T response = null;

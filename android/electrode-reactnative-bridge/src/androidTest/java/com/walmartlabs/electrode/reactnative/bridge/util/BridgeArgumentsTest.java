@@ -71,11 +71,11 @@ public class BridgeArgumentsTest extends TestCase {
 
     public void testBundleToPrimitiveAndViceVersaForString() {
         String[] expectedArray = {"ONE", "TWO", "THREE", "FOUR", "FIVE"};
-        Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class, REQUEST);
+        Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class);
         assertNotNull(bundle);
         assertNotNull(bundle.get(BridgeMessage.BRIDGE_MSG_DATA));
 
-        String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class, REQUEST);
+        String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class);
         assertNotNull(actualArray);
         assertEquals(expectedArray.length, actualArray.length);
 

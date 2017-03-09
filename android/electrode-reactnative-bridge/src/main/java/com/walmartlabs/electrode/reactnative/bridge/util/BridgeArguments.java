@@ -5,11 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 import java.lang.reflect.Constructor;
@@ -24,70 +21,11 @@ public final class BridgeArguments {
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
     /**
-     * @param data    {@link ReadableMap} received from JS side.
-     * @param dataKey Data entry key
-     * @return Bundle, if an entry is not found for dataKey
-     */
-    @NonNull
-    public static Bundle responseBundle(@NonNull ReadableMap data, @NonNull String dataKey) {
-        final String responseKey = BridgeMessage.Type.RESPONSE.getKey();
-        Bundle bundle = new Bundle();
-        if (data.getType(dataKey) == null) {
-            throw new IllegalArgumentException("Given readable map doesn't have expected entry with key(" + dataKey + ")");
-        }
-        switch (data.getType(dataKey)) {
-            case Array: {
-                ReadableArray readableArray = data.getArray(dataKey);
-                if (readableArray.size() != 0) {
-                    switch (readableArray.getType(0)) {
-                        case String:
-                            bundle.putStringArray(responseKey, ArgumentsEx.toStringArray(readableArray));
-                            break;
-                        case Boolean:
-                            bundle.putBooleanArray(responseKey, ArgumentsEx.toBooleanArray(readableArray));
-                            break;
-                        case Number:
-                            // Can be int or double
-                            bundle.putDoubleArray(responseKey, ArgumentsEx.toDoubleArray(readableArray));
-                            break;
-                        case Map:
-                            bundle.putParcelableArray(responseKey, ArgumentsEx.toBundleArray(readableArray));
-                            break;
-                        case Array:
-                        default:
-                            throw new UnsupportedOperationException("Don't support conversion of this type(" + readableArray.getType(0) + ") yet");
-                    }
-                }
-            }
-            break;
-            case Map:
-                bundle.putBundle(responseKey, ArgumentsEx.toBundle(data.getMap(dataKey)));
-                break;
-            case Boolean:
-                bundle.putBoolean(responseKey, data.getBoolean(dataKey));
-                break;
-            case Number:
-                // can be int or double
-                bundle.putDouble(responseKey, data.getDouble(dataKey));
-                break;
-            case String:
-                bundle.putString(responseKey, data.getString(dataKey));
-                break;
-            case Null:
-                break;
-            default:
-                throw new UnsupportedOperationException("Don't support conversion of this type(" + data.getType(dataKey) + ") yet");
-        }
-        return bundle;
-    }
-
-    /**
      * @param object
-     * @param type
      * @return Bundle representation of the given object. If the passed object is a primitive wrapper a bundle with one item will be generated and the
      */
     @NonNull
-    public static Bundle generateBundle(@Nullable Object object, @NonNull BridgeMessage.Type type) {
+    public static Bundle generateBundle(@Nullable Object object) {
         if (object == null) {
             return Bundle.EMPTY;
         }
@@ -96,14 +34,14 @@ public final class BridgeArguments {
             data = new Bundle();
             data.putBundle(BridgeMessage.BRIDGE_MSG_DATA, ((Bridgeable) object).toBundle());
         } else {
-            data = BridgeArguments.getBundleForPrimitive(object, object.getClass(), type);
+            data = BridgeArguments.getBundleForPrimitive(object, object.getClass());
         }
 
         return data;
     }
 
     @Nullable
-    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass, @NonNull BridgeMessage.Type type) {
+    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
         T response = null;
         if (payload != null
                 && !payload.isEmpty()) {
@@ -121,7 +59,7 @@ public final class BridgeArguments {
 
                 response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
             } else {
-                response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass, type);
+                response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass);
             }
         }
         return response;
@@ -172,7 +110,7 @@ public final class BridgeArguments {
 
     @NonNull
     @VisibleForTesting
-    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull BridgeMessage.Type type) {
+    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz) {
         Object value = null;
         String key = BridgeMessage.BRIDGE_MSG_DATA;
         if (String.class.isAssignableFrom(reqClazz)) {
@@ -194,7 +132,7 @@ public final class BridgeArguments {
 
     @NonNull
     @VisibleForTesting
-    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, BridgeMessage.Type type) {
+    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass) {
         Bundle bundle = new Bundle();
         String key = BridgeMessage.BRIDGE_MSG_DATA;
         if (String.class.isAssignableFrom(respClass)) {

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BaseBridgeTestCase extends InstrumentationTestCase {
 
-    private static final int REQUEST_TIMEOUT_SECONDS = 10;
+    private static final int REQUEST_TIMEOUT_SECONDS = 30;
 
     @Override
     protected void setUp() throws Exception {

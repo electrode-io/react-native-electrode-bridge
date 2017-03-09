@@ -92,7 +92,7 @@ public class BridgeMessage {
         if (data instanceof Bundle) {
             dataMap = Arguments.fromBundle((Bundle) data);
         } else {
-            dataMap = Arguments.fromBundle(BridgeArguments.generateBundle(data, type));
+            dataMap = Arguments.fromBundle(BridgeArguments.generateBundle(data));
         }
         writableMap.merge(dataMap);
 
@@ -109,7 +109,7 @@ public class BridgeMessage {
         if (data instanceof Bundle) {
             bundle.putAll((Bundle) data);
         } else {
-            bundle.putAll(BridgeArguments.generateBundle(data, type));
+            bundle.putAll(BridgeArguments.generateBundle(data));
         }
 
         bundle.putString(BRIDGE_MSG_TYPE, getType().getKey());

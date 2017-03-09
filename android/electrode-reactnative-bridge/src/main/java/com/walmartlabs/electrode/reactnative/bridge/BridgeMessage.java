@@ -66,7 +66,7 @@ public class BridgeMessage {
         if (isValid(messageMap)) {
             name = messageMap.getString(BRIDGE_MSG_NAME);
             id = messageMap.getString(BRIDGE_MSG_ID);
-            
+
             type = Type.getType(messageMap.getString(BRIDGE_MSG_TYPE));
             if (type == null) {
                 throw new IllegalArgumentException("Invalid type(" + messageMap.getString(BRIDGE_MSG_TYPE) + ") received. Unable to construct BridgeMessage");
@@ -143,7 +143,7 @@ public class BridgeMessage {
 
     @Override
     public String toString() {
-        return name + ", data: " + (data != null ? data : "<empty>") + " type: " + type;
+        return "name:" + name + ", id:" + id + ", data:" + data + " type:" + type;
     }
 
     static boolean isValid(final ReadableMap data, Type type) {

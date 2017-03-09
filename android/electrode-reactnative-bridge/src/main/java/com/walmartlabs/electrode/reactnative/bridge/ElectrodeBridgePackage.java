@@ -14,13 +14,13 @@ import java.util.List;
 public class ElectrodeBridgePackage implements ReactPackage {
 
     @VisibleForTesting
-    ElectrodeBridgeInternal electrodeBridgeInternal;
+    ElectrodeBridgeTransceiver electrodeBridgeTransceiver;
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        this.electrodeBridgeInternal = ElectrodeBridgeInternal.create(reactContext);
-        modules.add(electrodeBridgeInternal);
+        this.electrodeBridgeTransceiver = ElectrodeBridgeTransceiver.create(reactContext);
+        modules.add(electrodeBridgeTransceiver);
         return modules;
     }
 
@@ -37,7 +37,7 @@ public class ElectrodeBridgePackage implements ReactPackage {
     //
     // Invoked by ern platform once react native engine is initialized/ready
     public void onReactNativeInitialized() {
-        this.electrodeBridgeInternal.onReactNativeInitialized();
+        this.electrodeBridgeTransceiver.onReactNativeInitialized();
     }
 
 }

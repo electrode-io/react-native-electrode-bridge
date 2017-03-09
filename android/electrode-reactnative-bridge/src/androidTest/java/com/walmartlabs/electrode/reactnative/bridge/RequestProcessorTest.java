@@ -218,7 +218,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
         request.putMap(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, inputPerson);
 
-        ElectrodeBridgeInternal.instance().dispatchEvent(request);
+        ElectrodeBridgeTransceiver.instance().dispatchEvent(request);
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
@@ -258,7 +258,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
     public void testGetPersonRequestSentFromJsWithEmptyDataInRequest() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        ElectrodeBridgeInternal electrodeBridgeInternal = ElectrodeBridgeInternal.instance();
+        ElectrodeBridgeTransceiver electrodeBridgeTransceiver = ElectrodeBridgeTransceiver.instance();
 
         PersonApi.requests().registerGetPersonRequestHandler(new ElectrodeBridgeRequestHandler<None, Person>() {
             @Override
@@ -274,7 +274,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         map.putString(BridgeMessage.BRIDGE_MSG_NAME, PersonApi.Requests.REQUEST_GET_PERSON);
         map.putString(BridgeMessage.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
 
-        electrodeBridgeInternal.dispatchEvent(map);
+        electrodeBridgeTransceiver.dispatchEvent(map);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

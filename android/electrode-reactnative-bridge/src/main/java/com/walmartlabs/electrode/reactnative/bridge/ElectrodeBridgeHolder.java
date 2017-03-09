@@ -2,7 +2,6 @@ package com.walmartlabs.electrode.reactnative.bridge;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
@@ -13,7 +12,7 @@ import java.util.Map;
 
 /**
  * Client facing class.
- * Facade to ElectrodeBridgeInternal.
+ * Facade to ElectrodeBridgeTransceiver.
  * Handles queuing every method calls until react native is ready.
  */
 public final class ElectrodeBridgeHolder {
@@ -39,11 +38,11 @@ public final class ElectrodeBridgeHolder {
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
 
     static {
-        ElectrodeBridgeInternal.registerReactNativeReadyListener(new ElectrodeBridgeInternal.ReactNativeReadyListener() {
+        ElectrodeBridgeTransceiver.registerReactNativeReadyListener(new ElectrodeBridgeTransceiver.ReactNativeReadyListener() {
             @Override
             public void onReactNativeReady() {
                 isReactNativeReady = true;
-                electrodeBridge = ElectrodeBridgeInternal.instance();
+                electrodeBridge = ElectrodeBridgeTransceiver.instance();
                 registerQueuedEventListeners();
                 registerQueuedRequestHandlers();
                 sendQueuedRequests();

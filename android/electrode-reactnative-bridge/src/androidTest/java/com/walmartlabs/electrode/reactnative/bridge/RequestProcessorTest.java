@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
@@ -41,8 +40,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
     public void testSampleRequestNativeToJSSuccess() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "Richard Mercille";
-        final WritableMap expectedResultMap = Arguments.createMap();
-        expectedResultMap.putString(BridgeMessage.Type.RESPONSE.getKey(), expectedResult);
 
         UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_USER_NAME, new BaseBridgeTestCase.MockElectrodeEventListener() {
             @Override
@@ -50,7 +47,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 assertNotNull(request);
                 assertEquals(PersonApi.Requests.REQUEST_GET_USER_NAME, request.getString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME));
                 WritableMap response = Arguments.createMap();
-                response.putMap(ElectrodeBridgeResponse.BRIDGE_MSG_DATA, expectedResultMap);
+                response.putString(ElectrodeBridgeResponse.BRIDGE_MSG_DATA, expectedResult);
                 jsResponseDispatcher.dispatchResponse(response);
                 countDownLatch.countDown();
             }
@@ -129,9 +126,11 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 assertNotNull(request);
                 assertEquals(PersonApi.Requests.REQUEST_GET_STATUS, request.getString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME));
 
-                Bundle personBundle = BridgeArguments.responseBundle(request, ElectrodeBridgeRequest.BRIDGE_MSG_DATA);
-                assertNotNull(personBundle);
-                Person person = BridgeArguments.generateObject(personBundle, Person.class, BridgeMessage.Type.RESPONSE);
+                ReadableMap personMap = request.getMap(BridgeMessage.BRIDGE_MSG_DATA);
+                assertNotNull(personMap);
+
+                Bundle personBundle = Arguments.toBundle(personMap);
+                Person person = new Person(personBundle);
                 assertNotNull(person);
                 assertEquals(actualPerson.getName(), person.getName());
                 assertEquals(actualPerson.getMonth(), person.getMonth());
@@ -197,7 +196,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
-                ReadableMap responseMap = response.getMap(BridgeMessage.BRIDGE_MSG_DATA).getMap(BridgeMessage.Type.RESPONSE.getKey());
+                ReadableMap responseMap = response.getMap(BridgeMessage.BRIDGE_MSG_DATA);
                 assertSame(result.getMember(), responseMap.getBoolean("member"));
                 assertSame(result.getLog(), responseMap.getBoolean("log"));
                 countDownLatch.countDown();
@@ -212,14 +211,12 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         WritableMap inputPerson = Arguments.createMap();
         inputPerson.putString("name", person.getName());
         inputPerson.putInt("month", person.getMonth());
-        WritableMap requestMap = Arguments.createMap();
-        requestMap.putMap(BridgeMessage.Type.REQUEST.getKey(), inputPerson);
 
         WritableMap request = Arguments.createMap();
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_ID, ElectrodeBridgeRequest.getUUID());
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME, PersonApi.Requests.REQUEST_GET_STATUS);
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
-        request.putMap(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, requestMap);
+        request.putMap(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, inputPerson);
 
         ElectrodeBridgeInternal.instance().dispatchEvent(request);
 

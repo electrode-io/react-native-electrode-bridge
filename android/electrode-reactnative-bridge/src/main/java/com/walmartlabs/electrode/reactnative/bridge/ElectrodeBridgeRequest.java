@@ -23,12 +23,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
             String eventId = messageMap.getString(BRIDGE_MSG_ID);
             Bundle data = null;
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                String requestKey = BridgeMessage.Type.REQUEST.getKey();
-                if (messageMap.getMap(BRIDGE_MSG_DATA).hasKey(requestKey)) {
-                    data = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_DATA));
-                } else {
-                    Logger.w(TAG, "Looks like the request data from JS is not having an %s key entry, the data will be ignored.", requestKey);
-                }
+                data = ArgumentsEx.toBundle(messageMap, BRIDGE_MSG_DATA);
             }
             bridgeMessage = new ElectrodeBridgeRequest.Builder(eventName).withData(data).id(eventId).build();
             bridgeMessage.isJsInitiated = true;
@@ -62,7 +57,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
 
     public static class Builder {
         private final String mName;
-        private Bundle mData;
+        private Object mData;
         private int mTimeoutMs;
         private String mId;
 
@@ -94,12 +89,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
          * @param data The data
          * @return Current builder instance for chaining
          */
-        public Builder withData(Bundle data) {
-            if (data != null
-                    && !data.isEmpty()
-                    && !data.containsKey(BridgeMessage.Type.REQUEST.getKey())) {
-                throw new IllegalArgumentException("The request data should be put inside " + BridgeMessage.Type.REQUEST.getKey() + " key");
-            }
+        public Builder withData(Object data) {
             this.mData = data;
             return this;
         }

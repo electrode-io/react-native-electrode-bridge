@@ -94,7 +94,7 @@ public final class BridgeArguments {
         Bundle data;
         if (object instanceof Bridgeable) {
             data = new Bundle();
-            data.putBundle(type.getKey(), ((Bridgeable) object).toBundle());
+            data.putBundle(BridgeMessage.BRIDGE_MSG_DATA, ((Bridgeable) object).toBundle());
         } else {
             data = BridgeArguments.getBundleForPrimitive(object, object.getClass(), type);
         }
@@ -107,7 +107,7 @@ public final class BridgeArguments {
         T response = null;
         if (payload != null
                 && !payload.isEmpty()) {
-            String key = type.getKey();
+            String key = BridgeMessage.BRIDGE_MSG_DATA;
 
             if (payload.get(key) == null) {
                 throw new IllegalArgumentException("Cannot find key(" + key + ") in given bundle:" + payload);
@@ -174,14 +174,15 @@ public final class BridgeArguments {
     @VisibleForTesting
     static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull BridgeMessage.Type type) {
         Object value = null;
+        String key = BridgeMessage.BRIDGE_MSG_DATA;
         if (String.class.isAssignableFrom(reqClazz)) {
-            value = payload.getString(type.getKey());
+            value = payload.getString(key);
         } else if (Integer.class.isAssignableFrom(reqClazz)) {
-            value = payload.getInt(type.getKey());
+            value = payload.getInt(key);
         } else if (Boolean.class.isAssignableFrom(reqClazz)) {
-            value = payload.getBoolean(type.getKey());
+            value = payload.getBoolean(key);
         } else if (String[].class.isAssignableFrom(reqClazz)) {
-            value = payload.getStringArray(type.getKey());
+            value = payload.getStringArray(key);
         }
 
         if (reqClazz.isInstance(value)) {
@@ -195,14 +196,15 @@ public final class BridgeArguments {
     @VisibleForTesting
     static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, BridgeMessage.Type type) {
         Bundle bundle = new Bundle();
+        String key = BridgeMessage.BRIDGE_MSG_DATA;
         if (String.class.isAssignableFrom(respClass)) {
-            bundle.putString(type.getKey(), (String) respObj);
+            bundle.putString(key, (String) respObj);
         } else if (Integer.class.isAssignableFrom(respClass)) {
-            bundle.putInt(type.getKey(), (Integer) respObj);
+            bundle.putInt(key, (Integer) respObj);
         } else if (Boolean.class.isAssignableFrom(respClass)) {
-            bundle.putBoolean(type.getKey(), (Boolean) respObj);
+            bundle.putBoolean(key, (Boolean) respObj);
         } else if (String[].class.isAssignableFrom(respClass)) {
-            bundle.putStringArray(type.getKey(), (String[]) respObj);
+            bundle.putStringArray(key, (String[]) respObj);
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + respClass + " is not implemented yet");
         }

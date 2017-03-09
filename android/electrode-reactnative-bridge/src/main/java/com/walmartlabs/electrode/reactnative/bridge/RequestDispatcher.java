@@ -1,11 +1,10 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 public interface RequestDispatcher {
 
-    void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener);
+    void dispatchRequest(@NonNull final ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseHandler responseHandler);
 
     /**
      * Checks to see if a request handler is available for given request

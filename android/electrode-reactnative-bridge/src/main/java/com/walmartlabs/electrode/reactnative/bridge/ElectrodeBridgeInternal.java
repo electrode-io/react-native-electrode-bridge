@@ -30,7 +30,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
     private final ConcurrentHashMap<String, BridgeTransaction> pendingTransactions = new ConcurrentHashMap<>();
     private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Bundle>> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Object>> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
 
@@ -100,7 +100,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     }
 
     @Override
-    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler) {
+    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler) {
         mRequestRegistrar.registerRequestHandler(name, requestHandler);
     }
 
@@ -160,16 +160,11 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
 
     private void dispatchRequestToLocalHandler(@NonNull final BridgeTransaction transaction) {
         Logger.d(TAG, "Sending request(id=%s) to local handler", transaction.getRequest().getId());
-        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Bundle>() {
-            @Override
-            public void onFailure(@NonNull FailureMessage failureMessage) {
-                transaction.setResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, failureMessage));
-                completeTransaction(transaction);
-            }
 
+        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseHandler() {
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
-                transaction.setResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), responseData, null));
+            public void onResponse(@NonNull ElectrodeBridgeResponse response) {
+                transaction.setResponse(response);
                 completeTransaction(transaction);
             }
         });
@@ -303,7 +298,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
                     mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                         @Override
                         public void run() {
-                            transaction.getFinalResponseListener().onSuccess(response.getData());
+                            transaction.getFinalResponseListener().onSuccess(response.bundle());
                         }
                     });
                 }

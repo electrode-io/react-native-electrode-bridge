@@ -35,12 +35,7 @@ public class ElectrodeBridgeResponse extends BridgeMessage {
 
             Bundle data = null;
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                String responseKey = BridgeMessage.Type.RESPONSE.getKey();
-                if (messageMap.getMap(BRIDGE_MSG_DATA).hasKey(responseKey)) {
-                    data = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_DATA));
-                } else {
-                    Logger.w(TAG, "Looks like the response data from JS is not having an '%s' key entry, the data will be ignored.", responseKey);
-                }
+                data = ArgumentsEx.toBundle(messageMap, BRIDGE_MSG_DATA);
             }
 
             FailureMessage failureMessage = null;
@@ -66,18 +61,13 @@ public class ElectrodeBridgeResponse extends BridgeMessage {
     }
 
     @Nullable
-    public static ElectrodeBridgeResponse createResponseForRequest(@NonNull ElectrodeBridgeRequest request, @Nullable Bundle responseData, @Nullable FailureMessage failureMessage) {
-        if (responseData != null
-                && !responseData.isEmpty()
-                && !responseData.containsKey(BridgeMessage.Type.RESPONSE.getKey())) {
-            throw new IllegalArgumentException("The response data should be put inside 'rsp' key");
-        }
+    public static ElectrodeBridgeResponse createResponseForRequest(@NonNull ElectrodeBridgeRequest request, @Nullable Object responseData, @Nullable FailureMessage failureMessage) {
         return new ElectrodeBridgeResponse(request.getName(), request.getId(), BridgeMessage.Type.RESPONSE, responseData, failureMessage);
     }
 
     private final FailureMessage failureMessage;
 
-    private ElectrodeBridgeResponse(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Bundle data, @Nullable FailureMessage failureMessage) {
+    private ElectrodeBridgeResponse(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Object data, @Nullable FailureMessage failureMessage) {
         super(name, id, type, data);
         this.failureMessage = failureMessage;
     }

@@ -145,4 +145,62 @@ public class ArgumentsEx {
         }
         return bundle;
     }
+
+    /**
+     * Convert a {@link WritableMap} to a {@link Bundle}.
+     *
+     * @param readableMap the {@link WritableMap} to convert.
+     * @return the converted {@link Bundle}.
+     */
+    @NonNull
+    public static Bundle toBundle(@Nullable ReadableMap readableMap, @NonNull String key) {
+        if (readableMap == null) {
+            return Bundle.EMPTY;
+        }
+
+        Bundle bundle = new Bundle();
+        ReadableType readableType = readableMap.getType(key);
+        switch (readableType) {
+            case Null:
+                bundle.putString(key, null);
+                break;
+            case Boolean:
+                bundle.putBoolean(key, readableMap.getBoolean(key));
+                break;
+            case Number:
+                // Can be int or double.
+                bundle.putDouble(key, readableMap.getDouble(key));
+                break;
+            case String:
+                bundle.putString(key, readableMap.getString(key));
+                break;
+            case Map:
+                bundle.putBundle(key, toBundle(readableMap.getMap(key)));
+                break;
+            case Array: {
+                ReadableArray readableArray = readableMap.getArray(key);
+                switch (readableArray.getType(0)) {
+                    case String:
+                        bundle.putStringArray(key, ArgumentsEx.toStringArray(readableArray));
+                        break;
+                    case Boolean:
+                        bundle.putBooleanArray(key, ArgumentsEx.toBooleanArray(readableArray));
+                        break;
+                    case Number:
+                        // Can be int or double but we just assume double for now
+                        bundle.putDoubleArray(key, ArgumentsEx.toDoubleArray(readableArray));
+                        break;
+                    case Map:
+                        bundle.putParcelableArray(key, ArgumentsEx.toBundleArray(readableArray));
+                        break;
+                    case Array:
+                        throw new UnsupportedOperationException("Arrays of arrays is not supported");
+                }
+            }
+            break;
+            default:
+                throw new IllegalArgumentException("Could not convert object with key: " + key + ".");
+        }
+        return bundle;
+    }
 }

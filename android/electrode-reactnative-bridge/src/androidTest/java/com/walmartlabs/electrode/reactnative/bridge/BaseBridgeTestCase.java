@@ -193,17 +193,13 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
      * Creates a MAP representation of a event coming from JS side with the given name and data.
      *
      * @param TEST_EVENT_NAME {@link String}
-     * @param data            {@link WritableMap}
      * @return WritableMap
      */
-    WritableMap createTestEventMap(String TEST_EVENT_NAME, @Nullable WritableMap data) {
+    WritableMap createTestEventMap(String TEST_EVENT_NAME) {
         WritableMap eventMap = Arguments.createMap();
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_ID, ElectrodeBridgeEvent.getUUID());
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME, TEST_EVENT_NAME);
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_TYPE, BridgeMessage.Type.EVENT.getKey());
-        if (data != null) {
-            eventMap.putMap(ElectrodeBridgeEvent.BRIDGE_MSG_DATA, data);
-        }
         return eventMap;
     }
 

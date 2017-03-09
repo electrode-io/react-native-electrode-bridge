@@ -24,7 +24,7 @@ public interface ElectrodeBridge {
      * @param name           name of the request
      * @param requestHandler call back to be issued for a given request.
      */
-    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler);
+    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler);
 
     /**
      * Emits an event with some data to the all the even listeners.

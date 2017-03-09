@@ -20,13 +20,7 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
             String eventId = messageMap.getString(BRIDGE_MSG_ID);
             Bundle data = null;
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                String eventKey = BridgeMessage.Type.EVENT.getKey();
-                if (messageMap.getMap(BRIDGE_MSG_DATA).hasKey(eventKey)) {
-                    data = ArgumentsEx.toBundle(messageMap.getMap(BRIDGE_MSG_DATA));
-                } else {
-                    Logger.w(TAG, "Looks like the event data from JS is not having an '%s' key entry, the data will be ignored.", eventKey);
-                }
-
+                data = ArgumentsEx.toBundle(messageMap, BRIDGE_MSG_DATA);
             }
             bridgeMessage = new Builder(eventName).withData(data).id(eventId).build();
 
@@ -43,7 +37,7 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
     public static class Builder {
         private final String mName;
         private String mId;
-        private Bundle mData;
+        private Object mData;
 
         /**
          * Initializes a new event builder
@@ -66,12 +60,7 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
          * @param data The data
          * @return Current builder instance for chaining
          */
-        public Builder withData(Bundle data) {
-            if (data != null
-                    && !data.isEmpty()
-                    && !data.containsKey(BridgeMessage.Type.EVENT.getKey())) {
-                throw new IllegalArgumentException("The event data should be put inside " + BridgeMessage.Type.EVENT.getKey() + " key");
-            }
+        public Builder withData(Object data) {
             this.mData = data;
             return this;
         }

@@ -2,6 +2,7 @@ package com.walmartlabs.electrode.reactnative.bridge.util;
 
 import android.os.Bundle;
 
+import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.sample.model.BirthYear;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -72,7 +73,7 @@ public class BridgeArgumentsTest extends TestCase {
         String[] expectedArray = {"ONE", "TWO", "THREE", "FOUR", "FIVE"};
         Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class, REQUEST);
         assertNotNull(bundle);
-        assertNotNull(bundle.get(REQUEST.getKey()));
+        assertNotNull(bundle.get(BridgeMessage.BRIDGE_MSG_DATA));
 
         String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class, REQUEST);
         assertNotNull(actualArray);

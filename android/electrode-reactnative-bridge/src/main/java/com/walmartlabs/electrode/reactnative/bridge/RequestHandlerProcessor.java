@@ -31,10 +31,10 @@ public class RequestHandlerProcessor<TReq, TResp> {
     }
 
     public void execute() {
-        final ElectrodeBridgeRequestHandler<Bundle, Bundle> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Bundle>() {
+        final ElectrodeBridgeRequestHandler<Bundle, Object> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Object>() {
 
             @Override
-            public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
+            public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Object> responseListener) {
                 Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
                 TReq request = BridgeArguments.generateObject(payload, reqClazz, BridgeMessage.Type.REQUEST);
 
@@ -49,11 +49,12 @@ public class RequestHandlerProcessor<TReq, TResp> {
                     @Override
                     public void onSuccess(TResp obj) {
                         Logger.d(TAG, "Received successful response(%s) from handler, now lets try to convert to real object for the response listener", obj);
-                        responseListener.onSuccess(BridgeArguments.generateBundle(obj, BridgeMessage.Type.RESPONSE));
+                        responseListener.onSuccess(obj);
                     }
                 });
             }
         };
+
         ElectrodeBridgeHolder.registerRequestHandler(requestName, intermediateRequestHandler);
     }
 

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 import java.util.UUID;
 
@@ -43,18 +44,18 @@ public class BridgeMessage {
 
     private static final String TAG = BridgeMessage.class.getSimpleName();
 
-    static final String BRIDGE_MSG_NAME = "name";
-    static final String BRIDGE_MSG_ID = "id";
-    static final String BRIDGE_MSG_TYPE = "type";
-    static final String BRIDGE_MSG_DATA = "data";
+    public static final String BRIDGE_MSG_NAME = "name";
+    public static final String BRIDGE_MSG_ID = "id";
+    public static final String BRIDGE_MSG_TYPE = "type";
+    public static final String BRIDGE_MSG_DATA = "data";
 
     private final String name;
     private final String id;
     private final Type type;
-    private final Bundle data;
+    private final Object data;
 
 
-    public BridgeMessage(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Bundle data) {
+    public BridgeMessage(@NonNull String name, @NonNull String id, @NonNull Type type, @Nullable Object data) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -77,7 +78,7 @@ public class BridgeMessage {
     }
 
     @Nullable
-    public Bundle getData() {
+    public Object getData() {
         return data;
     }
 
@@ -87,12 +88,33 @@ public class BridgeMessage {
         writableMap.putString(BRIDGE_MSG_ID, getId());
         writableMap.putString(BRIDGE_MSG_NAME, getName());
 
-        Bundle data = getData() != null ? getData() : Bundle.EMPTY;
-        writableMap.putMap(BRIDGE_MSG_DATA, Arguments.fromBundle(data));
+        WritableMap dataMap;
+        if (data instanceof Bundle) {
+            dataMap = Arguments.fromBundle((Bundle) data);
+        } else {
+            dataMap = Arguments.fromBundle(BridgeArguments.generateBundle(data, type));
+        }
+        writableMap.merge(dataMap);
 
         writableMap.putString(BRIDGE_MSG_TYPE, getType().getKey());
-
         return writableMap;
+    }
+
+    @NonNull
+    public Bundle bundle() {
+        Bundle bundle = new Bundle();
+        bundle.putString(BRIDGE_MSG_ID, getId());
+        bundle.putString(BRIDGE_MSG_NAME, getName());
+
+        if (data instanceof Bundle) {
+            bundle.putAll((Bundle) data);
+        } else {
+            bundle.putAll(BridgeArguments.generateBundle(data, type));
+        }
+
+        bundle.putString(BRIDGE_MSG_TYPE, getType().getKey());
+
+        return bundle;
     }
 
     @Override

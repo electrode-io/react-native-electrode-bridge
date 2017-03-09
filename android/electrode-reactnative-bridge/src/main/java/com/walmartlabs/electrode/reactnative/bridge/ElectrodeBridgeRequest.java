@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 public class ElectrodeBridgeRequest extends BridgeMessage {
@@ -17,24 +16,23 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
 
     @Nullable
     public static ElectrodeBridgeRequest create(@NonNull ReadableMap messageMap) {
-        ElectrodeBridgeRequest bridgeMessage = null;
+        ElectrodeBridgeRequest bridgeRequest = null;
         if (isValid(messageMap, BridgeMessage.Type.REQUEST)) {
-            String eventName = messageMap.getString(BRIDGE_MSG_NAME);
-            String eventId = messageMap.getString(BRIDGE_MSG_ID);
-            Bundle data = null;
-            if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                data = ArgumentsEx.toBundle(messageMap, BRIDGE_MSG_DATA);
-            }
-            bridgeMessage = new ElectrodeBridgeRequest.Builder(eventName).withData(data).id(eventId).build();
-            bridgeMessage.isJsInitiated = true;
+            bridgeRequest = new ElectrodeBridgeRequest(messageMap);
         } else {
             Logger.w(TAG, "Unable to createMessage a bridge message, invalid data received(%s)", messageMap);
         }
-        return bridgeMessage;
+        return bridgeRequest;
+    }
+
+    private ElectrodeBridgeRequest(@NonNull ReadableMap messageMap) {
+        super(messageMap);
+        mTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS;
+        isJsInitiated = true;
     }
 
     private ElectrodeBridgeRequest(Builder requestBuilder) {
-        super(requestBuilder.mName, requestBuilder.mId == null ? getUUID() : requestBuilder.mId, BridgeMessage.Type.REQUEST, requestBuilder.mData);
+        super(requestBuilder.mName, getUUID(), BridgeMessage.Type.REQUEST, requestBuilder.mData);
         mTimeoutMs = requestBuilder.mTimeoutMs;
 
     }
@@ -91,11 +89,6 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
          */
         public Builder withData(Object data) {
             this.mData = data;
-            return this;
-        }
-
-        public Builder id(String id) {
-            mId = id;
             return this;
         }
 

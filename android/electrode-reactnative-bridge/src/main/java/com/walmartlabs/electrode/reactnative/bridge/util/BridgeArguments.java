@@ -5,10 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
+import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
-import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 import java.lang.reflect.Constructor;
@@ -23,122 +21,53 @@ public final class BridgeArguments {
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
     /**
-     * Represents the types of arguments that is sent across the bridge.
-     */
-    public enum Type {
-        REQUEST("req"),
-        RESPONSE("rsp"),
-        EVENT("event");
-
-        private String key;
-
-        Type(@NonNull String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
-    }
-
-    /**
-     * @param data    {@link ReadableMap} received from JS side.
-     * @param dataKey Data entry key
-     * @return Bundle, if an entry is not found for dataKey
-     */
-    @NonNull
-    public static Bundle responseBundle(@NonNull ReadableMap data, @NonNull String dataKey) {
-        final String responseKey = Type.RESPONSE.key;
-        Bundle bundle = new Bundle();
-        if (data.getType(dataKey) == null) {
-            throw new IllegalArgumentException("Given readable map doesn't have expected entry with key(" + dataKey + ")");
-        }
-        switch (data.getType(dataKey)) {
-            case Array: {
-                ReadableArray readableArray = data.getArray(dataKey);
-                if (readableArray.size() != 0) {
-                    switch (readableArray.getType(0)) {
-                        case String:
-                            bundle.putStringArray(responseKey, ArgumentsEx.toStringArray(readableArray));
-                            break;
-                        case Boolean:
-                            bundle.putBooleanArray(responseKey, ArgumentsEx.toBooleanArray(readableArray));
-                            break;
-                        case Number:
-                            // Can be int or double
-                            bundle.putDoubleArray(responseKey, ArgumentsEx.toDoubleArray(readableArray));
-                            break;
-                        case Map:
-                            bundle.putParcelableArray(responseKey, ArgumentsEx.toBundleArray(readableArray));
-                            break;
-                        case Array:
-                        default:
-                            throw new UnsupportedOperationException("Don't support conversion of this type(" + readableArray.getType(0) + ") yet");
-                    }
-                }
-            }
-            break;
-            case Map:
-                bundle.putBundle(responseKey, ArgumentsEx.toBundle(data.getMap(dataKey)));
-                break;
-            case Boolean:
-                bundle.putBoolean(responseKey, data.getBoolean(dataKey));
-                break;
-            case Number:
-                // can be int or double
-                bundle.putDouble(responseKey, data.getDouble(dataKey));
-                break;
-            case String:
-                bundle.putString(responseKey, data.getString(dataKey));
-                break;
-            case Null:
-                break;
-            default:
-                throw new UnsupportedOperationException("Don't support conversion of this type(" + data.getType(dataKey) + ") yet");
-        }
-        return bundle;
-    }
-
-    /**
      * @param object
-     * @param type
-     * @return Bundle representation of the given object. If the passed object is a primitive wrapper a bundle with one item will be generated and the
+     * @return Bundle representation of the given object. The output bundle will put the object inside key = {@link BridgeMessage#BRIDGE_MSG_DATA}
      */
     @NonNull
-    public static Bundle generateBundle(@Nullable Object object, @NonNull Type type) {
+    public static Bundle generateDataBundle(@Nullable Object object) {
         if (object == null) {
             return Bundle.EMPTY;
         }
         Bundle data;
         if (object instanceof Bridgeable) {
             data = new Bundle();
-            data.putBundle(type.key, ((Bridgeable) object).toBundle());
+            data.putBundle(BridgeMessage.BRIDGE_MSG_DATA, ((Bridgeable) object).toBundle());
         } else {
-            data = BridgeArguments.getBundleForPrimitive(object, object.getClass(), type);
+            data = BridgeArguments.getBundleForPrimitive(object, object.getClass());
         }
 
         return data;
     }
 
+    /**
+     * Looks for an entry with key = {@link BridgeMessage#BRIDGE_MSG_DATA} inside the bundle and then tries to convert the value to either a primitive wrapper or {@link Bridgeable}
+     *
+     * @param payload     {@link Bundle}
+     * @param returnClass {@link Class}
+     * @param <T>         return type
+     * @return T
+     */
     @Nullable
-    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass, @NonNull Type type) {
+    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
         T response = null;
         if (payload != null
                 && !payload.isEmpty()) {
+            String key = BridgeMessage.BRIDGE_MSG_DATA;
 
-            if (payload.get(type.key) == null) {
-                throw new IllegalArgumentException("Cannot find key(" + type.key + ") in given bundle:" + payload);
+            if (payload.get(key) == null) {
+                throw new IllegalArgumentException("Cannot find key(" + key + ") in given bundle:" + payload);
             }
 
             if (Bridgeable.class.isAssignableFrom(returnClass)) {
 
-                if (payload.getBundle(type.key) == null) {
-                    throw new IllegalArgumentException("Value for key(" + type.key + ") should be a bundle, looks like it is not.");
+                if (payload.getBundle(key) == null) {
+                    throw new IllegalArgumentException("Value for key(" + key + ") should be a bundle, looks like it is not.");
                 }
 
-                response = BridgeArguments.bridgeableFromBundle(payload.getBundle(type.key), returnClass);
+                response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
             } else {
-                response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass, type);
+                response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass);
             }
         }
         return response;
@@ -189,16 +118,17 @@ public final class BridgeArguments {
 
     @NonNull
     @VisibleForTesting
-    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz, @NonNull Type type) {
+    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz) {
         Object value = null;
+        String key = BridgeMessage.BRIDGE_MSG_DATA;
         if (String.class.isAssignableFrom(reqClazz)) {
-            value = payload.getString(type.key);
+            value = payload.getString(key);
         } else if (Integer.class.isAssignableFrom(reqClazz)) {
-            value = payload.getInt(type.key);
+            value = payload.getInt(key);
         } else if (Boolean.class.isAssignableFrom(reqClazz)) {
-            value = payload.getBoolean(type.key);
+            value = payload.getBoolean(key);
         } else if (String[].class.isAssignableFrom(reqClazz)) {
-            value = payload.getStringArray(type.key);
+            value = payload.getStringArray(key);
         }
 
         if (reqClazz.isInstance(value)) {
@@ -210,16 +140,17 @@ public final class BridgeArguments {
 
     @NonNull
     @VisibleForTesting
-    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass, Type type) {
+    static Bundle getBundleForPrimitive(@NonNull Object respObj, @NonNull Class respClass) {
         Bundle bundle = new Bundle();
+        String key = BridgeMessage.BRIDGE_MSG_DATA;
         if (String.class.isAssignableFrom(respClass)) {
-            bundle.putString(type.key, (String) respObj);
+            bundle.putString(key, (String) respObj);
         } else if (Integer.class.isAssignableFrom(respClass)) {
-            bundle.putInt(type.key, (Integer) respObj);
+            bundle.putInt(key, (Integer) respObj);
         } else if (Boolean.class.isAssignableFrom(respClass)) {
-            bundle.putBoolean(type.key, (Boolean) respObj);
+            bundle.putBoolean(key, (Boolean) respObj);
         } else if (String[].class.isAssignableFrom(respClass)) {
-            bundle.putStringArray(type.key, (String[]) respObj);
+            bundle.putStringArray(key, (String[]) respObj);
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + respClass + " is not implemented yet");
         }

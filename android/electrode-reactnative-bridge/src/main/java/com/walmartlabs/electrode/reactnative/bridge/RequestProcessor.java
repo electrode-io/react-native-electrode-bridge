@@ -31,7 +31,7 @@ public class RequestProcessor<TReq, TResp> {
 
     public void execute() {
         Logger.d(TAG, "Request processor started processing request(%s)", requestName);
-        Bundle data = BridgeArguments.generateBundle(requestPayload, BridgeArguments.Type.REQUEST);
+        Bundle data = BridgeArguments.generateDataBundle(requestPayload);
 
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(requestName)
                 .withData(data)
@@ -45,7 +45,7 @@ public class RequestProcessor<TReq, TResp> {
 
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
-                TResp response = BridgeArguments.generateObject(responseData, responseClass, BridgeArguments.Type.RESPONSE);
+                TResp response = BridgeArguments.generateObject(responseData, responseClass);
                 Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
                 responseListener.onSuccess(response);
             }

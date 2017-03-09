@@ -95,7 +95,7 @@ public final class ElectrodeBridgeHolder {
     @SuppressWarnings("unused")
     @NonNull
     public static void registerRequestHandler(@NonNull String name,
-                                              @NonNull ElectrodeBridgeRequestHandler<Bundle, Bundle> requestHandler) {
+                                              @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler) {
         if (!isReactNativeReady) {
             Log.d(TAG, "Queuing request handler registration. Will register once react native initialization is complete.");
             mQueuedRequestHandlersRegistration.put(name, requestHandler);

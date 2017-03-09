@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -12,7 +13,7 @@ import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeInternal.BRIDGE_MSG_DATA;
+import static com.walmartlabs.electrode.reactnative.bridge.BridgeMessage.BRIDGE_MSG_DATA;
 
 public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
@@ -42,13 +43,13 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
         final String expectedResult = "yay tests";
         ElectrodeBridge electrodeBridge = ElectrodeBridgeInternal.instance();
 
-        electrodeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Bundle>() {
+        electrodeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
             @Override
-            public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Bundle> responseListener) {
+            public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
                 assertNotNull(payload);
-                assertTrue(payload.isEmpty());
+                assertNull(payload.get(BRIDGE_MSG_DATA));
                 assertNotNull(responseListener);
-                responseListener.onSuccess(BridgeArguments.generateBundle(expectedResult, BridgeArguments.Type.RESPONSE));
+                responseListener.onSuccess(expectedResult);
                 countDownLatch.countDown();
             }
         });
@@ -64,7 +65,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
                 assertNotNull(responseData);
-                assertEquals(expectedResult, responseData.getString("rsp"));
+                assertEquals(expectedResult, responseData.getString(BRIDGE_MSG_DATA));
                 countDownLatch.countDown();
             }
         });
@@ -76,11 +77,11 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
         final String expectedInput = "expectedInput";
         ElectrodeBridge electrodeBridge = ElectrodeBridgeInternal.instance();
 
-        electrodeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Bundle>() {
+        electrodeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
             @Override
-            public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Bundle> responseListener) {
+            public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
                 assertNotNull(payload);
-                assertEquals(expectedInput, payload.getString("req"));
+                assertEquals(expectedInput, payload.getString(BRIDGE_MSG_DATA));
                 assertNotNull(responseListener);
                 responseListener.onSuccess(null);
                 countDownLatch.countDown();
@@ -88,9 +89,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
         });
 
 
-        Bundle bundle = new Bundle();
-        bundle.putString("req", expectedInput);
-        ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").withData(bundle).build();
+        ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").withData(expectedInput).build();
         electrodeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
@@ -100,7 +99,7 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
                 assertNotNull(responseData);
-                assertTrue(responseData.isEmpty());
+                assertNull(responseData.get(BRIDGE_MSG_DATA));
                 countDownLatch.countDown();
             }
         });
@@ -116,19 +115,27 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
         UUID uuid = addMockEventListener(REQUEST_NAME, new MockElectrodeEventListener() {
             @Override
-            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                assertEquals(REQUEST_NAME, eventName);
-                assertNotNull(message);
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                assertEquals(REQUEST_NAME, request.getString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME));
                 assertNotNull(jsResponseDispatcher);
-                assertEquals(expectedInput, message.getMap("data").getString("req"));
+                assertEquals(expectedInput, request.getString(BRIDGE_MSG_DATA));
                 jsResponseDispatcher.dispatchResponse(Arguments.createMap());
                 countDownLatch.countDown();
             }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
         });
 
-        Bundle bundle = new Bundle();
-        bundle.putString("req", expectedInput);
-        ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder(REQUEST_NAME).withData(bundle).build();
+        ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder(REQUEST_NAME).withData(expectedInput).build();
         electrodeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
@@ -138,7 +145,8 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
                 assertNotNull(responseData);
-                assertTrue(responseData.isEmpty());
+                assertNotNull(responseData.get(BRIDGE_MSG_DATA));
+                assertTrue(responseData.getBundle(BRIDGE_MSG_DATA).isEmpty());
                 countDownLatch.countDown();
             }
         });
@@ -149,11 +157,8 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
 
 
     public void testEmitEventWithSimpleDataFromNative() {
-        final String TEST_EVENT_NAME = "testEmitEventWithSimpleDataFromNative";
-        final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
+        final String TEST_EVENT_NAME = "testEmitEventWithData";
         final String TEST_EVENT_VALUE = "this is a test event";
-        final Bundle eventBundle = new Bundle();
-        eventBundle.putString(TEST_EVENT_KEY, TEST_EVENT_VALUE);
 
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -162,34 +167,43 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
-                assertTrue(eventPayload.containsKey(TEST_EVENT_KEY));
-                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(TEST_EVENT_KEY));
+                assertTrue(eventPayload.containsKey(BRIDGE_MSG_DATA));
+                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(BRIDGE_MSG_DATA));
                 countDownLatch.countDown();
             }
         });
 
         UUID uuid = addMockEventListener(TEST_EVENT_NAME, new MockElectrodeEventListener() {
             @Override
-            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                assertEquals(TEST_EVENT_NAME, eventName);
-                assertNotNull(message);
-                assertTrue(message.hasKey(BRIDGE_MSG_DATA));
-                assertEquals(TEST_EVENT_VALUE, message.getMap(BRIDGE_MSG_DATA).getString(TEST_EVENT_KEY));
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                assertNotNull(event);
+                assertEquals(TEST_EVENT_NAME, event.getString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME));
+                assertTrue(event.hasKey(BRIDGE_MSG_DATA));
+                assertEquals(TEST_EVENT_VALUE, event.getString(BRIDGE_MSG_DATA));
                 countDownLatch.countDown();
             }
         });
 
-        electrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(eventBundle).build());
+        electrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(TEST_EVENT_VALUE).build());
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
     }
 
     public void testEmitEventWithSimpleDataFromJS() {
         final String TEST_EVENT_NAME = "testEmitEventWithSimpleDataFromJS";
-        final String TEST_EVENT_KEY = BridgeArguments.Type.EVENT.getKey();
         final String TEST_EVENT_VALUE = "this is a test event";
-        final WritableMap eventMap = Arguments.createMap();
-        eventMap.putString(TEST_EVENT_KEY, TEST_EVENT_VALUE);
+        final WritableMap eventMap = createTestEventMap(TEST_EVENT_NAME);
+        eventMap.putString(BRIDGE_MSG_DATA, TEST_EVENT_VALUE);
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -198,14 +212,14 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
-                assertTrue(eventPayload.containsKey(TEST_EVENT_KEY));
-                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(TEST_EVENT_KEY));
+                assertTrue(eventPayload.containsKey(BRIDGE_MSG_DATA));
+                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(BRIDGE_MSG_DATA));
                 countDownLatch.countDown();
             }
         });
 
 
-        ElectrodeBridgeInternal.instance().dispatchEvent(TEST_EVENT_NAME, null, eventMap);
+        ElectrodeBridgeInternal.instance().dispatchEvent(eventMap);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }
@@ -213,7 +227,6 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
     public void testEmitEventWithComplexDataFromNative() {
         final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromNative";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
-        final Bundle eventBundle = person.toBundle();
 
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -222,26 +235,38 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
-                assertNotNull(eventPayload.getString("name"));
-                assertEquals(person.getName(), eventPayload.getString("name"));
-                assertEquals(person.getMonth(), BridgeArguments.getNumberValue(eventBundle, "month"));
+                Bundle resultBundle = eventPayload.getBundle(BRIDGE_MSG_DATA);
+                assertNotNull(resultBundle);
+                assertEquals(person.getName(), resultBundle.getString("name"));
+                assertEquals(person.getMonth(), BridgeArguments.getNumberValue(resultBundle, "month"));
                 countDownLatch.countDown();
             }
         });
 
         UUID uuid = addMockEventListener(TEST_EVENT_NAME, new MockElectrodeEventListener() {
             @Override
-            public void onEvent(@NonNull String eventName, @Nullable WritableMap message, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                assertEquals(TEST_EVENT_NAME, eventName);
-                assertNotNull(message);
-                assertTrue(message.hasKey(BRIDGE_MSG_DATA));
-                assertEquals(person.getName(), message.getMap(BRIDGE_MSG_DATA).getString("name"));
-                assertEquals(person.getMonth(), Integer.valueOf((int) message.getMap(BRIDGE_MSG_DATA).getDouble("month")));
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                assertNotNull(event);
+                assertEquals(TEST_EVENT_NAME, event.getString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME));
+                assertTrue(event.hasKey(BRIDGE_MSG_DATA));
+                ReadableMap personMap = event.getMap(BRIDGE_MSG_DATA);
+                assertEquals(person.getName(), personMap.getString("name"));
+                assertEquals(person.getMonth(), Integer.valueOf((int) personMap.getDouble("month")));
                 countDownLatch.countDown();
             }
         });
 
-        electrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(eventBundle).build());
+        electrodeBridge.emitEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(person).build());
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
@@ -250,7 +275,8 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
     public void testEmitEventWithComplexDataFromJS() {
         final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromJS";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
-        final WritableMap eventMap = Arguments.fromBundle(person.toBundle());
+        final WritableMap eventMap = createTestEventMap(TEST_EVENT_NAME);
+        eventMap.putMap(BRIDGE_MSG_DATA, Arguments.fromBundle(person.toBundle()));
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -259,13 +285,15 @@ public class ElectrodeBridgeInternalTest extends BaseBridgeTestCase {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
-                assertNotNull(eventPayload.getString("name"));
-                assertEquals(person.getName(), eventPayload.getString("name"));
+                Bundle eventData = eventPayload.getBundle(BRIDGE_MSG_DATA);
+                assertNotNull(eventData);
+                assertNotNull(eventData.getString("name"));
+                assertEquals(person.getName(), eventData.getString("name"));
                 countDownLatch.countDown();
             }
         });
 
-        ElectrodeBridgeInternal.instance().dispatchEvent(TEST_EVENT_NAME, null, eventMap);
+        ElectrodeBridgeInternal.instance().dispatchEvent(eventMap);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

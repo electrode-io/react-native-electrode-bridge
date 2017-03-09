@@ -2,6 +2,7 @@ package com.walmartlabs.electrode.reactnative.bridge.util;
 
 import android.os.Bundle;
 
+import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.sample.model.BirthYear;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -10,7 +11,7 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import junit.framework.TestCase;
 
-import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.Type.REQUEST;
+import static com.walmartlabs.electrode.reactnative.bridge.BridgeMessage.Type.REQUEST;
 
 public class BridgeArgumentsTest extends TestCase {
 
@@ -70,11 +71,11 @@ public class BridgeArgumentsTest extends TestCase {
 
     public void testBundleToPrimitiveAndViceVersaForString() {
         String[] expectedArray = {"ONE", "TWO", "THREE", "FOUR", "FIVE"};
-        Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class, REQUEST);
+        Bundle bundle = BridgeArguments.getBundleForPrimitive(expectedArray, String[].class);
         assertNotNull(bundle);
-        assertNotNull(bundle.get(REQUEST.getKey()));
+        assertNotNull(bundle.get(BridgeMessage.BRIDGE_MSG_DATA));
 
-        String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class, REQUEST);
+        String[] actualArray = (String[]) BridgeArguments.getPrimitiveFromBundle(bundle, String[].class);
         assertNotNull(actualArray);
         assertEquals(expectedArray.length, actualArray.length);
 

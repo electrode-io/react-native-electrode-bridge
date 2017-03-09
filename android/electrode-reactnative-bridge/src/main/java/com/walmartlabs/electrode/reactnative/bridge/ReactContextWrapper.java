@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 /**
@@ -13,7 +14,7 @@ import com.facebook.react.bridge.WritableMap;
  */
 
 interface ReactContextWrapper {
-    void emitEvent(@NonNull String eventName, @Nullable WritableMap message);
+    void emitEvent(@NonNull BridgeMessage event);
 
     void runOnUiQueueThread(@NonNull Runnable runnable);
 

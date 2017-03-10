@@ -84,7 +84,7 @@ class ElectrodeBridge extends EventEmitter {
       data
     } = {} /*: Object */ ) {
       const eventMessage = this._buildMessage(ELECTRODE_BRIDGE_EVENT_TYPE, name, { data })
-      NativeModules.ElectrodeBridge.dispatchEvent(eventMessage)
+      NativeModules.ElectrodeBridge.sendMessage(eventMessage)
       this.emit(name, data)
   }
 
@@ -108,7 +108,7 @@ class ElectrodeBridge extends EventEmitter {
     } else {
       let requestMessage = this._buildMessage(ELECTRODE_BRIDGE_REQUEST_TYPE, name, { data })
       requestPromise = this._waitForResponse(requestMessage.id)
-      NativeModules.ElectrodeBridge.dispatchEvent(requestMessage)
+      NativeModules.ElectrodeBridge.sendMessage(requestMessage)
     }
 
     const timeoutPromise = new Promise((resolve, reject) => {
@@ -205,7 +205,7 @@ class ElectrodeBridge extends EventEmitter {
             ELECTRODE_BRIDGE_RESPONSE_TYPE, 
             message.name, 
             { id: messsage.id, error: ERROR_NO_REQUEST_HANDLER })
-          return NativeModules.ElectrodeBridge.dispatchEvent(errorMessage)
+          return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
         }
 
         this.requestHandlerByRequestName.get(message.name)(message.data)
@@ -214,14 +214,14 @@ class ElectrodeBridge extends EventEmitter {
             ELECTRODE_BRIDGE_RESPONSE_TYPE, 
             message.name, 
             { id: message.id, data })
-          return NativeModules.ElectrodeBridge.dispatchEvent(responseMessage)
+          return NativeModules.ElectrodeBridge.sendMessage(responseMessage)
         })
         .catch((error) => {
           const errorMessage = this._buildMessage(
             ELECTRODE_BRIDGE_RESPONSE_TYPE, 
             message.name, 
             { id: messsage.id, error });
-          return NativeModules.ElectrodeBridge.dispatchEvent(errorMessage)
+          return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
         })
         break
 

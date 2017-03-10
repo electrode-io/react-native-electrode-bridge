@@ -1,11 +1,8 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 

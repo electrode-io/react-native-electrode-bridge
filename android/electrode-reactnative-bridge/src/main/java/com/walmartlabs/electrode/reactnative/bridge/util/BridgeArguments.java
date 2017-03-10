@@ -21,7 +21,7 @@ public final class BridgeArguments {
     private static final String TAG = BridgeArguments.class.getSimpleName();
 
     /**
-     * @param object
+     * @param object Accepted object types are {@link Bridgeable}, All primitive wrappers and null
      * @return Bundle representation of the given object. The output bundle will put the object inside key = {@link BridgeMessage#BRIDGE_MSG_DATA}
      */
     @NonNull
@@ -68,6 +68,7 @@ public final class BridgeArguments {
 
                 response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
             } else {
+                //noinspection unchecked
                 response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass);
             }
         }
@@ -79,6 +80,7 @@ public final class BridgeArguments {
     static <T> T bridgeableFromBundle(@NonNull Bundle bundle, @NonNull Class<T> clazz) {
         Logger.d(TAG, "entering bridgeableFromBundle with bundle(%s) for class(%s)", bundle, clazz);
 
+        //noinspection TryWithIdenticalCatches
         try {
             Class clz = Class.forName(clazz.getName());
             Constructor[] constructors = clz.getDeclaredConstructors();
@@ -89,6 +91,7 @@ public final class BridgeArguments {
                         args[0] = bundle;
                         Object result = constructor.newInstance(args);
                         if (clazz.isInstance(result)) {
+                            //noinspection unchecked
                             return (T) result;
                         } else {
                             Logger.w(TAG, "Object creation from bundle not possible since the created object(%s) is not an instance of %s", result, clazz);
@@ -101,7 +104,7 @@ public final class BridgeArguments {
             Logger.w(TAG, "Could not find a constructor that takes in a Bundle param for class(%s)", clazz);
         } catch (ClassNotFoundException e) {
             logException(e);
-        } catch (InstantiationException e) {
+        } catch (@SuppressWarnings("TryWithIdenticalCatches") InstantiationException e) {
             logException(e);
         } catch (IllegalAccessException e) {
             logException(e);

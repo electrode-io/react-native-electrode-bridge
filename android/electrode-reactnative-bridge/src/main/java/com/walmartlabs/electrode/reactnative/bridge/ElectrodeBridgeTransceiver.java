@@ -16,6 +16,9 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Class that is responsible for transmitting messages between native and react native
+ */
 class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements ElectrodeBridge, ElectrodeReactBridge {
 
     private static final String TAG = ElectrodeBridgeTransceiver.class.getSimpleName();

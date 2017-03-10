@@ -43,8 +43,6 @@ public class BridgeMessage {
         }
     }
 
-    private static final String TAG = BridgeMessage.class.getSimpleName();
-
     public static final String BRIDGE_MSG_NAME = "name";
     public static final String BRIDGE_MSG_ID = "id";
     public static final String BRIDGE_MSG_TYPE = "type";

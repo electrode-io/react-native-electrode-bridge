@@ -31,6 +31,7 @@ public interface FailureMessage {
      *
      * @return Exception
      */
+    @SuppressWarnings("unused")
     @Nullable
     Throwable getException();
 
@@ -40,6 +41,7 @@ public interface FailureMessage {
      *
      * @return String
      */
+    @SuppressWarnings("unused")
     @Nullable
     String getDebugMessage();
 }

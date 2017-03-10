@@ -4,10 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReadableMap;
 
-/**
- * Created by d0g00g4 on 3/9/17.
- */
-
 public interface ElectrodeReactBridge {
 
     /**

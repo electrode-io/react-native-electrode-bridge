@@ -22,6 +22,7 @@ public interface RequestRegistrar<T> {
      *
      * @param requestHandlerUuid The UUID that was obtained through initial registerRequestHandler call
      */
+    @SuppressWarnings("unused")
     void unregisterRequestHandler(@NonNull UUID requestHandlerUuid);
 
     /**

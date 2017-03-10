@@ -93,8 +93,6 @@ public final class ElectrodeBridgeHolder {
      * @param name           The request name this handler can handle
      * @param requestHandler The request handler instance
      */
-    @SuppressWarnings("unused")
-    @NonNull
     public static void registerRequestHandler(@NonNull String name,
                                               @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler) {
         if (!isReactNativeReady) {
@@ -111,9 +109,7 @@ public final class ElectrodeBridgeHolder {
      *
      * @param name          The event name this listener is interested in
      * @param eventListener The event listener
-     * @return A UUID to pass back to unregisterEventListener
      */
-    @SuppressWarnings("unused")
     public static void addEventListener(@NonNull String name,
                                         @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         if (!isReactNativeReady) {

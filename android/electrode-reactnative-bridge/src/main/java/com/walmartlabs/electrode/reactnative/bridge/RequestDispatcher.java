@@ -9,7 +9,7 @@ public interface RequestDispatcher {
     /**
      * Checks to see if a request handler is available for given request
      *
-     * @param name
+     * @param name {@link String} request name
      * @return true | false
      */
     boolean canHandleRequest(@NonNull String name);

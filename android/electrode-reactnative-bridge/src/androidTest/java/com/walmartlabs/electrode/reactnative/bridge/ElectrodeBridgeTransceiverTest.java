@@ -220,7 +220,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         });
 
 
-        ElectrodeBridgeTransceiver.instance().dispatchEvent(eventMap);
+        ElectrodeBridgeTransceiver.instance().sendMessage(eventMap);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }
@@ -294,7 +294,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        ElectrodeBridgeTransceiver.instance().dispatchEvent(eventMap);
+        ElectrodeBridgeTransceiver.instance().sendMessage(eventMap);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

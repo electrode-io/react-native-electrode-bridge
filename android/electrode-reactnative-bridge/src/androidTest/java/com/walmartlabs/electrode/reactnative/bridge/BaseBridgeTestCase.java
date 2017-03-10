@@ -165,7 +165,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
                                     finalResponse.putMap(ElectrodeBridgeResponse.BRIDGE_MSG_DATA, responseData);
                                 }
                             }
-                            ElectrodeBridgeTransceiver.instance().dispatchEvent(finalResponse);
+                            ElectrodeBridgeTransceiver.instance().sendMessage(finalResponse);
                         }
                     });
                     break;

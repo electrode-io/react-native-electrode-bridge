@@ -16,7 +16,7 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements ElectrodeBridge {
+class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements ElectrodeBridge, ElectrodeReactBridge {
 
     private static final String TAG = ElectrodeBridgeTransceiver.class.getSimpleName();
 
@@ -138,15 +138,16 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
      * @param data The event data
      */
     @ReactMethod
-    public void dispatchEvent(@NonNull final ReadableMap data) {
-        Logger.d(TAG, "received event from JS(data=%s)", data);
+    @Override
+    public void sendMessage(@NonNull final ReadableMap data) {
+        Logger.d(TAG, "received message from JS(data=%s)", data);
         BridgeMessage.Type type = BridgeMessage.Type.getType(data.getString(BridgeMessage.BRIDGE_MSG_TYPE));
         if (type != null) {
             switch (type) {
                 case EVENT:
                     ElectrodeBridgeEvent event = ElectrodeBridgeEvent.create(data);
                     if (event != null) {
-                        Logger.d(TAG, "Received event is a regular EVENT(name=%s), will notify local event listeners.", event.getName());
+                        Logger.d(TAG, "Received message is an EVENT(name=%s), will notify local event listeners.", event.getName());
                         notifyLocalEventListeners(event);
                     } else {
                         throw new IllegalArgumentException("Unable to construct event from data");
@@ -155,7 +156,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
                 case REQUEST:
                     ElectrodeBridgeRequest request = ElectrodeBridgeRequest.create(data);
                     if (request != null) {
-                        Logger.d(TAG, "Received event is a REQUEST(name=%s), will look for a request handler and forward this request", request.getName());
+                        Logger.d(TAG, "Received message is a REQUEST(name=%s), will look for a request handler and forward this request", request.getName());
                         handleRequest(request, null);
                     } else {
                         throw new IllegalArgumentException("Unable to construct request from data");
@@ -165,7 +166,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
                 case RESPONSE:
                     ElectrodeBridgeResponse response = ElectrodeBridgeResponse.create(data);
                     if (response != null) {
-                        Logger.d(TAG, "Received event is a RESPONSE for a request(name=%s, id=%s)", response.getName(), response.getId());
+                        Logger.d(TAG, "Received message is a RESPONSE for a request(name=%s, id=%s)", response.getName(), response.getId());
                         handleResponse(response);
                     } else {
                         throw new IllegalArgumentException("Unable to construct a response from data");

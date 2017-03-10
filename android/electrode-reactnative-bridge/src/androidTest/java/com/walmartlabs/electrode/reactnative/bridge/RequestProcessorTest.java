@@ -218,7 +218,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
         request.putMap(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, inputPerson);
 
-        ElectrodeBridgeTransceiver.instance().dispatchEvent(request);
+        ElectrodeBridgeTransceiver.instance().sendMessage(request);
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
@@ -274,7 +274,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         map.putString(BridgeMessage.BRIDGE_MSG_NAME, PersonApi.Requests.REQUEST_GET_PERSON);
         map.putString(BridgeMessage.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
 
-        electrodeBridgeTransceiver.dispatchEvent(map);
+        electrodeBridgeTransceiver.sendMessage(map);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

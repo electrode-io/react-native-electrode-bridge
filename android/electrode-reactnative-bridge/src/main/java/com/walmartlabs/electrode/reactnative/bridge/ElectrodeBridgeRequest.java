@@ -57,7 +57,6 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
         private final String mName;
         private Object mData;
         private int mTimeoutMs;
-        private String mId;
 
         /**
          * Initializes a new request builder
@@ -76,6 +75,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
          * @param timeoutMs The timeout in milliseconds
          * @return Current builder instance for chaining
          */
+        @SuppressWarnings("unused")
         public Builder withTimeout(int timeoutMs) {
             this.mTimeoutMs = timeoutMs;
             return this;

@@ -18,7 +18,6 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
      * @param requestHandler The request handler instance
      * @return UUID to provide when calling unregisterRequestHandler
      */
-    @SuppressWarnings("unused")
     @NonNull
     public UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler) {
         UUID requestHandlerUuid = UUID.randomUUID();
@@ -32,7 +31,6 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
      *
      * @param requestHandlerUuid The UUID that was obtained through initial registerRequestHandler call
      */
-    @SuppressWarnings("unused")
     public void unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
         String requestName = mRequestNameByUUID.remove(requestHandlerUuid);
         if (requestName != null) {

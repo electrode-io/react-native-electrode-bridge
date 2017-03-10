@@ -2,7 +2,6 @@ package com.walmartlabs.electrode.reactnative.bridge;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
@@ -13,7 +12,7 @@ import java.util.Map;
 
 /**
  * Client facing class.
- * Facade to ElectrodeBridgeInternal.
+ * Facade to ElectrodeBridgeTransceiver.
  * Handles queuing every method calls until react native is ready.
  */
 public final class ElectrodeBridgeHolder {
@@ -39,11 +38,11 @@ public final class ElectrodeBridgeHolder {
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
 
     static {
-        ElectrodeBridgeInternal.registerReactNativeReadyListener(new ElectrodeBridgeInternal.ReactNativeReadyListener() {
+        ElectrodeBridgeTransceiver.registerReactNativeReadyListener(new ElectrodeBridgeTransceiver.ReactNativeReadyListener() {
             @Override
             public void onReactNativeReady() {
                 isReactNativeReady = true;
-                electrodeBridge = ElectrodeBridgeInternal.instance();
+                electrodeBridge = ElectrodeBridgeTransceiver.instance();
                 registerQueuedEventListeners();
                 registerQueuedRequestHandlers();
                 sendQueuedRequests();
@@ -66,7 +65,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        electrodeBridge.emitEvent(event);
+        electrodeBridge.sendEvent(event);
     }
 
     /**
@@ -94,8 +93,6 @@ public final class ElectrodeBridgeHolder {
      * @param name           The request name this handler can handle
      * @param requestHandler The request handler instance
      */
-    @SuppressWarnings("unused")
-    @NonNull
     public static void registerRequestHandler(@NonNull String name,
                                               @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler) {
         if (!isReactNativeReady) {
@@ -112,9 +109,7 @@ public final class ElectrodeBridgeHolder {
      *
      * @param name          The event name this listener is interested in
      * @param eventListener The event listener
-     * @return A UUID to pass back to unregisterEventListener
      */
-    @SuppressWarnings("unused")
     public static void addEventListener(@NonNull String name,
                                         @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         if (!isReactNativeReady) {
@@ -149,7 +144,7 @@ public final class ElectrodeBridgeHolder {
 
     private static void emitQueuedEvents() {
         for (ElectrodeBridgeEvent event : mQueuedEvents) {
-            electrodeBridge.emitEvent(event);
+            electrodeBridge.sendEvent(event);
         }
         mQueuedEvents.clear();
     }

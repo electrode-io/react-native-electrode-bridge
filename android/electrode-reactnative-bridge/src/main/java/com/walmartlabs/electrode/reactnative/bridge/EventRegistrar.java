@@ -22,7 +22,6 @@ public interface EventRegistrar<T> {
      *
      * @param eventListenerUuid The UUID that was obtained through initial registerEventListener call
      */
-    @SuppressWarnings("unused")
     void unregisterEventListener(@NonNull UUID eventListenerUuid);
 
     /**

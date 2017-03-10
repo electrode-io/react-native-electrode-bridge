@@ -4,10 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-/**
- * Created by d0g00g4 on 3/6/17.
- */
-
 public class BridgeTransaction {
 
     private final ElectrodeBridgeRequest request;

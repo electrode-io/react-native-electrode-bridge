@@ -19,7 +19,7 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
      * @param eventListener The event listener
      * @return A UUID to pass back to unregisterEventListener
      */
-    @SuppressWarnings("unused")
+    @NonNull
     public UUID registerEventListener(@NonNull String name, @NonNull T eventListener) {
         UUID eventListenerUuid = UUID.randomUUID();
         if (mEventListenersByEventName.containsKey(name)) {
@@ -38,7 +38,6 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
      *
      * @param eventListenerUuid The UUID that was obtained through initial registerEventListener call
      */
-    @SuppressWarnings("unused")
     public void unregisterEventListener(@NonNull UUID eventListenerUuid) {
         T eventListener = mEventListenerByUUID.remove(eventListenerUuid);
         if (eventListener != null) {

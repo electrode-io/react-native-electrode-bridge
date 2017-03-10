@@ -84,8 +84,8 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         @Override
         public List<NativeModule> createNativeModules(final ReactApplicationContext reactContext) {
             List<NativeModule> modules = new ArrayList<>();
-            this.electrodeBridgeInternal = ElectrodeBridgeInternal.create(getReactContextWrapper(reactContext));
-            modules.add(electrodeBridgeInternal);
+            this.electrodeBridgeTransceiver = ElectrodeBridgeTransceiver.create(getReactContextWrapper(reactContext));
+            modules.add(electrodeBridgeTransceiver);
             return modules;
         }
     }
@@ -165,7 +165,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
                                     finalResponse.putMap(ElectrodeBridgeResponse.BRIDGE_MSG_DATA, responseData);
                                 }
                             }
-                            ElectrodeBridgeInternal.instance().dispatchEvent(finalResponse);
+                            ElectrodeBridgeTransceiver.instance().sendMessage(finalResponse);
                         }
                     });
                     break;

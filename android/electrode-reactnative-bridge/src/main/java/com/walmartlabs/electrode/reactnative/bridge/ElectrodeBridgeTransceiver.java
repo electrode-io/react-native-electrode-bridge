@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -17,16 +16,19 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements ElectrodeBridge {
+/**
+ * Class that is responsible for transmitting messages between native and react native
+ */
+class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements ElectrodeBridge, ElectrodeReactBridge {
 
-    private static final String TAG = ElectrodeBridgeInternal.class.getSimpleName();
+    private static final String TAG = ElectrodeBridgeTransceiver.class.getSimpleName();
 
     private final ReactContextWrapper mReactContextWrapper;
     private final EventDispatcher mEventDispatcher;
     private final RequestDispatcher mRequestDispatcher;
 
     // Singleton instance of the bridge
-    private static ElectrodeBridgeInternal sInstance;
+    private static ElectrodeBridgeTransceiver sInstance;
 
     private final ConcurrentHashMap<String, BridgeTransaction> pendingTransactions = new ConcurrentHashMap<>();
     private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar = new EventRegistrarImpl<>();
@@ -35,11 +37,11 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     private static boolean sIsReactNativeReady;
 
     /**
-     * Initializes a new instance of ElectrodeBridgeInternal
+     * Initializes a new instance of ElectrodeBridgeTransceiver
      *
      * @param reactContextWrapper The react application context
      */
-    private ElectrodeBridgeInternal(@NonNull ReactContextWrapper reactContextWrapper) {
+    private ElectrodeBridgeTransceiver(@NonNull ReactContextWrapper reactContextWrapper) {
         super(reactContextWrapper.getContext());
         mReactContextWrapper = reactContextWrapper;
         mEventDispatcher = new EventDispatcherImpl(mEventRegistrar);
@@ -47,27 +49,27 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     }
 
     /**
-     * Creates the ElectrodeBridgeInternal singleton
+     * Creates the ElectrodeBridgeTransceiver singleton
      *
      * @param reactApplicationContext The react application context
-     * @return The singleton instance of ElectrodeBridgeInternal
+     * @return The singleton instance of ElectrodeBridgeTransceiver
      */
-    static ElectrodeBridgeInternal create(ReactApplicationContext reactApplicationContext) {
+    static ElectrodeBridgeTransceiver create(ReactApplicationContext reactApplicationContext) {
         return create(new ReactContextWrapperInternal(reactApplicationContext));
     }
 
     /**
-     * Creates the ElectrodeBridgeInternal singleton
+     * Creates the ElectrodeBridgeTransceiver singleton
      *
      * @param reactContextWrapper {@link ReactContextWrapper}
-     * @return The singleton instance of ElectrodeBridgeInternal
+     * @return The singleton instance of ElectrodeBridgeTransceiver
      */
     @VisibleForTesting
-    static ElectrodeBridgeInternal create(@NonNull ReactContextWrapper reactContextWrapper) {
-        Logger.d(TAG, "Creating ElectrodeBridgeInternal instance");
-        synchronized (ElectrodeBridgeInternal.class) {
+    static ElectrodeBridgeTransceiver create(@NonNull ReactContextWrapper reactContextWrapper) {
+        Logger.d(TAG, "Creating ElectrodeBridgeTransceiver instance");
+        synchronized (ElectrodeBridgeTransceiver.class) {
             if (sInstance == null) {
-                sInstance = new ElectrodeBridgeInternal(reactContextWrapper);
+                sInstance = new ElectrodeBridgeTransceiver(reactContextWrapper);
             }
         }
         return sInstance;
@@ -76,9 +78,9 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
     /**
      * Returns the singleton instance of the bridge
      */
-    public static ElectrodeBridgeInternal instance() {
+    public static ElectrodeBridgeTransceiver instance() {
         if (sInstance == null) {
-            throw new IllegalStateException("Bridge singleton has not been created. Make sure to call createMessage first.");
+            throw new IllegalStateException("Bridge transceiver instance has not been created yet. Transceiver requires a valid ReactContext to get initialized. Make sure to that BridgePackage is added to react module which normally initializes transceiver.");
         }
         return sInstance;
     }
@@ -111,7 +113,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
      */
     @SuppressWarnings("unused")
     @Override
-    public void emitEvent(@NonNull ElectrodeBridgeEvent event) {
+    public void sendEvent(@NonNull ElectrodeBridgeEvent event) {
         Logger.d(TAG, "Emitting event[name:%s id:%s]", event.getName(), event.getId());
 
         notifyReactEventListeners(event);
@@ -139,15 +141,16 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
      * @param data The event data
      */
     @ReactMethod
-    public void dispatchEvent(@NonNull final ReadableMap data) {
-        Logger.d(TAG, "received event from JS(data=%s)", data);
+    @Override
+    public void sendMessage(@NonNull final ReadableMap data) {
+        Logger.d(TAG, "received message from JS(data=%s)", data);
         BridgeMessage.Type type = BridgeMessage.Type.getType(data.getString(BridgeMessage.BRIDGE_MSG_TYPE));
         if (type != null) {
             switch (type) {
                 case EVENT:
                     ElectrodeBridgeEvent event = ElectrodeBridgeEvent.create(data);
                     if (event != null) {
-                        Logger.d(TAG, "Received event is a regular EVENT(name=%s), will notify local event listeners.", event.getName());
+                        Logger.d(TAG, "Received message is an EVENT(name=%s), will notify local event listeners.", event.getName());
                         notifyLocalEventListeners(event);
                     } else {
                         throw new IllegalArgumentException("Unable to construct event from data");
@@ -156,7 +159,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
                 case REQUEST:
                     ElectrodeBridgeRequest request = ElectrodeBridgeRequest.create(data);
                     if (request != null) {
-                        Logger.d(TAG, "Received event is a REQUEST(name=%s), will look for a request handler and forward this request", request.getName());
+                        Logger.d(TAG, "Received message is a REQUEST(name=%s), will look for a request handler and forward this request", request.getName());
                         handleRequest(request, null);
                     } else {
                         throw new IllegalArgumentException("Unable to construct request from data");
@@ -166,7 +169,7 @@ class ElectrodeBridgeInternal extends ReactContextBaseJavaModule implements Elec
                 case RESPONSE:
                     ElectrodeBridgeResponse response = ElectrodeBridgeResponse.create(data);
                     if (response != null) {
-                        Logger.d(TAG, "Received event is a RESPONSE for a request(name=%s, id=%s)", response.getName(), response.getId());
+                        Logger.d(TAG, "Received message is a RESPONSE for a request(name=%s, id=%s)", response.getName(), response.getId());
                         handleResponse(response);
                     } else {
                         throw new IllegalArgumentException("Unable to construct a response from data");

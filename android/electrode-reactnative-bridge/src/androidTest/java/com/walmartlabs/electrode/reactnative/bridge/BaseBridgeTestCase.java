@@ -203,6 +203,14 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         return eventMap;
     }
 
+    WritableMap getRequestMap(String requestName) {
+        WritableMap request = Arguments.createMap();
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_ID, ElectrodeBridgeRequest.getUUID());
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME, requestName);
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
+        return request;
+    }
+
 
     /**
      * This interface is a mock representation of JS side receiving an event.

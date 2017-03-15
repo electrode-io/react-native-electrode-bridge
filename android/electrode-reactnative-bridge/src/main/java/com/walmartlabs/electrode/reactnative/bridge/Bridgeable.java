@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 /**
- * Indicates that any class that implements this interface can be sent across the ElectrodeBridge.
+ * Indicates that any class that implements this interface can be sent across the ElectrodeNativeBridge.
  */
 
 public interface Bridgeable {

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Class that is responsible for transmitting messages between native and react native
  */
-class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements ElectrodeBridge, ElectrodeReactBridge {
+class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements ElectrodeNativeBridge, ElectrodeReactBridge {
 
     private static final String TAG = ElectrodeBridgeTransceiver.class.getSimpleName();
 
@@ -91,7 +91,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
      */
     @Override
     public String getName() {
-        return "ElectrodeBridge";
+        return "ElectrodeNativeBridge";
     }
 
     @NonNull

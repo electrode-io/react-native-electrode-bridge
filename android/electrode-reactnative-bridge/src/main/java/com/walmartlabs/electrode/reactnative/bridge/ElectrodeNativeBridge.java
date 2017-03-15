@@ -9,7 +9,7 @@ import java.util.UUID;
  * Client facing bridge api. Defines all the actions that a native client can perform through the bridge.
  */
 
-public interface ElectrodeBridge {
+public interface ElectrodeNativeBridge {
     /**
      * Send a request from Android native to either Native or React Native side depending on where the request handler is registered.
      *

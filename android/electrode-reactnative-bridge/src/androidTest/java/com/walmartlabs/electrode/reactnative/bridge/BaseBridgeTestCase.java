@@ -132,7 +132,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     }
 
     /**
-     * This is mainly exposed to mock a JS side event handling. This is called when {@link ElectrodeBridge} emits en event to JS side to handle a request or event.
+     * This is mainly exposed to mock a JS side event handling. This is called when {@link ElectrodeNativeBridge} emits en event to JS side to handle a request or event.
      *
      * @param inputMessage {@link WritableMap}
      */

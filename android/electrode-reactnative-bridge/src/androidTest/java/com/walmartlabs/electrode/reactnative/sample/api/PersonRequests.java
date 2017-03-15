@@ -1,8 +1,8 @@
 package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeHolder;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
 import com.walmartlabs.electrode.reactnative.bridge.None;
@@ -40,6 +40,11 @@ final class PersonRequests implements PersonApi.Requests {
     }
 
     @Override
+    public void registerUpdatePersonRequestHandler(@NonNull ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler) {
+        new RequestHandlerProcessor<>(REQUEST_POST_PERSON_UPDATE, UpdatePersonRequestData.class, Person.class, handler).execute();
+    }
+
+    @Override
     public void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
         new RequestProcessor<>(REQUEST_GET_PERSON, null, Person.class, responseListener).execute();
     }
@@ -59,5 +64,10 @@ final class PersonRequests implements PersonApi.Requests {
     @Override
     public void getAge(@NonNull String name, @NonNull final ElectrodeBridgeResponseListener<Integer> responseListener) {
         new RequestProcessor<>(REQUEST_GET_AGE, name, Integer.class, responseListener).execute();
+    }
+
+    @Override
+    public void updatePersonPost(@NonNull UpdatePersonRequestData updatePersonRequestData, @NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
+        new RequestProcessor<>(REQUEST_POST_PERSON_UPDATE, updatePersonRequestData, Person.class, responseListener).execute();
     }
 }

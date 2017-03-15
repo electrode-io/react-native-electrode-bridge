@@ -20,11 +20,11 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
     public void testSendRequestForTimeOut() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
+        ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").build();
 
-        electrodeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 assertNotNull(failureMessage);
@@ -42,9 +42,9 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
     public void testSendRequestWithEmptyRequestDataAndNonEmptyResponse() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "yay tests";
-        ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
+        ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
-        electrodeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
+        electrodeNativeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
             @Override
             public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
                 assertNotNull(payload);
@@ -57,7 +57,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").build();
-        electrodeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 fail();
@@ -76,9 +76,9 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
     public void testSendRequestWithRequestDataAndEmptyResponse() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedInput = "expectedInput";
-        ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
+        ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
-        electrodeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
+        electrodeNativeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
             @Override
             public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
                 assertNotNull(payload);
@@ -91,7 +91,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").withData(expectedInput).build();
-        electrodeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 fail();
@@ -112,7 +112,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedInput = "expectedInput";
         final String REQUEST_NAME = "testSendRequestWithRequestDataAndEmptyResponseWithJSRequestHandler";
-        ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
+        ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
         UUID uuid = addMockEventListener(REQUEST_NAME, new MockElectrodeEventListener() {
             @Override
@@ -137,7 +137,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         });
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder(REQUEST_NAME).withData(expectedInput).build();
-        electrodeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 fail();
@@ -163,8 +163,8 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
-        final ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
@@ -195,7 +195,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        electrodeBridge.sendEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(TEST_EVENT_VALUE).build());
+        electrodeNativeBridge.sendEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(TEST_EVENT_VALUE).build());
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
     }
@@ -208,8 +208,8 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        final ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
@@ -231,8 +231,8 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
-        final ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);
@@ -267,7 +267,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        electrodeBridge.sendEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(person).build());
+        electrodeNativeBridge.sendEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(person).build());
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
@@ -281,8 +281,8 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        final ElectrodeBridge electrodeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
             @Override
             public void onEvent(@Nullable Bundle eventPayload) {
                 assertNotNull(eventPayload);

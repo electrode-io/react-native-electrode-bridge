@@ -8,6 +8,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
+import com.walmartlabs.electrode.reactnative.sample.api.UpdatePersonRequestData;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -212,10 +213,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         inputPerson.putString("name", person.getName());
         inputPerson.putInt("month", person.getMonth());
 
-        WritableMap request = Arguments.createMap();
-        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_ID, ElectrodeBridgeRequest.getUUID());
-        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME, PersonApi.Requests.REQUEST_GET_STATUS);
-        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
+        WritableMap request = getRequestMap(PersonApi.Requests.REQUEST_GET_STATUS);
         request.putMap(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, inputPerson);
 
         ElectrodeBridgeTransceiver.instance().sendMessage(request);
@@ -279,4 +277,142 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+
+    public void testRequestsWithMultipleParamsNativeToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final String firstName = "Tom";
+        final String lastName = "Jerry";
+        final Status status = new Status.Builder(false).build();
+
+        PersonApi.requests().registerUpdatePersonRequestHandler(new ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person>() {
+            @Override
+            public void onRequest(@Nullable UpdatePersonRequestData payload, @NonNull ElectrodeBridgeResponseListener<Person> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(new Person.Builder((payload.getFirstName() + payload.getLastName()), 0).status(status).build());
+            }
+        });
+
+
+        PersonApi.requests().updatePersonPost(new UpdatePersonRequestData.Builder(firstName, lastName, status).build(), new ElectrodeBridgeResponseListener<Person>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable Person responseData) {
+                assertNotNull(responseData);
+                assertEquals((firstName + lastName), responseData.getName());
+                assertNotNull(responseData.getStatus());
+                assertEquals(status.getMember(), responseData.getStatus().getMember());
+                countDownLatch.countDown();
+            }
+        });
+
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testRequestsWithMultipleParamsJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final String firstName = "Tom";
+        final String lastName = "Jerry";
+        final Status status = new Status.Builder(false).build();
+
+        ElectrodeBridgeTransceiver transceiver = ElectrodeBridgeTransceiver.instance();
+
+        PersonApi.requests().registerUpdatePersonRequestHandler(new ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person>() {
+            @Override
+            public void onRequest(@Nullable UpdatePersonRequestData payload, @NonNull ElectrodeBridgeResponseListener<Person> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(new Person.Builder((payload.getFirstName() + payload.getLastName()), 0).status(status).build());
+            }
+        });
+
+
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                assertTrue(response.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                ReadableMap person = response.getMap(BridgeMessage.BRIDGE_MSG_DATA);
+                assertNotNull(person);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+        WritableMap requestData = Arguments.createMap();
+        requestData.putString("firstName", firstName);
+        requestData.putString("lastName", lastName);
+        requestData.putMap("status", Arguments.fromBundle(status.toBundle()));
+
+        WritableMap requestMap = getRequestMap(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE);
+        requestMap.putMap(BridgeMessage.BRIDGE_MSG_DATA, requestData);
+
+        transceiver.sendMessage(requestMap);
+
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+    }
+
+    public void testRequestsWithMultipleParamsNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final String firstName = "Tom";
+        final String lastName = "Jerry";
+        final Status status = new Status.Builder(false).build();
+
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                ReadableMap requestData = request.getMap(BridgeMessage.BRIDGE_MSG_DATA);
+                assertNotNull(requestData);
+                Status _status = new Status.Builder(requestData.getMap("status").getBoolean("member")).build();
+                Person person = new Person.Builder(requestData.getString("firstName") + requestData.getString("lastName"), 0).status(_status).build();
+                jsResponseDispatcher.dispatchResponse(Arguments.fromBundle(person.toBundle()));
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+
+        PersonApi.requests().updatePersonPost(new UpdatePersonRequestData.Builder(firstName, lastName, status).build(), new ElectrodeBridgeResponseListener<Person>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable Person responseData) {
+                assertNotNull(responseData);
+                assertEquals((firstName + lastName), responseData.getName());
+                assertNotNull(responseData.getStatus());
+                assertEquals(status.getMember(), responseData.getStatus().getMember());
+                countDownLatch.countDown();
+            }
+        });
+
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+    }
 }

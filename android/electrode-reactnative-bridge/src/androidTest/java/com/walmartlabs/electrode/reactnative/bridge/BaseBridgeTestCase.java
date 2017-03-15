@@ -132,7 +132,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     }
 
     /**
-     * This is mainly exposed to mock a JS side event handling. This is called when {@link ElectrodeBridge} emits en event to JS side to handle a request or event.
+     * This is mainly exposed to mock a JS side event handling. This is called when {@link ElectrodeNativeBridge} emits en event to JS side to handle a request or event.
      *
      * @param inputMessage {@link WritableMap}
      */
@@ -201,6 +201,14 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_NAME, TEST_EVENT_NAME);
         eventMap.putString(ElectrodeBridgeEvent.BRIDGE_MSG_TYPE, BridgeMessage.Type.EVENT.getKey());
         return eventMap;
+    }
+
+    WritableMap getRequestMap(String requestName) {
+        WritableMap request = Arguments.createMap();
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_ID, ElectrodeBridgeRequest.getUUID());
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_NAME, requestName);
+        request.putString(ElectrodeBridgeRequest.BRIDGE_MSG_TYPE, BridgeMessage.Type.REQUEST.getKey());
+        return request;
     }
 
 

@@ -1,6 +1,7 @@
 package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeEventListener;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
@@ -75,6 +76,7 @@ public final class PersonApi {
         String REQUEST_GET_STATUS = "com.apisample.ern.apisample.get.status";
         String REQUEST_GET_USER_NAME = "com.apisample.ern.apisample.get.user.name";
         String REQUEST_GET_AGE = "com.apisample.ern.apisample.get.age";
+        String REQUEST_POST_PERSON_UPDATE = "com.apisample.ern.apisample.post.update.person";
 
         /***
          * Registers a handler that returns the current user when {@link #getPerson(ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
@@ -91,6 +93,8 @@ public final class PersonApi {
         void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler);
 
         void registerGetAgeRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<String, Integer> handler);
+
+        void registerUpdatePersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler);
 
 
         /**
@@ -116,6 +120,7 @@ public final class PersonApi {
 
         void getAge(@NonNull String name, @NonNull final ElectrodeBridgeResponseListener<Integer> responseListener);
 
+        void updatePersonPost(@NonNull UpdatePersonRequestData updatePersonRequestData, @NonNull final ElectrodeBridgeResponseListener<Person> responseListener);
     }
 
 }

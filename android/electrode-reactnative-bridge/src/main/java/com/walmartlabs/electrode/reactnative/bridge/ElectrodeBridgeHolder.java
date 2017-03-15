@@ -21,7 +21,7 @@ public final class ElectrodeBridgeHolder {
 
     private static boolean isReactNativeReady;
 
-    private static ElectrodeBridge electrodeBridge;
+    private static ElectrodeNativeBridge electrodeNativeBridge;
 
     // We queue requests/events as long as react native initialization is not complete.
     // Indeed, if a client of the bridge calls `sendRequest` upon it's application start,
@@ -42,7 +42,7 @@ public final class ElectrodeBridgeHolder {
             @Override
             public void onReactNativeReady() {
                 isReactNativeReady = true;
-                electrodeBridge = ElectrodeBridgeTransceiver.instance();
+                electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
                 registerQueuedEventListeners();
                 registerQueuedRequestHandlers();
                 sendQueuedRequests();
@@ -65,7 +65,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        electrodeBridge.sendEvent(event);
+        electrodeNativeBridge.sendEvent(event);
     }
 
     /**
@@ -84,7 +84,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        electrodeBridge.sendRequest(request, responseListener);
+        electrodeNativeBridge.sendRequest(request, responseListener);
     }
 
     /**
@@ -101,7 +101,7 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        electrodeBridge.registerRequestHandler(name, requestHandler);
+        electrodeNativeBridge.registerRequestHandler(name, requestHandler);
     }
 
     /**
@@ -118,33 +118,33 @@ public final class ElectrodeBridgeHolder {
             return;
         }
 
-        electrodeBridge.addEventListener(name, eventListener);
+        electrodeNativeBridge.addEventListener(name, eventListener);
     }
 
     private static void registerQueuedRequestHandlers() {
         for (Map.Entry<String, ElectrodeBridgeRequestHandler<Bundle, Object>> entry : mQueuedRequestHandlersRegistration.entrySet()) {
-            electrodeBridge.registerRequestHandler(entry.getKey(), entry.getValue());
+            electrodeNativeBridge.registerRequestHandler(entry.getKey(), entry.getValue());
         }
         mQueuedRequestHandlersRegistration.clear();
     }
 
     private static void registerQueuedEventListeners() {
         for (Map.Entry<String, ElectrodeBridgeEventListener<Bundle>> entry : mQueuedEventListenersRegistration.entrySet()) {
-            electrodeBridge.addEventListener(entry.getKey(), entry.getValue());
+            electrodeNativeBridge.addEventListener(entry.getKey(), entry.getValue());
         }
         mQueuedEventListenersRegistration.clear();
     }
 
     private static void sendQueuedRequests() {
         for (Map.Entry<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener<Bundle>> entry : mQueuedRequests.entrySet()) {
-            electrodeBridge.sendRequest(entry.getKey(), entry.getValue());
+            electrodeNativeBridge.sendRequest(entry.getKey(), entry.getValue());
         }
         mQueuedRequests.clear();
     }
 
     private static void emitQueuedEvents() {
         for (ElectrodeBridgeEvent event : mQueuedEvents) {
-            electrodeBridge.sendEvent(event);
+            electrodeNativeBridge.sendEvent(event);
         }
         mQueuedEvents.clear();
     }

@@ -84,26 +84,51 @@ public class BridgeMessage {
         }
     }
 
+    /**
+     * Unique name of the message.
+     *
+     * @return String
+     */
     @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * Unique ID representing the bridge message.
+     *
+     * @return String
+     */
     @NonNull
     public String getId() {
         return id;
     }
 
+    /**
+     * Type of the message
+     *
+     * @return Type
+     */
     @NonNull
     public Type getType() {
         return type;
     }
 
+    /**
+     * Data that is being passed
+     *
+     * @return Object
+     */
     @Nullable
     public Object getData() {
         return data;
     }
 
+    /**
+     * Returns a writable map representation of {@link BridgeMessage}
+     *
+     * @return WritableMap
+     */
     @NonNull
     public WritableMap map() {
         WritableMap writableMap = Arguments.createMap();
@@ -122,6 +147,11 @@ public class BridgeMessage {
         return writableMap;
     }
 
+    /**
+     * Returns a {@link Bundle} representation of {@link BridgeMessage}
+     *
+     * @return Bundle
+     */
     @NonNull
     public Bundle bundle() {
         Bundle bundle = new Bundle();

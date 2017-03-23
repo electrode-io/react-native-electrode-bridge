@@ -5,8 +5,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.api.UpdatePersonRequestData;
@@ -532,6 +535,73 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 countDownLatch.countDown();
             }
         });
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testRequestsWithListJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final Status status = new Status.Builder(true).log(false).build();
+        final Status status1 = new Status.Builder(true).log(false).build();
+        final Status status2 = new Status.Builder(true).log(false).build();
+
+        final Person person = new Person.Builder("test1", 1).build();
+        final Person person1 = new Person.Builder("test2", 2).build();
+        final Person person2 = new Person.Builder("test3", 3).build();
+        final List<Person> personList = new ArrayList<Person>() {{
+            add(person);
+            add(person1);
+            add(person2);
+        }};
+
+        PersonApi.requests().registerFindPersonsByStatus(new ElectrodeBridgeRequestHandler<List<Status>, List<Person>>() {
+            @Override
+            public void onRequest(@Nullable List<Status> payload, @NonNull ElectrodeBridgeResponseListener<List<Person>> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(personList);
+                countDownLatch.countDown();
+            }
+        });
+
+        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                ReadableArray readableArray = response.getArray(BridgeMessage.BRIDGE_MSG_DATA);
+                assertNotNull(readableArray);
+                List<Person> actualPersonList = (List<Person>) BridgeArguments.generateObject(ArgumentsEx.toBundle(response, BridgeMessage.BRIDGE_MSG_DATA), Person.class);
+                assertNotNull(actualPersonList);
+                for (int i = 0; i < personList.size(); i++) {
+                    Person expected = personList.get(i);
+                    Person actual = actualPersonList.get(i);
+                    assertEquals(expected.getName(), actual.getName());
+                    assertEquals(expected.getMonth(), actual.getMonth());
+                }
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+
+        WritableArray writableArray = Arguments.createArray();
+        writableArray.pushMap(Arguments.fromBundle(status.toBundle()));
+        writableArray.pushMap(Arguments.fromBundle(status1.toBundle()));
+        writableArray.pushMap(Arguments.fromBundle(status2.toBundle()));
+
+        WritableMap request = getRequestMap(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS);
+        request.putArray(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, writableArray);
+
+        ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+        reactBridge.sendMessage(request);
+
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 }

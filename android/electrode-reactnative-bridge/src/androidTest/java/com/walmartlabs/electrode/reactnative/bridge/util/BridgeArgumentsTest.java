@@ -11,7 +11,8 @@ import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
 import junit.framework.TestCase;
 
-import static com.walmartlabs.electrode.reactnative.bridge.BridgeMessage.Type.REQUEST;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BridgeArgumentsTest extends TestCase {
 
@@ -80,4 +81,85 @@ public class BridgeArgumentsTest extends TestCase {
         assertEquals(expectedArray.length, actualArray.length);
 
     }
+
+    public void testGenerateBundleForList() {
+        final Person person = new Person.Builder("test1", 1).build();
+        final Person person1 = new Person.Builder("test2", 2).build();
+        final Person person2 = new Person.Builder("test3", 3).build();
+        List<Person> personList = new ArrayList<Person>() {{
+            add(person);
+            add(person1);
+            add(person2);
+        }};
+
+        Bundle bundle = BridgeArguments.generateDataBundle(personList);
+        assertNotNull(bundle);
+
+        List<Person> personListCopy = (List<Person>) BridgeArguments.generateObject(bundle, Person.class);
+        assertNotNull(personListCopy);
+        assertEquals(personList.size(), personListCopy.size());
+        for (int i = 0; i < personList.size(); i++) {
+            Person expected = personList.get(i);
+            Person actual = personListCopy.get(i);
+            assertNotNull(actual);
+            assertEquals(expected.getName(), actual.getName());
+            assertEquals(expected.getMonth(), actual.getMonth());
+        }
+    }
+
+
+    public void testGenerateObjectForBridgeable() {
+        final Person person = new Person.Builder("test1", 1).build();
+        Bundle bundle = BridgeArguments.generateDataBundle(person);
+        assertNotNull(bundle);
+
+        final Person personCopy = (Person) BridgeArguments.generateObject(bundle, Person.class);
+        assertNotNull(personCopy);
+        assertEquals(person.getName(), personCopy.getName());
+        assertEquals(person.getMonth(), personCopy.getMonth());
+    }
+
+    public void testGenerateObjectForString() {
+        final String expected = "test";
+        Bundle bundle = BridgeArguments.generateDataBundle(expected);
+        assertNotNull(bundle);
+
+        final String actual = (String) BridgeArguments.generateObject(bundle, String.class);
+        assertNotNull(actual);
+        assertEquals(expected, actual);
+    }
+
+    public void testGenerateObjectForStringArray() {
+        final String[] expected = {"one", "two"};
+        Bundle bundle = BridgeArguments.generateDataBundle(expected);
+        assertNotNull(bundle);
+
+        final String[] actual = (String[]) BridgeArguments.generateObject(bundle, String[].class);
+        assertNotNull(actual);
+        assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i]);
+        }
+    }
+
+    public void testGenerateObjectForInteger() {
+        final Integer expected = 1;
+        Bundle bundle = BridgeArguments.generateDataBundle(expected);
+        assertNotNull(bundle);
+
+        final Integer actual = (Integer) BridgeArguments.generateObject(bundle, Integer.class);
+        assertNotNull(actual);
+        assertEquals(expected, actual);
+    }
+
+    public void testGenerateObjectForBoolean() {
+        final Boolean expected = true;
+        Bundle bundle = BridgeArguments.generateDataBundle(expected);
+        assertNotNull(bundle);
+
+        final Boolean actual = (Boolean) BridgeArguments.generateObject(bundle, Boolean.class);
+        assertNotNull(actual);
+        assertEquals(expected, actual);
+    }
+
 }

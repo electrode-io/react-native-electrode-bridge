@@ -1,6 +1,7 @@
 package com.walmartlabs.electrode.reactnative.bridge.util;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -11,6 +12,8 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class contains utility methods for bridge
@@ -33,6 +36,35 @@ public final class BridgeArguments {
         if (object instanceof Bridgeable) {
             data = new Bundle();
             data.putBundle(BridgeMessage.BRIDGE_MSG_DATA, ((Bridgeable) object).toBundle());
+        } else if (object instanceof List) {
+            data = new Bundle();
+            List objList = (List) object;
+            if (!objList.isEmpty()) {
+                Object firstItem = objList.get(0);
+                if (firstItem instanceof Bridgeable) {
+                    Bundle[] bundleList = new Bundle[objList.size()];
+                    for (int i = 0; i < objList.size(); i++) {
+                        Object obj = objList.get(i);
+                        if (obj instanceof Bridgeable) {
+                            bundleList[i] = (((Bridgeable) obj).toBundle());
+                        } else {
+                            throw new IllegalArgumentException("Obj should be bridgeable");
+                        }
+                    }
+                    data.putParcelableArray(BridgeMessage.BRIDGE_MSG_DATA, bundleList);
+                } else {
+                    if (firstItem instanceof String) {
+                        ArrayList<String> stringList = new ArrayList<>();
+                        for (Object obj : objList) {
+                            stringList.add((String) obj);
+                        }
+                        data.putStringArrayList(BridgeMessage.BRIDGE_MSG_DATA, stringList);
+                    } else {
+                        throw new IllegalArgumentException("Should never happen, looks like logic to handle " + firstItem.getClass() + " is not implemented yet");
+                    }
+                }
+
+            }
         } else {
             data = BridgeArguments.getBundleForPrimitive(object, object.getClass());
         }
@@ -49,23 +81,40 @@ public final class BridgeArguments {
      * @return T
      */
     @Nullable
-    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
+    public static <T> Object generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
         T response = null;
         if (payload != null
                 && !payload.isEmpty()) {
             String key = BridgeMessage.BRIDGE_MSG_DATA;
 
-            if (payload.get(key) == null) {
+            Object data = payload.get(key);
+
+            if (data == null) {
                 Logger.d(TAG, "Cannot find key(%s) in given bundle:%s", key, payload);
                 return null;
             }
 
-            if (Bridgeable.class.isAssignableFrom(returnClass)) {
+            if (data instanceof Bundle[]) {
+                Parcelable[] parcelables = payload.getParcelableArray(key);
+                if (parcelables != null) {
+                    List<T> objectList = new ArrayList<>();
+                    for (Parcelable parcelable : parcelables) {
+                        if (parcelable instanceof Bundle) {
+                            T item = BridgeArguments.bridgeableFromBundle((Bundle) parcelable, returnClass);
+                            objectList.add(item);
+                        } else {
+                            throw new IllegalArgumentException("Expected a Bundle, but received " + parcelable);
+                        }
+                    }
+                    return objectList;
 
+                } else {
+                    throw new IllegalArgumentException("Expected an arrayList, but received " + payload.get(key));
+                }
+            } else if (data instanceof Bundle) {
                 if (payload.getBundle(key) == null) {
                     throw new IllegalArgumentException("Value for key(" + key + ") should be a bundle, looks like it is not.");
                 }
-
                 response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
             } else {
                 //noinspection unchecked

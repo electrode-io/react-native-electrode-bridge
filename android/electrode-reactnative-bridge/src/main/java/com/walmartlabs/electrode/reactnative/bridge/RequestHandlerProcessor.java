@@ -36,7 +36,7 @@ public class RequestHandlerProcessor<TReq, TResp> {
             @Override
             public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Object> responseListener) {
                 Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
-                TReq request = BridgeArguments.generateObject(payload, reqClazz);
+                TReq request = (TReq) BridgeArguments.generateObject(payload, reqClazz);
 
                 Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, payload);
 

@@ -19,12 +19,18 @@ public class RequestProcessor<TReq, TResp> {
     private final String requestName;
     private final TReq requestPayload;
     private final Class<TResp> responseClass;
+    private final Class responseType;//Used when the TResp is List
     private final ElectrodeBridgeResponseListener<TResp> responseListener;
 
     public RequestProcessor(@NonNull String requestName, @Nullable TReq requestPayload, @NonNull Class<TResp> respClass, @NonNull ElectrodeBridgeResponseListener<TResp> responseListener) {
+        this(requestName, requestPayload, respClass, respClass, responseListener);
+    }
+
+    public RequestProcessor(@NonNull String requestName, @Nullable TReq requestPayload, @NonNull Class<TResp> respClass, @NonNull Class responseType, @NonNull ElectrodeBridgeResponseListener<TResp> responseListener) {
         this.requestName = requestName;
         this.requestPayload = requestPayload;
         this.responseClass = respClass;
+        this.responseType = responseType;
         this.responseListener = responseListener;
     }
 
@@ -45,7 +51,7 @@ public class RequestProcessor<TReq, TResp> {
 
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
-                TResp response = BridgeArguments.generateObject(responseData, responseClass);
+                TResp response = (TResp) BridgeArguments.generateObject(responseData, responseType);
                 Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
                 responseListener.onSuccess(response);
             }

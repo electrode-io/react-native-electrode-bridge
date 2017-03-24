@@ -5,13 +5,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
+import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.api.UpdatePersonRequestData;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
@@ -118,7 +124,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
     public void testGetStatusRequestHandlerNativeToJSSuccess() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        final Person actualPerson = new Person.Builder("John", 05).build();
+        final Person actualPerson = new Person.Builder("John", 05).age(10).build();
         final Status result = new Status.Builder(true).log(true).build();
 
         UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_STATUS, new BaseBridgeTestCase.MockElectrodeEventListener() {
@@ -414,5 +420,341 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
         waitForCountDownToFinishOrFail(countDownLatch);
         removeMockEventListener(uuid);
+    }
+
+
+    public void testRequestsWithComplexObjectListNativeToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Status status = new Status.Builder(true).log(false).build();
+        final Status status1 = new Status.Builder(true).log(false).build();
+        final Status status2 = new Status.Builder(true).log(false).build();
+        List<Status> statusList = new ArrayList<Status>() {{
+            add(status);
+            add(status1);
+            add(status2);
+        }};
+
+
+        final Person person = new Person.Builder("test1", 1).build();
+        final Person person1 = new Person.Builder("test2", 2).build();
+        final Person person2 = new Person.Builder("test3", 3).build();
+        final List<Person> personList = new ArrayList<Person>() {{
+            add(person);
+            add(person1);
+            add(person2);
+        }};
+
+        PersonApi.requests().registerFindPersonsByStatus(new ElectrodeBridgeRequestHandler<List<Status>, List<Person>>() {
+            @Override
+            public void onRequest(@Nullable List<Status> payload, @NonNull ElectrodeBridgeResponseListener<List<Person>> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(personList);
+            }
+        });
+
+
+        PersonApi.requests().findPersonsByStatus(statusList, new ElectrodeBridgeResponseListener<List<Person>>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+
+            }
+
+            @Override
+            public void onSuccess(@Nullable List<Person> responseData) {
+                assertNotNull(responseData);
+                for (int i = 0; i < personList.size(); i++) {
+                    Person expected = personList.get(i);
+                    Person actual = responseData.get(i);
+                    assertNotNull(actual);
+                    assertEquals(expected.getName(), actual.getName());
+                    assertEquals(expected.getMonth(), actual.getMonth());
+                }
+                countDownLatch.countDown();
+            }
+        });
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testRequestsWithComplexObjectListNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final Status status = new Status.Builder(true).log(false).build();
+        final Status status1 = new Status.Builder(true).log(false).build();
+        final Status status2 = new Status.Builder(true).log(false).build();
+        List<Status> statusList = new ArrayList<Status>() {{
+            add(status);
+            add(status1);
+            add(status2);
+        }};
+
+
+        final Person person = new Person.Builder("test1", 1).build();
+        final Person person1 = new Person.Builder("test2", 2).build();
+        final Person person2 = new Person.Builder("test3", 3).build();
+        final List<Person> personList = new ArrayList<Person>() {{
+            add(person);
+            add(person1);
+            add(person2);
+        }};
+
+
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                jsResponseDispatcher.dispatchResponse(Arguments.fromBundle(BridgeArguments.generateDataBundle(personList)));
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+        PersonApi.requests().findPersonsByStatus(statusList, new ElectrodeBridgeResponseListener<List<Person>>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+
+            }
+
+            @Override
+            public void onSuccess(@Nullable List<Person> responseData) {
+                assertNotNull(responseData);
+                for (int i = 0; i < personList.size(); i++) {
+                    Person expected = personList.get(i);
+                    Person actual = responseData.get(i);
+                    assertNotNull(actual);
+                    assertEquals(expected.getName(), actual.getName());
+                    assertEquals(expected.getMonth(), actual.getMonth());
+                }
+                countDownLatch.countDown();
+            }
+        });
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+    }
+
+    public void testRequestsWithComplexObjectListJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final Status status = new Status.Builder(true).log(false).build();
+        final Status status1 = new Status.Builder(true).log(false).build();
+        final Status status2 = new Status.Builder(true).log(false).build();
+
+        final Person person = new Person.Builder("test1", 1).build();
+        final Person person1 = new Person.Builder("test2", 2).build();
+        final Person person2 = new Person.Builder("test3", 3).build();
+        final List<Person> personList = new ArrayList<Person>() {{
+            add(person);
+            add(person1);
+            add(person2);
+        }};
+
+        PersonApi.requests().registerFindPersonsByStatus(new ElectrodeBridgeRequestHandler<List<Status>, List<Person>>() {
+            @Override
+            public void onRequest(@Nullable List<Status> payload, @NonNull ElectrodeBridgeResponseListener<List<Person>> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(personList);
+                countDownLatch.countDown();
+            }
+        });
+
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                ReadableArray readableArray = response.getArray(BridgeMessage.BRIDGE_MSG_DATA);
+                assertNotNull(readableArray);
+                List<Person> actualPersonList = (List<Person>) BridgeArguments.generateObject(ArgumentsEx.toBundle(response, BridgeMessage.BRIDGE_MSG_DATA), Person.class);
+                assertNotNull(actualPersonList);
+                for (int i = 0; i < personList.size(); i++) {
+                    Person expected = personList.get(i);
+                    Person actual = actualPersonList.get(i);
+                    assertEquals(expected.getName(), actual.getName());
+                    assertEquals(expected.getMonth(), actual.getMonth());
+                }
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+
+        WritableArray writableArray = Arguments.createArray();
+        writableArray.pushMap(Arguments.fromBundle(status.toBundle()));
+        writableArray.pushMap(Arguments.fromBundle(status1.toBundle()));
+        writableArray.pushMap(Arguments.fromBundle(status2.toBundle()));
+
+        WritableMap request = getRequestMap(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS);
+        request.putArray(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, writableArray);
+
+        ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+        reactBridge.sendMessage(request);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+        removeMockEventListener(uuid);
+    }
+
+
+    public void testRequestsWithPrimitiveListNativeToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final List<String> namesList = new ArrayList<String>() {{
+            add("name1");
+            add("name2");
+            add("name3");
+        }};
+
+        final List<Integer> ageList = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+        }};
+
+        PersonApi.requests().registerFindPersonsAgeByName(new ElectrodeBridgeRequestHandler<List<String>, List<Integer>>() {
+            @Override
+            public void onRequest(@Nullable List<String> payload, @NonNull ElectrodeBridgeResponseListener<List<Integer>> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(ageList);
+            }
+        });
+
+        PersonApi.requests().findPersonsAgeByName(namesList, new ElectrodeBridgeResponseListener<List<Integer>>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable List<Integer> responseData) {
+                assertNotNull(responseData);
+                for (int i = 0; i < namesList.size(); i++) {
+                    Integer expected = ageList.get(i);
+                    Integer actual = responseData.get(i);
+                    assertNotNull(actual);
+                    assertEquals(expected, actual);
+                }
+                countDownLatch.countDown();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testRequestsWithPrimitiveListNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final List<String> namesList = new ArrayList<String>() {{
+            add("name1");
+            add("name2");
+            add("name3");
+        }};
+
+        final List<Integer> ageList = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+        }};
+
+        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                jsResponseDispatcher.dispatchResponse(Arguments.fromBundle(BridgeArguments.generateDataBundle(ageList)));
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+        PersonApi.requests().findPersonsAgeByName(namesList, new ElectrodeBridgeResponseListener<List<Integer>>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable List<Integer> responseData) {
+                assertNotNull(responseData);
+                for (int i = 0; i < namesList.size(); i++) {
+                    Integer expected = ageList.get(i);
+                    Integer actual = responseData.get(i);
+                    assertNotNull(actual);
+                    assertEquals(expected, actual);
+                }
+                countDownLatch.countDown();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testRequestsWithPrimitiveListJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        final List<Integer> ageList = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+        }};
+
+        PersonApi.requests().registerFindPersonsAgeByName(new ElectrodeBridgeRequestHandler<List<String>, List<Integer>>() {
+            @Override
+            public void onRequest(@Nullable List<String> payload, @NonNull ElectrodeBridgeResponseListener<List<Integer>> responseListener) {
+                assertNotNull(payload);
+                responseListener.onSuccess(ageList);
+                countDownLatch.countDown();
+            }
+        });
+
+        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+        WritableArray writableArray = Arguments.createArray();
+        writableArray.pushString("name1");
+        writableArray.pushString("name2");
+        writableArray.pushString("name3");
+
+        WritableMap request = getRequestMap(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME);
+        request.putArray(ElectrodeBridgeRequest.BRIDGE_MSG_DATA, writableArray);
+
+        ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+        reactBridge.sendMessage(request);
+
+
+        waitForCountDownToFinishOrFail(countDownLatch);
     }
 }

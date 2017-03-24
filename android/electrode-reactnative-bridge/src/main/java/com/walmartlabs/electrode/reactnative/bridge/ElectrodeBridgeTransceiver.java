@@ -342,4 +342,12 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
             sReactNativeReadyListener.onReactNativeReady();
         }
     }
+
+    /**
+     * Method for testing only
+     */
+    @VisibleForTesting
+    void debug_ClearRequestHandlerRegistrar() {
+        ((RequestRegistrarImpl) mRequestRegistrar).reset();
+    }
 }

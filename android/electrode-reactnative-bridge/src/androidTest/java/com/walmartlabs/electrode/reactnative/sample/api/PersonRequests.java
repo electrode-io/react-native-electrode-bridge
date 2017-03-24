@@ -1,7 +1,6 @@
 package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
@@ -10,6 +9,8 @@ import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerProcessor;
 import com.walmartlabs.electrode.reactnative.bridge.RequestProcessor;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
+
+import java.util.List;
 
 /***
  * This is a test API generated for testing the bridge. This is first generated using api gen commend and necessary changes are made.
@@ -45,6 +46,16 @@ final class PersonRequests implements PersonApi.Requests {
     }
 
     @Override
+    public void registerFindPersonsByStatus(@NonNull ElectrodeBridgeRequestHandler<List<Status>, List<Person>> handler) {
+        new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_BY_STATUS, (Class) Status.class, (Class) Person.class, handler).execute();
+    }
+
+    @Override
+    public void registerFindPersonsAgeByName(@NonNull ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler) {
+        new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_AGE_BY_NAME, (Class) String.class, (Class) Integer.class, handler).execute();
+    }
+
+    @Override
     public void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
         new RequestProcessor<>(REQUEST_GET_PERSON, null, Person.class, responseListener).execute();
     }
@@ -69,5 +80,15 @@ final class PersonRequests implements PersonApi.Requests {
     @Override
     public void updatePersonPost(@NonNull UpdatePersonRequestData updatePersonRequestData, @NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
         new RequestProcessor<>(REQUEST_POST_PERSON_UPDATE, updatePersonRequestData, Person.class, responseListener).execute();
+    }
+
+    @Override
+    public void findPersonsByStatus(@NonNull List<Status> statusList, @NonNull ElectrodeBridgeResponseListener<List<Person>> responseListener) {
+        new RequestProcessor<>(REQUEST_FIND_PERSONS_BY_STATUS, statusList, (Class) List.class, Person.class, responseListener).execute();
+    }
+
+    @Override
+    public void findPersonsAgeByName(@NonNull List<String> names, @NonNull ElectrodeBridgeResponseListener<List<Integer>> responseListener) {
+        new RequestProcessor<>(REQUEST_FIND_PERSONS_AGE_BY_NAME, names, (Class) List.class, Integer.class, responseListener).execute();
     }
 }

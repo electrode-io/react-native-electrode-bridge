@@ -11,6 +11,10 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains utility methods for bridge
@@ -19,6 +23,19 @@ import java.lang.reflect.InvocationTargetException;
 public final class BridgeArguments {
 
     private static final String TAG = BridgeArguments.class.getSimpleName();
+
+    private static final Set<Class> SUPPORTED_PRIMITIVE_TYPES = new HashSet() {{
+        add(String.class);
+        add(String[].class);
+        add(Integer.class);
+        add(Integer[].class);
+        add(int[].class);
+        add(Boolean.class);
+        add(Boolean[].class);
+        add(Double.class);
+        add(Double[].class);
+        add(double[].class);
+    }};
 
     /**
      * @param object Accepted object types are {@link Bridgeable}, All primitive wrappers and null
@@ -29,15 +46,52 @@ public final class BridgeArguments {
         if (object == null) {
             return Bundle.EMPTY;
         }
-        Bundle data;
+        Bundle data = new Bundle();
         if (object instanceof Bridgeable) {
-            data = new Bundle();
             data.putBundle(BridgeMessage.BRIDGE_MSG_DATA, ((Bridgeable) object).toBundle());
+        } else if (object instanceof List) {
+            List objList = (List) object;
+            if (!objList.isEmpty()) {
+                Object firstItem = objList.get(0);
+                if (firstItem instanceof Bridgeable) {
+                    Bundle[] bundleArray = getBundleArray(objList);
+                    data.putParcelableArray(BridgeMessage.BRIDGE_MSG_DATA, bundleArray);
+                } else if (isSupportedPrimitiveType(firstItem.getClass())) {
+
+                    if (firstItem instanceof String) {
+                        String[] primitiveArray = (String[]) objList.toArray(new String[objList.size()]);
+                        data.putStringArray(BridgeMessage.BRIDGE_MSG_DATA, primitiveArray);
+                    } else if (firstItem instanceof Integer) {
+                        int[] primitiveArray = new int[objList.size()];
+                        for (int i = 0; i < objList.size(); i++) {
+                            primitiveArray[i] = (Integer) objList.get(i);
+                        }
+                        data.putIntArray(BridgeMessage.BRIDGE_MSG_DATA, primitiveArray);
+                    } else {
+                        throw new IllegalArgumentException("Should never happen, looks like logic to handle " + firstItem.getClass() + " is not implemented yet");
+                    }
+                } else {
+                    throw new IllegalArgumentException("should never reach here");
+                }
+
+            } else {
+                Logger.w(TAG, "Received empty list, will return empty bundle");
+            }
         } else {
             data = BridgeArguments.getBundleForPrimitive(object, object.getClass());
         }
 
         return data;
+    }
+
+    @NonNull
+    private static Bundle[] getBundleArray(@NonNull List<Bridgeable> objList) {
+        Bundle[] bundleList = new Bundle[objList.size()];
+        for (int i = 0; i < objList.size(); i++) {
+            Object obj = objList.get(i);
+            bundleList[i] = (((Bridgeable) obj).toBundle());
+        }
+        return bundleList;
     }
 
     /**
@@ -49,34 +103,87 @@ public final class BridgeArguments {
      * @return T
      */
     @Nullable
-    public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
-        T response = null;
-        if (payload != null
-                && !payload.isEmpty()) {
-            String key = BridgeMessage.BRIDGE_MSG_DATA;
+    public static <T> Object generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
+        if (payload == null || payload.isEmpty()) {
+            return null;
+        }
 
-            if (payload.get(key) == null) {
-                Logger.d(TAG, "Cannot find key(%s) in given bundle:%s", key, payload);
-                return null;
-            }
+        Object data = payload.get(BridgeMessage.BRIDGE_MSG_DATA);
+        if (data == null) {
+            Logger.d(TAG, "Cannot find key(%s) in given bundle:%s", BridgeMessage.BRIDGE_MSG_DATA, payload);
+            return null;
+        }
 
-            if (Bridgeable.class.isAssignableFrom(returnClass)) {
-
-                if (payload.getBundle(key) == null) {
-                    throw new IllegalArgumentException("Value for key(" + key + ") should be a bundle, looks like it is not.");
-                }
-
-                response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
-            } else {
-                //noinspection unchecked
-                response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass);
-            }
+        Object response;
+        if (isArray(data)) {
+            response = getList(data, returnClass);
+        } else if (data instanceof Bundle) {
+            response = BridgeArguments.bridgeableFromBundle((Bundle) data, returnClass);
+        } else if (returnClass.isAssignableFrom(data.getClass())//GOTCHA: we should check for return data being an array of primitives. this is needed because the returnClass ony contains the content of the array.
+                && isSupportedPrimitiveType(data.getClass())) {
+            //noinspection unchecked
+            response = data;
+        } else {
+            throw new IllegalArgumentException("Should never happen, looks like logic to handle " + data.getClass() + " type is not implemented yet");
         }
         return response;
     }
 
+
+    private static boolean isArray(@NonNull Object obj) {
+        return obj.getClass().isArray();
+    }
+
+    /**
+     * @param obj           input array
+     * @param listItemClass Defines the conent type of the list
+     * @return List
+     */
+    private static List getList(Object obj, @Nullable Class listItemClass) {
+        if (!isArray(obj)) {
+            throw new IllegalArgumentException("Should never reach here, expected an array, received: " + obj);
+        }
+
+        List convertedList = new ArrayList<>();
+        if (obj instanceof Bundle[]) {
+            if (listItemClass == null) {
+                throw new IllegalArgumentException("listItemClass is required to convert Bundle[]");
+            }
+            Bundle[] bundles = (Bundle[]) obj;
+
+            for (Bundle bundle : bundles) {
+                Object item = BridgeArguments.bridgeableFromBundle(bundle, listItemClass);
+                convertedList.add(item);
+            }
+
+        } else if (Object[].class.isAssignableFrom(obj.getClass())
+                && isSupportedPrimitiveType(obj.getClass())) {
+            Object[] objectArray = (Object[]) obj;
+            for (Object o : objectArray) {
+                convertedList.add(o);
+            }
+        } else if (int[].class.isAssignableFrom(obj.getClass())
+                && isSupportedPrimitiveType(obj.getClass())) {
+            int[] objectArray = (int[]) obj;
+            for (Object o : objectArray) {
+                convertedList.add(o);
+            }
+
+        } else if (double[].class.isAssignableFrom(obj.getClass())
+                && isSupportedPrimitiveType(obj.getClass())) {
+            double[] objectArray = (double[]) obj;
+            for (Object o : objectArray) {
+                convertedList.add(o);
+            }
+
+        } else {
+            throw new IllegalArgumentException("Array of type " + obj.getClass().getSimpleName() + " is not supported yet");
+        }
+        return convertedList;
+    }
+
     @VisibleForTesting
-    @Nullable
+    @NonNull
     static <T> T bridgeableFromBundle(@NonNull Bundle bundle, @NonNull Class<T> clazz) {
         Logger.d(TAG, "entering bridgeableFromBundle with bundle(%s) for class(%s)", bundle, clazz);
 
@@ -112,34 +219,11 @@ public final class BridgeArguments {
             logException(e);
         }
 
-        Logger.d(TAG, "FromBundle failed to execute");
-        return null;
+        throw new IllegalArgumentException("Unable to generate a Bridgeable from bundle: " + bundle);
     }
 
     private static void logException(Exception e) {
         Logger.w(TAG, "FromBundle failed to execute(%s)", e.getMessage() != null ? e.getMessage() : e.getCause());
-    }
-
-    @NonNull
-    @VisibleForTesting
-    static Object getPrimitiveFromBundle(@NonNull Bundle payload, @NonNull Class reqClazz) {
-        Object value = null;
-        String key = BridgeMessage.BRIDGE_MSG_DATA;
-        if (String.class.isAssignableFrom(reqClazz)) {
-            value = payload.getString(key);
-        } else if (Integer.class.isAssignableFrom(reqClazz)) {
-            value = payload.getInt(key);
-        } else if (Boolean.class.isAssignableFrom(reqClazz)) {
-            value = payload.getBoolean(key);
-        } else if (String[].class.isAssignableFrom(reqClazz)) {
-            value = payload.getStringArray(key);
-        }
-
-        if (reqClazz.isInstance(value)) {
-            return value;
-        } else {
-            throw new IllegalArgumentException("Should never happen, looks like logic to handle " + reqClazz + " is not implemented yet");
-        }
     }
 
     @NonNull
@@ -174,5 +258,9 @@ public final class BridgeArguments {
             }
         }
         return output;
+    }
+
+    private static boolean isSupportedPrimitiveType(@NonNull Class clazz) {
+        return SUPPORTED_PRIMITIVE_TYPES.contains(clazz);
     }
 }

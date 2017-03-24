@@ -32,6 +32,8 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         super.setUp();
         Logger.overrideLogLevel(Logger.LogLevel.DEBUG);
         initBridge();
+        ElectrodeBridgeTransceiver.instance().debug_ClearRequestHandlerRegistrar();
+        ((EventRegistrarImpl) mockEventRegistrar).reset();
     }
 
     private void initBridge() {

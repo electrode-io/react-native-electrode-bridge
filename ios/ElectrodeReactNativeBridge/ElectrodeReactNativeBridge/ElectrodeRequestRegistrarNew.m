@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (id<ElectrodeBridgeRequestHandler>)getRequestHandler:(NSString *)name
+- (id<ElectrodeBridgeRequestHandler> _Nullable)getRequestHandler:(NSString *)name
 {
     @synchronized (self) {
         return [self.requestHandlerByRequestName objectForKey:name];

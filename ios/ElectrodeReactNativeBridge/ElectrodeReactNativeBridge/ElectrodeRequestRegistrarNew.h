@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param name The name of the request, in reverse url format.
  @return Returns a request handler for a specific name.
  */
-- (id<ElectrodeBridgeRequestHandler>)getRequestHandler:(NSString *)name;
+- (id<ElectrodeBridgeRequestHandler> _Nullable)getRequestHandler:(NSString *)name;
 
 @end
 

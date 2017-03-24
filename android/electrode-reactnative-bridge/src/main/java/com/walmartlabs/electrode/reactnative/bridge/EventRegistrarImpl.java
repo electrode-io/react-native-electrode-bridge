@@ -1,6 +1,7 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,5 +66,14 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
         }
 
         return Collections.unmodifiableList(mEventListenersByEventName.get(name));
+    }
+
+    /**
+     * FOR TESTING ONLY
+     */
+    @VisibleForTesting
+    void reset() {
+        mEventListenerByUUID.clear();
+        mEventListenersByEventName.clear();
     }
 }

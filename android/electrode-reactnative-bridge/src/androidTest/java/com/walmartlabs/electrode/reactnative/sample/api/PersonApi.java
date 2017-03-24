@@ -79,6 +79,7 @@ public final class PersonApi {
         String REQUEST_GET_AGE = "com.apisample.ern.apisample.get.age";
         String REQUEST_POST_PERSON_UPDATE = "com.apisample.ern.apisample.post.update.person";
         String REQUEST_FIND_PERSONS_BY_STATUS = "com.apisample.ern.apisample.find.persons.by.status";
+        String REQUEST_FIND_PERSONS_AGE_BY_NAME = "com.apisample.ern.apisample.find.persons.age.by.name";
 
         /***
          * Registers a handler that returns the current user when {@link #getPerson(ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
@@ -99,6 +100,8 @@ public final class PersonApi {
         void registerUpdatePersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler);
 
         void registerFindPersonsByStatus(@NonNull final ElectrodeBridgeRequestHandler<List<Status>, List<Person>> handler);
+
+        void registerFindPersonsAgeByName(@NonNull final ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler);
 
 
         /**
@@ -127,6 +130,8 @@ public final class PersonApi {
         void updatePersonPost(@NonNull UpdatePersonRequestData updatePersonRequestData, @NonNull final ElectrodeBridgeResponseListener<Person> responseListener);
 
         void findPersonsByStatus(@NonNull List<Status> statusList, @NonNull final ElectrodeBridgeResponseListener<List<Person>> responseListener);
+
+        void findPersonsAgeByName(@NonNull List<String> names, @NonNull final ElectrodeBridgeResponseListener<List<Integer>> responseListener);
     }
 
 }

@@ -51,6 +51,11 @@ final class PersonRequests implements PersonApi.Requests {
     }
 
     @Override
+    public void registerFindPersonsAgeByName(@NonNull ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler) {
+        new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_AGE_BY_NAME, (Class) String.class, (Class) Integer.class, handler).execute();
+    }
+
+    @Override
     public void getPerson(@NonNull final ElectrodeBridgeResponseListener<Person> responseListener) {
         new RequestProcessor<>(REQUEST_GET_PERSON, null, Person.class, responseListener).execute();
     }
@@ -80,5 +85,10 @@ final class PersonRequests implements PersonApi.Requests {
     @Override
     public void findPersonsByStatus(@NonNull List<Status> statusList, @NonNull ElectrodeBridgeResponseListener<List<Person>> responseListener) {
         new RequestProcessor<>(REQUEST_FIND_PERSONS_BY_STATUS, statusList, (Class) List.class, Person.class, responseListener).execute();
+    }
+
+    @Override
+    public void findPersonsAgeByName(@NonNull List<String> names, @NonNull ElectrodeBridgeResponseListener<List<Integer>> responseListener) {
+        new RequestProcessor<>(REQUEST_FIND_PERSONS_AGE_BY_NAME, names, (Class) List.class, Integer.class, responseListener).execute();
     }
 }

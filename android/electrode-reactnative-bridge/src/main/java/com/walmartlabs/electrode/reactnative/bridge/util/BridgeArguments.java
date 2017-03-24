@@ -29,10 +29,12 @@ public final class BridgeArguments {
         add(String[].class);
         add(Integer.class);
         add(Integer[].class);
+        add(int[].class);
         add(Boolean.class);
         add(Boolean[].class);
         add(Double.class);
         add(Double[].class);
+        add(double[].class);
     }};
 
     /**
@@ -51,13 +53,20 @@ public final class BridgeArguments {
             List objList = (List) object;
             if (!objList.isEmpty()) {
                 Object firstItem = objList.get(0);
-                Bundle[] bundleArray = getBundleArray(objList);
                 if (firstItem instanceof Bridgeable) {
+                    Bundle[] bundleArray = getBundleArray(objList);
                     data.putParcelableArray(BridgeMessage.BRIDGE_MSG_DATA, bundleArray);
                 } else if (isSupportedPrimitiveType(firstItem.getClass())) {
-                    Object[] primitiveArray = objList.toArray();
+
                     if (firstItem instanceof String) {
-                        data.putStringArray(BridgeMessage.BRIDGE_MSG_DATA, (String[]) primitiveArray);
+                        String[] primitiveArray = (String[]) objList.toArray(new String[objList.size()]);
+                        data.putStringArray(BridgeMessage.BRIDGE_MSG_DATA, primitiveArray);
+                    } else if (firstItem instanceof Integer) {
+                        int[] primitiveArray = new int[objList.size()];
+                        for (int i = 0; i < objList.size(); i++) {
+                            primitiveArray[i] = (Integer) objList.get(i);
+                        }
+                        data.putIntArray(BridgeMessage.BRIDGE_MSG_DATA, primitiveArray);
                     } else {
                         throw new IllegalArgumentException("Should never happen, looks like logic to handle " + firstItem.getClass() + " is not implemented yet");
                     }
@@ -105,25 +114,72 @@ public final class BridgeArguments {
             return null;
         }
 
-        T response;
-        if (data instanceof Bundle[]) {
-            Bundle[] bundles = (Bundle[]) data;
-            List<T> objectList = new ArrayList<>();
-            for (Bundle bundle : bundles) {
-                T item = BridgeArguments.bridgeableFromBundle(bundle, returnClass);
-                objectList.add(item);
-            }
-            return objectList;
+        Object response;
+        if (isArray(data)) {
+            response = getList(data, returnClass);
         } else if (data instanceof Bundle) {
             response = BridgeArguments.bridgeableFromBundle((Bundle) data, returnClass);
-        } else if (returnClass.isAssignableFrom(data.getClass())
+        } else if (returnClass.isAssignableFrom(data.getClass())//GOTCHA: we should check for return data being an array of primitives. this is needed because the returnClass ony contains the content of the array.
                 && isSupportedPrimitiveType(data.getClass())) {
             //noinspection unchecked
-            response = (T) data;
+            response = data;
         } else {
-            throw new IllegalArgumentException("Should never happen, looks like logic to handle " + returnClass + " type is not implemented yet");
+            throw new IllegalArgumentException("Should never happen, looks like logic to handle " + data.getClass() + " type is not implemented yet");
         }
         return response;
+    }
+
+
+    private static boolean isArray(@NonNull Object obj) {
+        return obj.getClass().isArray();
+    }
+
+    /**
+     * @param obj           input array
+     * @param listItemClass Defines the conent type of the list
+     * @return List
+     */
+    private static List getList(Object obj, @Nullable Class listItemClass) {
+        if (!isArray(obj)) {
+            throw new IllegalArgumentException("Should never reach here, expected an array, received: " + obj);
+        }
+
+        List convertedList = new ArrayList<>();
+        if (obj instanceof Bundle[]) {
+            if (listItemClass == null) {
+                throw new IllegalArgumentException("listItemClass is required to convert Bundle[]");
+            }
+            Bundle[] bundles = (Bundle[]) obj;
+
+            for (Bundle bundle : bundles) {
+                Object item = BridgeArguments.bridgeableFromBundle(bundle, listItemClass);
+                convertedList.add(item);
+            }
+
+        } else if (Object[].class.isAssignableFrom(obj.getClass())
+                && isSupportedPrimitiveType(obj.getClass())) {
+            Object[] objectArray = (Object[]) obj;
+            for (Object o : objectArray) {
+                convertedList.add(o);
+            }
+        } else if (int[].class.isAssignableFrom(obj.getClass())
+                && isSupportedPrimitiveType(obj.getClass())) {
+            int[] objectArray = (int[]) obj;
+            for (Object o : objectArray) {
+                convertedList.add(o);
+            }
+
+        } else if (double[].class.isAssignableFrom(obj.getClass())
+                && isSupportedPrimitiveType(obj.getClass())) {
+            double[] objectArray = (double[]) obj;
+            for (Object o : objectArray) {
+                convertedList.add(o);
+            }
+
+        } else {
+            throw new IllegalArgumentException("Array of type " + obj.getClass().getSimpleName() + " is not supported yet");
+        }
+        return convertedList;
     }
 
     @VisibleForTesting

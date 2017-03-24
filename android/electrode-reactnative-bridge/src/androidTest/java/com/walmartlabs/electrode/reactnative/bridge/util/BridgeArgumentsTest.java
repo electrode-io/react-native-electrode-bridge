@@ -111,11 +111,13 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(expected);
         assertNotNull(bundle);
 
-        final String[] actual = (String[]) BridgeArguments.generateObject(bundle, String[].class);
-        assertNotNull(actual);
-        assertEquals(expected.length, actual.length);
+        final Object actual = BridgeArguments.generateObject(bundle, String[].class);
+        assertTrue(actual instanceof List);
+        assertTrue(((List) actual).size() > 0);
+        assertTrue(((List) actual).get(0) instanceof String);
+        assertEquals(expected.length, ((List) actual).size());
         for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], ((List) actual).get(i));
         }
     }
 

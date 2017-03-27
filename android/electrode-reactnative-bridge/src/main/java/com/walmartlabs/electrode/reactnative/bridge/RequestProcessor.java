@@ -16,7 +16,7 @@ import java.util.List;
  * @param <TReq>
  * @param <TResp>
  */
-public class RequestProcessor<TReq, TResp> {
+public class RequestProcessor<TReq, TResp> implements Processor {
     private final String TAG = RequestProcessor.class.getSimpleName();
 
     private final String requestName;
@@ -38,6 +38,7 @@ public class RequestProcessor<TReq, TResp> {
     }
 
 
+    @Override
     public void execute() {
         Logger.d(TAG, "Request processor started processing request(%s)", requestName);
         Bundle data = BridgeArguments.generateDataBundle(requestPayload);
@@ -56,6 +57,7 @@ public class RequestProcessor<TReq, TResp> {
             public void onSuccess(@Nullable Bundle responseData) {
                 TResp response = (TResp) BridgeArguments.generateObject(responseData, responseType);
 
+                //Check to see if the List needs Number polishing since the JS side always gives Double for a Number.
                 if (response instanceof List
                         && !((List) response).isEmpty()
                         && !responseType.getClass().isAssignableFrom(((List) response).get(0).getClass())//Make sure the expected type and actual type are not same

@@ -15,7 +15,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <TReq>
  * @param <TResp>
  */
-public class RequestHandlerProcessor<TReq, TResp> {
+public class RequestHandlerProcessor<TReq, TResp> implements Processor {
     private final String TAG = RequestHandlerProcessor.class.getSimpleName();
 
     private final String requestName;
@@ -30,6 +30,7 @@ public class RequestHandlerProcessor<TReq, TResp> {
         this.handler = handler;
     }
 
+    @Override
     public void execute() {
         final ElectrodeBridgeRequestHandler<Bundle, Object> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Object>() {
 

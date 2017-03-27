@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
-
+RCT_EXPORT_MODULE();
 + (NSArray *)electrodeModules
 {
     return @[[[ElectrodeBridgeTransceiver alloc] init]];
@@ -123,6 +123,51 @@ NS_ASSUME_NONNULL_BEGIN
     NSUUID *uUID = [self.eventDispatcher.eventRegistrar registerEventListener:name eventListener:eventListener];
     return uUID;
 }
+#pragma ElectrodeReactBridge
+
+RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
+{
+    NSLog(@"Received message from JS(data=%@)", bridgeMessage);
+    NSString *typeString = (NSString *)[bridgeMessage objectForKey:kElectrodeBridgeMessageType];
+    ElectrodeMessageType type = [ElectrodeBridgeMessage typeFromString:typeString];
+    switch (type) {
+        case ElectrodeMessageTypeRequest:
+        {
+            ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:bridgeMessage];
+            [self handleRequest:request withResponseListner:nil];
+            break;
+        }
+            
+        case ElectrodeMessageTypeResponse:
+        {
+            ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseWithData:bridgeMessage];
+            if (response != nil) {
+                [self handleResponse:response];
+            } else {
+                [NSException raise:@"invalue resonse" format:@"cannot construct a response from data"];
+            }
+            break;
+        }
+        case ElectrodeMessageTypeEvent:
+        {
+            ElectrodeBridgeEventNew *event = [ElectrodeBridgeEventNew createEventWithData:bridgeMessage];
+            if (event != nil) {
+                [self notifyNativeEventListenerWithEvent:event];
+            } else {
+                [NSException raise:@"invalue event" format:@"cannot construct an event from data"];
+                
+            }
+            break;
+        }
+        case ElectrodeMessageTypeUnknown:
+        default:
+            [NSException raise:@"invalue message" format:@"cannot construct any message from data"];
+            break;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma private methods
 
 -(void)notifyReactNativeEventListenerWithEvent: (ElectrodeBridgeEventNew *) event {
     [self sendEventWithName:event.name body:event.data]; //note: don't use the old emitEvent because it's deprecated according to RCT docs
@@ -240,49 +285,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(void)logResponse: (ElectrodeBridgeResponse *)response {
     
-}
-
-#pragma ElectrodeReactBridge
-
-- (void)sendMessage:(NSDictionary *)bridgeMessage
-{
-    NSLog(@"Received message from JS(data=%@)", bridgeMessage);
-    NSString *typeString = (NSString *)[bridgeMessage objectForKey:kElectrodeBridgeMessageType];
-    ElectrodeMessageType type = [ElectrodeBridgeMessage typeFromString:typeString];
-    switch (type) {
-        case ElectrodeMessageTypeRequest:
-        {
-            ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:bridgeMessage];
-            [self handleRequest:request withResponseListner:nil];
-            break;
-        }
-
-        case ElectrodeMessageTypeResponse:
-        {
-            ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseWithData:bridgeMessage];
-            if (response != nil) {
-                [self handleResponse:response];
-            } else {
-                [NSException raise:@"invalue resonse" format:@"cannot construct a response from data"];
-            }
-            break;
-        }
-        case ElectrodeMessageTypeEvent:
-        {
-            ElectrodeBridgeEventNew *event = [ElectrodeBridgeEventNew createEventWithData:bridgeMessage];
-            if (event != nil) {
-                [self notifyNativeEventListenerWithEvent:event];
-            } else {
-                [NSException raise:@"invalue event" format:@"cannot construct an event from data"];
-
-            }
-            break;
-        }
-        case ElectrodeMessageTypeUnknown:
-        default:
-            [NSException raise:@"invalue message" format:@"cannot construct any message from data"];
-            break;
-    }
 }
 
 - (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) reactNativeReadyListner

@@ -77,7 +77,9 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
  * @param name name of the request
  * @param requestHandler call back to be issued for a given request.
  */
--(void)regiesterRequestHandlerWithName: (NSString *)name handler:(id<ElectrodeBridgeRequestHandler>) requestHandler error: (NSError **) error;
+-(NSUUID *)regiesterRequestHandlerWithName: (NSString *)name
+                                   handler:(id<ElectrodeBridgeRequestHandler>)requestHandler
+                                     error: (NSError **) error;
 
 /**
  * Sends an event with payload to all the event listeners

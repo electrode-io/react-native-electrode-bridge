@@ -25,7 +25,7 @@ public class BridgeArgumentsTest extends TestCase {
         Person person = new Person.Builder("Deepu", 10).build();
         Bundle personBundle = person.toBundle();
 
-        Person personCopy = BridgeArguments.bridgeableFromBundle(personBundle, Person.class);
+        Person personCopy = (Person) BridgeArguments.objectFromBundle(personBundle, Person.class);
         assertNotNull(personCopy);
         assertEquals(person.getName(), personCopy.getName());
         assertEquals(person.getMonth(), personCopy.getMonth());
@@ -44,7 +44,7 @@ public class BridgeArgumentsTest extends TestCase {
                 .build();
         Bundle personBundle = person.toBundle();
 
-        Person personCopy = BridgeArguments.bridgeableFromBundle(personBundle, Person.class);
+        Person personCopy = (Person) BridgeArguments.objectFromBundle(personBundle, Person.class);
         assertNotNull(personCopy);
         assertEquals(person.getName(), personCopy.getName());
         assertEquals(person.getMonth(), personCopy.getMonth());

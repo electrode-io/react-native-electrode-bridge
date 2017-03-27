@@ -80,7 +80,7 @@ public class RequestProcessor<TReq, TResp> {
         }
 
 
-        List updatedResponse = new ArrayList(response.size());
+        List<Number> updatedResponse = new ArrayList<>(response.size());
         for (Number number : response) {
             if (responseType == Integer.class) {
                 updatedResponse.add(number.intValue());
@@ -96,7 +96,7 @@ public class RequestProcessor<TReq, TResp> {
             //Ensure the list content is matching the responseType. This is a workaround to eliminate the limitation of generics preventing the List type being represented inside Class.
             if (!((List) response).isEmpty()) {
                 if (!responseType.isAssignableFrom(((List) response).get(0).getClass())) {
-                    throw new IllegalArgumentException("Expected List<" + responseType + "> but received List<" + ((List) response).get(0).getClass() + ">");
+                    throw new IllegalArgumentException("Expected List<" + responseType + "> but received List<" + ((List) response).get(0).getClass().getSimpleName() + ">");
                 }
             }
         }

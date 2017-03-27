@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ElectrodeBridgeFailureMessage.h"
 #import "ElectrodeBridgeRequestNew.h"
-#import "ElectrodeBridgeEvent.h"
+#import "ElectrodeBridgeEventNew.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -17,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 #pragma ElectrodeBridgeResponseListener protocol
+
+typedef void(^ElectrodeBridgeResponseListenerSuccessBlock) (NSDictionary *);
+typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMessage>);
 
 @protocol ElectrodeBridgeResponseListener <NSObject>
 
@@ -74,13 +77,13 @@ NS_ASSUME_NONNULL_BEGIN
  * @param name name of the request
  * @param requestHandler call back to be issued for a given request.
  */
--(void)regiesterRequestHandlerWithName: (NSString *)name handler:(id<ElectrodeBridgeRequestHandler>) requestHandler;
+-(void)regiesterRequestHandlerWithName: (NSString *)name handler:(id<ElectrodeBridgeRequestHandler>) requestHandler error: (NSError **) error;
 
 /**
  * Sends an event with payload to all the event listeners
  * @param event The event to emit
  */
--(void)sendEvent: (ElectrodeBridgeEvent *)event;
+-(void)sendEvent: (ElectrodeBridgeEventNew *)event;
 
 /**
  * Add an event listener for the passed event

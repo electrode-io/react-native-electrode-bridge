@@ -32,7 +32,9 @@
     
     for (id<ElectrodeBridgeEventListener> eventListener in eventListeners) {
         NSLog(@"ElectrodeEventDispatcher is dispatching events %@, id(%@) to listener %@", bridgeEvent.name, bridgeEvent.messageId, eventListener);
-        [eventListener onEvent:bridgeEvent.data];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [eventListener onEvent:bridgeEvent.data];
+        });
     }
 }
 

@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger, ElectrodeMessageType) {
 
 -(nullable instancetype)initWithData: (NSDictionary *)data;
 -(NSString *)description;
-
++(ElectrodeMessageType) typeFromString: (NSString *)string;
 
 @end
 

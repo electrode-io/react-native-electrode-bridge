@@ -18,8 +18,8 @@
 // Note: response can be set
 @property(nonatomic, readwrite, strong,nullable) ElectrodeBridgeResponse *response;
 
--(nonnull instancetype)initWithRequest: (nonnull ElectrodeBridgeRequest *)request
-              responseListener: (nullable id<ElectrodeBridgeResponseListener>) responseListener;
+-(nonnull instancetype)initWithRequest: ( ElectrodeBridgeRequestNew * _Nonnull)request
+              responseListener: ( id<ElectrodeBridgeResponseListener> _Nullable) responseListener;
 -(nonnull NSString *)transactionId;
 -(BOOL)isJsInitiated;
 

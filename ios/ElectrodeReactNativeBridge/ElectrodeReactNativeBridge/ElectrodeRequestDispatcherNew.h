@@ -14,6 +14,8 @@
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeRequestDispatcherNew : NSObject
 
+@property(nonatomic, strong, readonly) ElectrodeRequestRegistrarNew *requestRegistrar;
+
 -(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrarNew *)requestRegistrar;
 -(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
   withResponseListener: (id<ElectrodeBridgeResponseListener>) responseListener;

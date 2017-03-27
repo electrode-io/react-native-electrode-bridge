@@ -8,16 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
-
+#import <React/RCTEventEmitter.h>
 #import "ElectrodeBridgeProtocols.h"
 /**
  * A class that is responsible for transmitting messages between native side and react native side.
  */
+typedef void(^ElectrodeBridgeReactNativeReadyListner)();
 
-@interface ElectrodeBridgeTransceiver : NSObject<RCTBridgeModule, ElectrodeNativeBridge, ElectrodeReactBridge>
+@interface ElectrodeBridgeTransceiver : RCTEventEmitter<ElectrodeNativeBridge, ElectrodeReactBridge>
 
 @property(nonatomic, copy, readonly) NSString *name;
 
 + (instancetype)sharedInstance;
-
+- (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) reactNativeReadyListner;
 @end

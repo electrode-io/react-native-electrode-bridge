@@ -18,8 +18,8 @@
 
 @implementation ElectrodeBridgeTransaction
 
--(nonnull instancetype)initWithRequest: (nonnull ElectrodeBridgeRequestNew *)request
-                      responseListener: (nullable id<ElectrodeBridgeResponseListener>) responseListener {
+-(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew * _Nonnull)request
+                      responseListener: (id<ElectrodeBridgeResponseListener> _Nullable) responseListener {
     if (request.type != ElectrodeMessageTypeRequest) {
         [NSException raise:@"Invalid type" format:@"BridgeTransaction constrictor expects a request type, did you accidentally pass in a different type"];
     }

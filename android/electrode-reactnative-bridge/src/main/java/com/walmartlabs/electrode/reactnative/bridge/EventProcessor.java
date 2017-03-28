@@ -13,7 +13,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <T> eventPayload
  */
 
-public class EventProcessor<T> {
+public class EventProcessor<T> implements Processor {
     private static final String TAG = EventProcessor.class.getSimpleName();
 
     private final T eventPayload;
@@ -24,6 +24,7 @@ public class EventProcessor<T> {
         this.eventName = eventName;
     }
 
+    @Override
     public void execute() {
         Logger.d(TAG, "EventProcessor is emitting event(%s), with payload(%s)", eventName, eventPayload);
         Bundle data = BridgeArguments.generateDataBundle(eventPayload);

@@ -3,7 +3,7 @@
 //  ElectrodeReactNativeBridge
 //
 //  Created by Cody Garvin on 3/10/17.
-//  Copyright © 2017 Bharath Marulasiddappa. All rights reserved.
+//  Copyright © 2017 Walmart. All rights reserved.
 //
 
 import UIKit

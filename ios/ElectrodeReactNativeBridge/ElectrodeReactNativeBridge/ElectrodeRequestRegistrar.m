@@ -45,17 +45,17 @@
     return;
   }
   
-  NSString *requestName = [_requestNameByUUID objectForKey:uuid];
+  NSString *requestName = [self.requestNameByUUID objectForKey:uuid];
   if (requestName)
   {
-    [_requestNameByUUID removeObjectForKey:uuid];
-    [_requestHandlerByRequestName removeObjectForKey:requestName];
+    [self.requestNameByUUID removeObjectForKey:uuid];
+    [self.requestHandlerByRequestName removeObjectForKey:requestName];
   }
 }
 
 - (id<ElectrodeRequestHandler>)getRequestHandler:(NSString *)name
 {
-  return [_requestHandlerByRequestName objectForKey:name];
+  return [self.requestHandlerByRequestName objectForKey:name];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

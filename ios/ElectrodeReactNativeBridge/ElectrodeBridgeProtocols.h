@@ -70,7 +70,7 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
  * @param request    The ElectrodeBridgeRequest that contains request name, data, destination mode and timeout 
  * @param responseListener The response call back listener to issue success/failure of the request.
  */
--(void)sendRequest:(ElectrodeBridgeRequestNew *)request withResponseListener:(id<ElectrodeBridgeEventListener>) responseListener;
+-(void)sendRequest:(ElectrodeBridgeRequestNew *)request withResponseListener:(id<ElectrodeBridgeResponseListener>) responseListener;
 
 /**
  * Register the request handler

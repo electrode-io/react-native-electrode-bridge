@@ -14,6 +14,10 @@ extern NSString * const kElectrodeBridgeMessageId;
 extern NSString * const kElectrodeBridgeMessageType;
 extern NSString * const kElectrodeBridgeMessageData;
 
+extern NSString * const kElectrodeBridgeMessageRequest;
+extern NSString * const kElectrodeBridgeMessageResponse;
+extern NSString * const kElectordeBridgeMessageEvent;
+
 typedef NS_ENUM(NSUInteger, ElectrodeMessageType) {
     ElectrodeMessageTypeRequest,
     ElectrodeMessageTypeResponse,

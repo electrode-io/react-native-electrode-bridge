@@ -62,7 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) ElectrodeRequestDispatcherNew *requestDispatcher;
 @property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction * > *pendingTransaction;
 @property (nonatomic, assign) dispatch_queue_t syncQueue; //this is used to make sure access to pendingTransaction is thread safe.
-@property(nonatomic, copy) NSMutableArray *listnerBlocks;
+@property(nonatomic, copy) NSMutableArray < ElectrodeBridgeReactNativeReadyListner>*listnerBlocks;
+@property(nonatomic, assign) BOOL isReactNativeBridgeReady;
+
 
 @end
 //CLAIRE TODO: check what are the methods that needs to mark with RCT_EXPORT_METHOD 
@@ -87,6 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
         _eventDispatcher = [[ElectrodeEventDispatcherNew alloc] initWithEventRegistrar:eventRegistrar];
         _pendingTransaction = [[NSMutableDictionary alloc] init];
         _listnerBlocks = [[NSMutableArray alloc] init];
+        [self onReactNativeInitialized];
     }
     return self;
 }
@@ -100,6 +103,10 @@ RCT_EXPORT_MODULE();
     return @"ElectrodeBridgeTransceiver";
 }
 
+-(NSArray *) supportedEvents
+{
+    return @[@"testing1"];
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ElectrodeNativeBridge implementation
@@ -325,11 +332,15 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     }
 }
 
-
-// CLAIRE TODO: initialization static method to bring up the bridge
-
+- (void)onReactNativeInitialized
+{
+    self.isReactNativeBridgeReady = YES;
+    if (self.listnerBlocks)
+    {
+        for (ElectrodeBridgeReactNativeReadyListner listener in self.listnerBlocks) {
+            listener();
+        }
+    }
+}
 @end
-
-
-
 NS_ASSUME_NONNULL_END

@@ -18,7 +18,9 @@ typedef void(^ElectrodeBridgeReactNativeReadyListner)();
 @interface ElectrodeBridgeTransceiver : RCTEventEmitter<ElectrodeNativeBridge, ElectrodeReactBridge>
 
 @property(nonatomic, copy, readonly) NSString *name;
+@property(nonatomic, assign,readonly) BOOL isReactNativeBridgeReady;
 
 + (instancetype)sharedInstance;
 - (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) reactNativeReadyListner;
+- (void)onReactNativeInitialized;
 @end

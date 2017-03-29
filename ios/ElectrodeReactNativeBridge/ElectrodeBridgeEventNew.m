@@ -7,6 +7,7 @@
 //
 
 #import "ElectrodeBridgeEventNew.h"
+#import "ElectrodeBridgeMessage.h"
 
 @implementation ElectrodeBridgeEventNew
 

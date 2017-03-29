@@ -13,7 +13,6 @@
 /**
  * A class that is responsible for transmitting messages between native side and react native side.
  */
-typedef void(^ElectrodeBridgeReactNativeReadyListner)();
 
 @interface ElectrodeBridgeTransceiver : RCTEventEmitter<ElectrodeNativeBridge, ElectrodeReactBridge>
 

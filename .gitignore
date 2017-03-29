@@ -22,3 +22,6 @@ npm-debug.log
 
 # VSCode
 .vscode
+
+# XCode
+xcuserdata

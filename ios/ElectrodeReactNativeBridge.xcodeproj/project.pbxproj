@@ -42,6 +42,10 @@
 		9678D33E1E7332F200719AD5 /* ElectrodeRequestProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D33D1E7332F200719AD5 /* ElectrodeRequestProcessor.swift */; };
 		96F9A1CF1E68AF0200752759 /* ElectrodeEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F9A1CE1E68AF0200752759 /* ElectrodeEventProcessor.swift */; };
 		DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F211E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m */; };
+		DA0B9F371E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F341E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m */; };
+		DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F351E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m */; };
+		DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F361E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m */; };
+		DA0B9F421E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */; };
 		DA4BE0C61E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4BE0BC1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework */; };
 		DA4BE0CB1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4BE0CA1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m */; };
 		DA4BE0CD1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = DA4BE0BF1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -175,6 +179,10 @@
 		9678D33D1E7332F200719AD5 /* ElectrodeRequestProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeRequestProcessor.swift; sourceTree = "<group>"; };
 		96F9A1CE1E68AF0200752759 /* ElectrodeEventProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeEventProcessor.swift; sourceTree = "<group>"; };
 		DA0B9F211E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeTransactionTests.m; sourceTree = "<group>"; };
+		DA0B9F341E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeEventTests.m; sourceTree = "<group>"; };
+		DA0B9F351E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeRequestTests.m; sourceTree = "<group>"; };
+		DA0B9F361E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeResponseTests.m; sourceTree = "<group>"; };
+		DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeMessageTests.m; sourceTree = "<group>"; };
 		DA4BE0BC1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ElectrodeReactNativeBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA4BE0BF1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ElectrodeReactNativeBridge.h; sourceTree = "<group>"; };
 		DA4BE0C01E36DBCD00DBA1ED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -287,6 +295,10 @@
 		DA4BE0C91E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests */ = {
 			isa = PBXGroup;
 			children = (
+				DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */,
+				DA0B9F341E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m */,
+				DA0B9F351E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m */,
+				DA0B9F361E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m */,
 				DA0B9F211E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m */,
 				309A03A21E8AE8F900501219 /* MiniApp.jsbundle */,
 				DA4BE0CA1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m */,
@@ -585,7 +597,11 @@
 			files = (
 				DA4BE0CB1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m in Sources */,
 				3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */,
+				DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */,
 				3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */,
+				DA0B9F421E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m in Sources */,
+				DA0B9F371E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m in Sources */,
+				DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */,
 				DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

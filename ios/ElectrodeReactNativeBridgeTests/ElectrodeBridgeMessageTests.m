@@ -35,10 +35,4 @@
     XCTAssertEqual(requestMessage.type, messageType, @"Message type may be different. Invalid assignment");
 }
 
-
-
-
-
-
-
 @end

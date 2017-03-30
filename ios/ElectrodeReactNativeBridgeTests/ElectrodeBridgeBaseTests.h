@@ -32,10 +32,20 @@ extern const int kElectrodeBridgeRequestTestTimeOut;
 
 @end
 
+
+typedef void (^successBlock)(NSDictionary *data);
+typedef void (^failureBlock)(id<ElectrodeFailureMessage> failureMessage);
+
 @interface MockElectrodeBridgeResponseListener : XCTestCase<ElectrodeBridgeResponseListener>
+- (instancetype) initWithExpectation: (nonnull XCTestExpectation *) expectation successBlock:(nonnull successBlock) success NS_DESIGNATED_INITIALIZER;
+- (instancetype) initWithExpectation: (nonnull XCTestExpectation *) expectation failureBlock:(nonnull failureBlock) failure NS_DESIGNATED_INITIALIZER;
+
 @property(nonatomic, assign) BOOL isSuccessListener;
 @property(nonatomic, assign) int testTimeOutMs;
-@property(nonatomic, strong) XCTestExpectation *expectation;
+@property(nonatomic, strong, nonnull) XCTestExpectation* expectation;
+
+@property(nonatomic, copy, nullable) successBlock successBlk;
+@property(nonatomic, copy, nullable) failureBlock failureBlk;
 @end
 
 

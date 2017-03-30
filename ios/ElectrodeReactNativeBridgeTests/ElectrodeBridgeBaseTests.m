@@ -19,7 +19,7 @@
     NSDictionary *data = @{kElectrodeBridgeMessageName: name,
                            kElectrodeBridgeMessageId:@"1234",
                            kElectrodeBridgeMessageType:kElectrodeBridgeMessageRequest,
-                               kElectrodeBridgeMessageData: @{@"key": @"value"}
+                           kElectrodeBridgeMessageData: @{@"key": @"value"}
                            };
     ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:data];
     
@@ -31,16 +31,43 @@
 
 @implementation MockElectrodeBridgeResponseListener
 
+
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation successBlock:(successBlock)success
+{
+    if(self = [super init]) {
+        self.successBlk = success;
+        self.isSuccessListener = YES;
+        self.expectation = expectation;
+        return self;
+    }
+    return nil;
+}
+
+-(instancetype)initWithExpectation:(XCTestExpectation *)expectation failureBlock:(failureBlock)failure
+{
+    if(self = [super init]) {
+        self.failureBlk = failure;
+        self.isSuccessListener = NO;
+        self.expectation = expectation;
+        return self;
+    }
+    return nil;
+}
+
 -(void)onFailure:(id<ElectrodeFailureMessage>)failureMessage
 {
     if(!self.isSuccessListener) {
-        [self.expectation fulfill];
+        self.failureBlk(failureMessage);
+    } else {
+        XCTFail("Expected a success response");
     }
 }
 -(void)onSuccess:(nullable NSDictionary *)responseData
 {
     if(self.isSuccessListener) {
-        [self.expectation fulfill];
+        self.successBlk(responseData);
+    } else {
+        XCTFail("Expected a failure response");
     }
 }
 

@@ -17,6 +17,7 @@ NSString * const kElectrodeBridgeMessageData = @"data";
 NSString * const kElectrodeBridgeMessageRequest = @"req";
 NSString * const kElectrodeBridgeMessageResponse = @"rsp";
 NSString * const kElectordeBridgeMessageEvent = @"event";
+NSString * const kElectordeBridgeMessageUnknown = @"unknown";
 
 @interface ElectrodeBridgeMessage()
 @property(nonatomic, copy)   NSString *name;
@@ -57,20 +58,39 @@ NSString * const kElectordeBridgeMessageEvent = @"event";
     return self;
 }
 
--(nullable instancetype)initWithData: (NSDictionary *)data {
+- (nullable instancetype)initWithData:(NSDictionary *)data {
     if ([ElectrodeBridgeMessage isValidFromData:data]) { //CLAIRE TODO: Ask Deepu why it's not checking for data.
         NSString *name = [data objectForKey:kElectrodeBridgeMessageName];
         NSString *messageId = [data objectForKey:kElectrodeBridgeMessageId];
         ElectrodeMessageType type = [ElectrodeBridgeMessage typeFromString:(NSString *)[data objectForKey:kElectrodeBridgeMessageType]];
-        NSDictionary *bridgeMessageData = (NSDictionary *) [data objectForKey:kElectrodeBridgeMessageData];
-        
+        NSDictionary *bridgeMessageData = (NSDictionary *)[data objectForKey:kElectrodeBridgeMessageData];
         return [self initWithName:name messageId:messageId type:type data:bridgeMessageData];
     }
-    
     return nil;
 }
 
-+(ElectrodeMessageType) typeFromString: (NSString *)string { //CLAIRE TODO: What to do when the type string does not match
++ (NSString*)convertEnumTypeToString:(ElectrodeMessageType)electrodeMessageType {
+    NSString *result = nil;
+    switch(electrodeMessageType) {
+        case ElectrodeMessageTypeRequest:
+            result = kElectrodeBridgeMessageRequest;
+            break;
+        case ElectrodeMessageTypeResponse:
+            result = kElectrodeBridgeMessageResponse;
+            break;
+        case ElectrodeMessageTypeEvent:
+            result = kElectordeBridgeMessageEvent;
+            break;
+        case ElectrodeMessageTypeUnknown:
+            result = kElectordeBridgeMessageUnknown;
+            break;
+        default:
+            [NSException raise:NSGenericException format:@"Unexpected FormatType."];
+    }
+    return result;
+}
+
++ (ElectrodeMessageType) typeFromString: (NSString *)string { //CLAIRE TODO: What to do when the type string does not match
     if ([string isEqualToString:kElectrodeBridgeMessageRequest]) {
         return ElectrodeMessageTypeRequest;
     } else if ([string isEqualToString:kElectrodeBridgeMessageResponse]) {

@@ -42,8 +42,9 @@ typedef NS_ENUM(NSUInteger, ElectrodeMessageType) {
                        data: (NSDictionary *) data;
 
 -(nullable instancetype)initWithData: (NSDictionary *)data;
--(NSString *)description;
 +(ElectrodeMessageType) typeFromString: (NSString *)string;
++ (NSString*)convertEnumTypeToString:(ElectrodeMessageType)electrodeMessageType;
+
 
 @end
 

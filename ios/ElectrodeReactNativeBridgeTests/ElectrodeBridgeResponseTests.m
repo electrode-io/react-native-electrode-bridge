@@ -10,7 +10,6 @@
 #import "ElectrodeBridgeResponse.h"
 
 @interface ElectrodeBridgeResponseTests : XCTestCase
-
 @end
 
 @implementation ElectrodeBridgeResponseTests

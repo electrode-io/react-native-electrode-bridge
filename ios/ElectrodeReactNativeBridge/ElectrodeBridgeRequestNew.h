@@ -8,6 +8,7 @@
 
 #import "ElectrodeBridgeMessage.h"
 #import <Foundation/Foundation.h>
+@class ElectrodeBridgeMessage;
 NS_ASSUME_NONNULL_BEGIN
 extern const int kElectrodeBridgeRequestDefaultTimeOut;
 

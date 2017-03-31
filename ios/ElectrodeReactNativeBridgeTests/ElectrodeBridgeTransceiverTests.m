@@ -22,13 +22,13 @@
     
     
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithRequestBlock:^(ElectrodeBridgeRequestNew *request) {
-        //Do mock your response here. For this test case this should be a failure message saying no handler.
+        XCTAssertNotNil(request);
     }] forName:@"test1"];
     
     id<ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
     ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithName:@"test1"];
     MockElectrodeBridgeResponseListener *listener = [[MockElectrodeBridgeResponseListener alloc] initWithExpectation:expectation failureBlock:^(id failureMessage) {
-        XCTAssertNil(failureMessage);
+        XCTAssertNotNil(failureMessage);
         [expectation fulfill];
     }];
     

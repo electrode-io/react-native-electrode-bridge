@@ -8,6 +8,7 @@
 
 #import "ElectrodeBridgeHolderNew.h"
 #import "ElectrodeBridgeTransceiver.h"
+#import "ElectrodeBridgeProtocols.h"
 
 
 @interface ElectrodeBridgeHolderNew()

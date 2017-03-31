@@ -15,13 +15,13 @@
 		309A03C11E8B319E00501219 /* ElectrodeBridgeHolderNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 309A03BF1E8B319E00501219 /* ElectrodeBridgeHolderNew.m */; };
 		30BA8F161E84972D00D3C440 /* ElectrodeBridgeEventNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F021E84972D00D3C440 /* ElectrodeBridgeEventNew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30BA8F171E84972D00D3C440 /* ElectrodeBridgeEventNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F031E84972D00D3C440 /* ElectrodeBridgeEventNew.m */; };
-		30BA8F181E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F041E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h */; };
+		30BA8F181E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F041E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30BA8F191E84972D00D3C440 /* ElectrodeBridgeFailureMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F051E84972D00D3C440 /* ElectrodeBridgeFailureMessage.m */; };
 		30BA8F1A1E84972D00D3C440 /* ElectrodeBridgeMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F061E84972D00D3C440 /* ElectrodeBridgeMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30BA8F1B1E84972D00D3C440 /* ElectrodeBridgeMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F071E84972D00D3C440 /* ElectrodeBridgeMessage.m */; };
-		30BA8F1C1E84972D00D3C440 /* ElectrodeBridgeProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F081E84972D00D3C440 /* ElectrodeBridgeProtocols.h */; };
+		30BA8F1C1E84972D00D3C440 /* ElectrodeBridgeProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F081E84972D00D3C440 /* ElectrodeBridgeProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30BA8F1D1E84972D00D3C440 /* ElectrodeBridgeProtocols.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F091E84972D00D3C440 /* ElectrodeBridgeProtocols.m */; };
-		30BA8F1E1E84972D00D3C440 /* ElectrodeBridgeRequestNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F0A1E84972D00D3C440 /* ElectrodeBridgeRequestNew.h */; };
+		30BA8F1E1E84972D00D3C440 /* ElectrodeBridgeRequestNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F0A1E84972D00D3C440 /* ElectrodeBridgeRequestNew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30BA8F1F1E84972D00D3C440 /* ElectrodeBridgeRequestNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F0B1E84972D00D3C440 /* ElectrodeBridgeRequestNew.m */; };
 		30BA8F201E84972D00D3C440 /* ElectrodeBridgeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F0C1E84972D00D3C440 /* ElectrodeBridgeResponse.h */; };
 		30BA8F211E84972D00D3C440 /* ElectrodeBridgeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F0D1E84972D00D3C440 /* ElectrodeBridgeResponse.m */; };

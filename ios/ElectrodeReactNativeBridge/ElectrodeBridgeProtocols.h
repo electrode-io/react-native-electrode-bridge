@@ -51,7 +51,10 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
 #pragma ElectrodeBridgeEventListener protocol
 @protocol ElectrodeBridgeEventListener <NSObject>
 
--(void)onEvent: (NSDictionary *)eventPayload;
+/*
+ * @param eventPayload that associated with the event. Can be an object or NSDictionary. 
+ */
+- (void)onEvent:(id _Nullable)eventPayload;
 
 @end
 

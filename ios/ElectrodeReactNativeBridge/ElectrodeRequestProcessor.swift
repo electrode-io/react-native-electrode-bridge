@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+/*
 class ElectrodeRequestProcessor<TReq: Bridgeable, TResp>: NSObject {
     private let tag: String
     
@@ -29,14 +29,14 @@ class ElectrodeRequestProcessor<TReq: Bridgeable, TResp>: NSObject {
         print("RequestProcessor started processing request (\(requestName)) with payload (\(requestPayload))")
         
         // Convert the payload
-        let requestDictionary = requestPayload?.toDictionary()
+        guard let requestDictionary = requestPayload?.toDictionary() else {
         
         // Build a new bridge request to send out
-        let request = ElectrodeBridgeRequest(name: requestName, data: requestDictionary as! [AnyHashable : Any]?, mode: EBDispatchMode.JS)
+        //let request = ElectrodeBridgeRequest(name: requestName, data: requestDictionary as! [AnyHashable : Any]?, mode: EBDispatchMode.JS)
         
-        let listener = ElectrodeRequestCompletionListenerImplementor<TReq>()
+        //let listener = ElectrodeRequestCompletionListenerImplementor<TReq>()
         
-        ElectrodeBridgeHolder.sharedInstance().send(request, completionListener: listener)
+        //ElectrodeBridgeHolder.sharedInstance().send(request, completionListener: listener)
     }
 }
 
@@ -101,3 +101,4 @@ public class RequestProcessor<TReq, TResp> {
     
     }
 }*/
+ */

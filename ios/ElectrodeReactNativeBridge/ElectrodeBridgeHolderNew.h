@@ -9,11 +9,11 @@
 #import <Foundation/Foundation.h>
 //#import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeBridgeEventNew.h"
-//#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeRequestNew.h"
 //#import "ElectrodeBridgeProtocols.h"
 
 typedef void(^ElectrodeBridgeReactNativeReadyListner)();
-@class ElectrodeBridgeTransceiver, ElectrodeBridgeRequestNew;
+@class ElectrodeBridgeTransceiver;
 @protocol ElectrodeBridgeResponseListener, ElectrodeBridgeRequestHandler, ElectrodeBridgeEventListener;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,8 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 - (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) listener;
-
-
 
 - (void)sendEvent: (ElectrodeBridgeEventNew *)event;
 

@@ -57,6 +57,7 @@
         _message = message;
         _exception = exception;
         _debugMessage = (debugMessage == nil) ? exception.reason : nil;
+        return self;
     }
     
     return nil;

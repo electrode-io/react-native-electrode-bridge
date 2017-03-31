@@ -7,6 +7,7 @@
 //
 
 #import "ElectrodeBridgeBaseTests.h"
+#import "ElectrodeBridgeTransceiver_Internal.h"
 
 @implementation ElectrodeBridgeRequestNew (CustomeBuilder)
 
@@ -79,6 +80,14 @@
 @end
 
 @implementation ElectrodeBridgeBaseTests
+
+-(void)setUp
+{
+    if(self.mockListenerStore) {
+        [self.mockListenerStore removeAllObjects];
+    }
+}
+
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
     NSString *absolutePath = @"/Users/w0l00qx/Code/react-native-electrode-bridge/ios/ElectrodeReactNativeBridge/ElectrodeReactNativeBridgeTests/MiniApp.jsbundle";
@@ -88,7 +97,8 @@
 
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
-    return @[[[ElectrodeBridgeTransceiver alloc] init]];
+    self.mockListenerStore = [[NSMutableDictionary alloc] init];
+    return @[[[MockBridgeTransceiver alloc] initWithJsMockListenerStore:self.mockListenerStore]];
 }
 
 -(void)initializeBundle
@@ -97,5 +107,92 @@
     self.bridge = bridge;
 }
 
+-(id<ElectrodeNativeBridge>)getNativeBridge
+{
+    return [self.bridge moduleForClass:[MockBridgeTransceiver class]];
+}
+
+- (id<ElectrodeReactBridge>)getReactBridge
+{
+    return [self.bridge moduleForClass:[MockBridgeTransceiver class]];
+}
+
+-(void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name
+{
+    [_mockListenerStore setValue:mockJsEventListener forKey:name];
+}
+
 @end
 
+
+@implementation MockBridgeTransceiver
+
+- (instancetype)initWithJsMockListenerStore:(NSMutableDictionary<NSString *,MockJSEeventListener *> *)mockListenerStore
+{
+    if(self = [super init])
+    {
+        self.mockListenerStore = mockListenerStore;
+    }
+    
+    return self;
+}
+
+- (void)emitMessage:(ElectrodeBridgeMessage *)bridgeMessage
+{
+    NSLog(@"Trying to emit messgae to JS, mock JS implemenation here.");
+    MockJSEeventListener* registeredListener = [self.mockListenerStore objectForKey:bridgeMessage.name];
+    if(registeredListener) {
+        switch (bridgeMessage.type) {
+            case ElectrodeMessageTypeEvent:
+                registeredListener.evetBlock((ElectrodeBridgeEventNew *)bridgeMessage);
+                break;
+            case ElectrodeMessageTypeRequest:
+                registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
+                break;
+            case ElectrodeMessageTypeResponse:
+                registeredListener.responseBlock((ElectrodeBridgeResponse *)bridgeMessage);
+                break;
+            default:
+                XCTFail("Should never reach here");
+                break;
+        }
+    }
+    
+}
+
+- (NSArray<NSString *> *)supportedEvents
+{
+     return @[@"bridgeTest"];
+}
+
+@end
+
+
+@implementation MockJSEeventListener
+
+- (instancetype)initWithEventBlock:(evetBlock)evetBlock
+{
+    if(self = [super init]) {
+        self.evetBlock = evetBlock;
+    }
+    return self;
+}
+
+- (instancetype)initWithRequestBlock:(requestBlock)requestBlock
+{
+    if(self = [super init]) {
+        self.requestBlock = requestBlock;
+    }
+    return self;
+}
+
+- (instancetype)initWithResponseBlock:(responseBlock)responseBlock
+{
+    if(self = [super init]) {
+        self.responseBlock = responseBlock;
+    }
+    return self;
+}
+
+
+@end

@@ -7,6 +7,7 @@
 //
 
 #import "ElectrodeBridgeTransceiver.h"
+#import "ElectrodeBridgeTransceiver_Internal.h"
 #import "ElectrodeEventDispatcherNew.h"
 #import "ElectrodeRequestDispatcherNew.h"
 #import "ElectrodeBridgeTransaction.h"
@@ -177,8 +178,14 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma private methods
 
+-(void)emitMessage:(ElectrodeBridgeMessage * _Nonnull)bridgeMessage
+{
+    NSLog(@"Sending bridgeMessage(id=%@, name=%@) to JS", bridgeMessage.messageId, bridgeMessage.name);
+    [self sendEventWithName:@"electrode.bridge.message" body:bridgeMessage.data];
+}
+
 -(void)notifyReactNativeEventListenerWithEvent: (ElectrodeBridgeEventNew *) event {
-    [self sendEventWithName:event.name body:event.data]; //note: don't use the old emitEvent because it's deprecated according to RCT docs
+    [self emitMessage:event];
 }
 
 -(void)notifyNativeEventListenerWithEvent: (ElectrodeBridgeEventNew *)event {
@@ -262,7 +269,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 -(void)dispatchRequestToReactHandlerForTransaction:(ElectrodeBridgeTransaction *)transaction
 {
     NSLog(@"Sending request(id=%@) over to JS to handler because there is no local request handler available", transaction.request.messageId);
-    [self sendEventWithName:transaction.request.name body:transaction.request.data];
+    [self emitMessage:transaction.request];
 }
 
 -(void)handleResponse:(ElectrodeBridgeResponse *)response
@@ -295,7 +302,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     
     if(transaction.isJsInitiated) {
         NSLog(@"Completing transaction by emitting event back to JS since the request is initiated from JS side");
-        [self sendEventWithName:response.name body:response.data];
+        [self emitMessage:response];
     } else {
         if(transaction.finalResponseListener != nil) {
             if(response.failureMessage != nil) {

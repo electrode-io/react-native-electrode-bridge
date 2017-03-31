@@ -7,8 +7,11 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeProtocols.h"
+
 
 @interface MockElectrodeBridgeResponseListener : NSObject <ElectrodeBridgeResponseListener>
 @end

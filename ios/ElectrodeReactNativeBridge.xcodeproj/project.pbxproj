@@ -37,6 +37,7 @@
 		30BA8F851E859CD400D3C440 /* ElectrodeEventDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F831E859CD400D3C440 /* ElectrodeEventDispatcherNew.m */; };
 		30BA8FA21E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8FA01E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h */; };
 		30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */; };
+		7F8E8CBA1E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */; };
 		9678D27C1E68CC2D00719AD5 /* EventListenerProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */; };
 		9678D33C1E721BC600719AD5 /* ElectrodeUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */; };
 		9678D33E1E7332F200719AD5 /* ElectrodeRequestProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D33D1E7332F200719AD5 /* ElectrodeRequestProcessor.swift */; };
@@ -174,6 +175,7 @@
 		30BA8F831E859CD400D3C440 /* ElectrodeEventDispatcherNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeEventDispatcherNew.m; sourceTree = "<group>"; };
 		30BA8FA01E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeRequestDispatcherNew.h; sourceTree = "<group>"; };
 		30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeRequestDispatcherNew.m; sourceTree = "<group>"; };
+		7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeTransceiver_Internal.h; sourceTree = "<group>"; };
 		9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventListenerProcessor.swift; sourceTree = "<group>"; };
 		9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeUtilities.swift; sourceTree = "<group>"; };
 		9678D33D1E7332F200719AD5 /* ElectrodeRequestProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeRequestProcessor.swift; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 				30BA8F0E1E84972D00D3C440 /* ElectrodeBridgeTransaction.h */,
 				30BA8F0F1E84972D00D3C440 /* ElectrodeBridgeTransaction.m */,
 				30BA8F101E84972D00D3C440 /* ElectrodeBridgeTransceiver.h */,
+				7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */,
 				30BA8F111E84972D00D3C440 /* ElectrodeBridgeTransceiver.m */,
 				30BA8F121E84972D00D3C440 /* ElectrodeEventRegistrarNew.h */,
 				30BA8F131E84972D00D3C440 /* ElectrodeEventRegistrarNew.m */,
@@ -370,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				30BA8F241E84972D00D3C440 /* ElectrodeBridgeTransceiver.h in Headers */,
+				7F8E8CBA1E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h in Headers */,
 				DA4BE0EA1E36DD6500DBA1ED /* ElectrodeBridgeHolder.h in Headers */,
 				30BA8F841E859CD400D3C440 /* ElectrodeEventDispatcherNew.h in Headers */,
 				30BA8F221E84972D00D3C440 /* ElectrodeBridgeTransaction.h in Headers */,

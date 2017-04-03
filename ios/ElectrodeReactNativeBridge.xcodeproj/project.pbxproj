@@ -37,6 +37,7 @@
 		30BA8F851E859CD400D3C440 /* ElectrodeEventDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F831E859CD400D3C440 /* ElectrodeEventDispatcherNew.m */; };
 		30BA8FA21E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8FA01E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h */; };
 		30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */; };
+		30BFEE591E92082500FE1B4F /* ElectrodeUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */; };
 		7F8E8CBA1E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */; };
 		9678D27C1E68CC2D00719AD5 /* EventListenerProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */; };
 		9678D33C1E721BC600719AD5 /* ElectrodeUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */; };
@@ -175,6 +176,8 @@
 		30BA8F831E859CD400D3C440 /* ElectrodeEventDispatcherNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeEventDispatcherNew.m; sourceTree = "<group>"; };
 		30BA8FA01E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeRequestDispatcherNew.h; sourceTree = "<group>"; };
 		30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeRequestDispatcherNew.m; sourceTree = "<group>"; };
+		30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ElectrodeReactNativeBridgeTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeUtilitiesTests.swift; sourceTree = "<group>"; };
 		7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeTransceiver_Internal.h; sourceTree = "<group>"; };
 		9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventListenerProcessor.swift; sourceTree = "<group>"; };
 		9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeUtilities.swift; sourceTree = "<group>"; };
@@ -308,6 +311,8 @@
 				3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */,
 				3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */,
 				3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */,
+				30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */,
+				30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */,
 			);
 			path = ElectrodeReactNativeBridgeTests;
 			sourceTree = "<group>";
@@ -456,6 +461,7 @@
 					DA4BE0C41E36DBCD00DBA1ED = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = DXZ5VF8836;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -603,6 +609,7 @@
 				3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */,
 				DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */,
 				3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */,
+				30BFEE591E92082500FE1B4F /* ElectrodeUtilitiesTests.swift in Sources */,
 				DA0B9F421E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m in Sources */,
 				DA0B9F371E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m in Sources */,
 				DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */,
@@ -789,11 +796,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = DXZ5VF8836;
 				INFOPLIST_FILE = ElectrodeReactNativeBridgeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.walmart.platform.ElectrodeReactNativeBridgeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ElectrodeReactNativeBridgeTests/ElectrodeReactNativeBridgeTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -801,11 +812,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = DXZ5VF8836;
 				INFOPLIST_FILE = ElectrodeReactNativeBridgeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.walmart.platform.ElectrodeReactNativeBridgeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ElectrodeReactNativeBridgeTests/ElectrodeReactNativeBridgeTests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

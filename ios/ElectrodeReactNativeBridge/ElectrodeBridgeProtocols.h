@@ -25,7 +25,7 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
 @protocol ElectrodeBridgeResponseListener <NSObject>
 
 -(void)onFailure:(id<ElectrodeFailureMessage>)failureMessage;
--(void)onSuccess:(nullable NSDictionary *)responseData;
+-(void)onSuccess:(id _Nullable)responseData;
 
 @end
 ////////////////////////////////////////////////

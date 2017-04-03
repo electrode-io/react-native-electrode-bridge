@@ -19,6 +19,7 @@ class EventListenerProcessor<T: Bridgeable>: NSObject {
         self.eventName = eventName
         self.eventPayloadClass = eventPayloadClass
         self.appEventListener = eventListener
+        super.init()
     }
     
     func execute() {
@@ -37,7 +38,7 @@ private class ElectrodeEventListenerImplementor<T: Bridgeable>: NSObject, Electr
     
     func onEvent(_ eventPayload: Any?) {
         print("Processing final result for the event with payload bundle (\(eventPayload))")
-        let result = T.generateObject(eventPayload) as? Bridgeable
+        let result = NSObject.generateObject(data: eventPayload as! [AnyHashable : Any], passedClass: eventPayloadClass)
         appEventListener.onEvent(result)
     }
 }

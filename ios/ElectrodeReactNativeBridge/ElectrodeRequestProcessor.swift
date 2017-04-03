@@ -7,98 +7,98 @@
 //
 
 import UIKit
-/*
-class ElectrodeRequestProcessor<TReq: Bridgeable, TResp>: NSObject {
+
+typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
+typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> ()
+
+class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
     private let tag: String
-    
     private let requestName: String
     private let requestPayload: TReq?
     private let responseClass: TResp.Type
-    private let responseListener: ElectrodeRequestHandler
+    private let responseItemType: TItem.Type?
+    private let responseListener: ElectrodeBridgeResponseListener
     
-    init(requestName: String, requestPayload: TReq?, respClass: TResp.Type, responseListener: ElectrodeRequestHandler) {
-        self.tag = String(describing: type(of: self))
-        
-        self.requestName = requestName
-        self.requestPayload = requestPayload
-        self.responseClass = respClass
+    init(requestName: String,
+         requestPayload: TReq?,
+         respClass: TResp.Type,
+         responseItemType: TItem.Type?,
+         responseListener: ElectrodeBridgeResponseListener)
+    {
+        self.tag              = String(describing: type(of:self))
+        self.requestName      = requestName
+        self.requestPayload   = requestPayload
+        self.responseClass    = respClass
+        self.responseItemType = responseItemType
         self.responseListener = responseListener
+        super.init()
     }
     
-    func execute() {
+    func execute()
+    {
         print("RequestProcessor started processing request (\(requestName)) with payload (\(requestPayload))")
-        
-        // Convert the payload
-        guard let requestDictionary = requestPayload?.toDictionary() else {
-        
-        // Build a new bridge request to send out
-        //let request = ElectrodeBridgeRequest(name: requestName, data: requestDictionary as! [AnyHashable : Any]?, mode: EBDispatchMode.JS)
-        
-        //let listener = ElectrodeRequestCompletionListenerImplementor<TReq>()
-        
-        //ElectrodeBridgeHolder.sharedInstance().send(request, completionListener: listener)
-    }
-}
-
-class ElectrodeRequestCompletionListenerImplementor<T: Bridgeable>: NSObject, ElectrodeRequestCompletionListener {
-    
-    private var executor: ((_ listener: Bridgeable?) -> ())? = nil
-    
-    func onSuccess(_ data: [AnyHashable : Any]?) {
-        
-        print("Processing final result for the request with payload bundle (\(data))")
-        let result = T.generateObject(data) as? Bridgeable
-        
-        if let executor = executor {
-            executor(result)
+        guard let requestDictionary = requestPayload?.toDictionary() as? [AnyHashable: Any] else {
+            assertionFailure("\(tag) : Cannot convert payload to valid type")
+            return
         }
+        let request = ElectrodeBridgeRequestNew.createRequest(withData: requestDictionary)
+        
+        guard let validRequest = request else {
+            assertionFailure("Invalid request")
+            return
+        }
+        
+        let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: { [weak self]
+            (responseData: Any?) in
+            //response from a req should always be dic. so we can assume that? 
+            let processedResp = self?.processSuccessResponse(responseData: responseData)
+            self?.responseListener.onSuccess(processedResp)
+            
+        }, failureClosure: { (failureMessage: ElectrodeFailureMessage) in
+            self.responseListener.onFailure(failureMessage)
+        })
+        
+        ElectrodeBridgeHolderNew.sharedInstance().sendRequest(validRequest, responseListener: intermediateListener)
     }
     
-    func onError(_ code: String, message: String) {
-        
+    private func processSuccessResponse(responseData: Any?) -> AnyObject{
+        /*
+        if let itemType = responseItemType {
+            //let resp = ElectrodeUtilities.generateList(data: responseData, itemType: itemType)
+            return resp as AnyObject
+        } else {
+            //let resp = ElectrodeUtilities<Any>.generateObject(data: responseData)
+            
+            return resp
+        }
+         */
+        return NSString()
     }
 }
 
-/*
-public class RequestProcessor<TReq, TResp> {
-    private final String TAG = RequestProcessor.class.getSimpleName();
+class ElectrodeBridgeResponseListenerImpl: NSObject, ElectrodeBridgeResponseListener {
+    private let successClosure: ElectrodeRequestProcessorSuccessClosure?
+    private let failureClosure: ElectrodeRequestProcessorFailureClosure?
+    init(successClosure: ElectrodeRequestProcessorSuccessClosure?, failureClosure: ElectrodeRequestProcessorFailureClosure?)
+    {
+        self.successClosure = successClosure
+        self.failureClosure = failureClosure
+    }
     
-    private final String requestName;
-    private final TReq requestPayload;
-    private final Class<TResp> responseClass;
-    private final ElectrodeBridgeResponseListener<TResp> responseListener;
-    
-    public RequestProcessor(@NonNull String requestName, @Nullable TReq requestPayload, @NonNull Class<TResp> respClass, @NonNull ElectrodeBridgeResponseListener<TResp> responseListener) {
-        this.requestName = requestName;
-        this.requestPayload = requestPayload;
-        this.responseClass = respClass;
-        this.responseListener = responseListener;
+    func onSuccess(_ responseData: Any?) {
+        guard let success = successClosure else {
+            assertionFailure("no success block on sucess callback ")
+            return
+        }
+        success(responseData)
     }
     
     
-    public void execute() {
-        Logger.d(TAG, "Request processor started processing request(%s)", requestName);
-        Bundle data = BridgeArguments.generateBundle(requestPayload, BridgeArguments.Type.REQUEST);
-        
-        ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(requestName)
-        .withData(data)
-        .build();
-    
-        ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<Bundle>() {
-    
-            @Override
-            public void onFailure(@NonNull FailureMessage failureMessage) {
-                responseListener.onFailure(failureMessage);
-            }
-    
-            @Override
-            public void onSuccess(@Nullable Bundle responseData) {
-                TResp response = BridgeArguments.generateObject(responseData, responseClass, BridgeArguments.Type.RESPONSE);
-                Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
-                responseListener.onSuccess(response);
-            }
-        });
-    
+    func onFailure(_ failureMessage: ElectrodeFailureMessage) {
+        guard let failure = failureClosure else {
+            assertionFailure("no failure block on sucess callback ")
+            return
+        }
+        failure(failureMessage)
     }
-}*/
- */
+}

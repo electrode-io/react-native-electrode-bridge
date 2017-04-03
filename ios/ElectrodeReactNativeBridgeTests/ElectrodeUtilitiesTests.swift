@@ -8,17 +8,51 @@
 
 import XCTest
 
+@testable import ElectrodeReactNativeBridge
+
 class ElectrodeUtilitiesTests: XCTestCase {
     
-    ////primitive int //////////////////////////////////////////////////
-    //let convertAnyObjectAsInput = primitiveData as AnyObject
-    //let returnType = type(of:primitiveData)
-    //let primitiveGen = try? NSObject.generateObject(data: convertAnyObjectAsInput, classType: returnType)
-    //////////////////////////////////////////////////////
-    ////primitive string //////////////////////////////////////////////////
-    //let anyObjectOfprimitiveString = primitiveString as AnyObject
-    //let strType = type(of:primitiveData)
-    //let primitiveStringGen = try? NSObject.generateObject(data: anyObjectOfprimitiveString, classType: strType)
+
+    func testGenerateObjectWithIntInput() {
+        let primitiveData = 2
+        let returnType = type(of:primitiveData)
+        let primitiveGen = try? NSObject.generateObject(data: primitiveData as AnyObject, classType: returnType)
+        guard let res = primitiveGen as? Int else {
+            XCTAssert(false)
+            return
+        }
+        
+        XCTAssert(res == 2)
+    }
+    
+    func testGenerateObjectWithStringAsInput() {
+        let str = "MyString"
+        let returnType = String.self
+        let strGen = try? NSObject.generateObject(data: str, classType: returnType)
+        guard let res = strGen as? String else {
+            XCTAssert(false)
+            return
+        }
+        XCTAssert(res == str)
+        
+    }
+    
+    func testGenerateObjectWithDicionaryAsInput() {
+        let addressDict = ["street": "860", "zipcode":"94086"]
+        let returnType = Address.self
+        let addressGen = try? NSObject.generateObject(data: addressDict, classType: returnType)
+        
+        guard let res = addressGen as? Address else {
+            XCTAssert(false)
+            return
+        }
+        XCTAssert(res.street == "860")
+        XCTAssert(res.zipcode == "94086")
+    }
+    
+    
+    
+    
     //dictionary object /////////////////////////////////////////////////////////////////
     //let anyAddress = addressData as AnyObject
     //let addressType = Address.self
@@ -60,5 +94,31 @@ class ElectrodeUtilitiesTests: XCTestCase {
     print(addressArray[1].street)
     print(addressArray[1].zipcode)
    */
+    
+}
+
+
+class AddressWrapper: NSObject, Bridgeable {
+    var address: Address = Address()
+}
+
+class AddressArrayWrapper: NSObject, Bridgeable {
+    var addresses: [Address]  = [Address(), Address()]
+}
+
+class Address: NSObject, Bridgeable {
+    var street: String
+    var zipcode: String
+    
+    init(street: String, zipcode: String) {
+        self.street = street
+        self.zipcode = zipcode
+    }
+    
+    
+    override init() {
+        street = ""
+        zipcode = ""
+    }
     
 }

@@ -77,7 +77,7 @@ extension NSObject {
         let res = obj.init()
         let aMirrorChildren = Mirror(reflecting: res).children
         for case let(label, _) in aMirrorChildren {
-            let tmpType = res.getTypeOfProperty(label!)!
+            let tmpType = res.getTypeOfProperty(label!)! //Claire Todo: FIX force unwrapp
             switch(tmpType) {
             case .Class(let classType):
                 let nextVal = data[label!]
@@ -97,8 +97,8 @@ extension NSObject {
     // assume data has to be NSObject and return type has to be NSObject too
     // TODO: check with Deepu. What is it's a List of [AddressObject, primitives]
     // how to handle BOOL ?
-    static func generateObject(data: AnyObject, classType: Any.Type, itemType: Any.Type? = nil) throws -> AnyObject {
-        var res: AnyObject
+    public static func generateObject(data: Any, classType: Any.Type, itemType: Any.Type? = nil) throws -> Any {
+        var res: Any
         print(type(of:data))
         if(ElectrodeUtilities.isObjectiveCPrimitives(type: classType)) {
             res = data
@@ -121,7 +121,7 @@ extension NSObject {
                     if (ElectrodeUtilities.isObjectiveCPrimitives(type: validItemType)) {
                         obj = item as AnyObject
                     } else {
-                        obj = try NSObject.generateObject(data: item as AnyObject, classType: validItemType)
+                        obj = try NSObject.generateObject(data: item as AnyObject, classType: validItemType) as AnyObject
                     }
                     tmpRes.append(obj)
                 }
@@ -160,6 +160,42 @@ class ElectrodeUtilities: NSObject {
     
 }
 
-@objc protocol Bridgeable { //@objc requires this protocol to be a class protocol
+@objc public protocol Bridgeable { //@objc requires this protocol to be a class protocol
     func toDictionary() -> NSDictionary
+}
+
+extension Bridgeable {
+    func toDictionary() -> NSDictionary {
+        let aMirror = Mirror(reflecting: self)
+        var dict = [AnyHashable: Any]()
+        for case let(label, value) in aMirror.children {
+            guard let validLabel = label else {
+                assertionFailure("label for object is not valid")
+                return NSDictionary()
+            }
+            
+            guard let obj = self as? NSObject else {
+                assertionFailure("cannot bridge object to toDictionary")
+                return NSDictionary()
+            }
+            
+            guard let propertyType = obj.getTypeOfProperty(validLabel) else {
+                assertionFailure("object has property of empty label")
+                return NSDictionary()
+            }
+            switch(propertyType) {
+            case .Class(let classType):
+                guard let validValue = value as? Bridgeable else {
+                    assertionFailure("\(classType) is not bridgeable when it's required")
+                    return NSDictionary()
+                }
+                dict[validLabel] = validValue.toDictionary()
+                
+            case .Struct:
+                dict[validLabel] = value
+            }
+
+        }
+        return dict as NSDictionary
+    }
 }

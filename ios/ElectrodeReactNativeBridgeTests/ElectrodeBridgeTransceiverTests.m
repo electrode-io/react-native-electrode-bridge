@@ -17,9 +17,7 @@
 
 -(void)testSendTimeOutRequest
 {
-    [super initializeBundle];
     XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSendTimeOutRequest"];
-    
     
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithRequestBlock:^(ElectrodeBridgeRequestNew *request) {
         XCTAssertNotNil(request);

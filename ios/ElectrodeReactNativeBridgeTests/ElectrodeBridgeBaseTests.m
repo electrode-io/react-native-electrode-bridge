@@ -83,6 +83,8 @@
 
 -(void)setUp
 {
+    [self initializeBundle];
+    
     if(self.mockListenerStore) {
         [self.mockListenerStore removeAllObjects];
     }

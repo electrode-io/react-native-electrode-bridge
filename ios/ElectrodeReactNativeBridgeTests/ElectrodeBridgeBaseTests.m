@@ -28,6 +28,23 @@
 }
 
 
++ (instancetype)createRequestWithName:(NSString *)name data:(id)data
+{
+    NSString * const kElectrodeBridgeMessageName = @"name";
+    NSString * const kElectrodeBridgeMessageId = @"id";
+    NSString * const kElectrodeBridgeMessageType = @"type";
+    NSString * const kElectrodeBridgeMessageData = @"data";
+    NSDictionary *requestData = @{kElectrodeBridgeMessageName: name,
+                           kElectrodeBridgeMessageId:@"1234",
+                           kElectrodeBridgeMessageType:kElectrodeBridgeMessageRequest,
+                           kElectrodeBridgeMessageData: data
+                           };
+    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:requestData];
+    
+    return request;
+
+}
+
 @end
 
 @implementation MockElectrodeBridgeResponseListener

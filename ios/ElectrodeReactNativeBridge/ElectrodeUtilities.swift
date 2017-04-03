@@ -81,7 +81,7 @@ extension NSObject {
 }
 
 
-class ElectrodeUtilities: NSObject {
+@objc class ElectrodeUtilities: NSObject {
 
     
     static func primitiveSet() -> Set<String> {
@@ -97,9 +97,4 @@ class ElectrodeUtilities: NSObject {
     }
     
     
-}
-
-
-@objc protocol Bridgeable { //@objc requires this protocol to be a class protocol
-    func toDictionary() -> NSDictionary
 }

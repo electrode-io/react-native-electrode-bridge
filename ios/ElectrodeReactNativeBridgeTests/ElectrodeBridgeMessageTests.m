@@ -35,4 +35,20 @@
     XCTAssertEqual(requestMessage.type, messageType, @"Message type may be different. Invalid assignment");
 }
 
+-(void)testPrimitiveTypeAsData {
+    NSString* messageName = @"com.walmart.ern.requestmessage";
+    NSDictionary* messageData = @{@"test" : @"requestMessage"};
+    NSString* messageId = [ElectrodeBridgeMessage UUID];
+    ElectrodeMessageType messageType = ElectrodeMessageTypeRequest;
+    NSDictionary* data = @{
+                           kElectrodeBridgeMessageName : messageName,
+                           kElectrodeBridgeMessageId : messageId,
+                           kElectrodeBridgeMessageType : [ElectrodeBridgeMessage convertEnumTypeToString:messageType] ,
+                           kElectrodeBridgeMessageData : @3
+                           };
+    
+    ElectrodeBridgeMessage* requestMessage = [[ElectrodeBridgeMessage alloc] initWithData:data];
+    XCTAssertEqual(requestMessage.data, @3);
+}
+
 @end

@@ -44,10 +44,10 @@
     XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSampleRequestNativeToNative"];
     id<ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
     
-    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithName:@"testRequest" data:@"testData"];
+    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithName:@"testRequest" data:nil];
     
     [nativeBridge regiesterRequestHandlerWithName:@"testRequest" handler:[[TestRequestHandler alloc] initWithOnRequestBlock:^(NSDictionary *data, id<ElectrodeBridgeResponseListener> responseListener) {
-        XCTAssertNotNil(data);
+        XCTAssertNil(data);
         [responseListener onSuccess:nil];
     }] error:nil];
     
@@ -60,6 +60,31 @@
     
     [self waitForExpectationToFullFillOrTimeOut];
 }
+
+-(void)testSendRequestWithEmptyRequestDataAndNEmptyResponseJSToNative
+{
+    XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSampleRequestNativeToNative"];
+    
+    id<ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
+    id<ElectrodeReactBridge> reactBridge = [self getReactBridge];
+    
+    [nativeBridge regiesterRequestHandlerWithName:@"testRequest" handler:[[TestRequestHandler alloc] initWithOnRequestBlock:^(NSDictionary *data, id<ElectrodeBridgeResponseListener> responseListener) {
+        XCTAssertNil(data);
+        [responseListener onSuccess:nil];
+    }] error:nil];
+    
+    [self addMockEventListener:[[MockJSEeventListener alloc] initWithResponseBlock:^(ElectrodeBridgeResponse *response) {
+        XCTAssertNotNil(response);
+        [expectation fulfill];
+    }] forName:@"testRequest"];
+    
+    NSDictionary *jsRequest = [self createBridgeRequestForName:@"testRequest" id:[ElectrodeBridgeMessage UUID] data:nil];
+    [reactBridge sendMessage:jsRequest];
+    
+    [self waitForExpectationToFullFillOrTimeOut];
+}
+
+
 
 -(void)testSendRequestWithRequestDataAndEmptyResponse
 {

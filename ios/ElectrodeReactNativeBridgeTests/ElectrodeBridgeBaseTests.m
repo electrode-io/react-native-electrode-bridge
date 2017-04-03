@@ -120,6 +120,19 @@
     [_mockListenerStore setValue:mockJsEventListener forKey:name];
 }
 
+- (NSDictionary *)createBridgeRequestForName:(NSString *)name id:(NSString *)requestId data:(id)data
+{
+    NSMutableDictionary *jsRequest = [[NSMutableDictionary alloc] init];
+    [jsRequest setObject:name forKey:kElectrodeBridgeMessageName];
+    [jsRequest setObject:requestId forKey:kElectrodeBridgeMessageId];
+    [jsRequest setObject:[ElectrodeBridgeMessage convertEnumTypeToString:ElectrodeMessageTypeRequest] forKey:kElectrodeBridgeMessageType];
+    if(data)
+    {
+        [jsRequest setObject:data forKey:kElectrodeBridgeMessageData];
+    }
+    return jsRequest;
+}
+
 @end
 
 

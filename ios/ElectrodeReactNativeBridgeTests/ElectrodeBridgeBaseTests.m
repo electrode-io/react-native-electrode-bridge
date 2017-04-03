@@ -142,16 +142,37 @@
     if(registeredListener) {
         switch (bridgeMessage.type) {
             case ElectrodeMessageTypeEvent:
-                registeredListener.evetBlock((ElectrodeBridgeEventNew *)bridgeMessage);
+                if(!registeredListener.evetBlock)
+                {
+                    NSLog(@"TEST FAILURE: expected a non null event block but found a nil event block for mock listener registered for: %@", bridgeMessage.name);
+                }
+                else
+                {
+                    registeredListener.evetBlock((ElectrodeBridgeEventNew *)bridgeMessage);
+                }
                 break;
             case ElectrodeMessageTypeRequest:
-                registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
+                if(!registeredListener.requestBlock)
+                {
+                    NSLog(@"TEST FAILURE: expected a non null request block but found a nil request block for mock listener registered for : %@", bridgeMessage.name);
+                }
+                else
+                {
+                    registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
+                }
                 break;
             case ElectrodeMessageTypeResponse:
-                registeredListener.responseBlock((ElectrodeBridgeResponse *)bridgeMessage);
+                if(!registeredListener.responseBlock)
+                {
+                    NSLog(@"TEST FAILURE: expected a non null response block but found a nil response block for mock listener registered for: %@", bridgeMessage.name);
+                }
+                else
+                {
+                    registeredListener.responseBlock((ElectrodeBridgeResponse *)bridgeMessage);
+                }
                 break;
             default:
-                XCTFail("Should never reach here");
+                NSLog(@"TEST FAILURE: Should never reach here for request:%@", bridgeMessage.name);
                 break;
         }
     }

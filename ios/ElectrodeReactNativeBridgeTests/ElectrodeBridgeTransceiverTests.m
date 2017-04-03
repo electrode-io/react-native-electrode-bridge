@@ -8,6 +8,8 @@
 
 #import <XCTest/XCTest.h>
 #import "ElectrodeBridgeBaseTests.h"
+#import "TestRequestHandler.h"
+#import "ElectrodeBridgeResponse.h"
 
 @interface ElectrodeBridgeTransceiverTests : ElectrodeBridgeBaseTests
 
@@ -17,9 +19,7 @@
 
 -(void)testSendTimeOutRequest
 {
-    [super initializeBundle];
     XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSendTimeOutRequest"];
-    
     
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithRequestBlock:^(ElectrodeBridgeRequestNew *request) {
         XCTAssertNotNil(request);
@@ -39,9 +39,26 @@
 
 }
 
--(void)testSendRequestWithEmptyRequestDataAndNonEmptyResponse
+-(void)testSendRequestWithEmptyRequestDataAndNEmptyResponseNativeToNative
 {
+    XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSampleRequestNativeToNative"];
+    id<ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
     
+    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithName:@"testRequest" data:@"testData"];
+    
+    [nativeBridge regiesterRequestHandlerWithName:@"testRequest" handler:[[TestRequestHandler alloc] initWithOnRequestBlock:^(NSDictionary *data, id<ElectrodeBridgeResponseListener> responseListener) {
+        XCTAssertNotNil(data);
+        [responseListener onSuccess:nil];
+    }] error:nil];
+    
+    
+    MockElectrodeBridgeResponseListener *listener = [[MockElectrodeBridgeResponseListener alloc] initWithExpectation:expectation successBlock:^(NSDictionary *data) {
+        XCTAssertNil(data);
+        [expectation fulfill];
+    }];
+    [nativeBridge sendRequest:request withResponseListener:listener];
+    
+    [self waitForExpectationToFullFillOrTimeOut];
 }
 
 -(void)testSendRequestWithRequestDataAndEmptyResponse

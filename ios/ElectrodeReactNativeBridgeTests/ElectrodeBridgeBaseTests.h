@@ -55,6 +55,8 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 
 +(instancetype)createRequestWithName: (NSString *)name;
 
++(instancetype)createRequestWithName: (NSString *)name data:(id)data;
+
 @end
 
 /////////////////MockElectrodeBridgeResponseListener

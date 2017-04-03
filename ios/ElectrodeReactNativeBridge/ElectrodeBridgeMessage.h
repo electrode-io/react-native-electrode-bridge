@@ -30,7 +30,7 @@ typedef NS_ENUM(NSUInteger, ElectrodeMessageType) {
 @property(nonatomic, copy, readonly) NSString *name;
 @property(nonatomic, copy, readonly) NSString *messageId;
 @property(nonatomic, assign, readonly)ElectrodeMessageType type;
-@property(nonatomic, copy, readonly) NSDictionary *data;
+@property(nonatomic, strong, readonly, nullable) id data; //this could be NSDictionary, primitives, or NSArray
 
 +(BOOL)isValidFromData: (NSDictionary *)data;
 +(BOOL)isValidFromData: (NSDictionary *)data withType: (ElectrodeMessageType) type;
@@ -39,12 +39,16 @@ typedef NS_ENUM(NSUInteger, ElectrodeMessageType) {
 -(instancetype)initWithName: (NSString *) name
                   messageId: (NSString *)messageId
                        type: (ElectrodeMessageType) type
-                       data: (NSDictionary *) data;
+                       data: (id _Nullable) data; //this could be NSDictionary, primitives, or NSArray
 
+/*
+ * return an instance of bridge message from a NSDictionary representation of it.
+ * @param data NSDictionary representation of BridgeMessage. Has keys of 'id','name','type','data'
+ */
 -(nullable instancetype)initWithData: (NSDictionary *)data;
 +(ElectrodeMessageType) typeFromString: (NSString *)string;
 + (NSString*)convertEnumTypeToString:(ElectrodeMessageType)electrodeMessageType;
-
+-(NSDictionary *)toDictionary;
 
 @end
 

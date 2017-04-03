@@ -91,7 +91,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
      */
     @Override
     public String getName() {
-        return "ElectrodeNativeBridge";
+        return "ElectrodeBridge";
     }
 
     @NonNull

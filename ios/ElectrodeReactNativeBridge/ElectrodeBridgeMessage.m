@@ -7,6 +7,8 @@
 //
 
 #import "ElectrodeBridgeMessage.h"
+#import <ElectrodeReactNativeBridge/ElectrodeReactNativeBridge-Swift.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 NSString * const kElectrodeBridgeMessageName = @"name";
@@ -23,7 +25,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
 @property(nonatomic, copy)   NSString *name;
 @property(nonatomic, copy)   NSString *messageId;
 @property(nonatomic, assign) ElectrodeMessageType type;
-@property(nonatomic, copy)   NSDictionary *data;
+@property(nonatomic, strong, nullable) id data;
 @end
 
 @implementation ElectrodeBridgeMessage
@@ -46,7 +48,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
 -(instancetype)initWithName: (NSString *) name
                   messageId:(NSString *)messageId
                        type: (ElectrodeMessageType) type
-                       data: (NSDictionary *) data
+                       data: (id _Nullable) data
 {
     if (self = [super init]) {
         _name      = name;
@@ -59,14 +61,58 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
 }
 
 - (nullable instancetype)initWithData:(NSDictionary *)data {
-    if ([ElectrodeBridgeMessage isValidFromData:data]) { //CLAIRE TODO: Ask Deepu why it's not checking for data.
+    if ([ElectrodeBridgeMessage isValidFromData:data]) {
         NSString *name = [data objectForKey:kElectrodeBridgeMessageName];
         NSString *messageId = [data objectForKey:kElectrodeBridgeMessageId];
         ElectrodeMessageType type = [ElectrodeBridgeMessage typeFromString:(NSString *)[data objectForKey:kElectrodeBridgeMessageType]];
-        NSDictionary *bridgeMessageData = (NSDictionary *)[data objectForKey:kElectrodeBridgeMessageData];
+        // BridgeMessage can be sent from either Native or React Native side. When it's from RN side, it can be
+        // NSDictionary, primitives, NSArray etc; when it's from Native side, it will be a complex object. 
+        id bridgeMessageData = [data objectForKey:kElectrodeBridgeMessageData]; //TODO: if it's primitive..?
         return [self initWithName:name messageId:messageId type:type data:bridgeMessageData];
     }
     return nil;
+}
+-(NSDictionary *)toDictionary {
+    NSMutableDictionary *messageDict = [[NSMutableDictionary alloc] init];
+    [messageDict setObject:self.name forKey:kElectrodeBridgeMessageName];
+    [messageDict setObject:self.messageId forKey:kElectrodeBridgeMessageId];
+    NSString *typeString = [ElectrodeBridgeMessage convertEnumTypeToString:self.type];
+    [messageDict setObject:typeString forKey:kElectrodeBridgeMessageType];
+    if(self.data != nil) {
+        id dataObj;
+        if ([self.data conformsToProtocol:@protocol(Bridgeable) ]) {
+            id<Bridgeable> bridgeableData = self.data;
+            dataObj = [bridgeableData toDictionary];
+        } else if ([self.data isKindOfClass:[NSArray class]]) {
+            id element = [self.data firstObject];
+            if (element) { //assume the array has the same type of object
+                if ([element conformsToProtocol:@protocol(Bridgeable)]) {
+                    NSArray *convertedArray = [self convertToArrayOfBridgeable:self.data];
+                    dataObj = convertedArray;
+                }
+            } else {
+                NSLog(@"ElectrodeBridgeMessage: empty array");
+            }
+        } else {
+            dataObj = self.data;
+        }
+        [messageDict setObject:dataObj forKey:kElectrodeBridgeMessageData];
+    }
+    
+    return [messageDict copy];
+}
+
+-(NSArray<NSDictionary *> *)convertToArrayOfBridgeable: (NSArray<Bridgeable> *)data {
+    NSMutableArray *res = [[NSMutableArray alloc] init];
+    for (id element in data) {
+        if ([element conformsToProtocol:@protocol(Bridgeable)]) {
+            NSDictionary *serialized = [element toDictionary];
+            [res addObject:serialized];
+        } else {
+            NSLog(@"ElectrodeBridgeMessage: element does not conform to protocol in toDictionary");
+        }
+    }
+    return [res copy];
 }
 
 + (NSString*)convertEnumTypeToString:(ElectrodeMessageType)electrodeMessageType {

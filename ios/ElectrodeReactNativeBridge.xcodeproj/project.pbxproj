@@ -37,6 +37,7 @@
 		30BA8F851E859CD400D3C440 /* ElectrodeEventDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F831E859CD400D3C440 /* ElectrodeEventDispatcherNew.m */; };
 		30BA8FA21E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8FA01E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h */; };
 		30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */; };
+		30C8F4AC1E92DB2400E40221 /* Bridgeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */; };
 		7F8E8CBA1E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */; };
 		9678D27C1E68CC2D00719AD5 /* EventListenerProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */; };
 		9678D33C1E721BC600719AD5 /* ElectrodeUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */; };
@@ -175,6 +176,7 @@
 		30BA8F831E859CD400D3C440 /* ElectrodeEventDispatcherNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeEventDispatcherNew.m; sourceTree = "<group>"; };
 		30BA8FA01E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeRequestDispatcherNew.h; sourceTree = "<group>"; };
 		30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeRequestDispatcherNew.m; sourceTree = "<group>"; };
+		30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bridgeable.swift; sourceTree = "<group>"; };
 		7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeTransceiver_Internal.h; sourceTree = "<group>"; };
 		9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventListenerProcessor.swift; sourceTree = "<group>"; };
 		9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeUtilities.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				9678D33D1E7332F200719AD5 /* ElectrodeRequestProcessor.swift */,
 				9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */,
 				9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */,
+				30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */,
 			);
 			name = Swift;
 			sourceTree = "<group>";
@@ -578,6 +581,7 @@
 				DA4BE0ED1E36DD6500DBA1ED /* ElectrodeBridgeRequest.m in Sources */,
 				30BA8F271E84972D00D3C440 /* ElectrodeEventRegistrarNew.m in Sources */,
 				DA4BE0E71E36DD6500DBA1ED /* ElectrodeBridge.m in Sources */,
+				30C8F4AC1E92DB2400E40221 /* Bridgeable.swift in Sources */,
 				DA4BE0F11E36DD6500DBA1ED /* ElectrodeEventRegistrar.m in Sources */,
 				DA4BE0EB1E36DD6500DBA1ED /* ElectrodeBridgeHolder.m in Sources */,
 				96F9A1CF1E68AF0200752759 /* ElectrodeEventProcessor.swift in Sources */,

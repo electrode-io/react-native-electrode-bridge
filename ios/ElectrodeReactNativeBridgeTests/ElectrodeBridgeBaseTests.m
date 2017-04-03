@@ -13,36 +13,15 @@
 
 +(instancetype)createRequestWithName: (NSString *)name
 {
-    NSString * const kElectrodeBridgeMessageName = @"name";
-    NSString * const kElectrodeBridgeMessageId = @"id";
-    NSString * const kElectrodeBridgeMessageType = @"type";
-    NSString * const kElectrodeBridgeMessageData = @"data";
-    NSDictionary *data = @{kElectrodeBridgeMessageName: name,
-                           kElectrodeBridgeMessageId:@"1234",
-                           kElectrodeBridgeMessageType:kElectrodeBridgeMessageRequest,
-                           kElectrodeBridgeMessageData: @{@"key": @"value"}
-                           };
-    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:data];
-    
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:nil];
     return request;
 }
 
 
 + (instancetype)createRequestWithName:(NSString *)name data:(id)data
 {
-    NSString * const kElectrodeBridgeMessageName = @"name";
-    NSString * const kElectrodeBridgeMessageId = @"id";
-    NSString * const kElectrodeBridgeMessageType = @"type";
-    NSString * const kElectrodeBridgeMessageData = @"data";
-    NSDictionary *requestData = @{kElectrodeBridgeMessageName: name,
-                           kElectrodeBridgeMessageId:@"1234",
-                           kElectrodeBridgeMessageType:kElectrodeBridgeMessageRequest,
-                           kElectrodeBridgeMessageData: data
-                           };
-    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:requestData];
-    
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:data];
     return request;
-
 }
 
 @end

@@ -29,12 +29,14 @@ const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
     return nil;
 }
 
--(instancetype)initWithValidData: (NSDictionary *)data {
-    if (self = [super initWithData:data]) {
+- (instancetype)initWithData:(NSDictionary *)data
+{
+    if(self = [super initWithData:data])
+    {
         _timeoutMs = kElectrodeBridgeRequestDefaultTimeOut;
-        _isJsInitiated = YES; // Claire TODO: why it's defualt to true
+        _isJsInitiated = YES;
     }
-    
     return self;
 }
+
 @end

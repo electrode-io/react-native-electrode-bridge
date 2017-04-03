@@ -50,63 +50,69 @@ class ElectrodeUtilitiesTests: XCTestCase {
         XCTAssert(res.zipcode == "94086")
     }
     
+    func testGenerateObjectWithObjectInsideAnotherObjAsInput() {
+        let addressWrapperDict = ["address": ["street": "860", "zipcode":"94086"]]
+        let returnType = AddressWrapper.self
+        let addressWrapperGen = try? NSObject.generateObject(data: addressWrapperDict, classType: returnType)
+        
+        guard let res = addressWrapperGen as? AddressWrapper else {
+            XCTAssert(false)
+            return
+        }
+        XCTAssert(res.address.isKind(of: Address.self))
+        XCTAssert(res.address.zipcode == "94086")
+        XCTAssert(res.address.street == "860")
+        
+    }
     
+    func testGenerateObjectWithArrayOfPrimitivesAsInput() {
+        let strArray = ["a", "b"]
+        let returnType = Array<Any>.self
+        let itemType = String.self
+        let arrayPrimitivesGen = try? NSObject.generateObject(data: strArray, classType: returnType, itemType: itemType)
+        guard let res = arrayPrimitivesGen as? [String] else {
+            XCTAssert(false)
+            return
+        }
+        XCTAssert(strArray.count == res.count)
+        XCTAssert(res[0] == "a")
+        XCTAssert(res[1] == "b")
+        
+    }
     
-    
-    //dictionary object /////////////////////////////////////////////////////////////////
-    //let anyAddress = addressData as AnyObject
-    //let addressType = Address.self
-    //let addressGen = try? NSObject.generateObject(data: anyAddress, classType: addressType)
-    //guard let address = addressGen as? Address else {
-    //    assertionFailure("failed")
-    //    return
-    //}
-    //print(address.street)
-    //print(address.zipcode)
-    //dictionary wrapper object////////////////////////////////////////////////////
-    /*
-     let anyAddressWrapper = addressWrapperData as AnyObject
-     let addressWrapperType = AddressWrapper.self
-     let addressWrapperGen = try? NSObject.generateObject(data: anyAddressWrapper, classType: addressWrapperType)
-     guard let wrapper = addressWrapperGen as? AddressWrapper else {
-     assertionFailure("failed")
-     return
-     }
-     print(wrapper)
-     */
-    /////////////////array primitives////
-    /*
-     let anystringArrayData = stringArrayData as AnyObject
-     let anystringArrayDataType = Array<Any>.self
-     let itemType = String.self
-     let anystringArrayDataGen = try? NSObject.generateObject(data: anystringArrayData, classType: anystringArrayDataType, itemType: itemType)
-     print(anystringArrayDataGen)
-     */
-    
-    /*
-    let anyaddressArrayData = addressArrayData as AnyObject
-    let anyaddressArrayDataType = Array<Any>.self
-    let itemType = Address.self
-    let anyaddressArrayDataGen = try? NSObject.generateObject(data: anyaddressArrayData, classType: anyaddressArrayDataType, itemType: itemType)
-    guard let addressArray = anyaddressArrayDataGen as? Array<Address> else {return}
-    print(addressArray[0].street)
-    print(addressArray[0].zipcode)
-    print(addressArray[1].street)
-    print(addressArray[1].zipcode)
-   */
-    
+    func testGenerateObjectWithArrayOfComplexObjectAsInput() {
+        let addressArray = [["street": "a", "zipcode":"94086"], ["street": "b", "zipcode":"94087"]]
+        let returnType = Array<Any>.self
+        let itemType = Address.self
+        let arrayAddressGen = try? NSObject.generateObject(data: addressArray, classType: returnType, itemType: itemType)
+        guard let res = arrayAddressGen as? [Address] else {
+            XCTAssert(false)
+            return
+        }
+        
+        XCTAssert(res.count == addressArray.count)
+        XCTAssert(res[0].street == "a")
+        XCTAssert(res[0].zipcode == "94086")
+        XCTAssert(res[1].street == "b")
+        XCTAssert(res[1].zipcode == "94087")
+    }
 }
 
-
-@objc class AddressWrapper:  Bridgeable {
+@objc class AddressWrapper:  NSObject, Bridgeable {
     var address: Address = Address()
+    
+    func toDictionary() -> NSDictionary {
+        var dict = [AnyHashable: Any]()
+        dict["address"] = address.toDictionary()
+        return dict as NSDictionary
+    }
 }
 
-@objc class AddressArrayWrapper:Bridgeable {
+@objc class AddressArrayWrapper:NSObject {
     var addresses: [Address]  = [Address(), Address()]
 }
 
-@objc class Address: Bridgeable {
+@objc class Address: NSObject, Bridgeable {
     var street: String
     var zipcode: String
     
@@ -119,6 +125,13 @@ class ElectrodeUtilitiesTests: XCTestCase {
     override init() {
         street = ""
         zipcode = ""
+    }
+    
+    func toDictionary() -> NSDictionary {
+        var dict = [AnyHashable: Any]()
+        dict["street"] = street
+        dict["zipcode"] = zipcode
+        return dict as NSDictionary
     }
     
 }

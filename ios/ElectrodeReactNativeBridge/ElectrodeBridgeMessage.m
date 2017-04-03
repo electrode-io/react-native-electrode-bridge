@@ -80,12 +80,12 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     [messageDict setObject:typeString forKey:kElectrodeBridgeMessageType];
     if(self.data != nil) {
         id dataObj;
-        if ([self.data isKindOfClass:[Bridgeable class] ]) {
+        if ([self.data conformsToProtocol:@protocol(Bridgeable)]) {
             dataObj = [self.data toDictionary];
         } else if ([self.data isKindOfClass:[NSArray class]]) {
             id element = [self.data firstObject];
             if (element) { //assume the array has the same type of object
-                if ([element isKindOfClass:[Bridgeable class]]) {
+                if ([element conformsToProtocol:@protocol(Bridgeable)]) {
                     NSArray *convertedArray = [self convertToArrayOfBridgeable:self.data];
                     dataObj = convertedArray;
                 }
@@ -101,10 +101,10 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     return [messageDict copy];
 }
 
--(NSArray<NSDictionary *> *)convertToArrayOfBridgeable: (NSArray<Bridgeable *> *)data {
+-(NSArray<NSDictionary *> *)convertToArrayOfBridgeable: (NSArray<Bridgeable> *)data {
     NSMutableArray *res = [[NSMutableArray alloc] init];
     for (id element in data) {
-        if ([element isKindOfClass:[Bridgeable class]]) {
+        if ([element conformsToProtocol:@protocol(Bridgeable)]) {
             NSDictionary *serialized = [element toDictionary];
             [res addObject:serialized];
         } else {

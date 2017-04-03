@@ -10,37 +10,6 @@ import Foundation
 
 //@objc requires this protocol to be a class protocol
 // mark public because ElectrodeBridgeMessage is public
-@objc public class Bridgeable: NSObject {
-    
-}
-
-extension Bridgeable {
-    func toDictionary() -> NSDictionary {
-        let aMirror = Mirror(reflecting: self)
-        var dict = [AnyHashable: Any]()
-        for case let(label, value) in aMirror.children {
-            guard let validLabel = label else {
-                assertionFailure("label for object is not valid")
-                return NSDictionary()
-            }
-            
-            guard let propertyType = self.getTypeOfProperty(validLabel) else {
-                assertionFailure("object has property of empty label")
-                return NSDictionary()
-            }
-            switch(propertyType) {
-            case .Class(let classType):
-                guard let validValue = value as? Bridgeable else {
-                    assertionFailure("\(classType) is not bridgeable when it's required")
-                    return NSDictionary()
-                }
-                dict[validLabel] = validValue.toDictionary()
-                
-            case .Struct:
-                dict[validLabel] = value
-            }
-            
-        }
-        return dict as NSDictionary
-    }
+@objc public protocol Bridgeable {
+    func toDictionary() -> NSDictionary
 }

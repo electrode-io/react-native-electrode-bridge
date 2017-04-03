@@ -45,6 +45,7 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 -(void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name;
 -(id<ElectrodeNativeBridge>) getNativeBridge;
 -(id<ElectrodeReactBridge>) getReactBridge;
+-(nonnull NSDictionary*) createBridgeRequestForName:(nonnull NSString*)name id:(nonnull NSString*)requestId data:(nullable id)data;
 
 @end
 

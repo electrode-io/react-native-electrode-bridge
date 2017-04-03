@@ -13,36 +13,15 @@
 
 +(instancetype)createRequestWithName: (NSString *)name
 {
-    NSString * const kElectrodeBridgeMessageName = @"name";
-    NSString * const kElectrodeBridgeMessageId = @"id";
-    NSString * const kElectrodeBridgeMessageType = @"type";
-    NSString * const kElectrodeBridgeMessageData = @"data";
-    NSDictionary *data = @{kElectrodeBridgeMessageName: name,
-                           kElectrodeBridgeMessageId:@"1234",
-                           kElectrodeBridgeMessageType:kElectrodeBridgeMessageRequest,
-                           kElectrodeBridgeMessageData: @{@"key": @"value"}
-                           };
-    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:data];
-    
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:nil];
     return request;
 }
 
 
 + (instancetype)createRequestWithName:(NSString *)name data:(id)data
 {
-    NSString * const kElectrodeBridgeMessageName = @"name";
-    NSString * const kElectrodeBridgeMessageId = @"id";
-    NSString * const kElectrodeBridgeMessageType = @"type";
-    NSString * const kElectrodeBridgeMessageData = @"data";
-    NSDictionary *requestData = @{kElectrodeBridgeMessageName: name,
-                           kElectrodeBridgeMessageId:@"1234",
-                           kElectrodeBridgeMessageType:kElectrodeBridgeMessageRequest,
-                           kElectrodeBridgeMessageData: data
-                           };
-    ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:requestData];
-    
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:data];
     return request;
-
 }
 
 @end
@@ -141,6 +120,19 @@
     [_mockListenerStore setValue:mockJsEventListener forKey:name];
 }
 
+- (NSDictionary *)createBridgeRequestForName:(NSString *)name id:(NSString *)requestId data:(id)data
+{
+    NSMutableDictionary *jsRequest = [[NSMutableDictionary alloc] init];
+    [jsRequest setObject:name forKey:kElectrodeBridgeMessageName];
+    [jsRequest setObject:requestId forKey:kElectrodeBridgeMessageId];
+    [jsRequest setObject:[ElectrodeBridgeMessage convertEnumTypeToString:ElectrodeMessageTypeRequest] forKey:kElectrodeBridgeMessageType];
+    if(data)
+    {
+        [jsRequest setObject:data forKey:kElectrodeBridgeMessageData];
+    }
+    return jsRequest;
+}
+
 @end
 
 
@@ -163,16 +155,37 @@
     if(registeredListener) {
         switch (bridgeMessage.type) {
             case ElectrodeMessageTypeEvent:
-                registeredListener.evetBlock((ElectrodeBridgeEventNew *)bridgeMessage);
+                if(!registeredListener.evetBlock)
+                {
+                    NSLog(@"TEST FAILURE: expected a non null event block but found a nil event block for mock listener registered for: %@", bridgeMessage.name);
+                }
+                else
+                {
+                    registeredListener.evetBlock((ElectrodeBridgeEventNew *)bridgeMessage);
+                }
                 break;
             case ElectrodeMessageTypeRequest:
-                registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
+                if(!registeredListener.requestBlock)
+                {
+                    NSLog(@"TEST FAILURE: expected a non null request block but found a nil request block for mock listener registered for : %@", bridgeMessage.name);
+                }
+                else
+                {
+                    registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
+                }
                 break;
             case ElectrodeMessageTypeResponse:
-                registeredListener.responseBlock((ElectrodeBridgeResponse *)bridgeMessage);
+                if(!registeredListener.responseBlock)
+                {
+                    NSLog(@"TEST FAILURE: expected a non null response block but found a nil response block for mock listener registered for: %@", bridgeMessage.name);
+                }
+                else
+                {
+                    registeredListener.responseBlock((ElectrodeBridgeResponse *)bridgeMessage);
+                }
                 break;
             default:
-                XCTFail("Should never reach here");
+                NSLog(@"TEST FAILURE: Should never reach here for request:%@", bridgeMessage.name);
                 break;
         }
     }

@@ -10,66 +10,96 @@ import UIKit
 
 let kElectrodeBridgeRequestTimeoutTime = 10;
 
-enum BridgeMessageType: String {
-    case Data = "data"
-    case Name = "name"
-    case ID   = "id"
-    case MessageType = "type"
+
+enum Property<AnyClass> {
+    case Class(AnyClass)
+    case Struct
 }
 
-class BridgeMessage: NSObject {
+extension NSObject {
     
-}
-
-class ElectrodeUtilities: NSObject {
-    static func generateObject<T>(payload: NSDictionary?, returnClass: T.Type) -> T? {
-        var response: T? = nil
+    // Returns the property type
+    func getTypeOfProperty (_ name: String) -> Property<Any>? {
         
-        guard let payload = payload else { return response }
-        if !payload.allKeys.isEmpty {
-            
-            if payload.object(forKey: BridgeMessageType.Data.rawValue) != nil {
+        var type: Mirror = Mirror(reflecting: self)
+        
+        for child in type.children {
+            if child.label! == name {
+                let res = type(of: child.value)
+                let tmp = ElectrodeUtilities.isSupportedPrimitive(type: res)
+                return (!tmp) ? .Class(res) : .Struct
                 
             }
         }
-        
-        return response
-    }
-}
-
-protocol Bridgeable {
-    func toDictionary() -> NSDictionary
-    static func generateObject(_ data: Any?) -> AnyObject
-}
-
-extension Bridgeable {
-    static func generateObject(_ data: Any?) -> AnyObject? {
+        while let parent = type.superclassMirror {
+            for child in parent.children {
+                if child.label! == name {
+                    let res = type(of: child.value)
+                    let tmp = ElectrodeUtilities.isSupportedPrimitive(type: res)
+                    return (tmp) ? .Class(res) : .Struct
+                }
+            }
+            type = parent
+        }
         return nil
     }
+    
+    func toNSDictionary() -> NSDictionary {
+        let type: Mirror = Mirror(reflecting: self)
+        var res = [AnyHashable: Any]()
+        for case let(label, value) in type.children {
+            res[label!] = value
+        }
+        return res as NSDictionary
+    }
+    
+    static func generateObject(data: [AnyHashable: Any], passedClass: AnyClass) -> AnyObject? {
+        let obj = (passedClass as? NSObject.Type)!
+        let res = obj.init()
+        let aMirrorChildren = Mirror(reflecting: res).children
+        for case let(label, value) in aMirrorChildren {
+            let tmpType = res.getTypeOfProperty(label!)!
+            switch(tmpType) {
+            case .Class(let classType):
+                guard let tmpValue = value as? Bridgeable else {
+                    assertionFailure("is not bridgeable")
+                    return nil
+                }
+                
+                let dictValue = tmpValue.toDictionary() as! [AnyHashable : Any]
+                let obj = NSObject.generateObject(data: dictValue , passedClass: classType as! AnyClass)
+                
+                res.setValue(obj, forKey: label!)
+                print(classType)
+            case .Struct:
+                print(tmpType)
+                res.setValue(value, forKey: label!)
+            }
+        }
+        return res
+    }
 }
 
-/*
-@Nullable
-public static <T> T generateObject(@Nullable Bundle payload, @NonNull Class<T> returnClass) {
-    T response = null;
-    if (payload != null
-        && !payload.isEmpty()) {
-        String key = BridgeMessage.BRIDGE_MSG_DATA;
-        
-        if (payload.get(key) == null) {
-            throw new IllegalArgumentException("Cannot find key(" + key + ") in given bundle:" + payload);
-        }
-        
-        if (Bridgeable.class.isAssignableFrom(returnClass)) {
-            
-            if (payload.getBundle(key) == null) {
-                throw new IllegalArgumentException("Value for key(" + key + ") should be a bundle, looks like it is not.");
-            }
-            
-            response = BridgeArguments.bridgeableFromBundle(payload.getBundle(key), returnClass);
-        } else {
-            response = (T) BridgeArguments.getPrimitiveFromBundle(payload, returnClass);
-        }
+
+class ElectrodeUtilities: NSObject {
+
+    
+    static func primitiveSet() -> Set<String> {
+        let des = String(describing: type(of: String.self))
+        let b = String(describing: type(of: Int.self))
+        let c = String(describing: type(of: [String]?.self))
+        return Set([des, b, c])
     }
-    return response;
-}*/
+    
+    static func isSupportedPrimitive(type: Any.Type) -> Bool {
+        let str = String(describing: type(of: type))
+        return ElectrodeUtilities.primitiveSet().contains(str)
+    }
+    
+    
+}
+
+
+@objc protocol Bridgeable { //@objc requires this protocol to be a class protocol
+    func toDictionary() -> NSDictionary
+}

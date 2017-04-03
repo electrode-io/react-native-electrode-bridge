@@ -17,6 +17,7 @@ class EventProcessor<T: Bridgeable>: NSObject {
         self.tag = String(describing: type(of: self))
         self.eventName = eventName
         self.eventPayload = eventPayload
+        super.init()
     }
     
     func execute() {

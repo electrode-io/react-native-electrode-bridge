@@ -80,9 +80,8 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     [messageDict setObject:typeString forKey:kElectrodeBridgeMessageType];
     if(self.data != nil) {
         id dataObj;
-        if ([self.data conformsToProtocol:@protocol(Bridgeable) ]) {
-            id<Bridgeable> bridgeableData = self.data;
-            dataObj = [bridgeableData toDictionary];
+        if ([self.data conformsToProtocol:@protocol(Bridgeable)]) {
+            dataObj = [self.data toDictionary];
         } else if ([self.data isKindOfClass:[NSArray class]]) {
             id element = [self.data firstObject];
             if (element) { //assume the array has the same type of object

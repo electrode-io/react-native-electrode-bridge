@@ -10,8 +10,8 @@ import Foundation
 
 //@objc requires this protocol to be a class protocol
 // mark public because ElectrodeBridgeMessage is public
-@objc public protocol Bridgeable {
-    @objc func toDictionary() -> NSDictionary
+@objc public class Bridgeable: NSObject {
+    
 }
 
 extension Bridgeable {
@@ -24,12 +24,7 @@ extension Bridgeable {
                 return NSDictionary()
             }
             
-            guard let obj = self as? NSObject else {
-                assertionFailure("cannot bridge object to toDictionary")
-                return NSDictionary()
-            }
-            
-            guard let propertyType = obj.getTypeOfProperty(validLabel) else {
+            guard let propertyType = self.getTypeOfProperty(validLabel) else {
                 assertionFailure("object has property of empty label")
                 return NSDictionary()
             }

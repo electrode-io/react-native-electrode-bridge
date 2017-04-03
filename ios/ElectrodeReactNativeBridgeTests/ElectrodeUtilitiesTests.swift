@@ -98,15 +98,15 @@ class ElectrodeUtilitiesTests: XCTestCase {
 }
 
 
-class AddressWrapper: NSObject, Bridgeable {
+@objc class AddressWrapper:  Bridgeable {
     var address: Address = Address()
 }
 
-class AddressArrayWrapper: NSObject, Bridgeable {
+@objc class AddressArrayWrapper:Bridgeable {
     var addresses: [Address]  = [Address(), Address()]
 }
 
-class Address: NSObject, Bridgeable {
+@objc class Address: Bridgeable {
     var street: String
     var zipcode: String
     

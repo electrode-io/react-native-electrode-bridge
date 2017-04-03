@@ -49,8 +49,6 @@
     
     ElectrodeBridgeMessage* requestMessage = [[ElectrodeBridgeMessage alloc] initWithData:data];
     XCTAssertEqual(requestMessage.data, @3);
-
-    
 }
 
 @end

@@ -43,7 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
         [responseListener onFailure:failureMessage];
         return;
     }
-    [requestHandler onRequest:bridgeRequest.data responseListener:responseListener];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [requestHandler onRequest:bridgeRequest.data responseListener:responseListener];
+    });
 }
 -(BOOL)canHandlerRequestWithName: (NSString *)name
 {

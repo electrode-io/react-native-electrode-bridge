@@ -39,6 +39,8 @@
 		30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */; };
 		30BFEE591E92082500FE1B4F /* ElectrodeUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */; };
 		30C8F4AC1E92DB2400E40221 /* Bridgeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */; };
+		30C8F4D41E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4D31E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift */; };
+		30C8F4DD1E9320E500E40221 /* Processor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4DC1E9320E500E40221 /* Processor.swift */; };
 		7F8E8CBA1E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */; };
 		7F8E8CBF1E8F0CCA00CF0D8C /* TestRequestHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F8E8CBE1E8F0CCA00CF0D8C /* TestRequestHandler.m */; };
 		9678D27C1E68CC2D00719AD5 /* EventListenerProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */; };
@@ -181,6 +183,8 @@
 		30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ElectrodeReactNativeBridgeTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeUtilitiesTests.swift; sourceTree = "<group>"; };
 		30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bridgeable.swift; sourceTree = "<group>"; };
+		30C8F4D31E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeRequestHandlerProcessor.swift; sourceTree = "<group>"; };
+		30C8F4DC1E9320E500E40221 /* Processor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Processor.swift; sourceTree = "<group>"; };
 		7F8E8CB91E8EC6D300CF0D8C /* ElectrodeBridgeTransceiver_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeTransceiver_Internal.h; sourceTree = "<group>"; };
 		7F8E8CBD1E8F0CCA00CF0D8C /* TestRequestHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestRequestHandler.h; sourceTree = "<group>"; };
 		7F8E8CBE1E8F0CCA00CF0D8C /* TestRequestHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRequestHandler.m; sourceTree = "<group>"; };
@@ -262,6 +266,8 @@
 				9678D33B1E721BC600719AD5 /* ElectrodeUtilities.swift */,
 				9678D27B1E68CC2D00719AD5 /* EventListenerProcessor.swift */,
 				30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */,
+				30C8F4D31E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift */,
+				30C8F4DC1E9320E500E40221 /* Processor.swift */,
 			);
 			name = Swift;
 			sourceTree = "<group>";
@@ -598,7 +604,9 @@
 				96F9A1CF1E68AF0200752759 /* ElectrodeEventProcessor.swift in Sources */,
 				DA665B761E7B19A700A9193A /* ElectrodeResponseBlock.m in Sources */,
 				30BA8F211E84972D00D3C440 /* ElectrodeBridgeResponse.m in Sources */,
+				30C8F4DD1E9320E500E40221 /* Processor.swift in Sources */,
 				DA4BE0E91E36DD6500DBA1ED /* ElectrodeBridgeEvent.m in Sources */,
+				30C8F4D41E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift in Sources */,
 				30BA8F291E84972D00D3C440 /* ElectrodeRequestRegistrarNew.m in Sources */,
 				30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m in Sources */,
 				30BA8F251E84972D00D3C440 /* ElectrodeBridgeTransceiver.m in Sources */,

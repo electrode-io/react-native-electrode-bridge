@@ -39,4 +39,9 @@ const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
     return self;
 }
 
+
+- (NSString *)description{
+    return [NSString stringWithFormat:@"%@, timeOut:%d, isJsInitiated:%d", [super description], self.timeoutMs, self.isJsInitiated];
+}
+
 @end

@@ -114,6 +114,10 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     return [res copy];
 }
 
+- (NSString *)description{
+    return [NSString stringWithFormat:@"name:%@, id:%@, type:%lu, data:%@", self.name, self.messageId, (unsigned long)self.type, self.data];
+}
+
 + (NSString*)convertEnumTypeToString:(ElectrodeMessageType)electrodeMessageType {
     NSString *result = nil;
     switch(electrodeMessageType) {

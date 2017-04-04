@@ -26,5 +26,9 @@ extern const int kElectrodeBridgeRequestDefaultTimeOut;
 @property(nonatomic, assign, readonly) BOOL isJsInitiated;
 
 +(nullable instancetype)createRequestWithData: (NSDictionary *)data;
+
+-(instancetype)initWithName: (NSString *) name
+                  messageId: (NSString *)messageId
+                       data: (id _Nullable) data;
 @end
 NS_ASSUME_NONNULL_END

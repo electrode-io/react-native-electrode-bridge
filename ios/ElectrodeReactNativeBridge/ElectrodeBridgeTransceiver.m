@@ -180,7 +180,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 -(void)emitMessage:(ElectrodeBridgeMessage * _Nonnull)bridgeMessage
 {
-    NSLog(@"Sending bridgeMessage(id=%@, name=%@) to JS", bridgeMessage.messageId, bridgeMessage.name);
+    NSLog(@"Sending bridgeMessage(%@) to JS", bridgeMessage);
     [self sendEventWithName:@"electrode.bridge.message" body:bridgeMessage.data];
 }
 
@@ -209,7 +209,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     } else if (!request.isJsInitiated) { //GOTCHA: Make sure not send a request back to JS if it's initiated on JS side
         [self dispatchRequestToReactHandlerForTransaction:transaction];
     }else {
-        NSLog(@"No handler available to handle request(id=%@, name=%@", request.messageId, request.name);
+        NSLog(@"No handler available to handle request(%@)", request);
         id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"ENOHANDLER" message:@"No registered request handler found"];
         ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request withResponseData:nil withFailureMessage:failureMessage];
         [self handleResponse:response];
@@ -233,7 +233,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 {
     // Add the timeout handler
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(transaction.request.timeoutMs * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(transaction.request.timeoutMs * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
         
         id<ElectrodeBridgeResponseListener> responseListener = transaction.finalResponseListener;
         if (responseListener && [responseListener conformsToProtocol:@protocol(ElectrodeBridgeResponseListener)])
@@ -247,7 +247,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 -(void)dispatchRequestToNativeHandlerForTransaction: (ElectrodeBridgeTransaction *)transaction
 {
-    NSLog(@"Sending request(id=%@) to native handler", transaction.request.messageId);
+    NSLog(@"Sending request(%@) to native handler", transaction.request);
     ElectrodeBridgeRequestNew *request = transaction.request;
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
 
@@ -268,13 +268,13 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 -(void)dispatchRequestToReactHandlerForTransaction:(ElectrodeBridgeTransaction *)transaction
 {
-    NSLog(@"Sending request(id=%@) over to JS to handler because there is no local request handler available", transaction.request.messageId);
+    NSLog(@"Sending request(%@) over to JS to handler because there is no local request handler available", transaction.request);
     [self emitMessage:transaction.request];
 }
 
 -(void)handleResponse:(ElectrodeBridgeResponse *)response
 {
-    NSLog(@"hanlding bridge response");
+    NSLog(@"hanlding bridge response: %@", response);
     ElectrodeBridgeTransaction *transaction;
     @synchronized (self) {
          transaction = (ElectrodeBridgeTransaction *) [self.pendingTransaction objectForKey:response.messageId];
@@ -283,7 +283,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         transaction.response = response;
         [self completeTransaction:transaction];
     } else {
-        NSLog(@"Response(id=%@, name=%@) will be ignored because the transcation for this request has been removed from the queue. Perhaps it's already timed-out or completed.", response.messageId, response.name);
+        NSLog(@"Response(%@) will be ignored because the transcation for this request has been removed from the queue. Perhaps it's already timed-out or completed.", response);
     }
     
 }
@@ -323,11 +323,11 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(void)logRequest: (ElectrodeBridgeRequestNew *)request {
-    //CLAIRE TODO: Add Logs
+    NSLog(@"--> --> --> --> --> Request(%@)", request);
 }
 
 -(void)logResponse: (ElectrodeBridgeResponse *)response {
-    
+    NSLog(@"<-- <-- <-- <-- <-- Response(%@)", response);
 }
 
 - (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) reactNativeReadyListner

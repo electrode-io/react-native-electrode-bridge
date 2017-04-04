@@ -8,7 +8,7 @@
 
 import UIKit
 
-typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
+typealias ElectrodeRequestProcessorSuccessClosure = ([AnyHashable: Any]?) -> ()
 typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> ()
 
 class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
@@ -30,7 +30,7 @@ class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
         self.requestPayload   = requestPayload
         self.responseClass    = respClass
         self.responseItemType = responseItemType
-        self.responseListener = responseListener
+        self.responseListener = responseListener //responseListnerOntheAppSide
         super.init()
     }
     
@@ -49,30 +49,36 @@ class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
         }
         
         let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: { [weak self]
-            (responseData: Any?) in
-            //response from a req should always be dic. so we can assume that? 
+            (responseData: [AnyHashable: Any]?) in
             let processedResp = self?.processSuccessResponse(responseData: responseData)
             self?.responseListener.onSuccess(processedResp)
             
-        }, failureClosure: { (failureMessage: ElectrodeFailureMessage) in
-            self.responseListener.onFailure(failureMessage)
+        }, failureClosure: { [weak self](failureMessage: ElectrodeFailureMessage) in
+            self?.responseListener.onFailure(failureMessage)
         })
         
         ElectrodeBridgeHolderNew.sharedInstance().sendRequest(validRequest, responseListener: intermediateListener)
     }
     
-    private func processSuccessResponse(responseData: Any?) -> AnyObject{
-        /*
-        if let itemType = responseItemType {
-            //let resp = ElectrodeUtilities.generateList(data: responseData, itemType: itemType)
-            return resp as AnyObject
-        } else {
-            //let resp = ElectrodeUtilities<Any>.generateObject(data: responseData)
-            
-            return resp
+    private func processSuccessResponse(responseData: [AnyHashable: Any]?) -> Any? {
+        guard let dict = responseData else {
+            return nil
         }
-         */
-        return NSString()
+        //extract data out from BridgeMessage
+        guard let dataFromResp = dict[kElectrodeBridgeMessageData] else {
+            assertionFailure("NO data associated with the bridge message")
+            return nil
+        }
+        let generatedRes: Any?
+        do {
+            generatedRes = try NSObject.generateObject(data: dataFromResp, classType: responseClass, itemType: responseItemType)
+
+        } catch {
+            assertionFailure("Failed to convert responseData to valid obj")
+            generatedRes = nil
+        }
+       
+        return generatedRes
     }
 }
 
@@ -85,12 +91,21 @@ class ElectrodeBridgeResponseListenerImpl: NSObject, ElectrodeBridgeResponseList
         self.failureClosure = failureClosure
     }
     
-    func onSuccess(_ responseData: Any?) {
+    func onSuccess(_ responseData: Any?) { //bridge passes responseData back
         guard let success = successClosure else {
             assertionFailure("no success block on sucess callback ")
             return
         }
-        success(responseData)
+        
+        guard responseData != nil else {
+            success(nil)
+            return
+        }
+        guard let dict = responseData as? [AnyHashable: Any] else {
+            assertionFailure("ElectrodeBridgeResponseListenerImpl: wrong type ")
+            return
+        }
+        success(dict)
     }
     
     

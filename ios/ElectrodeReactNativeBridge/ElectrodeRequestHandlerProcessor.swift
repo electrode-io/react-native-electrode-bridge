@@ -44,17 +44,21 @@ class ElectrodeBridgeRequestHandlerImpt<TReq>: NSObject, ElectrodeBridgeRequestH
         self.requestClass = requestClass
         self.requestHandler = requestHandler
     }
-    func onRequest(_ data: [AnyHashable : Any], responseListener: ElectrodeBridgeResponseListener) {
-        // Why this is needed?
-        // let requestObj = try? ElectrodeUtilities.generateObject(data: data, classType: requestClass)
+    func onRequest(_ data: Any?, responseListener: ElectrodeBridgeResponseListener) {
+        let request: Any?
+        if let nonnilData = data {
+            request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: requestClass)
+        } else {
+            request = nil
+        }
         let innerResponseListner = InnerElectrodeBridgeResponseListener(sucessClosure:{ (any) in
             responseListener.onSuccess(any)
         }, failureClosure: { (failureMessage) in
             responseListener.onFailure(failureMessage)
         })
         
-//TODO: should request always be Dictionary here instead of converting it to Object?
-        requestHandler.onRequest(data, responseListener: innerResponseListner)
+        //this is passed back to Native side. 
+        requestHandler.onRequest(request, responseListener: innerResponseListner)
     }
 }
 

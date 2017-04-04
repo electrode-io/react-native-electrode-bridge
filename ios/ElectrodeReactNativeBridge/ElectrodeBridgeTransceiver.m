@@ -233,7 +233,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 {
     // Add the timeout handler
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(transaction.request.timeoutMs * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(transaction.request.timeoutMs * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
         
         id<ElectrodeBridgeResponseListener> responseListener = transaction.finalResponseListener;
         if (responseListener && [responseListener conformsToProtocol:@protocol(ElectrodeBridgeResponseListener)])

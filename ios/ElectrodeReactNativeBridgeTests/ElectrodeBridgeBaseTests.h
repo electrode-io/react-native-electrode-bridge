@@ -63,8 +63,8 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 @end
 
 /////////////////MockElectrodeBridgeResponseListener
-typedef void (^successBlock)(NSDictionary *data);
-typedef void (^failureBlock)(id<ElectrodeFailureMessage> failureMessage);
+typedef void (^successBlock) (_Nullable id data);
+typedef void (^failureBlock) (_Nullable id<ElectrodeFailureMessage> failureMessage);
 
 @interface MockElectrodeBridgeResponseListener : XCTestCase<ElectrodeBridgeResponseListener>
 - (nonnull instancetype) initWithExpectation: (nonnull XCTestExpectation *) expectation successBlock:(nonnull successBlock) success NS_DESIGNATED_INITIALIZER;

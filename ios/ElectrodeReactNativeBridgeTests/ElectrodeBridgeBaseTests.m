@@ -134,7 +134,7 @@
 }
 
 
-- (NSDictionary *)createResponseDataWithName:(NSString *)name id:(NSString *)responseId data:(NSString *)data {
+- (NSDictionary *)createResponseDataWithName:(NSString *)name id:(NSString *)responseId data:(id)data {
     NSString* responseName = name;
     NSMutableDictionary* mockResponse = [[NSMutableDictionary alloc] init];
     [mockResponse setObject:responseName forKey:kElectrodeBridgeMessageName];

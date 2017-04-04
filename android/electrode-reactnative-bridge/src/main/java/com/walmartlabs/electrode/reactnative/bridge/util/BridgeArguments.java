@@ -36,6 +36,7 @@ public final class BridgeArguments {
         add(Double.class);
         add(Double[].class);
         add(double[].class);
+        add(Number.class);
     }};
 
     /**
@@ -138,12 +139,11 @@ public final class BridgeArguments {
             response = getList(data, returnClass);
         } else if (data instanceof Bundle) {
             response = objectFromBundle((Bundle) data, returnClass);
-        } else if (returnClass.isAssignableFrom(data.getClass())//GOTCHA: we should check for return data being an array of primitives. this is needed because the returnClass ony contains the content of the array.
-                && isSupportedPrimitiveType(data.getClass())) {
+        } else if (isSupportedPrimitiveType(data.getClass())) {
             //noinspection unchecked
             response = data;
         } else {
-            throw new IllegalArgumentException("Should never happen, looks like logic to handle " + data.getClass() + " type is not implemented yet");
+            throw new IllegalArgumentException("Should never happen, looks like logic to handle " + data.getClass() + " type is not implemented yet, returnClass:" + returnClass);
         }
         return response;
     }

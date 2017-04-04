@@ -13,7 +13,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <T> eventPayload
  */
 
-public class EventProcessor<T> implements Processor {
+public class EventProcessor<T> extends BridgeProcessor {
     private static final String TAG = EventProcessor.class.getSimpleName();
 
     private final T eventPayload;

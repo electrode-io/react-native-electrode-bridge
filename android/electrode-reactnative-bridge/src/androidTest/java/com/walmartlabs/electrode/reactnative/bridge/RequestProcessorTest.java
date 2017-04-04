@@ -23,6 +23,8 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Nonnull;
 
+import static com.walmartlabs.electrode.reactnative.sample.api.PersonApi.Requests.REQUEST_GET_AGE;
+
 public class RequestProcessorTest extends BaseBridgeTestCase {
     public void testSampleRequestNativeToNativeFailure() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -255,6 +257,92 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 countDownLatch.countDown();
             }
         });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testIntegerForResponseNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        addMockEventListener(REQUEST_GET_AGE, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(jsResponseDispatcher);
+                WritableMap writableMap = Arguments.createMap();
+                writableMap.putInt(BridgeMessage.BRIDGE_MSG_DATA, 10);
+                jsResponseDispatcher.dispatchResponse(writableMap);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                fail();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+
+        PersonApi.requests().getAge("deepu", new ElectrodeBridgeResponseListener<Integer>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable Integer responseData) {
+                assertNotNull(responseData);
+                assertSame(10, responseData);
+                countDownLatch.countDown();
+            }
+        });
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testIntegerForResponseJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        PersonApi.requests().registerGetAgeRequestHandler(new ElectrodeBridgeRequestHandler<String, Integer>() {
+            @Override
+            public void onRequest(@Nullable String payload, @NonNull ElectrodeBridgeResponseListener<Integer> responseListener) {
+                assertNotNull(payload);
+                assertNotNull(responseListener);
+                assertEquals("testName", payload);
+                responseListener.onSuccess(20);
+                countDownLatch.countDown();
+            }
+        });
+
+        addMockEventListener(REQUEST_GET_AGE, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                assertTrue(response.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                Integer responseAge = response.getInt(BridgeMessage.BRIDGE_MSG_DATA);
+                assertSame(20, responseAge);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+        WritableMap requestMap = getRequestMap(REQUEST_GET_AGE);
+        requestMap.putString(BridgeMessage.BRIDGE_MSG_DATA, "testName");
+
+        ElectrodeReactBridge electrodeReactBridge = ElectrodeBridgeTransceiver.instance();
+        electrodeReactBridge.sendMessage(requestMap);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

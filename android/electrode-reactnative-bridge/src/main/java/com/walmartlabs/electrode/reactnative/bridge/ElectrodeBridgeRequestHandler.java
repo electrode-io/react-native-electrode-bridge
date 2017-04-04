@@ -11,7 +11,7 @@ public interface ElectrodeBridgeRequestHandler<TReq, TResp> {
     /**
      * Called whenever a request matching this handler is received
      *
-     * @param payload          The payload of the request as a Bundle, payload can be null for a request.
+     * @param payload          The payload of the request, payload can be null for a request.
      * @param responseListener An instance of {@link ElectrodeBridgeResponseListener}
      */
     void onRequest(@Nullable TReq payload, @NonNull ElectrodeBridgeResponseListener<TResp> responseListener);

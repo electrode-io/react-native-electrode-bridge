@@ -31,6 +31,7 @@ public enum GenerateObjectError: Error {
     case emptyArrayItemType
     case unsupportedType
     case unBridgeable
+    case deserializationError
 }
 
 extension NSObject {

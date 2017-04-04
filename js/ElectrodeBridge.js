@@ -10,23 +10,23 @@ import uuid from 'uuid'
 var EventEmitter = require('events')
 
 //=====================================================
-// Sample message format 
+// Sample message format
 //
 // {
 //   "type": "req",
 //   "id": "2689ddb2-a33b-4b44-9409-533c100a5746",
 //   "name": "com.walmartlabs.sample.request",
-//   "data": "a string"   
+//   "data": "a string"
 // }
 //
-// "type", "id"" and "name are" mandatory. They'll be 
+// "type", "id"" and "name are" mandatory. They'll be
 // present in any message
 //
-// "data" is optional. It is the payload associated 
+// "data" is optional. It is the payload associated
 // with the message. It should not be present if there
 // is no payload for the message.
 //
-// "error" is optional. It is only used in response 
+// "error" is optional. It is only used in response
 // messages if the response contains an error.
 // If that is the case, then "data" should not be
 // specified. "error" and "data" are mutually exclusive
@@ -152,22 +152,22 @@ class ElectrodeBridge extends EventEmitter {
 
   /**
    * Builds a bridge message
-   * 
+   *
    * @param {string} type - The type of the message ('req', 'rsp' or 'event')
    * @param {string} name - The name of the message
    * @param {Object} obj - Options
-   * @param {Object|string|number} obj.data - The data attached to this message 
+   * @param {Object|string|number} obj.data - The data attached to this message
    * @param {Object} obj.error - The error attached to this message
-   * @param {string} obj.id - The id of this message 
+   * @param {string} obj.id - The id of this message
    */
-  _buildMessage(type, name, { 
-      data, 
-      error, 
-      id = uuid.v4() 
+  _buildMessage(type, name, {
+      data,
+      error,
+      id = uuid.v4()
     } = {}) {
     let message = { type, name, id }
-
-    if (data) {
+    //Check only if data is null or undefined. 0, false are valid values
+    if ((data !== undefined) && (data !== null)) {
       message.data = data
     } else if (error) {
       message.error = error
@@ -179,7 +179,7 @@ class ElectrodeBridge extends EventEmitter {
   /**
    * Create a promise that completed whenever we get a response
    * for a given request
-   * 
+   *
    * @param {string} requestId - The id of the request
    */
   _waitForResponse(requestId) {
@@ -202,8 +202,8 @@ class ElectrodeBridge extends EventEmitter {
       case ELECTRODE_BRIDGE_REQUEST_TYPE:
         if (!this.requestHandlerByRequestName.has(message.name)) {
           const errorMessage = this._buildMessage(
-            ELECTRODE_BRIDGE_RESPONSE_TYPE, 
-            message.name, 
+            ELECTRODE_BRIDGE_RESPONSE_TYPE,
+            message.name,
             { id: messsage.id, error: ERROR_NO_REQUEST_HANDLER })
           return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
         }
@@ -211,15 +211,15 @@ class ElectrodeBridge extends EventEmitter {
         this.requestHandlerByRequestName.get(message.name)(message.data)
         .then((data) => {
           const responseMessage = this._buildMessage(
-            ELECTRODE_BRIDGE_RESPONSE_TYPE, 
-            message.name, 
+            ELECTRODE_BRIDGE_RESPONSE_TYPE,
+            message.name,
             { id: message.id, data })
           return NativeModules.ElectrodeBridge.sendMessage(responseMessage)
         })
         .catch((error) => {
           const errorMessage = this._buildMessage(
-            ELECTRODE_BRIDGE_RESPONSE_TYPE, 
-            message.name, 
+            ELECTRODE_BRIDGE_RESPONSE_TYPE,
+            message.name,
             { id: messsage.id, error });
           return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
         })

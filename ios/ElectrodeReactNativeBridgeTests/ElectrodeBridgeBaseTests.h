@@ -47,6 +47,8 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 -(id<ElectrodeReactBridge>) getReactBridge;
 -(nonnull NSDictionary*) createBridgeRequestForName:(nonnull NSString*)name id:(nonnull NSString*)requestId data:(nullable id)data;
 
+- (nonnull NSDictionary *)createResponseDataWithName:(nonnull NSString *)name id:(nonnull NSString *)responseId data:(nullable id)data;
+
 @end
 
 

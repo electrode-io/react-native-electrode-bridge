@@ -91,10 +91,27 @@
     
 }
 
--(void)testSendRequestWithRequestDataAndEmptyResponseWithJSRequestHandler
-{
-    
+//tests Native request to JS with empty "data" (data = nil) as a response
+- (void)testSendRequestWithRequestDataAndEmptyResponseWithJSRequestHandler {
+    NSString* const name = @"testingSendRequest";
+    ElectrodeBridgeRequestNew* request = [ElectrodeBridgeRequestNew createRequestWithName:name data:nil];
+    XCTestExpectation* expectation = [self createExpectationWithDescription:@"sendRequestWithRequestDataAndEmptyResponseWithJSRequestHandler"];
+    [self addMockEventListener:[[MockJSEeventListener alloc]  initWithRequestBlock:^(ElectrodeBridgeRequestNew *request) {
+        id <ElectrodeReactBridge> reactBridge = [self getReactBridge];
+        //do mock JS response here
+        NSDictionary* emptyResponse = [self createResponseDataWithName:name id:request.messageId data:nil];
+        [reactBridge sendMessage:emptyResponse];
+    }] forName:name];
+    id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
+    MockElectrodeBridgeResponseListener* responseListener = [[MockElectrodeBridgeResponseListener alloc] initWithExpectation:expectation successBlock:^(NSDictionary *data) {
+        XCTAssertNil(data);
+        [expectation fulfill];
+    }];
+    [nativeBridge sendRequest:request withResponseListener:responseListener];
+    [self waitForExpectationToFullFillOrTimeOut];
 }
+
+
 
 -(void)testEmitEventWithSimpleDataFromNative
 {

@@ -8,6 +8,7 @@
 
 #import "ElectrodeBridgeBaseTests.h"
 #import "ElectrodeBridgeTransceiver_Internal.h"
+#import "ElectrodeBridgeMessage.h"
 
 @implementation ElectrodeBridgeRequestNew (CustomeBuilder)
 
@@ -16,7 +17,6 @@
     ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:nil];
     return request;
 }
-
 
 + (instancetype)createRequestWithName:(NSString *)name data:(id)data
 {
@@ -131,6 +131,19 @@
         [jsRequest setObject:data forKey:kElectrodeBridgeMessageData];
     }
     return jsRequest;
+}
+
+
+- (NSDictionary *)createResponseDataWithName:(NSString *)name id:(NSString *)responseId data:(NSString *)data {
+    NSString* responseName = name;
+    NSMutableDictionary* mockResponse = [[NSMutableDictionary alloc] init];
+    [mockResponse setObject:responseName forKey:kElectrodeBridgeMessageName];
+    [mockResponse setObject:responseId forKey:kElectrodeBridgeMessageId];
+    [mockResponse setObject:[ElectrodeBridgeMessage convertEnumTypeToString:ElectrodeMessageTypeResponse] forKey:kElectrodeBridgeMessageType];
+    if (data) {
+        [mockResponse setObject:data forKey:kElectrodeBridgeMessageData];
+    }
+    return mockResponse;
 }
 
 @end

@@ -39,11 +39,11 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
 /**
  Initial request handling starts. Respond on success or error.
  
- @param data Data that is associated with a request, always in NSDictionary format.
+ @param data Data that is associated with a request, can be a NSDictionary or an Object
  @param responseListener The request completion that is executed when a request is
  being processed.
  */
-- (void)onRequest:(NSDictionary *)data responseListener:(id<ElectrodeBridgeResponseListener>)responseListener;
+- (void)onRequest:(id _Nullable)data responseListener:(id<ElectrodeBridgeResponseListener>)responseListener;
 
 @end
 

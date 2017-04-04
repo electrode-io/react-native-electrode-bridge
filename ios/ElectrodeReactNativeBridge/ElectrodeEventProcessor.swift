@@ -21,7 +21,7 @@ class EventProcessor<T: Bridgeable>: NSObject {
     }
     
     func execute() {
-        print("EventProcessor is emitting event (\(eventName)) with payload (\(eventPayload))")
+        print("\(self.tag) EventProcessor is emitting event (\(eventName)) with payload (\(eventPayload))")
         guard let eventData = eventPayload?.toDictionary() as? [AnyHashable : Any] else {
             assertionFailure("\(tag): attempting to type case to [AnyHashable: Any] failed. Please check your payload")
             return

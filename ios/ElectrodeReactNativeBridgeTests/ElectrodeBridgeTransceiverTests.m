@@ -111,7 +111,50 @@
     [self waitForExpectationToFullFillOrTimeOut];
 }
 
+- (void)testSendRequestWithRequestDataAndExpectStringResponseFromNativeToJS {
+    NSString* const name = @"sendRequest";
+    NSString* const sendResponseString = @"responseString";
+    ElectrodeBridgeRequestNew* request = [ElectrodeBridgeRequestNew createRequestWithName:name data:@"requestString"];
+    XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSendRequestWithRequestDataAndExpectStringResponseFromNativeToJS"];
+    id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
+    XCTAssertNotNil(nativeBridge, @"Native bridge instance is nil");
+    [self addMockEventListener:[[MockJSEeventListener alloc]  initWithRequestBlock:^(ElectrodeBridgeRequestNew *request) {
+        id <ElectrodeReactBridge> reactBridge = [self getReactBridge];
+        //do mock JS response here
+        NSDictionary* response = [self createResponseDataWithName:name id:request.messageId data:sendResponseString];
+        [reactBridge sendMessage:response];
+    }] forName:name];
+    MockElectrodeBridgeResponseListener* responseListener = [[MockElectrodeBridgeResponseListener alloc] initWithExpectation:expectation successBlock:^(id data) {
+        XCTAssertNotNil(data, @"Response is nil. There's an error in receiving response");
+        XCTAssertEqual(sendResponseString, data, @"Sent and received response data doesn't match");
+        [expectation fulfill];
+    }];
+    [nativeBridge sendRequest:request withResponseListener:responseListener];
+    [self waitForExpectationToFullFillOrTimeOut];
+}
 
+
+- (void)testSendRequestWithRequestDataAndExpectDictionaryResponseFromNativeToJS {
+    NSString* const name = @"sendRequest";
+    NSDictionary* const sendResponseDictionary = @{@"response" : @"responseDictionary"};
+    ElectrodeBridgeRequestNew* request = [ElectrodeBridgeRequestNew createRequestWithName:name data:@"requestDictionary"];
+    XCTestExpectation* expectation = [self createExpectationWithDescription:@"testSendRequestWithRequestDataAndExpectDictionaryResponseFromNativeToJS"];
+    id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
+    XCTAssertNotNil(nativeBridge, @"Native bridge instance is nil");
+    [self addMockEventListener:[[MockJSEeventListener alloc]  initWithRequestBlock:^(ElectrodeBridgeRequestNew *request) {
+        id <ElectrodeReactBridge> reactBridge = [self getReactBridge];
+        //do mock JS response here
+        NSDictionary* response = [self createResponseDataWithName:name id:request.messageId data:sendResponseDictionary];
+        [reactBridge sendMessage:response];
+    }] forName:name];
+    MockElectrodeBridgeResponseListener* responseListener = [[MockElectrodeBridgeResponseListener alloc] initWithExpectation:expectation successBlock:^(id data) {
+        XCTAssertNotNil(data, @"Response is nil. There's an error in receiving response");
+        XCTAssertEqual(sendResponseDictionary, data, @"Sent and received response data doesn't match");
+        [expectation fulfill];
+    }];
+    [nativeBridge sendRequest:request withResponseListener:responseListener];
+    [self waitForExpectationToFullFillOrTimeOut];
+}
 
 -(void)testEmitEventWithSimpleDataFromNative
 {

@@ -14,13 +14,13 @@
 
 +(instancetype)createRequestWithName: (NSString *)name
 {
-    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:nil];
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" data:nil];
     return request;
 }
 
 + (instancetype)createRequestWithName:(NSString *)name data:(id)data
 {
-    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" type:ElectrodeMessageTypeRequest data:data];
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" data:data];
     return request;
 }
 

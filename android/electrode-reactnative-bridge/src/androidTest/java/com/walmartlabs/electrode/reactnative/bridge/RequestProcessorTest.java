@@ -845,4 +845,47 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }
+
+
+    public void testRequestHandlerReceivingIntegerInput() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testRequestHandlerReceivingIntegerInput";
+
+
+        new RequestHandlerProcessor<>(requestName, Integer.class, None.class, new ElectrodeBridgeRequestHandler<Integer, None>() {
+            @Override
+            public void onRequest(@Nullable Integer payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertNotNull(payload);
+                assertSame(1, payload);
+                countDownLatch.countDown();
+                responseListener.onSuccess(null);
+            }
+        }).execute();
+
+
+        addMockEventListener(requestName, new MockElectrodeEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                fail();
+            }
+
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onEvent(ReadableMap event) {
+                fail();
+            }
+        });
+
+        ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+        WritableMap requestMap = getRequestMap(requestName);
+        requestMap.putInt(BridgeMessage.BRIDGE_MSG_DATA, 1);
+        reactBridge.sendMessage(requestMap);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
 }

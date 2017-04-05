@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
+import java.util.List;
+
 /**
  * Class that handles a native request handler.
  * This class is responsible for converting the received bundle to a full fledged object before sending the request to the registered request handler
@@ -39,6 +41,8 @@ public class RequestHandlerProcessor<TReq, TResp> extends BridgeProcessor {
                 Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
                 TReq request = (TReq) BridgeArguments.generateObject(payload, reqClazz);
 
+                request = (TReq) preProcessObject(request, reqClazz);
+
                 Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, payload);
 
                 handler.onRequest(request, new ElectrodeBridgeResponseListener<TResp>() {
@@ -58,5 +62,4 @@ public class RequestHandlerProcessor<TReq, TResp> extends BridgeProcessor {
 
         ElectrodeBridgeHolder.registerRequestHandler(requestName, intermediateRequestHandler);
     }
-
 }

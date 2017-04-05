@@ -251,7 +251,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     ElectrodeBridgeRequestNew *request = transaction.request;
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
 
-    id<ElectrodeBridgeResponseListener> responseListener = [[ElectrodeBridgeResponseListenerImplementor alloc] initWithSuccessBlock:^(NSDictionary * _Nonnull data) {
+    id<ElectrodeBridgeResponseListener> responseListener = [[ElectrodeBridgeResponseListenerImplementor alloc] initWithSuccessBlock:^(id _Nullable data) {
         ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request
                                                                              withResponseData:data
                                                                            withFailureMessage:nil];
@@ -268,7 +268,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 -(void)dispatchRequestToReactHandlerForTransaction:(ElectrodeBridgeTransaction *)transaction
 {
-    NSLog(@"Sending request(%@) over to JS to handler because there is no local request handler available", transaction.request);
+    NSLog(@"Sending request(%@) over to JS handler because there is no local request handler available", transaction.request);
     [self emitMessage:transaction.request];
 }
 

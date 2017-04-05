@@ -11,6 +11,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
@@ -332,6 +333,15 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
                 assertNotNull(response);
                 assertEquals(stringArray.length, response.length);
                 countDownLatch.countDown();
+            }
+        });
+
+        ElectrodeBridgeHolder.registerReactConstantsProvider(new ReactConstantsProvider() {
+            @Nullable
+            @Override
+            public Map<String, Object> getConstants() {
+                //Apps logic here.
+                return null;
             }
         });
 

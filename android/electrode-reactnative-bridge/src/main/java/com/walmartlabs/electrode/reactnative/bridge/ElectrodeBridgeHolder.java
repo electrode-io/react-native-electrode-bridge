@@ -36,6 +36,7 @@ public final class ElectrodeBridgeHolder {
     private static final HashMap<String, ElectrodeBridgeEventListener<Bundle>> mQueuedEventListenersRegistration = new HashMap<>();
     private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener<Bundle>> mQueuedRequests = new HashMap<>();
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
+    private static ReactConstantsProvider reactConstantsProvider;
 
     static {
         ElectrodeBridgeTransceiver.registerReactNativeReadyListener(new ElectrodeBridgeTransceiver.ReactNativeReadyListener() {
@@ -47,6 +48,9 @@ public final class ElectrodeBridgeHolder {
                 registerQueuedRequestHandlers();
                 sendQueuedRequests();
                 emitQueuedEvents();
+                if (reactConstantsProvider != null) {
+                    electrodeNativeBridge.registerReactConstantsProvider(reactConstantsProvider);
+                }
             }
         });
 
@@ -119,6 +123,14 @@ public final class ElectrodeBridgeHolder {
         }
 
         electrodeNativeBridge.addEventListener(name, eventListener);
+    }
+
+    public static void registerReactConstantsProvider(@NonNull ReactConstantsProvider reactConstantsProvider) {
+        if (!isReactNativeReady) {
+            ElectrodeBridgeHolder.reactConstantsProvider = reactConstantsProvider;
+            return;
+        }
+        electrodeNativeBridge.registerReactConstantsProvider(reactConstantsProvider);
     }
 
     private static void registerQueuedRequestHandlers() {

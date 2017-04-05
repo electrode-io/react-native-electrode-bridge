@@ -95,7 +95,15 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
         } else {
             dataObj = self.data;
         }
-        [messageDict setObject:dataObj forKey:kElectrodeBridgeMessageData];
+        
+        if(dataObj)
+        {
+            [messageDict setObject:dataObj forKey:kElectrodeBridgeMessageData];
+        }
+        else
+        {
+            NSLog(@"data is null, data won't be set in toDictionary");
+        }
     }
     
     return [messageDict copy];

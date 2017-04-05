@@ -31,7 +31,7 @@ NSString * const kElectrodeBridgeResponseUnknownErrorCode = @"EUNKNOWN";
 }
 
 +(nullable instancetype)createResponseForRequest: (ElectrodeBridgeRequestNew *)request
-                                        withResponseData: (nullable NSDictionary *)data
+                                        withResponseData: (nullable id)data
                               withFailureMessage: (nullable id<ElectrodeFailureMessage>)failureMessage {
     return [[ElectrodeBridgeResponse alloc] initWithName:request.name
                                                messageId:request.messageId
@@ -58,7 +58,7 @@ NSString * const kElectrodeBridgeResponseUnknownErrorCode = @"EUNKNOWN";
 - (nullable instancetype)initWithName:(NSString *)name
                             messageId:(NSString *)messageId
                                  type:(ElectrodeMessageType)type
-                                 data:(NSDictionary *)data
+                                 data:(id)data
                        failureMessage: (id<ElectrodeFailureMessage>) failureMessage
 {
     if (self = [super initWithName:name messageId:messageId type:type data:data]) {

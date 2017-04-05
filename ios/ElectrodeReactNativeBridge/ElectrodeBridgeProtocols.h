@@ -19,7 +19,7 @@ typedef void(^ElectrodeBridgeReactNativeReadyListner)();
 
 #pragma ElectrodeBridgeResponseListener protocol
 
-typedef void(^ElectrodeBridgeResponseListenerSuccessBlock) (NSDictionary *);
+typedef void(^ElectrodeBridgeResponseListenerSuccessBlock) (id nullable);
 typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMessage>);
 
 @protocol ElectrodeBridgeResponseListener <NSObject>

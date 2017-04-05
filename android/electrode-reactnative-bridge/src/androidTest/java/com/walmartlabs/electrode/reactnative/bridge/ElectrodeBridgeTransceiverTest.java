@@ -114,7 +114,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final String REQUEST_NAME = "testSendRequestWithRequestDataAndEmptyResponseWithJSRequestHandler";
         ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
-        UUID uuid = addMockEventListener(REQUEST_NAME, new MockElectrodeEventListener() {
+        UUID uuid = addMockEventListener(REQUEST_NAME, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(request);
@@ -123,16 +123,6 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
                 assertEquals(expectedInput, request.getString(BRIDGE_MSG_DATA));
                 jsResponseDispatcher.dispatchResponse(Arguments.createMap());
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -174,17 +164,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        UUID uuid = addMockEventListener(TEST_EVENT_NAME, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
+        addMockEventListener(TEST_EVENT_NAME, new TestMockEventListener() {
             @Override
             public void onEvent(ReadableMap event) {
                 assertNotNull(event);
@@ -197,7 +177,6 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
         electrodeNativeBridge.sendEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(TEST_EVENT_VALUE).build());
         waitForCountDownToFinishOrFail(countDownLatch);
-        removeMockEventListener(uuid);
     }
 
     public void testEmitEventWithSimpleDataFromJS() {
@@ -244,17 +223,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        UUID uuid = addMockEventListener(TEST_EVENT_NAME, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
+        addMockEventListener(TEST_EVENT_NAME, new TestMockEventListener() {
             @Override
             public void onEvent(ReadableMap event) {
                 assertNotNull(event);
@@ -270,7 +239,6 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         electrodeNativeBridge.sendEvent(new ElectrodeBridgeEvent.Builder(TEST_EVENT_NAME).withData(person).build());
 
         waitForCountDownToFinishOrFail(countDownLatch);
-        removeMockEventListener(uuid);
     }
 
     public void testEmitEventWithComplexDataFromJS() {
@@ -306,7 +274,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
     public void testGetEmptyArrayFromJsToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
-        addMockEventListener("getEmptyArray", new MockElectrodeEventListener() {
+        addMockEventListener("getEmptyArray", new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 String[] emptyArray = new String[0];
@@ -315,16 +283,6 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
                 map.putArray(BRIDGE_MSG_DATA, array);
                 jsResponseDispatcher.dispatchResponse(map);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -348,7 +306,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
     public void testGetArrayFromJsToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String[] stringArray = {"one", "two", "three"};
-        addMockEventListener("getEmptyArray", new MockElectrodeEventListener() {
+        addMockEventListener("getEmptyArray", new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 WritableMap map = Arguments.createMap();
@@ -356,16 +314,6 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
                 map.putArray(BRIDGE_MSG_DATA, array);
                 jsResponseDispatcher.dispatchResponse(map);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 

@@ -238,4 +238,22 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         void dispatchResponse(@NonNull final WritableMap response);
     }
 
+
+    class TestMockEventListener implements MockElectrodeEventListener {
+
+        @Override
+        public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+            fail();
+        }
+
+        @Override
+        public void onResponse(ReadableMap response) {
+            fail();
+        }
+
+        @Override
+        public void onEvent(ReadableMap event) {
+            fail();
+        }
+    }
 }

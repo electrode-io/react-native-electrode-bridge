@@ -26,13 +26,23 @@ public abstract class BridgeProcessor implements Processor {
         }
     }
 
+    static Object preProcessObject(Object object, Class expectedObjectType) {
+        if (object instanceof List) {
+            object = updateListResponseIfRequired((List) object, expectedObjectType);
+            runValidationForListResponse(object, expectedObjectType);
+        } else if (Number.class.isAssignableFrom(expectedObjectType)) {
+            object = updateNumberResponseToMatchReturnType(object, expectedObjectType);
+        }
+        return object;
+    }
+
     /**
      * @param listResponse response object
      * @param listItemType list content type
      * @return List
      */
     //Needed since any response that is coming back from JS will only have number.
-    static List updateListResponseIfRequired(List listResponse, @NonNull Class listItemType) {
+    private static List updateListResponseIfRequired(List listResponse, @NonNull Class listItemType) {
         if (!listResponse.isEmpty()
                 && isNumberAndNeedsConversion(listResponse.get(0), listItemType)) {
             Logger.d(TAG, "Performing list Number conversion from %s to %s", listResponse.get(0).getClass(), listItemType);
@@ -45,7 +55,7 @@ public abstract class BridgeProcessor implements Processor {
         return listResponse;
     }
 
-    static Object updateNumberResponseToMatchReturnType(@NonNull Object response, @NonNull Class responseType) {
+    private static Object updateNumberResponseToMatchReturnType(@NonNull Object response, @NonNull Class responseType) {
 
         if (isNumberAndNeedsConversion(response, responseType)) {
             Logger.d(TAG, "Performing Number conversion from %s to %s", response.getClass(), responseType);
@@ -67,7 +77,7 @@ public abstract class BridgeProcessor implements Processor {
     }
 
     @NonNull
-    static private Number convertToNumberToResponseType(@NonNull Number response, @NonNull Class responseType) {
+    private static Number convertToNumberToResponseType(@NonNull Number response, @NonNull Class responseType) {
         if (responseType == Integer.class) {
             return response.intValue();
         } else {
@@ -75,7 +85,7 @@ public abstract class BridgeProcessor implements Processor {
         }
     }
 
-    static private boolean isNumberAndNeedsConversion(@NonNull Object obj, Class responseType) {
+    private static boolean isNumberAndNeedsConversion(@NonNull Object obj, Class responseType) {
         return !responseType.getClass().isAssignableFrom(obj.getClass())//Make sure the expected type and actual type are not same
                 && Number.class.isAssignableFrom(obj.getClass())
                 && Number.class.isAssignableFrom(responseType);

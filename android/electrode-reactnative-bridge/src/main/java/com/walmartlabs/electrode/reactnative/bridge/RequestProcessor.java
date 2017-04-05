@@ -56,34 +56,12 @@ public class RequestProcessor<TReq, TResp> extends BridgeProcessor {
             public void onSuccess(@Nullable Bundle responseData) {
                 TResp response = (TResp) BridgeArguments.generateObject(responseData, getResponseType(responseType));
 
-                response = preOnSuccess(response);
+                response = (TResp) preProcessObject(response, responseType);
 
                 Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
                 responseListener.onSuccess(response);
             }
         });
 
-    }
-
-    /**
-     * Does any response massaging before the final response is being issued back to the client.
-     *
-     * @param response response object
-     * @return TResp
-     */
-
-    private TResp preOnSuccess(TResp response) {
-        if (isListResponseExpected() && response instanceof List) {
-            response = (TResp) updateListResponseIfRequired((List) response, responseType);
-        } else if (Number.class.isAssignableFrom(responseType)) {
-            response = (TResp) updateNumberResponseToMatchReturnType(response, responseType);
-        }
-
-        runValidationForListResponse(response, responseType);
-        return response;
-    }
-
-    private boolean isListResponseExpected() {
-        return responseClass == List.class;
     }
 }

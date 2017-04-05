@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
@@ -50,7 +51,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "Richard Mercille";
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_USER_NAME, new BaseBridgeTestCase.MockElectrodeEventListener() {
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_USER_NAME, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(request);
@@ -59,16 +60,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 response.putString(ElectrodeBridgeResponse.BRIDGE_MSG_DATA, expectedResult);
                 jsResponseDispatcher.dispatchResponse(response);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -129,7 +120,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         final Person actualPerson = new Person.Builder("John", 05).age(10).build();
         final Status result = new Status.Builder(true).log(true).build();
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_STATUS, new BaseBridgeTestCase.MockElectrodeEventListener() {
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_STATUS, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(request);
@@ -149,16 +140,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 statusMap.putBoolean("log", result.getLog());
 
                 jsResponseDispatcher.dispatchResponse(statusMap);
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -196,12 +177,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         });
 
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_STATUS, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_GET_STATUS, new TestMockEventListener() {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
@@ -209,11 +185,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 assertSame(result.getMember(), responseMap.getBoolean("member"));
                 assertSame(result.getLog(), responseMap.getBoolean("log"));
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -264,7 +235,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
     public void testIntegerForResponseNativeToJS() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
-        addMockEventListener(REQUEST_GET_AGE, new MockElectrodeEventListener() {
+        addMockEventListener(REQUEST_GET_AGE, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(jsResponseDispatcher);
@@ -272,16 +243,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 writableMap.putInt(BridgeMessage.BRIDGE_MSG_DATA, 10);
                 jsResponseDispatcher.dispatchResponse(writableMap);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -317,12 +278,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             }
         });
 
-        addMockEventListener(REQUEST_GET_AGE, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
+        addMockEventListener(REQUEST_GET_AGE, new TestMockEventListener() {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
@@ -330,11 +286,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 Integer responseAge = response.getInt(BridgeMessage.BRIDGE_MSG_DATA);
                 assertSame(20, responseAge);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -424,12 +375,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         });
 
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE, new TestMockEventListener() {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
@@ -437,11 +383,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 ReadableMap person = response.getMap(BridgeMessage.BRIDGE_MSG_DATA);
                 assertNotNull(person);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -466,7 +407,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         final String lastName = "Jerry";
         final Status status = new Status.Builder(false).build();
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE, new MockElectrodeEventListener() {
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_POST_PERSON_UPDATE, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(request);
@@ -475,16 +416,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 Status _status = new Status.Builder(requestData.getMap("status").getBoolean("member")).build();
                 Person person = new Person.Builder(requestData.getString("firstName") + requestData.getString("lastName"), 0).status(_status).build();
                 jsResponseDispatcher.dispatchResponse(Arguments.fromBundle(person.toBundle()));
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -585,22 +516,12 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         }};
 
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new MockElectrodeEventListener() {
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(request);
                 jsResponseDispatcher.dispatchResponse(Arguments.fromBundle(BridgeArguments.generateDataBundle(personList)));
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -651,12 +572,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             }
         });
 
-        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
+        UUID uuid = addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_BY_STATUS, new TestMockEventListener() {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
@@ -671,11 +587,6 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                     assertEquals(expected.getMonth(), actual.getMonth());
                 }
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -754,22 +665,12 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             add(3);
         }};
 
-        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME, new MockElectrodeEventListener() {
+        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME, new TestMockEventListener() {
             @Override
             public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
                 assertNotNull(request);
                 jsResponseDispatcher.dispatchResponse(Arguments.fromBundle(BridgeArguments.generateDataBundle(ageList)));
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(ReadableMap response) {
-                fail();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -813,21 +714,15 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
             }
         });
 
-        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME, new MockElectrodeEventListener() {
-            @Override
-            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
-                fail();
-            }
-
+        addMockEventListener(PersonApi.Requests.REQUEST_FIND_PERSONS_AGE_BY_NAME, new TestMockEventListener() {
             @Override
             public void onResponse(ReadableMap response) {
                 assertNotNull(response);
+                ReadableArray intArray = response.getArray(BridgeMessage.BRIDGE_MSG_DATA);
+                assertNotNull(intArray);
+                assertEquals(ageList.size(), intArray.size());
+                assertTrue(intArray.getType(0) == ReadableType.Number);
                 countDownLatch.countDown();
-            }
-
-            @Override
-            public void onEvent(ReadableMap event) {
-                fail();
             }
         });
 
@@ -842,6 +737,72 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
         reactBridge.sendMessage(request);
 
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+
+    public void testRequestHandlerReceivingIntegerInputJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testRequestHandlerReceivingIntegerInput";
+
+
+        new RequestHandlerProcessor<>(requestName, Integer.class, None.class, new ElectrodeBridgeRequestHandler<Integer, None>() {
+            @Override
+            public void onRequest(@Nullable Integer payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertNotNull(payload);
+                assertSame(1, payload);
+                countDownLatch.countDown();
+                responseListener.onSuccess(null);
+            }
+        }).execute();
+
+
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                countDownLatch.countDown();
+            }
+        });
+
+        ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+        WritableMap requestMap = getRequestMap(requestName);
+        requestMap.putInt(BridgeMessage.BRIDGE_MSG_DATA, 1);
+        reactBridge.sendMessage(requestMap);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+
+    public void testRequestHandlerReceivingBooleanInputJSToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testRequestHandlerReceivingBooleanInput";
+
+
+        new RequestHandlerProcessor<>(requestName, Boolean.class, None.class, new ElectrodeBridgeRequestHandler<Boolean, None>() {
+            @Override
+            public void onRequest(@Nullable Boolean payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertNotNull(payload);
+                assertSame(true, payload);
+                countDownLatch.countDown();
+                responseListener.onSuccess(null);
+            }
+        }).execute();
+
+
+        addMockEventListener(requestName, new BaseBridgeTestCase.TestMockEventListener() {
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                countDownLatch.countDown();
+            }
+        });
+
+        ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+        WritableMap requestMap = getRequestMap(requestName);
+        requestMap.putBoolean(BridgeMessage.BRIDGE_MSG_DATA, true);
+        reactBridge.sendMessage(requestMap);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

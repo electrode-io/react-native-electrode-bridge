@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import static com.walmartlabs.electrode.reactnative.sample.api.PersonApi.Requests.REQUEST_GET_AGE;
 
 public class RequestProcessorTest extends BaseBridgeTestCase {
+
     public void testSampleRequestNativeToNativeFailure() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
@@ -803,6 +804,193 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         WritableMap requestMap = getRequestMap(requestName);
         requestMap.putBoolean(BridgeMessage.BRIDGE_MSG_DATA, true);
         reactBridge.sendMessage(requestMap);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testEmptyRequestAndResponseRequestWithNativeHandler() {
+        final CountDownLatch countDownLatch = new CountDownLatch(3);
+        final String requestName = "testEmptyRequestAndResponseRequestWithNativeHandler";
+
+        new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertNull(payload);
+                responseListener.onSuccess(null);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+
+        new RequestProcessor<None, None>(requestName, null, None.class, new ElectrodeBridgeResponseListener<None>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable None responseData) {
+                assertNull(responseData);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                assertFalse(response.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                countDownLatch.countDown();
+            }
+        });
+
+        WritableMap writableMap = getRequestMap(requestName);
+        getReactBridge().sendMessage(writableMap);
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testEmptyRequestAndResponseRequestWithJsHandler() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testEmptyRequestAndResponseRequestWithJsHandler";
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                assertFalse(request.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                jsResponseDispatcher.dispatchResponse(null);
+                countDownLatch.countDown();
+            }
+        });
+
+
+        new RequestProcessor<None, None>(requestName, null, None.class, new ElectrodeBridgeResponseListener<None>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable None responseData) {
+                assertNull(responseData);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testConcurrentRequestsWithNativeHandlerNativeToNative() {
+        final int TOTAL_REQUEST_COUNT = 10;
+        final CountDownLatch countDownLatch = new CountDownLatch(TOTAL_REQUEST_COUNT * 2);
+        final String requestName = "testConcurrentRequestsWithNativeHandlerNativeToNative";
+
+        new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertNull(payload);
+                responseListener.onSuccess(null);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+
+        for (int i = 0; i < TOTAL_REQUEST_COUNT; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new RequestProcessor<None, None>(requestName, null, None.class, new ElectrodeBridgeResponseListener<None>() {
+                        @Override
+                        public void onFailure(@NonNull FailureMessage failureMessage) {
+                            fail();
+                        }
+
+                        @Override
+                        public void onSuccess(@Nullable None responseData) {
+                            assertNull(responseData);
+                            countDownLatch.countDown();
+                        }
+                    }).execute();
+                }
+            }).run();
+        }
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testConcurrentRequestsWithNativeHandlerJsToNative() {
+        final int TOTAL_REQUEST_COUNT = 10;
+        final CountDownLatch countDownLatch = new CountDownLatch(TOTAL_REQUEST_COUNT * 2);
+        final String requestName = "testConcurrentRequestsWithNativeHandlerNativeToNative";
+
+        new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertNull(payload);
+                responseListener.onSuccess(null);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                assertFalse(response.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                countDownLatch.countDown();
+            }
+        });
+
+
+        for (int i = 0; i < TOTAL_REQUEST_COUNT; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    ElectrodeReactBridge reactBridge = ElectrodeBridgeTransceiver.instance();
+                    WritableMap requestMap = getRequestMap(requestName);
+                    requestMap.putBoolean(BridgeMessage.BRIDGE_MSG_DATA, true);
+                    reactBridge.sendMessage(requestMap);
+                }
+            }).run();
+        }
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testEmptyRequestAndResponseRequestWithJsHandlerNativeToJs() {
+        final int TOTAL_REQUEST_COUNT = 10;
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testEmptyRequestAndResponseRequestWithJsHandlerNativeToJs";
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                assertFalse(request.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                jsResponseDispatcher.dispatchResponse(null);
+                countDownLatch.countDown();
+            }
+        });
+
+        for (int i = 0; i < TOTAL_REQUEST_COUNT; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new RequestProcessor<None, None>(requestName, null, None.class, new ElectrodeBridgeResponseListener<None>() {
+                        @Override
+                        public void onFailure(@NonNull FailureMessage failureMessage) {
+                            fail();
+                        }
+
+                        @Override
+                        public void onSuccess(@Nullable None responseData) {
+                            assertNull(responseData);
+                            countDownLatch.countDown();
+                        }
+                    }).execute();
+                }
+            }).run();
+        }
+
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

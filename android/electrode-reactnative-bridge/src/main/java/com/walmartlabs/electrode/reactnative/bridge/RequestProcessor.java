@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
-import java.util.List;
-
 /**
  * This class takes care of processing a given request when {@link #execute()} is called on the instance.
  *
@@ -54,11 +52,14 @@ public class RequestProcessor<TReq, TResp> extends BridgeProcessor {
 
             @Override
             public void onSuccess(@Nullable Bundle responseData) {
-                TResp response = (TResp) BridgeArguments.generateObject(responseData, getResponseType(responseType));
+                TResp response = null;
+                if (responseClass != None.class) {
+                    response = (TResp) BridgeArguments.generateObject(responseData, getResponseType(responseType));
 
-                response = (TResp) preProcessObject(response, responseType);
+                    response = (TResp) preProcessObject(response, responseType);
 
-                Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
+                    Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
+                }
                 responseListener.onSuccess(response);
             }
         });

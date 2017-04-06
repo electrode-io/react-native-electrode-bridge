@@ -213,6 +213,14 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
         return request;
     }
 
+    ElectrodeReactBridge getReactBridge() {
+        return ElectrodeBridgeTransceiver.instance();
+    }
+
+    ElectrodeNativeBridge getNativeBridge() {
+        return ElectrodeBridgeTransceiver.instance();
+    }
+
 
     /**
      * This interface is a mock representation of JS side receiving an event.
@@ -235,7 +243,7 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     }
 
     interface MockJsResponseDispatcher {
-        void dispatchResponse(@NonNull final WritableMap response);
+        void dispatchResponse(@Nullable final WritableMap response);
     }
 
 

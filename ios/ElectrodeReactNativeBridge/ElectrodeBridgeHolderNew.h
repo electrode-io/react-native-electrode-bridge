@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-//#import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeBridgeEventNew.h"
 #import "ElectrodeBridgeRequestNew.h"
 //#import "ElectrodeBridgeProtocols.h"
@@ -25,21 +24,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 @interface ElectrodeBridgeHolderNew : NSObject
-@property(nonatomic, assign, readonly) BOOL isReactNativeReady;
 
-+ (instancetype)sharedInstance;
++ (void)sendEvent: (ElectrodeBridgeEventNew *)event;
 
-- (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) listener;
-
-- (void)sendEvent: (ElectrodeBridgeEventNew *)event;
-
-- (void)sendRequest: (ElectrodeBridgeRequestNew *)request
++ (void)sendRequest: (ElectrodeBridgeRequestNew *)request
    responseListener:(id<ElectrodeBridgeResponseListener> _Nonnull)responseListener;
 
-- (void)registerRequestHanlderWithName: (NSString *)name
++ (void)registerRequestHanlderWithName: (NSString *)name
                         requestHandler: (id<ElectrodeBridgeRequestHandler> _Nonnull) requestHandler;
 
-- (void)addEventListnerWithName: (NSString *)name
++ (void)addEventListnerWithName: (NSString *)name
                    eventListner: (id<ElectrodeBridgeEventListener>) eventListner;
 
 @end

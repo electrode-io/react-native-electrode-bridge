@@ -8,14 +8,14 @@
 
 import UIKit
 
-class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor {
+public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor {
     let tag: String
     let requestName: String
     let reqClass: TReq.Type
     let respClass: TResp.Type
     let requestHandler: ElectrodeBridgeRequestHandler
     
-    init(requestName: String,
+    public init(requestName: String,
          reqClass: TReq.Type,
          respClass: TResp.Type,
          requestHandler: ElectrodeBridgeRequestHandler)
@@ -28,9 +28,9 @@ class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor {
         super.init()
     }
     
-    func execute() {
+    public func execute() {
         let intermediateRequestHandler = ElectrodeBridgeRequestHandlerImpt(requestClass:reqClass , requestHandler: requestHandler)
-        ElectrodeBridgeHolderNew.sharedInstance().registerRequestHanlder(withName: requestName, requestHandler: intermediateRequestHandler)
+        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName, requestHandler: intermediateRequestHandler)
     }
     
     

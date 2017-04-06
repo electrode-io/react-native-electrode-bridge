@@ -8,6 +8,6 @@
 
 import Foundation
 
-@objc protocol Processor {
+@objc public protocol Processor {
     func execute()
 }

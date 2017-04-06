@@ -9,6 +9,9 @@
 #import "ElectrodeBridgeBaseTests.h"
 #import "ElectrodeBridgeTransceiver_Internal.h"
 #import "ElectrodeBridgeMessage.h"
+#import "ElectrodeBridgeEventNew.h"
+
+NSString* const ktestId = @"1234";
 
 @implementation ElectrodeBridgeRequestNew (CustomeBuilder)
 
@@ -18,12 +21,35 @@
     return request;
 }
 
-+ (instancetype)createRequestWithName:(NSString *)name data:(id)data
++ (instancetype)createRequestWithName:(NSString *)name data:(nullable id)data
 {
     ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" data:data];
     return request;
 }
 
+@end
+
+
+@implementation ElectrodeBridgeEventNew (ElectrodeBridgeEventNewAddition)
+
++ (nonnull instancetype)createEventWithName:(nonnull NSString *)name data:(nullable id)eventData {
+    ElectrodeBridgeEventNew *event = [[ElectrodeBridgeEventNew alloc] initWithName:name messageId:ktestId data:eventData];
+    return event;
+}
+@end
+
+@implementation MockElectrodeBridgeEventListener
+
+- (_Nonnull instancetype)initWithonEventBlock:(nullable onEventBlock)eventBlock {
+    if (self = [super init]) {
+        self.eventBlock = eventBlock;
+    }
+    return self;
+}
+
+- (void)onEvent:(id)eventPayload {
+    self.eventBlock(eventPayload);
+}
 @end
 
 @implementation MockElectrodeBridgeResponseListener
@@ -80,7 +106,7 @@
 -(void)setUp
 {
     [self initializeBundle];
-    
+
     if(self.mockListenerStore) {
         [self.mockListenerStore removeAllObjects];
     }
@@ -89,14 +115,13 @@
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
     NSString *absolutePath = @"/Users/w0l00qx/Code/react-native-electrode-bridge/ios/ElectrodeReactNativeBridge/ElectrodeReactNativeBridgeTests/MiniApp.jsbundle";
-    
+
     return [[NSURL alloc] initWithString:absolutePath];
 }
 
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
     self.mockListenerStore = [[NSMutableDictionary alloc] init];
-    
     MockBridgeTransceiver *mockTransceiver = [[MockBridgeTransceiver alloc] init];
     [MockBridgeTransceiver createWithTransceiver:mockTransceiver];
     mockTransceiver.myMockListenerStore = self.mockListenerStore;
@@ -158,9 +183,9 @@
 
 -(instancetype)init {
     if(self = [super init]) {
-        
+
     }
-    
+
     return self;
 }
 
@@ -211,7 +236,7 @@
                 break;
         }
     }
-    
+
 }
 
 - (NSArray<NSString *> *)supportedEvents
@@ -247,6 +272,4 @@
     }
     return self;
 }
-
-
 @end

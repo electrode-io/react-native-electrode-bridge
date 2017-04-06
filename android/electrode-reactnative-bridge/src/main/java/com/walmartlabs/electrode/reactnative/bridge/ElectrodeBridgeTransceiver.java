@@ -13,6 +13,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,6 +36,8 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Object>> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
+
+    private ReactConstantsProvider reactConstantsProvider;
 
     /**
      * Initializes a new instance of ElectrodeBridgeTransceiver
@@ -94,11 +97,30 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         return "ElectrodeBridge";
     }
 
+    @Nullable
+    @Override
+    public Map<String, Object> getConstants() {
+        if (reactConstantsProvider != null) {
+            try {
+                return reactConstantsProvider.getConstants();
+            } catch (Exception e) {
+                //GOTCHA: Added a try catch since the implementation of this would be on the client side and bridge has no control over unseen errors.
+                Logger.w(TAG, "getConstants() implementation by(%s) failed due to(%s)", reactConstantsProvider, e.getMessage());
+            }
+        }
+        return super.getConstants();
+    }
+
     @NonNull
     @Override
     public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
         Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
         return mEventRegistrar.registerEventListener(name, eventListener);
+    }
+
+    @Override
+    public void registerReactConstantsProvider(@NonNull ReactConstantsProvider reactConstantsProvider) {
+        this.reactConstantsProvider = reactConstantsProvider;
     }
 
     @Override

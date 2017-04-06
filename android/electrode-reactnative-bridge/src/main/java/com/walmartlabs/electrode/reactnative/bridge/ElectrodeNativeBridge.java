@@ -43,4 +43,10 @@ public interface ElectrodeNativeBridge {
     @NonNull
     UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener);
 
+    /**
+     * Registers the listen that will be used by the bridge module to get the constant values exposed to JavaScript
+     *
+     * @param reactConstantsProvider
+     */
+    void registerReactConstantsProvider(@NonNull ReactConstantsProvider reactConstantsProvider);
 }

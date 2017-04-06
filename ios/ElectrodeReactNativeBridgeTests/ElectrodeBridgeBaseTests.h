@@ -17,6 +17,7 @@
 #import <React/RCTBridge.h>
 
 extern const int kElectrodeBridgeRequestTestTimeOut;
+extern  NSString* _Nonnull  const ktestId;
 
 /////////////////MockJSEeventListener
 NS_ASSUME_NONNULL_BEGIN
@@ -34,6 +35,12 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 @property(nonatomic, copy, nullable) responseBlock responseBlock;
 @end
 
+/////MockElectrodeBridgeEventListener
+typedef void (^onEventBlock)(_Nullable id payLoad);
+@interface MockElectrodeBridgeEventListener : XCTestCase<ElectrodeBridgeEventListener>
+@property (nonatomic, copy, nullable) onEventBlock eventBlock;
+- (_Nonnull instancetype)initWithonEventBlock:(nullable onEventBlock)eventBlock;
+@end
 
 /////////////////ElectrodeBridgeBaseTests
 
@@ -47,11 +54,9 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 -(id<ElectrodeNativeBridge> _Nonnull) getNativeBridge;
 -(id<ElectrodeReactBridge> _Nonnull) getReactBridge;
 -(nonnull NSDictionary*) createBridgeRequestForName:(nonnull NSString*)name id:(nonnull NSString*)requestId data:(nullable id)data;
-
 - (nonnull NSDictionary *)createResponseDataWithName:(nonnull NSString *)name id:(nonnull NSString *)responseId data:(nullable id)data;
 
 @end
-
 
 
 /////////////////ElectrodeBridgeRequestNew
@@ -59,8 +64,13 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 
 +(nonnull instancetype)createRequestWithName: (NSString *)name;
 
-+(nonnull instancetype)createRequestWithName: (NSString *)name data:(id)data;
++(nonnull instancetype)createRequestWithName: (NSString *)name data:(nullable id)data;
 
+@end
+
+
+@interface ElectrodeBridgeEventNew (ElectrodeBridgeEventNewAddition)
++ (nonnull instancetype)createEventWithName:(nonnull NSString *)name data:(nullable id)eventData;
 @end
 
 /////////////////MockElectrodeBridgeResponseListener
@@ -78,6 +88,7 @@ typedef void (^failureBlock) (_Nullable id<ElectrodeFailureMessage> failureMessa
 @property(nonatomic, copy, nullable) successBlock successBlk;
 @property(nonatomic, copy, nullable) failureBlock failureBlk;
 @end
+
 
 /////////////////MockBridgeTransceiver
 @interface MockBridgeTransceiver : ElectrodeBridgeTransceiver

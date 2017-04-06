@@ -20,6 +20,14 @@
     return nil;
 }
 
+- (instancetype)initWithName:(NSString *)name messageId:(NSString *)messageId data:(id)data {
+    if (self = [super initWithName:name messageId:messageId type:ElectrodeMessageTypeEvent data:data]) {
+        return self;
+    }
+    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEventNew className], data);
+    return nil;
+}
+
 + (NSString *)className {
     return NSStringFromClass(self.class);
 }

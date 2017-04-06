@@ -34,27 +34,26 @@ public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject
         super.init()
     }
     
-    func execute()
+    public func execute()
     {
         print("RequestProcessor started processing request (\(requestName)) with payload (\(requestPayload))")
-        guard let requestDictionary = requestPayload?.toDictionary() as? [AnyHashable: Any] else {
-            assertionFailure("\(tag) : Cannot convert payload to valid type")
-            return
-        }
-        let request = ElectrodeBridgeRequestNew.createRequest(withData: requestDictionary)
+        let requestDictionary: [AnyHashable: Any]
+        let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
         
-        guard let validRequest = request else {
-            assertionFailure("Invalid request")
-            return
-        }
-        
-        let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: { [weak self]
+        let validRequest = ElectrodeBridgeRequestNew(name: requestName, messageId: UUID().uuidString, type: .request, data: bridgeMessageData)
+                
+        let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: {
             (responseData: [AnyHashable: Any]?) in
-            let processedResp = self?.processSuccessResponse(responseData: responseData)
-            self?.responseListener.onSuccess(processedResp)
+            let processedResp: Any?
+            if (self.responseClass != None.self) {
+                processedResp = self.processSuccessResponse(responseData: responseData)
+            } else {
+                processedResp = nil
+            }
+            self.responseListener.onSuccess(processedResp)
             
-        }, failureClosure: { [weak self](failureMessage: ElectrodeFailureMessage) in
-            self?.responseListener.onFailure(failureMessage)
+        }, failureClosure: { (failureMessage: ElectrodeFailureMessage) in
+            self.responseListener.onFailure(failureMessage)
         })
         
         ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)

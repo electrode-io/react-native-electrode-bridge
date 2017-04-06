@@ -21,6 +21,11 @@
 		309A03A31E8AE8F900501219 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 309A03A21E8AE8F900501219 /* MiniApp.jsbundle */; };
 		309A03C01E8B319E00501219 /* ElectrodeBridgeHolderNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 309A03BE1E8B319E00501219 /* ElectrodeBridgeHolderNew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		309A03C11E8B319E00501219 /* ElectrodeBridgeHolderNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 309A03BF1E8B319E00501219 /* ElectrodeBridgeHolderNew.m */; };
+		30B705C01E960BCE00B8DACE /* RequestProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */; };
+		30B705C91E960C8300B8DACE /* PersonEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705C81E960C8300B8DACE /* PersonEvents.swift */; };
+		30B705CB1E960CA000B8DACE /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705CA1E960CA000B8DACE /* Request.swift */; };
+		30B705CD1E960E6E00B8DACE /* PersonRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705CC1E960E6E00B8DACE /* PersonRequests.swift */; };
+		30B705CF1E96E5B300B8DACE /* None.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705CE1E96E5B300B8DACE /* None.swift */; };
 		30BA8F161E84972D00D3C440 /* ElectrodeBridgeEventNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F021E84972D00D3C440 /* ElectrodeBridgeEventNew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30BA8F171E84972D00D3C440 /* ElectrodeBridgeEventNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8F031E84972D00D3C440 /* ElectrodeBridgeEventNew.m */; };
 		30BA8F181E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F041E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -171,6 +176,11 @@
 		309A03A21E8AE8F900501219 /* MiniApp.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp.jsbundle; sourceTree = "<group>"; };
 		309A03BE1E8B319E00501219 /* ElectrodeBridgeHolderNew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeHolderNew.h; sourceTree = "<group>"; };
 		309A03BF1E8B319E00501219 /* ElectrodeBridgeHolderNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeHolderNew.m; sourceTree = "<group>"; };
+		30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestProcessorTests.swift; sourceTree = "<group>"; };
+		30B705C81E960C8300B8DACE /* PersonEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonEvents.swift; sourceTree = "<group>"; };
+		30B705CA1E960CA000B8DACE /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		30B705CC1E960E6E00B8DACE /* PersonRequests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonRequests.swift; sourceTree = "<group>"; };
+		30B705CE1E96E5B300B8DACE /* None.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = None.swift; sourceTree = "<group>"; };
 		30BA8F021E84972D00D3C440 /* ElectrodeBridgeEventNew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeEventNew.h; sourceTree = "<group>"; };
 		30BA8F031E84972D00D3C440 /* ElectrodeBridgeEventNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeEventNew.m; sourceTree = "<group>"; };
 		30BA8F041E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeFailureMessage.h; sourceTree = "<group>"; };
@@ -287,6 +297,9 @@
 			children = (
 				301940E01E941389002A0C69 /* PersonAPI.swift */,
 				3019418D1E9414A7002A0C69 /* Event.swift */,
+				30B705C81E960C8300B8DACE /* PersonEvents.swift */,
+				30B705CA1E960CA000B8DACE /* Request.swift */,
+				30B705CC1E960E6E00B8DACE /* PersonRequests.swift */,
 			);
 			name = APIs;
 			sourceTree = "<group>";
@@ -306,6 +319,7 @@
 			isa = PBXGroup;
 			children = (
 				301941991E942F42002A0C69 /* EventProcessorTests.swift */,
+				30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */,
 			);
 			name = Swift;
 			sourceTree = "<group>";
@@ -320,6 +334,7 @@
 				30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */,
 				30C8F4D31E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift */,
 				30C8F4DC1E9320E500E40221 /* Processor.swift */,
+				30B705CE1E96E5B300B8DACE /* None.swift */,
 			);
 			name = Swift;
 			sourceTree = "<group>";
@@ -654,6 +669,7 @@
 				30BA8F851E859CD400D3C440 /* ElectrodeEventDispatcherNew.m in Sources */,
 				30BA8F1D1E84972D00D3C440 /* ElectrodeBridgeProtocols.m in Sources */,
 				9678D33C1E721BC600719AD5 /* ElectrodeUtilities.swift in Sources */,
+				30B705CF1E96E5B300B8DACE /* None.swift in Sources */,
 				30BA8F171E84972D00D3C440 /* ElectrodeBridgeEventNew.m in Sources */,
 				9678D27C1E68CC2D00719AD5 /* EventListenerProcessor.swift in Sources */,
 				30BA8F1F1E84972D00D3C440 /* ElectrodeBridgeRequestNew.m in Sources */,
@@ -689,6 +705,8 @@
 				3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */,
 				301940E11E941389002A0C69 /* PersonAPI.swift in Sources */,
 				DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */,
+				30B705C91E960C8300B8DACE /* PersonEvents.swift in Sources */,
+				30B705CD1E960E6E00B8DACE /* PersonRequests.swift in Sources */,
 				301941931E941D26002A0C69 /* Person.swift in Sources */,
 				3019418E1E9414A7002A0C69 /* Event.swift in Sources */,
 				3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */,
@@ -697,9 +715,11 @@
 				DA0B9F421E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m in Sources */,
 				DA0B9F371E8DCC6D004A4629 /* ElectrodeBridgeEventTests.m in Sources */,
 				301941971E9420C5002A0C69 /* Status.swift in Sources */,
+				30B705C01E960BCE00B8DACE /* RequestProcessorTests.swift in Sources */,
 				DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */,
 				301941911E94153A002A0C69 /* BirthYear.swift in Sources */,
 				DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */,
+				30B705CB1E960CA000B8DACE /* Request.swift in Sources */,
 				7F8E8CBF1E8F0CCA00CF0D8C /* TestRequestHandler.m in Sources */,
 				3019419A1E942F42002A0C69 /* EventProcessorTests.swift in Sources */,
 			);

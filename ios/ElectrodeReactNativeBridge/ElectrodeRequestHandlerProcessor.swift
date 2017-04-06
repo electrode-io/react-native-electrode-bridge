@@ -46,11 +46,16 @@ class ElectrodeBridgeRequestHandlerImpt<TReq>: NSObject, ElectrodeBridgeRequestH
     }
     func onRequest(_ data: Any?, responseListener: ElectrodeBridgeResponseListener) {
         let request: Any?
-        if let nonnilData = data {
-            request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: requestClass)
-        } else {
+        if (requestClass == None.self) {
             request = nil
+        } else {
+            if let nonnilData = data {
+                request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: requestClass)
+            } else {
+                request = nil
+            }
         }
+
         let innerResponseListner = InnerElectrodeBridgeResponseListener(sucessClosure:{ (any) in
             responseListener.onSuccess(any)
         }, failureClosure: { (failureMessage) in

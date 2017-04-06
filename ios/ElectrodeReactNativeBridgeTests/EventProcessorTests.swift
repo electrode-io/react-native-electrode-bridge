@@ -74,25 +74,3 @@ private class PersonEventListener: NSObject, ElectrodeBridgeEventListener {
         self.validationBlock(eventPayload)
     }
 }
-
-public class PersonEvent: NSObject, Event {
-    public func addPersonAddedEventListenr(eventListener: ElectrodeBridgeEventListener) {
-        let listenerProcessor = EventListenerProcessor(eventName: kEventPersonAdded, eventPayloadClass: Person.self, eventListener: eventListener)
-        listenerProcessor.execute()
-    }
-    
-    public func addPersonNameUpdatedEventListener(eventListener: ElectrodeBridgeEventListener) {
-        let listenerProcessor = EventListenerProcessor(eventName: kEventPersonNameUpdated, eventPayloadClass: String.self, eventListener: eventListener)
-        listenerProcessor.execute()
-    }
-    
-    public func emitEventPersonAdded(person: Person) {
-        let eventProcessor = EventProcessor(eventName: kEventPersonAdded, eventPayload: person)
-        eventProcessor.execute()
-        
-    }
-    public func emitEventPersonNameUpdated(updatedName: String) {
-        let eventProcessor = EventProcessor(eventName: kEventPersonNameUpdated, eventPayload: updatedName)
-        eventProcessor.execute()
-    }
-}

@@ -336,7 +336,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        ElectrodeBridgeHolder.registerReactConstantsProvider(new ReactConstantsProvider() {
+        ElectrodeBridgeHolder.registerConstantsProvider(new ConstantsProvider() {
             @Nullable
             @Override
             public Map<String, Object> getConstants() {

@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 import java.util.Map;
 
-public interface ReactConstantsProvider {
+public interface ConstantsProvider {
     /**
      * Returns the constant values exposed to JavaScript.
      * <p>

@@ -37,7 +37,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
     private static boolean sIsReactNativeReady;
 
-    private ReactConstantsProvider reactConstantsProvider;
+    private ConstantsProvider constantsProvider;
 
     /**
      * Initializes a new instance of ElectrodeBridgeTransceiver
@@ -100,12 +100,12 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     @Nullable
     @Override
     public Map<String, Object> getConstants() {
-        if (reactConstantsProvider != null) {
+        if (constantsProvider != null) {
             try {
-                return reactConstantsProvider.getConstants();
+                return constantsProvider.getConstants();
             } catch (Exception e) {
                 //GOTCHA: Added a try catch since the implementation of this would be on the client side and bridge has no control over unseen errors.
-                Logger.w(TAG, "getConstants() implementation by(%s) failed due to(%s)", reactConstantsProvider, e.getMessage());
+                Logger.w(TAG, "getConstants() implementation by(%s) failed due to(%s)", constantsProvider, e.getMessage());
             }
         }
         return super.getConstants();
@@ -119,8 +119,8 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     }
 
     @Override
-    public void registerReactConstantsProvider(@NonNull ReactConstantsProvider reactConstantsProvider) {
-        this.reactConstantsProvider = reactConstantsProvider;
+    public void registerConstantsProvider(@NonNull ConstantsProvider constantsProvider) {
+        this.constantsProvider = constantsProvider;
     }
 
     @Override

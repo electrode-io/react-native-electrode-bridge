@@ -46,7 +46,7 @@ public interface ElectrodeNativeBridge {
     /**
      * Registers the listen that will be used by the bridge module to get the constant values exposed to JavaScript
      *
-     * @param reactConstantsProvider
+     * @param constantsProvider
      */
-    void registerReactConstantsProvider(@NonNull ReactConstantsProvider reactConstantsProvider);
+    void registerConstantsProvider(@NonNull ConstantsProvider constantsProvider);
 }

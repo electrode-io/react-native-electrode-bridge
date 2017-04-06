@@ -14,7 +14,7 @@ extern const int kElectrodeBridgeRequestDefaultTimeOut;
 
 
 
-@interface ElectrodeBridgeRequestNew : ElectrodeBridgeMessage
+@interface ElectrodeBridgeRequestNew : ElectrodeBridgeMessage<NSCopying>
 /**
  * return timeout of the request in ms.
  */

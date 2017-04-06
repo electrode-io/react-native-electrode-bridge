@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Status: NSObject, Bridgeable{
+public class Status: NSObject, Bridgeable{
     let log: Bool
     let member: Bool
     private static let tag = String(describing: type(of:self))
@@ -56,7 +56,7 @@ class Status: NSObject, Bridgeable{
         }
     }
     
-    func toDictionary() -> NSDictionary {
+    public func toDictionary() -> NSDictionary {
         return ["log": self.log, "member":self.member] as NSDictionary
     }
 }

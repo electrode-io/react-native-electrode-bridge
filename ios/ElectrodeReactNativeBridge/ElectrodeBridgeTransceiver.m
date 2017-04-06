@@ -63,20 +63,28 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) ElectrodeRequestDispatcherNew *requestDispatcher;
 @property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction * > *pendingTransaction;
 @property (nonatomic, assign) dispatch_queue_t syncQueue; //this is used to make sure access to pendingTransaction is thread safe.
-@property(nonatomic, copy) NSMutableArray < ElectrodeBridgeReactNativeReadyListner>*listnerBlocks;
-@property(nonatomic, assign) BOOL isReactNativeBridgeReady;
-
 
 @end
 //CLAIRE TODO: check what are the methods that needs to mark with RCT_EXPORT_METHOD 
 @implementation ElectrodeBridgeTransceiver
 
+static ElectrodeBridgeReactNativeReadyListner reactNativeReadyListener = nil;
+static BOOL isReactNativeReady = NO;
+
+static ElectrodeBridgeTransceiver *sharedInstance;
+static dispatch_once_t onceToken;
 +(instancetype)sharedInstance {
-    static ElectrodeBridgeTransceiver *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    
+
     dispatch_once(&onceToken, ^{
         sharedInstance = [[ElectrodeBridgeTransceiver alloc] init];
+    });
+    return sharedInstance;
+}
+
++ (instancetype) createWithTransceiver: (ElectrodeBridgeTransceiver *) transceiver {
+
+    dispatch_once(&onceToken, ^{
+        sharedInstance = transceiver;
     });
     return sharedInstance;
 }
@@ -89,8 +97,6 @@ NS_ASSUME_NONNULL_BEGIN
         _requestDispatcher = [[ElectrodeRequestDispatcherNew alloc] initWithRequestRegistrar:requestRegistrar];
         _eventDispatcher = [[ElectrodeEventDispatcherNew alloc] initWithEventRegistrar:eventRegistrar];
         _pendingTransaction = [[NSMutableDictionary alloc] init];
-        _listnerBlocks = [[NSMutableArray alloc] init];
-        [self onReactNativeInitialized];
     }
     return self;
 }
@@ -330,24 +336,26 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     NSLog(@"<-- <-- <-- <-- <-- Response(%@)", response);
 }
 
-- (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) reactNativeReadyListner
++ (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) listner
 {
-    if(self.bridge) {
-        reactNativeReadyListner();
-    } else {
-        [self.listnerBlocks addObject:[reactNativeReadyListner copy]];
+    if(isReactNativeReady) {
+        if (listner) {
+            listner();
+        }
     }
+    
+    reactNativeReadyListener = [listner copy];
 }
 
 - (void)onReactNativeInitialized
 {
-    self.isReactNativeBridgeReady = YES;
-    if (self.listnerBlocks)
-    {
-        for (ElectrodeBridgeReactNativeReadyListner listener in self.listnerBlocks) {
-            listener();
-        }
+    isReactNativeReady = YES;
+    if (reactNativeReadyListener) {
+        reactNativeReadyListener();
     }
+}
++ (BOOL)isReactNativeBridgeReady {
+    return isReactNativeReady;
 }
 @end
 NS_ASSUME_NONNULL_END

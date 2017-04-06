@@ -19,7 +19,7 @@
 extern const int kElectrodeBridgeRequestTestTimeOut;
 
 /////////////////MockJSEeventListener
-
+NS_ASSUME_NONNULL_BEGIN
 typedef void (^evetBlock)(ElectrodeBridgeEventNew *request);
 typedef void (^requestBlock)(ElectrodeBridgeRequestNew *request);
 typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
@@ -39,12 +39,13 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 
 @interface ElectrodeBridgeBaseTests : XCTestCase<RCTBridgeDelegate>
 -(void)initializeBundle;
-@property(nonatomic, strong, readonly) RCTBridge *bridge;
+@property(nonatomic, strong, readonly, nonnull) RCTBridge *bridge;
 @property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *mockListenerStore;
 
--(void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name;
--(id<ElectrodeNativeBridge>) getNativeBridge;
--(id<ElectrodeReactBridge>) getReactBridge;
+-(void) addMockEventListener:(MockJSEeventListener *)mockJsEventListener
+                     forName:(NSString *)name;
+-(id<ElectrodeNativeBridge> _Nonnull) getNativeBridge;
+-(id<ElectrodeReactBridge> _Nonnull) getReactBridge;
 -(nonnull NSDictionary*) createBridgeRequestForName:(nonnull NSString*)name id:(nonnull NSString*)requestId data:(nullable id)data;
 
 - (nonnull NSDictionary *)createResponseDataWithName:(nonnull NSString *)name id:(nonnull NSString *)responseId data:(nullable id)data;
@@ -56,9 +57,9 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 /////////////////ElectrodeBridgeRequestNew
 @interface ElectrodeBridgeRequestNew (CustomeBuilder)
 
-+(instancetype)createRequestWithName: (NSString *)name;
++(nonnull instancetype)createRequestWithName: (NSString *)name;
 
-+(instancetype)createRequestWithName: (NSString *)name data:(id)data;
++(nonnull instancetype)createRequestWithName: (NSString *)name data:(id)data;
 
 @end
 
@@ -80,10 +81,8 @@ typedef void (^failureBlock) (_Nullable id<ElectrodeFailureMessage> failureMessa
 
 /////////////////MockBridgeTransceiver
 @interface MockBridgeTransceiver : ElectrodeBridgeTransceiver
-- (nonnull instancetype) initWithJsMockListenerStore:(nonnull NSMutableDictionary<NSString *, MockJSEeventListener *> *)mockListenerStore NS_DESIGNATED_INITIALIZER;
-
-@property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *mockListenerStore;
+@property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *myMockListenerStore;
 @end
-
+NS_ASSUME_NONNULL_END
 
 

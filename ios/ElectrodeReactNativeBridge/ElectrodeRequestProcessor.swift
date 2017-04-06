@@ -11,7 +11,7 @@ import UIKit
 typealias ElectrodeRequestProcessorSuccessClosure = ([AnyHashable: Any]?) -> ()
 typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> ()
 
-class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
+public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
     private let tag: String
     private let requestName: String
     private let requestPayload: TReq?
@@ -19,7 +19,7 @@ class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
     private let responseItemType: TItem.Type?
     private let responseListener: ElectrodeBridgeResponseListener
     
-    init(requestName: String,
+    public init(requestName: String,
          requestPayload: TReq?,
          respClass: TResp.Type,
          responseItemType: TItem.Type?,
@@ -57,7 +57,7 @@ class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
             self?.responseListener.onFailure(failureMessage)
         })
         
-        ElectrodeBridgeHolderNew.sharedInstance().sendRequest(validRequest, responseListener: intermediateListener)
+        ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
     }
     
     private func processSuccessResponse(responseData: [AnyHashable: Any]?) -> Any? {

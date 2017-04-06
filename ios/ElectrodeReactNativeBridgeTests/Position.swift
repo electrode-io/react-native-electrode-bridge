@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Position: NSObject, Bridgeable{
+public class Position: NSObject, Bridgeable{
     let lat: Double
     let lng: Double
     
@@ -55,7 +55,7 @@ class Position: NSObject, Bridgeable{
         }
     }
     
-    func toDictionary() -> NSDictionary {
+    public func toDictionary() -> NSDictionary {
         return ["lat": self.lat, "lgn": self.lng] as NSDictionary
     }
     

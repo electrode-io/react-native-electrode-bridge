@@ -9,5 +9,10 @@
 import Foundation
 
 @objc public protocol PersonAPI {
-    
+    var event: Event { get }
 }
+
+class APersonAPI: PersonAPI {
+    var event: Event {return PersonEvent()}
+}
+

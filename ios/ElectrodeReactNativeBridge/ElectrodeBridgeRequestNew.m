@@ -52,4 +52,8 @@ const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
     return [NSString stringWithFormat:@"%@, timeOut:%d, isJsInitiated:%d", [super description], self.timeoutMs, self.isJsInitiated];
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone {
+    return self;
+}
+
 @end

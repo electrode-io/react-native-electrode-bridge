@@ -8,13 +8,13 @@
 
 import UIKit
 
-class EventListenerProcessor<T: Bridgeable>: NSObject {
+public class EventListenerProcessor<T>: NSObject, Processor {
     private let tag: String
     private let eventName: String
     private let eventPayloadClass: T.Type
     private let appEventListener: ElectrodeBridgeEventListener
     
-    init(eventName: String, eventPayloadClass: T.Type, eventListener: ElectrodeBridgeEventListener) {
+    public init(eventName: String, eventPayloadClass: T.Type, eventListener: ElectrodeBridgeEventListener) {
         self.tag = String(describing: type(of: self))
         self.eventName = eventName
         self.eventPayloadClass = eventPayloadClass
@@ -22,23 +22,28 @@ class EventListenerProcessor<T: Bridgeable>: NSObject {
         super.init()
     }
     
-    func execute() {
+    public func execute() {
+        let intermediateListener = ElectrodeEventListenerImplementor(eventPayloadClass: eventPayloadClass, onEventClosure: {
+            (any: Any?) in
+            self.appEventListener.onEvent(any)
+        })
+        ElectrodeBridgeHolderNew.addEventListner(withName: eventName, eventListner: intermediateListener)
     }
 }
 
-private class ElectrodeEventListenerImplementor<T: Bridgeable>: NSObject, ElectrodeBridgeEventListener {
+private class ElectrodeEventListenerImplementor<T>: NSObject, ElectrodeBridgeEventListener {
     
-    private let appEventListener: ElectrodeBridgeEventListener
     private let eventPayloadClass: T.Type
+    private let onEventClosure: (Any?) -> ()
     
-    init(eventPayloadClass: T.Type, appEventListener: ElectrodeBridgeEventListener) {
+    init(eventPayloadClass: T.Type, onEventClosure: @escaping (Any?) -> ()) {
         self.eventPayloadClass = eventPayloadClass
-        self.appEventListener = appEventListener
+        self.onEventClosure = onEventClosure
     }
     
     func onEvent(_ eventPayload: Any?) {
         print("Processing final result for the event with payload bundle (\(eventPayload))")
         let result = try? NSObject.generateObject(data: eventPayload as AnyObject, classType: eventPayloadClass)
-        appEventListener.onEvent(result)
+        onEventClosure(result)
     }
 }

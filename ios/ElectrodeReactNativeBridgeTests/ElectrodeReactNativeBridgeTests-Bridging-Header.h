@@ -6,3 +6,6 @@
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeProtocols.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeEventNew.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeRequestNew.h>
+
+//Expose headers in test target for swift to use 
+#import <ElectrodeReactNativeBridgeTests/ElectrodeBridgeBaseTests.h>

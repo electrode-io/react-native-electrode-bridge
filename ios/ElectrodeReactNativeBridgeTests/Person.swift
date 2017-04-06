@@ -9,7 +9,7 @@
 import UIKit
 
 
-class Person: NSObject, Bridgeable {
+public class Person: NSObject, Bridgeable {
     private static let tag = String(describing: type(of: self))
     
     let name: String
@@ -107,7 +107,7 @@ class Person: NSObject, Bridgeable {
         }
     }
 
-    func toDictionary() -> NSDictionary {
+    public func toDictionary() -> NSDictionary {
         return [
             "name": self.name,
             "age": self.age,

@@ -7,7 +7,11 @@
 //
 
 #import "ElectrodeBridgeTransceiver.h"
+NS_ASSUME_NONNULL_BEGIN
 
 @interface ElectrodeBridgeTransceiver ()
++ (instancetype) createWithTransceiver: (ElectrodeBridgeTransceiver *) transceiver;
 -(void) emitMessage:(ElectrodeBridgeMessage * _Nonnull) bridgeMessage;
 @end
+
+NS_ASSUME_NONNULL_END

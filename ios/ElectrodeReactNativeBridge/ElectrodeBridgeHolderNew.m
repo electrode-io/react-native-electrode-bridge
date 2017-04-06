@@ -6,9 +6,9 @@
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeBridgeHolderNew.h"
 #import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeBridgeProtocols.h"
+#import "ElectrodeBridgeHolderNew.h"
 
 
 @interface ElectrodeBridgeHolderNew()
@@ -18,10 +18,35 @@
 @property(nonatomic, copy) NSMutableDictionary<NSString *, id<ElectrodeBridgeEventListener>> *queuedEventListenerRegistration;
 @property(nonatomic, copy) NSMutableDictionary<ElectrodeBridgeRequestNew *,id<ElectrodeBridgeResponseListener>> *queuedRequests;
 @property(nonatomic, copy) NSMutableArray<ElectrodeBridgeEventNew *> *queuedEvents;
-@property(nonatomic, strong)ElectrodeBridgeTransceiver *electrodeNativeBridge;
 @end
 
 @implementation ElectrodeBridgeHolderNew
+static ElectrodeBridgeTransceiver *electrodeNativeBridge;
+static BOOL isReactNativeReady = NO;
+static NSMutableDictionary *queuedRequestHandlerRegistration;
+static NSMutableDictionary *queuedEventListenerRegistration;
+static NSMutableDictionary *queuedRequests;
+static NSMutableArray *queuedEvent;
+
++(void) initialize {
+    isReactNativeReady = YES;
+    electrodeNativeBridge = [ElectrodeBridgeTransceiver sharedInstance];
+    queuedRequestHandlerRegistration = [[NSMutableDictionary alloc] init];
+    queuedEventListenerRegistration = [[NSMutableDictionary alloc] init];
+    queuedRequests = [[NSMutableDictionary alloc] init];
+    queuedEvent = [[NSMutableArray alloc] init];
+    
+    [ElectrodeBridgeHolderNew registerReactReadyListenr];
+}
+
++ (void)registerReactReadyListenr {
+    [ElectrodeBridgeTransceiver registerReactNativeReadyListener:^{
+        [ElectrodeBridgeHolderNew registerQueuedEventListeners];
+        [ElectrodeBridgeHolderNew registerQueuedRequestHandlers];
+        [ElectrodeBridgeHolderNew sendQueuedEvents];
+        [ElectrodeBridgeHolderNew sendQueuedRequests];
+    }];
+}
 
 + (instancetype)sharedInstance
 {
@@ -34,54 +59,87 @@
     return sharedInstance;
 }
 
-- (instancetype) init{
-    if(self = [super init])
-    {
-        _queuedRequestHandlerRegistration = [[NSMutableDictionary alloc] init];
-        _queuedEventListenerRegistration = [[NSMutableDictionary alloc] init];
-        _queuedRequests = [[NSMutableDictionary alloc] init];
-        _queuedEvents = [[NSMutableArray alloc] init];
-        _electrodeNativeBridge = [[ElectrodeBridgeTransceiver alloc] init];
++ (void)sendEvent: (ElectrodeBridgeEventNew *)event
+{
+    if (!isReactNativeReady) {
+        [queuedEvent addObject:event];
+    } else {
+        [electrodeNativeBridge sendEvent:event];
     }
-    
-    return self;
 }
 
-- (BOOL)isReactNativeReady
-{
-    return self.electrodeNativeBridge.isReactNativeBridgeReady;
-}
-
-- (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) listener
-{
-    [self.electrodeNativeBridge registerReactNativeReadyListener:listener];
-}
-
-- (void)sendEvent: (ElectrodeBridgeEventNew *)event
-{
-    [self.electrodeNativeBridge sendEvent:event];
-}
-
-- (void)sendRequest: (ElectrodeBridgeRequestNew *)request
++ (void)sendRequest: (ElectrodeBridgeRequestNew *)request
    responseListener:(id<ElectrodeBridgeResponseListener> _Nonnull)responseListener
 {
-    [self.electrodeNativeBridge sendRequest:request withResponseListener:responseListener];
-}
-
-- (void)registerRequestHanlderWithName: (NSString *)name
-                        requestHandler: (id<ElectrodeBridgeRequestHandler> _Nonnull) requestHandler
-{
-    NSError *error;
-    [self.electrodeNativeBridge regiesterRequestHandlerWithName:name handler:requestHandler error:&error];
-    
-    if(error) {
-        [NSException raise:@"registration failed" format:@"registration for request handler failed"];
+    if (!isReactNativeReady) {
+        [queuedRequests setObject:responseListener forKey:request];
+    } else {
+        [electrodeNativeBridge sendRequest:request withResponseListener:responseListener];
     }
 }
 
-- (void)addEventListnerWithName: (NSString *)name
++ (void)registerRequestHanlderWithName: (NSString *)name
+                        requestHandler: (id<ElectrodeBridgeRequestHandler> _Nonnull) requestHandler
+{
+    if(!isReactNativeReady) {
+        [queuedRequestHandlerRegistration setObject:requestHandler forKey:name];
+    } else {
+        NSError *error;
+        [electrodeNativeBridge regiesterRequestHandlerWithName:name handler:requestHandler error:&error];
+        
+        if(error) {
+            [NSException raise:@"registration failed" format:@"registration for request handler failed"];
+        }
+    }
+}
+
++ (void)addEventListnerWithName: (NSString *)name
                    eventListner: (id<ElectrodeBridgeEventListener>) eventListner
 {
-    [self.electrodeNativeBridge addEventListenerWithName:name eventListener:eventListner];
+    if (!isReactNativeReady) {
+        [queuedEventListenerRegistration setObject:eventListner forKey:name];
+    } else {
+        [electrodeNativeBridge addEventListenerWithName:name eventListener:eventListner];
+    }
+}
+
+
++ (BOOL) isReactNativeReady {
+    return isReactNativeReady;
+}
+
++ (void) registerQueuedRequestHandlers {
+    for (NSString *requestName in queuedRequestHandlerRegistration) {
+        id<ElectrodeBridgeRequestHandler> requestHandler = queuedRequestHandlerRegistration[requestName];
+        [ElectrodeBridgeHolderNew registerRequestHanlderWithName:requestName requestHandler:requestHandler];
+    }
+    
+    [queuedRequestHandlerRegistration removeAllObjects];
+}
+
++ (void) registerQueuedEventListeners {
+    for (NSString *eventListnerName in queuedEventListenerRegistration) {
+        id<ElectrodeBridgeEventListener> eventListener = queuedEventListenerRegistration[eventListnerName];
+        [ElectrodeBridgeHolderNew addEventListnerWithName:eventListnerName eventListner:eventListener];
+    }
+    
+    [queuedEventListenerRegistration removeAllObjects];
+}
+
++ (void) sendQueuedRequests {
+    for (ElectrodeBridgeRequestNew *request in queuedRequests) {
+        id<ElectrodeBridgeResponseListener> responseListener = queuedRequests[request];
+        [ElectrodeBridgeHolderNew sendRequest:request responseListener:responseListener];
+    }
+    
+    [queuedRequests removeAllObjects];
+}
+
++ (void) sendQueuedEvents {
+    for (ElectrodeBridgeEventNew *event in queuedEvent) {
+        [ElectrodeBridgeHolderNew sendEvent:event];
+    }
+    
+    [queuedEvent removeAllObjects];
 }
 @end

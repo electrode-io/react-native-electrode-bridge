@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BirthYear: NSObject, Bridgeable {
+public class BirthYear: NSObject, Bridgeable {
     let month: Int
     let year: Int
     
@@ -53,7 +53,7 @@ class BirthYear: NSObject, Bridgeable {
         super.init()
     }
     
-    func toDictionary() -> NSDictionary {
+    public func toDictionary() -> NSDictionary {
         return ["month": self.month, "year": self.year] as NSDictionary
         
     }

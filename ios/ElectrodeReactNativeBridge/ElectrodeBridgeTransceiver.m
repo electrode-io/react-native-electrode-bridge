@@ -74,11 +74,17 @@ static BOOL isReactNativeReady = NO;
 static ElectrodeBridgeTransceiver *sharedInstance;
 static dispatch_once_t onceToken;
 +(instancetype)sharedInstance {
-    static ElectrodeBridgeTransceiver *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    
+
     dispatch_once(&onceToken, ^{
         sharedInstance = [[ElectrodeBridgeTransceiver alloc] init];
+    });
+    return sharedInstance;
+}
+
++ (instancetype) createWithTransceiver: (ElectrodeBridgeTransceiver *) transceiver {
+
+    dispatch_once(&onceToken, ^{
+        sharedInstance = transceiver;
     });
     return sharedInstance;
 }

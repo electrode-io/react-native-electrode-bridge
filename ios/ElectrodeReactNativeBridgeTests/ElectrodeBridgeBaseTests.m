@@ -96,13 +96,19 @@
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
     self.mockListenerStore = [[NSMutableDictionary alloc] init];
-    return @[[[MockBridgeTransceiver alloc] initWithJsMockListenerStore:self.mockListenerStore]];
+    
+    MockBridgeTransceiver *mockTransceiver = [[MockBridgeTransceiver alloc] init];
+    [MockBridgeTransceiver createWithTransceiver:mockTransceiver];
+    mockTransceiver.myMockListenerStore = self.mockListenerStore;
+    return @[mockTransceiver];
 }
 
 -(void)initializeBundle
 {
     RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:nil];
     self.bridge = bridge;
+    ElectrodeBridgeTransceiver *transceiver = (ElectrodeBridgeTransceiver *) [self getNativeBridge];
+    [transceiver onReactNativeInitialized];
 }
 
 -(id<ElectrodeNativeBridge>)getNativeBridge
@@ -148,23 +154,26 @@
 
 @end
 
-
 @implementation MockBridgeTransceiver
 
-- (instancetype)initWithJsMockListenerStore:(NSMutableDictionary<NSString *,MockJSEeventListener *> *)mockListenerStore
-{
-    if(self = [super init])
-    {
-        self.mockListenerStore = mockListenerStore;
+-(instancetype)init {
+    if(self = [super init]) {
+        
     }
     
     return self;
 }
 
++ (NSArray *)electrodeModules
+{
+    return @[[MockBridgeTransceiver sharedInstance]];
+}
+
+
 - (void)emitMessage:(ElectrodeBridgeMessage *)bridgeMessage
 {
     NSLog(@"Trying to emit messgae to JS, mock JS implemenation here.");
-    MockJSEeventListener* registeredListener = [self.mockListenerStore objectForKey:bridgeMessage.name];
+    MockJSEeventListener* registeredListener = [self.myMockListenerStore objectForKey:bridgeMessage.name];
     if(registeredListener) {
         switch (bridgeMessage.type) {
             case ElectrodeMessageTypeEvent:

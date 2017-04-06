@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DA4BE0C41E36DBCD00DBA1ED"
+               BuildableName = "ElectrodeReactNativeBridgeTests.xctest"
+               BlueprintName = "ElectrodeReactNativeBridgeTests"
+               ReferencedContainer = "container:ElectrodeReactNativeBridge.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

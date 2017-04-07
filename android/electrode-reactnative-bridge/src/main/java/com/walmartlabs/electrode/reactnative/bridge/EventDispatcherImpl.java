@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;

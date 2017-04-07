@@ -29,10 +29,11 @@ typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 -(nonnull instancetype) initWithEventBlock:(nonnull evetBlock) evetBlock;
 -(nonnull instancetype) initWithRequestBlock:(nonnull requestBlock) requestBlock;
 -(nonnull instancetype) initWithResponseBlock:(nonnull responseBlock) responseBlock;
-
+-(nonnull instancetype) initWithRequestBlock: (nonnull requestBlock) requestBlock response: (NSDictionary *)response;
 @property(nonatomic, copy, nullable) evetBlock evetBlock;
 @property(nonatomic, copy, nullable) requestBlock requestBlock;
 @property(nonatomic, copy, nullable) responseBlock responseBlock;
+@property(nonatomic, copy, nullable) NSDictionary *response;
 @end
 
 /////MockElectrodeBridgeEventListener

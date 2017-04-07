@@ -8,7 +8,7 @@
 
 import UIKit
 
-typealias ElectrodeRequestProcessorSuccessClosure = ([AnyHashable: Any]?) -> ()
+typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
 typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> ()
 
 public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
@@ -40,10 +40,10 @@ public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject
         let requestDictionary: [AnyHashable: Any]
         let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
         
-        let validRequest = ElectrodeBridgeRequestNew(name: requestName, messageId: UUID().uuidString, type: .request, data: bridgeMessageData)
+        let validRequest = ElectrodeBridgeRequestNew(name: requestName, messageId: UUID().uuidString, data: bridgeMessageData)
                 
         let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: {
-            (responseData: [AnyHashable: Any]?) in
+            (responseData: Any?) in
             let processedResp: Any?
             if (self.responseClass != None.self) {
                 processedResp = self.processSuccessResponse(responseData: responseData)
@@ -59,18 +59,14 @@ public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject
         ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
     }
     
-    private func processSuccessResponse(responseData: [AnyHashable: Any]?) -> Any? {
-        guard let dict = responseData else {
+    private func processSuccessResponse(responseData: Any?) -> Any? {
+        guard let anyData = responseData else {
             return nil
         }
-        //extract data out from BridgeMessage
-        guard let dataFromResp = dict[kElectrodeBridgeMessageData] else {
-            assertionFailure("NO data associated with the bridge message")
-            return nil
-        }
+
         let generatedRes: Any?
         do {
-            generatedRes = try NSObject.generateObject(data: dataFromResp, classType: responseClass, itemType: responseItemType)
+            generatedRes = try NSObject.generateObject(data: anyData, classType: responseClass, itemType: responseItemType)
 
         } catch {
             assertionFailure("Failed to convert responseData to valid obj")
@@ -96,15 +92,7 @@ class ElectrodeBridgeResponseListenerImpl: NSObject, ElectrodeBridgeResponseList
             return
         }
         
-        guard responseData != nil else {
-            success(nil)
-            return
-        }
-        guard let dict = responseData as? [AnyHashable: Any] else {
-            assertionFailure("ElectrodeBridgeResponseListenerImpl: wrong type ")
-            return
-        }
-        success(dict)
+        success(responseData)
     }
     
     

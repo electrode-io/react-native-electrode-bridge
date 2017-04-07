@@ -10,20 +10,45 @@ import XCTest
 @testable import ElectrodeReactNativeBridge
 
 class RequestProcessorTests: ElectrodeBridgeBaseTests {
+    let personAPI = APersonAPI()
+
     
     func testSampleRequestNativeToNativeFailure() {
         let asyncExpectation = expectation(description: "testSampleRequestNativeToNativeFailure")
 
-        let personAPI = APersonAPI()
         let responseListener = PersonResponseResponseListener(successCallBack: { (any) in
             XCTFail()
         }, failureCallBack: { (failureMessage) in
             asyncExpectation.fulfill()
         })
-        personAPI.request.getUserName(responseListner: responseListener)
+        self.personAPI.request.getUserName(responseListner: responseListener)
         waitForExpectations(timeout: 10)
     }
     
+    func testSampleRequestNativeToJSSuccess() {
+        
+        let asyncExpectation = expectation(description: "testSampleRequestNativeToJSSuccess")
+
+        let expectedResults = "Your boss"
+        let expectedResponseWithoutId = [kElectrodeBridgeMessageName : kRequestGetUserName,
+                                kElectrodeBridgeMessageType:kElectrodeBridgeMessageResponse,
+                                kElectrodeBridgeMessageData: expectedResults ]
+            
+        let mockJSListener = MockJSEeventListener(request: {(request) in
+            XCTAssertNotNil(request)
+         
+        }, response: expectedResponseWithoutId)
+
+        self.addMockEventListener(mockJSListener, forName: kRequestGetUserName)
+        let responseListener = PersonResponseResponseListener(successCallBack: { (any) in
+            asyncExpectation.fulfill()
+        }, failureCallBack: { (failureMessage) in
+            XCTFail()
+        })
+        self.personAPI.request.getUserName(responseListner: responseListener)
+        waitForExpectations(timeout: 10)
+
+    }
 }
 
 private class PersonResponseResponseListener: NSObject, ElectrodeBridgeResponseListener {

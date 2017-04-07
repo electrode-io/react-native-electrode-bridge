@@ -218,6 +218,12 @@
                 {
                     registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
                 }
+                
+                if (registeredListener.response) {
+                    NSMutableDictionary *response = [[NSMutableDictionary alloc] initWithDictionary:registeredListener.response];
+                    [response setObject:bridgeMessage.messageId forKey:kElectrodeBridgeMessageId];
+                    [self sendMessage: response];
+                }
                 break;
             case ElectrodeMessageTypeResponse:
                 if(!registeredListener.responseBlock)
@@ -267,6 +273,16 @@
     if(self = [super init]) {
         self.responseBlock = responseBlock;
     }
+    return self;
+}
+
+-(nonnull instancetype) initWithRequestBlock: (nonnull requestBlock) requestBlock
+                                    response:(nonnull NSDictionary *)response {
+    if (self = [super init]) {
+        self.requestBlock = requestBlock;
+        self.response = response;
+    }
+    
     return self;
 }
 @end

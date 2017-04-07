@@ -11,19 +11,17 @@
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeEventNew.h"
 
-NSString* const ktestId = @"1234";
-
 @implementation ElectrodeBridgeRequestNew (CustomeBuilder)
 
-+(instancetype)createRequestWithName: (NSString *)name
++ (instancetype)createRequestWithName:(NSString *)name
 {
-    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" data:nil];
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name data:nil];
     return request;
 }
 
 + (instancetype)createRequestWithName:(NSString *)name data:(nullable id)data
 {
-    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name messageId:@"1234" data:data];
+    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name data:data];
     return request;
 }
 
@@ -33,7 +31,7 @@ NSString* const ktestId = @"1234";
 @implementation ElectrodeBridgeEventNew (ElectrodeBridgeEventNewAddition)
 
 + (nonnull instancetype)createEventWithName:(nonnull NSString *)name data:(nullable id)eventData {
-    ElectrodeBridgeEventNew *event = [[ElectrodeBridgeEventNew alloc] initWithName:name messageId:ktestId data:eventData];
+    ElectrodeBridgeEventNew *event = [[ElectrodeBridgeEventNew alloc] initWithName:name data:eventData];
     return event;
 }
 @end
@@ -236,7 +234,6 @@ NSString* const ktestId = @"1234";
                 break;
         }
     }
-
 }
 
 - (NSArray<NSString *> *)supportedEvents

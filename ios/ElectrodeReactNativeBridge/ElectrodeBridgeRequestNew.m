@@ -39,9 +39,8 @@ const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
     return self;
 }
 
-- (instancetype)initWithName:(NSString *)name messageId:(NSString *)messageId data:(id)data
-{
-    if (self = [super initWithName:name messageId:messageId type:ElectrodeMessageTypeRequest data:data]) {
+- (instancetype)initWithName:(NSString *)name data:(id)data {
+    if (self = [super initWithName:name type:ElectrodeMessageTypeRequest data:data]) {
         _timeoutMs = kElectrodeBridgeRequestDefaultTimeOut;
         _isJsInitiated = NO;
     }

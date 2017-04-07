@@ -205,11 +205,12 @@
 - (void)testSendEventFromNativeToRCT {
     id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
     NSString* testEventName = @"com.walmart.ern.testevent";
-    ElectrodeBridgeEventNew* event = [ElectrodeBridgeEventNew createEventWithName:testEventName data:@"testeventdata"];
+    NSString* testData = @"testeventdata";
+    ElectrodeBridgeEventNew* event = [ElectrodeBridgeEventNew createEventWithName:testEventName data:testData];
     XCTAssertNotNil(event, @"Event instance is nil");
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithEventBlock:^(ElectrodeBridgeEventNew *event) {
         XCTAssertEqual(testEventName, event.name, @"Not an event RCT expected!");
-        XCTAssertEqual(ktestId, event.messageId, @"Not an event RCT expected!");
+        XCTAssertEqual(testData, event.data, @"Not an event RCT expected!");
     }] forName:testEventName];
     [nativeBridge sendEvent:event];
 }

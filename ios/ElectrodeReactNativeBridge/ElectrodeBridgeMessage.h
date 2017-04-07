@@ -39,8 +39,11 @@ typedef NS_ENUM(NSUInteger, ElectrodeMessageType) {
 -(instancetype)initWithName: (NSString *) name
                   messageId: (NSString *)messageId
                        type: (ElectrodeMessageType) type
-                       data: (id _Nullable) data; //this could be NSDictionary, primitives, or NSArray
+                       data: (id _Nullable) data;
 
+- (instancetype)initWithName:(NSString *)name
+                       type:(ElectrodeMessageType)type
+                       data:(id _Nullable)data; //this could be NSDictionary, primitives, or NSArray
 /*
  * return an instance of bridge message from a NSDictionary representation of it.
  * @param data NSDictionary representation of BridgeMessage. Has keys of 'id','name','type','data'

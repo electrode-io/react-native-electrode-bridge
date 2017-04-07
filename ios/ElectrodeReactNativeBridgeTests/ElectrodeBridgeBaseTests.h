@@ -24,15 +24,21 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^evetBlock)(ElectrodeBridgeEventNew *request);
 typedef void (^requestBlock)(ElectrodeBridgeRequestNew *request);
 typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
+typedef void (^JSResponseDispathcer)(ElectrodeBridgeResponse *response);
 
 @interface MockJSEeventListener : NSObject
 -(nonnull instancetype) initWithEventBlock:(nonnull evetBlock) evetBlock;
 -(nonnull instancetype) initWithRequestBlock:(nonnull requestBlock) requestBlock;
 -(nonnull instancetype) initWithResponseBlock:(nonnull responseBlock) responseBlock;
+-(nonnull instancetype) initWithRequestBlock: (nonnull requestBlock) requestBlock
+                      responseDispathcer: (JSResponseDispathcer) responseDispatcher
+                                    response: (ElectrodeBridgeResponse *) response;
 
 @property(nonatomic, copy, nullable) evetBlock evetBlock;
 @property(nonatomic, copy, nullable) requestBlock requestBlock;
 @property(nonatomic, copy, nullable) responseBlock responseBlock;
+@property(nonatomic, copy, nullable) JSResponseDispathcer responseDispatcher;
+@property(nonatomic, copy, nullable) ElectrodeBridgeResponse *response;
 @end
 
 /////MockElectrodeBridgeEventListener

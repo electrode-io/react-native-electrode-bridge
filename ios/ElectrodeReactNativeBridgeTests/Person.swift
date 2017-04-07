@@ -6,23 +6,21 @@
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-import UIKit
-
 
 public class Person: NSObject, Bridgeable {
     private static let tag = String(describing: type(of: self))
     
     let name: String
     let age: Int
-    let month: Int
+    let hiredMonth: Int?
     let status: Status
     let position: Position
     let birthYear: BirthYear
     
-    init(name: String, age: Int, month: Int, status: Status, position: Position, birthYear: BirthYear) {
+    init(name: String, age: Int, hiredMonth: Int?, status: Status, position: Position, birthYear: BirthYear) {
         self.name = name
         self.age = age
-        self.month = month
+        self.hiredMonth = hiredMonth
         self.status = status
         self.position = position
         self.birthYear = birthYear
@@ -41,7 +39,7 @@ public class Person: NSObject, Bridgeable {
             return nil
         }
         
-        guard let month = dictionary["month"] as? Int else {
+        guard let hiredMonth = dictionary["month"] as? Int? else {
             assertionFailure("\(Person.tag) need month property")
             return nil
         }
@@ -78,7 +76,7 @@ public class Person: NSObject, Bridgeable {
         
         self.init(name: name,
                   age: age,
-                  month: month,
+                  hiredMonth: hiredMonth,
                   status: statusObj,
                   position: positionObj,
                   birthYear: birthYearObj)
@@ -111,7 +109,7 @@ public class Person: NSObject, Bridgeable {
         return [
             "name": self.name,
             "age": self.age,
-            "month": self.month,
+            "hiredMonth": self.hiredMonth,
             "status": self.status.toDictionary(),
             "position": self.position.toDictionary(),
             "birthYear": self.birthYear.toDictionary()

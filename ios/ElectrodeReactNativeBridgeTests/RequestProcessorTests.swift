@@ -24,6 +24,13 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         waitForExpectations(timeout: 10)
     }
     
+    func testSampleRequestNativeToJSSuccess() {
+        let expectedResults = "Your boss"
+        
+
+        //self.addMockEventListener(mockJSEventListener, forName: "testSampleRequestNativeToJSSuccess")
+    }
+    
 }
 
 private class PersonResponseResponseListener: NSObject, ElectrodeBridgeResponseListener {

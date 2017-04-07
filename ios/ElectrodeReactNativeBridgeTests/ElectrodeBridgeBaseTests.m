@@ -220,6 +220,10 @@ NSString* const ktestId = @"1234";
                 {
                     registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
                 }
+                
+                if (registeredListener.responseDispatcher) {
+                    registeredListener.responseDispatcher(registeredListener.response);
+                }
                 break;
             case ElectrodeMessageTypeResponse:
                 if(!registeredListener.responseBlock)
@@ -270,6 +274,18 @@ NSString* const ktestId = @"1234";
     if(self = [super init]) {
         self.responseBlock = responseBlock;
     }
+    return self;
+}
+
+-(nonnull instancetype) initWithRequestBlock: (nonnull requestBlock) requestBlock
+                          responseDispathcer: (JSResponseDispathcer) responseDispatcher
+                                    response:(nonnull ElectrodeBridgeResponse *)response {
+    if (self = [super init]) {
+        self.requestBlock = requestBlock;
+        self.responseDispatcher = responseDispatcher;
+        self.response = response;
+    }
+    
     return self;
 }
 @end

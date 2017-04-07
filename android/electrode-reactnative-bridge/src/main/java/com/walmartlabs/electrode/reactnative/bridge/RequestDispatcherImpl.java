@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
@@ -8,14 +7,14 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 class RequestDispatcherImpl implements RequestDispatcher {
     private static final String TAG = RequestDispatcherImpl.class.getSimpleName();
 
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Object>> mRequestRegistrar;
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> mRequestRegistrar;
 
     /**
      * Initialize a new RequestDispatcherImpl instance
      *
      * @param requestRegistrar The request registrar to use for this dispatcher
      */
-    RequestDispatcherImpl(@NonNull RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Object>> requestRegistrar) {
+    RequestDispatcherImpl(@NonNull RequestRegistrar<ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> requestRegistrar) {
         mRequestRegistrar = requestRegistrar;
     }
 
@@ -25,13 +24,13 @@ class RequestDispatcherImpl implements RequestDispatcher {
         final String requestName = bridgeRequest.getName();
 
         Logger.d(TAG, "dispatching request(id=%s) locally", requestId);
-        ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler = mRequestRegistrar.getRequestHandler(requestName);
+        ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler = mRequestRegistrar.getRequestHandler(requestName);
         if (requestHandler == null) {
             FailureMessage failureMessage = BridgeFailureMessage.create("ENOHANDLER", "No registered request handler for request name " + requestName);
             responseListener.onFailure(failureMessage);
             return;
         }
-        requestHandler.onRequest(bridgeRequest.bundle(),responseListener);
+        requestHandler.onRequest(bridgeRequest,responseListener);
     }
 
 

@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -32,18 +31,22 @@ public class RequestHandlerProcessor<TReq, TResp> extends BridgeProcessor {
 
     @Override
     public void execute() {
-        final ElectrodeBridgeRequestHandler<Bundle, Object> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<Bundle, Object>() {
+        final ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>() {
 
             @Override
-            public void onRequest(@Nullable Bundle payload, @NonNull final ElectrodeBridgeResponseListener<Object> responseListener) {
-                Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", payload);
+            public void onRequest(@Nullable ElectrodeBridgeRequest bridgeRequest, @NonNull final ElectrodeBridgeResponseListener<Object> responseListener) {
+                if (bridgeRequest == null) {
+                    throw new IllegalArgumentException("BridgeRequest cannot be null, should never reach here");
+                }
+
+                Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", bridgeRequest);
                 TReq request = null;
 
                 if (reqClazz != None.class) {
-                    request = (TReq) BridgeArguments.generateObject(payload, reqClazz);
+                    request = (TReq) BridgeArguments.generateObject(bridgeRequest.getData(), reqClazz);
                     request = (TReq) preProcessObject(request, reqClazz);
                 }
-                Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, payload);
+                Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, bridgeRequest);
 
                 handler.onRequest(request, new ElectrodeBridgeResponseListener<TResp>() {
                     @Override

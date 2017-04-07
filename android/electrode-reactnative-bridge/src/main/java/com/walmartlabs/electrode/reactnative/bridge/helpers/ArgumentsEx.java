@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
+import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 
 import javax.annotation.Nullable;
 
@@ -179,7 +180,7 @@ public class ArgumentsEx {
                 break;
             case Array: {
                 ReadableArray readableArray = readableMap.getArray(key);
-                if(readableArray.size() > 0) {
+                if (readableArray.size() > 0) {
                     switch (readableArray.getType(0)) {
                         case String:
                             bundle.putStringArray(key, ArgumentsEx.toStringArray(readableArray));
@@ -204,5 +205,59 @@ public class ArgumentsEx {
                 throw new IllegalArgumentException("Could not convert object with key: " + key + ".");
         }
         return bundle;
+    }
+
+    public static Object getDataObject(@Nullable ReadableMap readableMap, @NonNull String key) {
+        if (readableMap == null) {
+            return null;
+        }
+        Object result = null;
+
+        ReadableType readableType = readableMap.getType(key);
+        switch (readableType) {
+            case Null:
+                result = null;
+                break;
+            case Boolean:
+                result = readableMap.getBoolean(key);
+                break;
+            case Number:
+                // Can be int or double.
+                result = readableMap.getDouble(key);
+                break;
+            case String:
+                result = readableMap.getString(key);
+                break;
+            case Map:
+                result = toBundle(readableMap.getMap(key));
+                break;
+            case Array: {
+                ReadableArray readableArray = readableMap.getArray(key);
+                if (readableArray.size() > 0) {
+                    switch (readableArray.getType(0)) {
+                        case String:
+                            result = ArgumentsEx.toStringArray(readableArray);
+                            break;
+                        case Boolean:
+                            result = ArgumentsEx.toBooleanArray(readableArray);
+                            break;
+                        case Number:
+                            // Can be int or double but we just assume double for now
+                            result = ArgumentsEx.toDoubleArray(readableArray);
+                            break;
+                        case Map:
+                            result = ArgumentsEx.toBundleArray(readableArray);
+                            break;
+                        case Array:
+                            throw new UnsupportedOperationException("Arrays of arrays is not supported");
+                    }
+                }
+            }
+            break;
+            default:
+                throw new IllegalArgumentException("Could not convert object with key: " + key + ".");
+        }
+
+        return result;
     }
 }

@@ -118,24 +118,27 @@ public final class BridgeArguments {
     /**
      * Looks for an entry with key = {@link BridgeMessage#BRIDGE_MSG_DATA} inside the bundle and then tries to convert the value to either a primitive wrapper or {@link Bridgeable}
      *
-     * @param payload     {@link Bundle}
-     * @param returnClass {@link Class}
-     * @return T
+     * @param data        {@link Object} data that may need to be casted to a specific type. Mainly for complex objects returned by React will be in form of Bundle.
+     * @param returnClass {@link Class} expected return type of the Object
+     * @return Object
      */
     @Nullable
-    public static Object generateObject(@Nullable Bundle payload, @NonNull Class<?> returnClass) {
-        if (payload == null || payload.isEmpty()) {
+    public static Object generateObject(@Nullable Object data, @NonNull Class<?> returnClass) {
+
+        if (data == null) {
             return null;
         }
 
-        Object data = payload.get(BridgeMessage.BRIDGE_MSG_DATA);
-        if (data == null) {
-            Logger.d(TAG, "Cannot find key(%s) in given bundle:%s", BridgeMessage.BRIDGE_MSG_DATA, payload);
-            return null;
+        if (returnClass.isAssignableFrom(data.getClass())) {
+            Logger.d(TAG, "Object conversion not required since the data is already of type(%s)", returnClass);
+            return data;
         }
 
         Object response;
-        if (isArray(data)) {
+        if (data instanceof List) {
+            //When native sends a request the data will already be a list, does not require  a conversion
+            response = data;
+        } else if (isArray(data)) {
             response = getList(data, returnClass);
         } else if (data instanceof Bundle) {
             response = objectFromBundle((Bundle) data, returnClass);

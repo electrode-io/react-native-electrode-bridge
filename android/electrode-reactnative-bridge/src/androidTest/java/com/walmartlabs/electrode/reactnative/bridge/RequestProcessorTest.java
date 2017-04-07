@@ -579,7 +579,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 assertNotNull(response);
                 ReadableArray readableArray = response.getArray(BridgeMessage.BRIDGE_MSG_DATA);
                 assertNotNull(readableArray);
-                List<Person> actualPersonList = (List<Person>) BridgeArguments.generateObject(ArgumentsEx.toBundle(response, BridgeMessage.BRIDGE_MSG_DATA), Person.class);
+                List<Person> actualPersonList = (List<Person>) BridgeArguments.generateObject(ArgumentsEx.toBundle(response, BridgeMessage.BRIDGE_MSG_DATA).get(BridgeMessage.BRIDGE_MSG_DATA), Person.class);
                 assertNotNull(actualPersonList);
                 for (int i = 0; i < personList.size(); i++) {
                     Person expected = personList.get(i);

@@ -16,7 +16,7 @@ public interface ElectrodeNativeBridge {
      * @param request          The ElectrodeBridgeRequest that will contain the request name,data, destination mode, and timeout
      * @param responseListener the response call back listener to issue success or failure of the {@param request}.
      */
-    void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener);
+    void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener);
 
     /**
      * Registere the request handler, which will be used to handle any
@@ -24,7 +24,7 @@ public interface ElectrodeNativeBridge {
      * @param name           name of the request
      * @param requestHandler call back to be issued for a given request.
      */
-    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler);
+    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler);
 
     /**
      * Sends an event with some data to the all the even listeners.
@@ -41,7 +41,7 @@ public interface ElectrodeNativeBridge {
      * @return A UUID to pass back to unregisterEventListener
      */
     @NonNull
-    UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener);
+    UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener);
 
     /**
      * Registers the listen that will be used by the bridge module to get the constant values exposed to JavaScript

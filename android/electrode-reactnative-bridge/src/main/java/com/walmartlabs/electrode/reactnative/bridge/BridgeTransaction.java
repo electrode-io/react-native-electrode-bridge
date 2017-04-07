@@ -1,17 +1,16 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class BridgeTransaction {
 
     private final ElectrodeBridgeRequest request;
-    private final ElectrodeBridgeResponseListener<Bundle> finalResponseListener;
+    private final ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> finalResponseListener;
     private ElectrodeBridgeResponse response;
 
 
-    public BridgeTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
+    public BridgeTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener) {
         if (request.getType() != BridgeMessage.Type.REQUEST) {
             throw new IllegalArgumentException("BridgeTransaction constrictor expects a request type, did you accidentally pass in a different type(" + request.getType() + ") ? ");
         }
@@ -30,7 +29,7 @@ public class BridgeTransaction {
     }
 
     @Nullable
-    public ElectrodeBridgeResponseListener<Bundle> getFinalResponseListener() {
+    public ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> getFinalResponseListener() {
         return finalResponseListener;
     }
 

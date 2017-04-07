@@ -27,9 +27,8 @@ public class EventProcessor<T> extends BridgeProcessor {
     @Override
     public void execute() {
         Logger.d(TAG, "EventProcessor is emitting event(%s), with payload(%s)", eventName, eventPayload);
-        Bundle data = BridgeArguments.generateDataBundle(eventPayload);
         ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(eventName)
-                .withData(data)
+                .withData(eventPayload)
                 .build());
     }
 }

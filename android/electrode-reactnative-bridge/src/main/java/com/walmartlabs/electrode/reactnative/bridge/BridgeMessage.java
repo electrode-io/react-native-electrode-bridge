@@ -71,7 +71,7 @@ public class BridgeMessage {
             }
 
             if (messageMap.hasKey(BRIDGE_MSG_DATA)) {
-                data = ArgumentsEx.toBundle(messageMap, BRIDGE_MSG_DATA);
+                data = ArgumentsEx.getDataObject(messageMap, BRIDGE_MSG_DATA);
             } else {
                 data = null;
             }
@@ -145,28 +145,6 @@ public class BridgeMessage {
 
         writableMap.putString(BRIDGE_MSG_TYPE, type.key);
         return writableMap;
-    }
-
-    /**
-     * Returns a {@link Bundle} representation of {@link BridgeMessage}
-     *
-     * @return Bundle
-     */
-    @NonNull
-    public Bundle bundle() {
-        Bundle bundle = new Bundle();
-        bundle.putString(BRIDGE_MSG_ID, id);
-        bundle.putString(BRIDGE_MSG_NAME, name);
-
-        if (data instanceof Bundle) {
-            bundle.putAll((Bundle) data);
-        } else {
-            bundle.putAll(BridgeArguments.generateDataBundle(data));
-        }
-
-        bundle.putString(BRIDGE_MSG_TYPE, type.key);
-
-        return bundle;
     }
 
     @Override

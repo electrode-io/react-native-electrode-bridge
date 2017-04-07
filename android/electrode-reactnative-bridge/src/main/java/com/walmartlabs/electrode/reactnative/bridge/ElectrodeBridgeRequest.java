@@ -66,7 +66,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
         public Builder(String name) {
             mName = name;
             mTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS;
-            mData = Bundle.EMPTY;
+            mData = null;
         }
 
         /**

@@ -9,17 +9,17 @@ public class EventDispatcherImpl implements EventDispatcher {
 
     private static final String TAG = EventDispatcherImpl.class.getSimpleName();
 
-    private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar;
+    private final EventRegistrar<ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> mEventRegistrar;
 
-    public EventDispatcherImpl(EventRegistrar<ElectrodeBridgeEventListener<Bundle>> eventRegistrar) {
+    public EventDispatcherImpl(EventRegistrar<ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> eventRegistrar) {
         mEventRegistrar = eventRegistrar;
     }
 
     @Override
     public void dispatchEvent(@NonNull ElectrodeBridgeEvent bridgeEvent) {
-        for (ElectrodeBridgeEventListener<Bundle> eventListener : mEventRegistrar.getEventListeners(bridgeEvent.getName())) {
+        for (ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener : mEventRegistrar.getEventListeners(bridgeEvent.getName())) {
             Logger.d(TAG, "Event dispatcher is dispatching event(%s), id(%s) to listener(%s)", bridgeEvent.getName(), bridgeEvent.getId(), eventListener);
-            eventListener.onEvent(bridgeEvent.bundle());
+            eventListener.onEvent(bridgeEvent);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -38,28 +37,30 @@ public class RequestProcessor<TReq, TResp> extends BridgeProcessor {
     @Override
     public void execute() {
         Logger.d(TAG, "Request processor started processing request(%s)", requestName);
-        Bundle data = BridgeArguments.generateDataBundle(requestPayload);
-
         ElectrodeBridgeRequest req = new ElectrodeBridgeRequest.Builder(requestName)
-                .withData(data)
+                .withData(requestPayload)
                 .build();
 
-        ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<Bundle>() {
+        ElectrodeBridgeHolder.sendRequest(req, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 responseListener.onFailure(failureMessage);
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
+            public void onSuccess(@Nullable ElectrodeBridgeResponse bridgeResponse) {
+                if (bridgeResponse == null) {
+                    throw new IllegalArgumentException("BridgeResponse cannot be null, should never reach here");
+                }
+
                 TResp response = null;
                 if (responseClass != None.class) {
-                    response = (TResp) BridgeArguments.generateObject(responseData, getResponseType(responseType));
+                    response = (TResp) BridgeArguments.generateObject(bridgeResponse.getData(), getResponseType(responseType));
 
                     response = (TResp) preProcessObject(response, responseType);
-
-                    Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
                 }
+
+                Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);
                 responseListener.onSuccess(response);
             }
         });

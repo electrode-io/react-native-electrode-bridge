@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -28,11 +27,21 @@ public class EventListenerProcessor<T> extends BridgeProcessor {
 
     @Override
     public void execute() {
-        ElectrodeBridgeEventListener<Bundle> intermediateEventListener = new ElectrodeBridgeEventListener<Bundle>() {
+        ElectrodeBridgeEventListener<ElectrodeBridgeEvent> intermediateEventListener = new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {
             @Override
-            public void onEvent(@Nullable Bundle eventPayload) {
-                Logger.d(TAG, "Processing final result for the event with payload bundle(%s)", eventPayload);
-                T result = (T) BridgeArguments.generateObject(eventPayload, eventPayLoadClass);
+            public void onEvent(@Nullable ElectrodeBridgeEvent bridgeEvent) {
+                if (bridgeEvent == null) {
+                    throw new IllegalArgumentException("bridgeEvent cannot be null, should never reach here");
+                }
+
+                Logger.d(TAG, "Processing final result for the event with payload bundle(%s)", bridgeEvent);
+
+                T result = null;
+                if (eventPayLoadClass != None.class) {
+                    result = (T) BridgeArguments.generateObject(bridgeEvent.getData(), eventPayLoadClass);
+                    result = (T) preProcessObject(result, eventPayLoadClass);
+                }
+
                 eventListener.onEvent(result);
             }
         };

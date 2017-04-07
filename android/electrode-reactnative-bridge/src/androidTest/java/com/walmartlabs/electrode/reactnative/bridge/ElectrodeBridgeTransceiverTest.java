@@ -8,7 +8,6 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 
 import java.util.Map;
@@ -25,7 +24,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").build();
 
-        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 assertNotNull(failureMessage);
@@ -33,7 +32,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
+            public void onSuccess(@Nullable ElectrodeBridgeResponse responseData) {
                 fail();
             }
         });
@@ -45,11 +44,11 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final String expectedResult = "yay tests";
         ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
-        electrodeNativeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
+        electrodeNativeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>() {
             @Override
-            public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
+            public void onRequest(@Nullable ElectrodeBridgeRequest payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
                 assertNotNull(payload);
-                assertNull(payload.get(BRIDGE_MSG_DATA));
+                assertNull(payload.getData());
                 assertNotNull(responseListener);
                 responseListener.onSuccess(expectedResult);
                 countDownLatch.countDown();
@@ -58,16 +57,16 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").build();
-        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 fail();
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
-                assertNotNull(responseData);
-                assertEquals(expectedResult, responseData.getString(BRIDGE_MSG_DATA));
+            public void onSuccess(@Nullable ElectrodeBridgeResponse response) {
+                assertNotNull(response);
+                assertEquals(expectedResult, response.getData());
                 countDownLatch.countDown();
             }
         });
@@ -79,11 +78,11 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final String expectedInput = "expectedInput";
         ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
 
-        electrodeNativeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<Bundle, Object>() {
+        electrodeNativeBridge.registerRequestHandler("sampleRequest", new ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>() {
             @Override
-            public void onRequest(@Nullable Bundle payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
+            public void onRequest(@Nullable ElectrodeBridgeRequest payload, @NonNull ElectrodeBridgeResponseListener<Object> responseListener) {
                 assertNotNull(payload);
-                assertEquals(expectedInput, payload.getString(BRIDGE_MSG_DATA));
+                assertEquals(expectedInput, payload.getData());
                 assertNotNull(responseListener);
                 responseListener.onSuccess(null);
                 countDownLatch.countDown();
@@ -92,16 +91,16 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder("sampleRequest").withData(expectedInput).build();
-        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 fail();
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
-                assertNotNull(responseData);
-                assertNull(responseData.get(BRIDGE_MSG_DATA));
+            public void onSuccess(@Nullable ElectrodeBridgeResponse bridgeResponse) {
+                assertNotNull(bridgeResponse);
+                assertNull(bridgeResponse.getData());
                 countDownLatch.countDown();
             }
         });
@@ -128,17 +127,18 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         });
 
         ElectrodeBridgeRequest electrodeBridgeRequest = new ElectrodeBridgeRequest.Builder(REQUEST_NAME).withData(expectedInput).build();
-        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<Bundle>() {
+        electrodeNativeBridge.sendRequest(electrodeBridgeRequest, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 fail();
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
+            public void onSuccess(@Nullable ElectrodeBridgeResponse responseData) {
                 assertNotNull(responseData);
-                assertNotNull(responseData.get(BRIDGE_MSG_DATA));
-                assertTrue(responseData.getBundle(BRIDGE_MSG_DATA).isEmpty());
+                assertNotNull(responseData.getData());
+                assertTrue(responseData.getData() instanceof Bundle);
+                assertTrue(((Bundle) responseData.getData()).isEmpty());
                 countDownLatch.countDown();
             }
         });
@@ -155,12 +155,11 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
         final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {
             @Override
-            public void onEvent(@Nullable Bundle eventPayload) {
-                assertNotNull(eventPayload);
-                assertTrue(eventPayload.containsKey(BRIDGE_MSG_DATA));
-                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(BRIDGE_MSG_DATA));
+            public void onEvent(@Nullable ElectrodeBridgeEvent event) {
+                assertNotNull(event);
+                assertEquals(TEST_EVENT_VALUE, event.getData());
                 countDownLatch.countDown();
             }
         });
@@ -189,12 +188,11 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {
             @Override
-            public void onEvent(@Nullable Bundle eventPayload) {
+            public void onEvent(@Nullable ElectrodeBridgeEvent eventPayload) {
                 assertNotNull(eventPayload);
-                assertTrue(eventPayload.containsKey(BRIDGE_MSG_DATA));
-                assertEquals(TEST_EVENT_VALUE, eventPayload.getString(BRIDGE_MSG_DATA));
+                assertEquals(TEST_EVENT_VALUE, eventPayload.getData());
                 countDownLatch.countDown();
             }
         });
@@ -212,14 +210,14 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
         final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {
             @Override
-            public void onEvent(@Nullable Bundle eventPayload) {
+            public void onEvent(@Nullable ElectrodeBridgeEvent eventPayload) {
                 assertNotNull(eventPayload);
-                Bundle resultBundle = eventPayload.getBundle(BRIDGE_MSG_DATA);
-                assertNotNull(resultBundle);
-                assertEquals(person.getName(), resultBundle.getString("name"));
-                assertEquals(person.getMonth(), BridgeArguments.getNumberValue(resultBundle, "month"));
+                assertTrue(eventPayload.getData() instanceof Person);
+                Person personResult = (Person) eventPayload.getData();
+                assertNotNull(personResult);
+                assertEquals(person, personResult);
                 countDownLatch.countDown();
             }
         });
@@ -251,11 +249,12 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         final ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
-        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<Bundle>() {
+        electrodeNativeBridge.addEventListener(TEST_EVENT_NAME, new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {
             @Override
-            public void onEvent(@Nullable Bundle eventPayload) {
+            public void onEvent(@Nullable ElectrodeBridgeEvent eventPayload) {
                 assertNotNull(eventPayload);
-                Bundle eventData = eventPayload.getBundle(BRIDGE_MSG_DATA);
+                assertTrue(eventPayload.getData() instanceof Bundle);
+                Bundle eventData = (Bundle) eventPayload.getData();
                 assertNotNull(eventData);
                 assertNotNull(eventData.getString("name"));
                 assertEquals(person.getName(), eventData.getString("name"));
@@ -289,14 +288,15 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
         ElectrodeBridgeRequest request = new ElectrodeBridgeRequest.Builder("getEmptyArray").build();
-        ElectrodeBridgeTransceiver.instance().sendRequest(request, new ElectrodeBridgeResponseListener<Bundle>() {
+        ElectrodeBridgeTransceiver.instance().sendRequest(request, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
 
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
+            public void onSuccess(@Nullable ElectrodeBridgeResponse responseData) {
+                assertNotNull(responseData);
                 countDownLatch.countDown();
             }
         });
@@ -320,16 +320,17 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
         ElectrodeBridgeRequest request = new ElectrodeBridgeRequest.Builder("getEmptyArray").build();
-        ElectrodeBridgeTransceiver.instance().sendRequest(request, new ElectrodeBridgeResponseListener<Bundle>() {
+        ElectrodeBridgeTransceiver.instance().sendRequest(request, new ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
 
             }
 
             @Override
-            public void onSuccess(@Nullable Bundle responseData) {
-                assertNotNull(responseData);
-                String[] response = responseData.getStringArray(BRIDGE_MSG_DATA);
+            public void onSuccess(@Nullable ElectrodeBridgeResponse bridgeResponse) {
+                assertNotNull(bridgeResponse);
+                assertTrue(bridgeResponse.getData() instanceof String[]);
+                String[] response = (String[]) bridgeResponse.getData();
                 assertNotNull(response);
                 assertEquals(stringArray.length, response.length);
                 countDownLatch.countDown();

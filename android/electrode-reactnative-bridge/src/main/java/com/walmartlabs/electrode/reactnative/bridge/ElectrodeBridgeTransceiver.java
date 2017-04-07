@@ -32,8 +32,8 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     private static ElectrodeBridgeTransceiver sInstance;
 
     private final ConcurrentHashMap<String, BridgeTransaction> pendingTransactions = new ConcurrentHashMap<>();
-    private final EventRegistrar<ElectrodeBridgeEventListener<Bundle>> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler<Bundle, Object>> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private final EventRegistrar<ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> mEventRegistrar = new EventRegistrarImpl<>();
+    private final RequestRegistrar<ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> mRequestRegistrar = new RequestRegistrarImpl<>();
 
     private static boolean sIsReactNativeReady;
 
@@ -113,7 +113,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
     @NonNull
     @Override
-    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<Bundle> eventListener) {
+    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener) {
         Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
         return mEventRegistrar.registerEventListener(name, eventListener);
     }
@@ -124,7 +124,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     }
 
     @Override
-    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<Bundle, Object> requestHandler) {
+    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler) {
         mRequestRegistrar.registerRequestHandler(name, requestHandler);
     }
 
@@ -151,7 +151,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
      */
     @SuppressWarnings("unused")
     @Override
-    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<Bundle> responseListener) {
+    public void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener) {
         handleRequest(request, responseListener);
     }
 
@@ -204,7 +204,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         }
     }
 
-    private void handleRequest(@NonNull final ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
+    private void handleRequest(@NonNull final ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener) {
         logRequest(request);
 
         if (responseListener == null && !request.isJsInitiated()) {
@@ -224,7 +224,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     }
 
     @NonNull
-    private BridgeTransaction createTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<Bundle> responseListener) {
+    private BridgeTransaction createTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener) {
         final BridgeTransaction bridgeTransaction = new BridgeTransaction(request, responseListener);
         pendingTransactions.put(request.getId(), bridgeTransaction);
         startTimeOutCheckForTransaction(bridgeTransaction);
@@ -320,7 +320,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
                     mReactContextWrapper.runOnUiQueueThread(new Runnable() {
                         @Override
                         public void run() {
-                            transaction.getFinalResponseListener().onSuccess(response.bundle());
+                            transaction.getFinalResponseListener().onSuccess(response);
                         }
                     });
                 }

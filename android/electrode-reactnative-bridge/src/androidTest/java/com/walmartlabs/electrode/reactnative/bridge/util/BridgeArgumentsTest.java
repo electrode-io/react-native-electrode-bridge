@@ -2,6 +2,7 @@ package com.walmartlabs.electrode.reactnative.bridge.util;
 
 import android.os.Bundle;
 
+import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.sample.model.BirthYear;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -72,7 +73,7 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(personList);
         assertNotNull(bundle);
 
-        List<Person> personListCopy = (List<Person>) BridgeArguments.generateObject(bundle, Person.class);
+        List<Person> personListCopy = (List<Person>) BridgeArguments.generateObject(bundle.get(BridgeMessage.BRIDGE_MSG_DATA), Person.class);
         assertNotNull(personListCopy);
         assertEquals(personList.size(), personListCopy.size());
         for (int i = 0; i < personList.size(); i++) {
@@ -90,7 +91,7 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(person);
         assertNotNull(bundle);
 
-        final Person personCopy = (Person) BridgeArguments.generateObject(bundle, Person.class);
+        final Person personCopy = (Person) BridgeArguments.generateObject(bundle.get(BridgeMessage.BRIDGE_MSG_DATA), Person.class);
         assertNotNull(personCopy);
         assertEquals(person.getName(), personCopy.getName());
         assertEquals(person.getMonth(), personCopy.getMonth());
@@ -101,7 +102,7 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(expected);
         assertNotNull(bundle);
 
-        final String actual = (String) BridgeArguments.generateObject(bundle, String.class);
+        final String actual = (String) BridgeArguments.generateObject(bundle.get(BridgeMessage.BRIDGE_MSG_DATA), String.class);
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
@@ -111,7 +112,7 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(expected);
         assertNotNull(bundle);
 
-        final Object actual = BridgeArguments.generateObject(bundle, String[].class);
+        final Object actual = BridgeArguments.generateObject(bundle.get(BridgeMessage.BRIDGE_MSG_DATA), String.class);
         assertTrue(actual instanceof List);
         assertTrue(((List) actual).size() > 0);
         assertTrue(((List) actual).get(0) instanceof String);
@@ -126,7 +127,7 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(expected);
         assertNotNull(bundle);
 
-        final Integer actual = (Integer) BridgeArguments.generateObject(bundle, Integer.class);
+        final Integer actual = (Integer) BridgeArguments.generateObject(bundle.get(BridgeMessage.BRIDGE_MSG_DATA), Integer.class);
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
@@ -136,7 +137,7 @@ public class BridgeArgumentsTest extends TestCase {
         Bundle bundle = BridgeArguments.generateDataBundle(expected);
         assertNotNull(bundle);
 
-        final Boolean actual = (Boolean) BridgeArguments.generateObject(bundle, Boolean.class);
+        final Boolean actual = (Boolean) BridgeArguments.generateObject(bundle.get(BridgeMessage.BRIDGE_MSG_DATA), Boolean.class);
         assertNotNull(actual);
         assertEquals(expected, actual);
     }

@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -66,7 +65,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
         public Builder(String name) {
             mName = name;
             mTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS;
-            mData = Bundle.EMPTY;
+            mData = null;
         }
 
         /**

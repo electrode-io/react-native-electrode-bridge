@@ -27,12 +27,11 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
     }
 
     private ElectrodeBridgeEvent(Builder eventBuilder) {
-        super(eventBuilder.mName, eventBuilder.mId == null ? getUUID() : eventBuilder.mId, BridgeMessage.Type.EVENT, eventBuilder.mData);
+        super(eventBuilder.mName, getUUID(), BridgeMessage.Type.EVENT, eventBuilder.mData);
     }
 
     public static class Builder {
         private final String mName;
-        private String mId;
         private Object mData;
 
         /**
@@ -43,11 +42,6 @@ public class ElectrodeBridgeEvent extends BridgeMessage {
         public Builder(String name) {
             this.mName = name;
             this.mData = Bundle.EMPTY;
-        }
-
-        public Builder id(String id) {
-            mId = id;
-            return this;
         }
 
         /**

@@ -27,8 +27,7 @@ extern const int kElectrodeBridgeRequestDefaultTimeOut;
 
 +(nullable instancetype)createRequestWithData: (NSDictionary *)data;
 
--(instancetype)initWithName: (NSString *) name
-                  messageId: (NSString *)messageId
-                       data: (id _Nullable) data;
+- (instancetype)initWithName:(NSString *)name data:(nullable id)data;
+
 @end
 NS_ASSUME_NONNULL_END

@@ -22,8 +22,7 @@ public class EventProcessor<T>: NSObject, Processor {
     
     public func execute() {
         print("\(self.tag) EventProcessor is emitting event (\(eventName)) with payload (\(eventPayload))")
-        
-        let event = ElectrodeBridgeEventNew(name: eventName, messageId: UUID().uuidString, type: .event, data: eventPayload)
+        let event = ElectrodeBridgeEventNew(name: eventName, type: .event, data: eventPayload)
         ElectrodeBridgeHolderNew.sendEvent(event)
     }
 }

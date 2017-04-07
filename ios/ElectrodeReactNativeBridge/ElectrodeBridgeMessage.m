@@ -60,6 +60,21 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     return self;
 }
 
+
+- (instancetype)initWithName:(NSString *)name
+                       type:(ElectrodeMessageType)type
+                       data:(id _Nullable)data {
+    if (self = [super init]) {
+        _name      = name;
+        _messageId = [ElectrodeBridgeMessage UUID];
+        _type      = type;
+        _data      = data;
+    }
+    return self;
+}
+
+
+
 - (nullable instancetype)initWithData:(NSDictionary *)data {
     if ([ElectrodeBridgeMessage isValidFromData:data]) {
         NSString *name = [data objectForKey:kElectrodeBridgeMessageName];

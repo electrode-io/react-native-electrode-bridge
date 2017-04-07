@@ -165,4 +165,50 @@ extension NSObject {
         }))
     }
     
+    static func convertObjectToBridgeMessageData(object: Any?) -> Any? {
+
+        if let objectArray = object as? NSArray {
+            let converted = ElectrodeUtilities.convertArrayToDictionary(object: objectArray)
+            return converted
+        }
+        
+        let convertedData = ElectrodeUtilities.convertSingleItemToBridgeReadyData(object: object)
+        return convertedData
+        
+    }
+    
+    private static func convertArrayToDictionary(object: NSArray) -> Array<Any?> {
+        var res = [Any?]()
+        for item in object {
+            if let itemArray = item  as? NSArray {
+                let convertedArray = ElectrodeUtilities.convertArrayToDictionary(object: itemArray)
+                res.append(convertedArray)
+            } else {
+                let convertedItem = ElectrodeUtilities.convertSingleItemToBridgeReadyData(object: item)
+                res.append(convertedItem)
+            }
+        }
+        return res
+    }
+    
+    private static func convertSingleItemToBridgeReadyData(object: Any? ) -> Any? {
+        let bridgeMessageReadyDictionary: Any?
+        guard let validObject = object else {
+            bridgeMessageReadyDictionary = nil
+            return bridgeMessageReadyDictionary
+        }
+        
+        let type = type(of:validObject)
+        if (ElectrodeUtilities.isSupportedPrimitive(type: type)) {
+            return validObject
+        }
+        
+        if let bridgeableObject = validObject as? Bridgeable {
+            bridgeMessageReadyDictionary = bridgeableObject.toDictionary()
+            return bridgeMessageReadyDictionary
+        }
+        
+        return nil
+    }
+    
 }

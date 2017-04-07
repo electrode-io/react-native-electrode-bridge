@@ -129,7 +129,6 @@ RCT_EXPORT_MODULE();
 
 -(void)sendEvent: (ElectrodeBridgeEventNew *)event {
     NSLog(@"ElectrodeBridgeTransceiver: emit event named: %@, id: %@", event.name, event.messageId);
-
     [self notifyNativeEventListenerWithEvent:event];
     [self notifyReactNativeEventListenerWithEvent:event];
 }

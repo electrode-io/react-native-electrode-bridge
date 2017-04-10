@@ -66,6 +66,8 @@
 		DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F351E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m */; };
 		DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F361E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m */; };
 		DA0B9F421E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */; };
+		DA0B9F601E9BFF0F004A4629 /* Person.h in Headers */ = {isa = PBXBuildFile; fileRef = DA0B9F5E1E9BFF0F004A4629 /* Person.h */; };
+		DA0B9F611E9BFF0F004A4629 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F5F1E9BFF0F004A4629 /* Person.m */; };
 		DA4BE0C61E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4BE0BC1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework */; };
 		DA4BE0CB1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4BE0CA1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m */; };
 		DA4BE0CD1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = DA4BE0BF1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -224,6 +226,8 @@
 		DA0B9F351E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeRequestTests.m; sourceTree = "<group>"; };
 		DA0B9F361E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeResponseTests.m; sourceTree = "<group>"; };
 		DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeMessageTests.m; sourceTree = "<group>"; };
+		DA0B9F5E1E9BFF0F004A4629 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		DA0B9F5F1E9BFF0F004A4629 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		DA4BE0BC1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ElectrodeReactNativeBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA4BE0BF1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ElectrodeReactNativeBridge.h; sourceTree = "<group>"; };
 		DA4BE0C01E36DBCD00DBA1ED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -395,6 +399,8 @@
 				3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */,
 				3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */,
 				3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */,
+				DA0B9F5E1E9BFF0F004A4629 /* Person.h */,
+				DA0B9F5F1E9BFF0F004A4629 /* Person.m */,
 				30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */,
 				30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */,
 				7F8E8CBD1E8F0CCA00CF0D8C /* TestRequestHandler.h */,
@@ -464,6 +470,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3019419C1E94340F002A0C69 /* ElectrodeBridgeBaseTests.h in Headers */,
+				DA0B9F601E9BFF0F004A4629 /* Person.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -707,6 +714,7 @@
 			files = (
 				DA4BE0CB1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m in Sources */,
 				3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */,
+				DA0B9F611E9BFF0F004A4629 /* Person.m in Sources */,
 				301940E11E941389002A0C69 /* PersonAPI.swift in Sources */,
 				DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */,
 				30B705C91E960C8300B8DACE /* PersonEvents.swift in Sources */,

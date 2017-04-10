@@ -136,12 +136,16 @@
 
 -(id<ElectrodeNativeBridge>)getNativeBridge
 {
-    return [self.bridge moduleForClass:[MockBridgeTransceiver class]];
+    id <ElectrodeNativeBridge> nativeBridge = [self.bridge moduleForClass:[MockBridgeTransceiver class]];
+    XCTAssertNotNil(nativeBridge, @"Native bridge instance is nil");
+    return nativeBridge;
 }
 
 - (id<ElectrodeReactBridge>)getReactBridge
 {
-    return [self.bridge moduleForClass:[MockBridgeTransceiver class]];
+    id <ElectrodeReactBridge> reactBridge = [self.bridge moduleForClass:[MockBridgeTransceiver class]];
+    XCTAssertNotNil(reactBridge, @"React bridge instance is nil");
+    return reactBridge;
 }
 
 -(void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name
@@ -175,6 +179,16 @@
     return mockResponse;
 }
 
+- (nonnull NSDictionary *)createEventDataWithName:(nonnull NSString *)eventName id:(nonnull NSString *)eventId data:(nullable id)eventData {
+    NSMutableDictionary* mockEvent = [NSMutableDictionary new];
+    [mockEvent setObject:eventName forKey:kElectrodeBridgeMessageName];
+    [mockEvent setObject:eventId forKey:kElectrodeBridgeMessageId];
+    [mockEvent setObject:[ElectrodeBridgeMessage convertEnumTypeToString:ElectrodeMessageTypeEvent] forKey:kElectrodeBridgeMessageType];
+    if (eventData) {
+        [mockEvent setObject:eventData forKey:kElectrodeBridgeMessageData];
+    }
+    return mockEvent;
+}
 @end
 
 @implementation MockBridgeTransceiver

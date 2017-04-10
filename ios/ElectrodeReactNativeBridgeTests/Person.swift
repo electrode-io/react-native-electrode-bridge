@@ -10,14 +10,14 @@
 public class Person: NSObject, Bridgeable {
     private static let tag = String(describing: type(of: self))
     
-    let name: String
-    let age: Int
-    let hiredMonth: Int?
-    let status: Status
-    let position: Position
-    let birthYear: BirthYear
+    var name: String
+    var age: Int?
+    var hiredMonth: Int
+    var status: Status?
+    var position: Position?
+    var birthYear: BirthYear?
     
-    init(name: String, age: Int, hiredMonth: Int?, status: Status, position: Position, birthYear: BirthYear) {
+    init(name: String, age: Int?, hiredMonth: Int, status: Status?, position: Position?, birthYear: BirthYear?) {
         self.name = name
         self.age = age
         self.hiredMonth = hiredMonth
@@ -27,52 +27,55 @@ public class Person: NSObject, Bridgeable {
         super.init()
     }
     
+    override init() {
+        self.name = String()
+        self.age = nil
+        self.hiredMonth = Int()
+        self.status = nil
+        self.position = nil
+        self.birthYear = nil
+        super.init()
+    }
     
-    convenience init?(dictionary: [String: Any]) {
-        guard let name = dictionary["name"] as? String else {
+    
+    convenience init?(dictionary: [String: Any]?) {
+        guard let nonNullDictionary = dictionary else {
+            return nil
+        }
+        
+        guard let name = nonNullDictionary["name"] as? String else {
             assertionFailure("\(Person.tag) need name property")
             return nil
         }
         
-        guard let age = dictionary["age"] as? Int else {
-            assertionFailure("\(Person.tag) need age property")
-            return nil
-        }
-        
-        guard let hiredMonth = dictionary["month"] as? Int? else {
+        guard let hiredMonth = nonNullDictionary["month"] as? Int else {
             assertionFailure("\(Person.tag) need month property")
             return nil
         }
         
-        guard let statusDict = dictionary["month"] as? [String: Any] else {
-            assertionFailure("\(Person.tag) need status property")
-            return nil
-        }
+        //optional params
+        let age = nonNullDictionary["age"] as? Int?
         
-        guard let statusObj = Status(dictionary: statusDict) else {
-            assertionFailure("\(Person.tag) need status property")
-            return nil
+        let statusObj: Status?
+        guard let statusDict = nonNullDictionary["month"] as? [String: Any] else {
+            statusObj = nil
+            return
         }
+        statusObj = Status(dictionary: statusDict)
         
-        guard let positionDict = dictionary["position"] as? [String: Any] else {
-            assertionFailure("\(Person.tag) need position property")
-            return nil
+        let positionObj: Position?
+        guard let positionDict = nonNullDictionary["position"] as? [String: Any] else {
+            positionObj = nil
+            return
         }
+         positionObj = Position(dictionary: positionDict)
         
-        guard let positionObj = Position(dictionary: positionDict) else {
-            assertionFailure("\(Person.tag) need position property")
-            return nil
+        let birthYearObj: BirthYear?
+        guard let birthYearDict = nonNullDictionary["birthYear"] as? [String: Any] else {
+            birthYearObj = nil
+            return
         }
-        
-        guard let birthYearDict = dictionary["birthYear"] as? [String: Any] else {
-            assertionFailure("\(Person.tag) need birthYear property")
-            return nil
-        }
-        
-        guard let birthYearObj = BirthYear(dictionary: birthYearDict) else {
-            assertionFailure("\(Person.tag) need birthYear property")
-            return nil
-        }
+        birthYearObj = BirthYear(dictionary: birthYearDict)
         
         self.init(name: name,
                   age: age,
@@ -80,7 +83,6 @@ public class Person: NSObject, Bridgeable {
                   status: statusObj,
                   position: positionObj,
                   birthYear: birthYearObj)
-        
     }
     
     convenience init?(data: Data?) {
@@ -106,13 +108,25 @@ public class Person: NSObject, Bridgeable {
     }
 
     public func toDictionary() -> NSDictionary {
-        return [
-            "name": self.name,
-            "age": self.age,
-            "hiredMonth": self.hiredMonth,
-            "status": self.status.toDictionary(),
-            "position": self.position.toDictionary(),
-            "birthYear": self.birthYear.toDictionary()
-                ] as NSDictionary
+        var dict = ["name": self.name,
+                    "hiredMonth": self.hiredMonth
+                    ] as [AnyHashable : Any]
+        if let nonNullAge = self.age {
+            dict["age"] = nonNullAge
+        }
+        
+        if let nonNullPosition = self.position {
+            dict["position"] = nonNullPosition.toDictionary()
+        }
+        
+        if let nonNullStatus = self.status{
+            dict["status"] = nonNullStatus.toDictionary()
+        }
+        
+        if let nonnullBirthYear = self.birthYear {
+            dict["birthYear"] = nonnullBirthYear.toDictionary()
+        }   
+        
+        return dict as NSDictionary
     }
 }

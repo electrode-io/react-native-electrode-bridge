@@ -149,6 +149,10 @@
     [_mockListenerStore setValue:mockJsEventListener forKey:name];
 }
 
+-(void)removeMockEventListenerWithName: (NSString *)name {
+    [self.mockListenerStore removeObjectForKey:name];
+}
+
 - (NSDictionary *)createBridgeRequestForName:(NSString *)name id:(NSString *)requestId data:(id)data
 {
     NSMutableDictionary *jsRequest = [[NSMutableDictionary alloc] init];

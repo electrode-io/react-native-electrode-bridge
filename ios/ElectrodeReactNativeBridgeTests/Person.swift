@@ -41,7 +41,8 @@ public class Person: ElectrodeObject, Bridgeable {
         }
         
         //optional params
-        let age = dictionary["age"] as? Int?
+        let age = dictionary["age"] as? Int
+        self.age = age
         
         let statusObj: Status?
         if let statusDict = dictionary["month"] as? [AnyHashable: Any]

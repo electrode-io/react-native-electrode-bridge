@@ -69,6 +69,13 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         })
         let responseListener = PersonResponseResponseListener(successCallBack: { (any) in
             XCTAssertNotNil(any)
+            guard let returnedStatus = any as? Status else {
+                XCTFail()
+                return
+            }
+            
+            XCTAssertEqual(returnedStatus.log, status.log)
+            XCTAssertEqual(returnedStatus.member, status.member)
             asyncExpectation.fulfill()
         }, failureCallBack: { (failureMessage) in
             XCTFail()
@@ -77,6 +84,48 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         self.personAPI.request.registerGetStatusRequestHandler(handler: requestHandler)
         self.personAPI.request.getStatus(person: person, responseListener: responseListener)
         waitForExpectations(timeout: 10)
+
+    }
+    
+    func testGetStatusRequestHandlerNativeToJSSuccess() {
+        let asyncExpectation = expectation(description: "testRegisterGetStatusRequestHandleNativeToNative")
+        let actualPerson = Person(name: "John", age: 10, hiredMonth: 5, status: nil, position: nil, birthYear: nil)
+        let expectedStatus = Status(log: true, member: true)
+        let statusDict = expectedStatus.toDictionary()
+        
+        let expectedResponseWithoutId = [kElectrodeBridgeMessageName : kRequestGetStatus,
+                                         kElectrodeBridgeMessageType:kElectrodeBridgeMessageResponse,
+        kElectrodeBridgeMessageData: statusDict ] as [AnyHashable: Any]
+        
+        let mockJSListener = MockJSEeventListener(request: {(request: ElectrodeBridgeRequestNew) in
+            XCTAssertNotNil(request)
+            XCTAssertEqual(kRequestGetStatus, request.name)
+            guard let requestPayload = request.data as? [AnyHashable: Any] else  {
+                XCTFail()
+                return
+            }
+            guard let person = try? NSObject.generateObject(data: requestPayload, classType: Person.self) as? Person else{
+                XCTFail()
+                return
+            }
+            XCTAssertNotNil(person)
+            
+            XCTAssertEqual(actualPerson.name, person?.name)
+            XCTAssertEqual(actualPerson.age, person?.age)
+            XCTAssertEqual(actualPerson.hiredMonth, person?.hiredMonth)
+            
+        }, response: expectedResponseWithoutId)
+        
+        self.addMockEventListener(mockJSListener, forName: kRequestGetStatus)
+        
+        let responseListener = PersonResponseResponseListener(successCallBack: { (any) in
+            XCTAssertNotNil(any)
+            asyncExpectation.fulfill()
+        }, failureCallBack: { (failureMessage) in
+            XCTFail()
+        })
+        self.personAPI.request.getStatus(person: actualPerson, responseListener: responseListener)
+        waitForExpectations(timeout: 100)
 
     }
 }

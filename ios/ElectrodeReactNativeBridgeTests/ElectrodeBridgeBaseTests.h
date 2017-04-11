@@ -52,6 +52,7 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 
 -(void) addMockEventListener:(MockJSEeventListener *)mockJsEventListener
                      forName:(NSString *)name;
+-(void)removeMockEventListenerWithName: (NSString *)name;
 -(id<ElectrodeNativeBridge> _Nonnull) getNativeBridge;
 -(id<ElectrodeReactBridge> _Nonnull) getReactBridge;
 -(nonnull NSDictionary*) createBridgeRequestForName:(nonnull NSString*)name id:(nonnull NSString*)requestId data:(nullable id)data;

@@ -37,7 +37,7 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
             asyncExpectation.fulfill()
         }
         
-        let personAPI = APersonAPI()
+        let personAPI = PersonAPI()
         personAPI.event.addPersonAddedEventListenr(eventListener: localListener)
         personAPI.event.emitEventPersonAdded(person: person)
         waitForExpectations(timeout: 5)
@@ -57,7 +57,7 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(name, "Claire")
             asyncExpectation.fulfill()
         })
-        let personAPI = APersonAPI()
+        let personAPI = PersonAPI()
         let personName = "Claire"
         personAPI.event.addPersonNameUpdatedEventListener(eventListener: localListener)
         personAPI.event.emitEventPersonNameUpdated(updatedName: personName)

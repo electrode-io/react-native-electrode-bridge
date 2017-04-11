@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2238E19E1E8C29E8007FEDA8 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2238E18A1E8C28A9007FEDA8 /* libReact.a */; };
 		301940E11E941389002A0C69 /* PersonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301940E01E941389002A0C69 /* PersonAPI.swift */; };
-		3019418E1E9414A7002A0C69 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3019418D1E9414A7002A0C69 /* Event.swift */; };
 		301941911E94153A002A0C69 /* BirthYear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941901E94153A002A0C69 /* BirthYear.swift */; };
 		301941931E941D26002A0C69 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941921E941D26002A0C69 /* Person.swift */; };
 		301941951E941D56002A0C69 /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941941E941D56002A0C69 /* Position.swift */; };
@@ -23,7 +22,6 @@
 		309A03C11E8B319E00501219 /* ElectrodeBridgeHolderNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 309A03BF1E8B319E00501219 /* ElectrodeBridgeHolderNew.m */; };
 		30B705C01E960BCE00B8DACE /* RequestProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */; };
 		30B705C91E960C8300B8DACE /* PersonEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705C81E960C8300B8DACE /* PersonEvents.swift */; };
-		30B705CB1E960CA000B8DACE /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705CA1E960CA000B8DACE /* Request.swift */; };
 		30B705CD1E960E6E00B8DACE /* PersonRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705CC1E960E6E00B8DACE /* PersonRequests.swift */; };
 		30B705CF1E96E5B300B8DACE /* None.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705CE1E96E5B300B8DACE /* None.swift */; };
 		30BA8F161E84972D00D3C440 /* ElectrodeBridgeEventNew.h in Headers */ = {isa = PBXBuildFile; fileRef = 30BA8F021E84972D00D3C440 /* ElectrodeBridgeEventNew.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -52,6 +50,7 @@
 		30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m in Sources */ = {isa = PBXBuildFile; fileRef = 30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcherNew.m */; };
 		30BFEE591E92082500FE1B4F /* ElectrodeUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */; };
 		30C03CDE1E9CAC5A0094A17A /* ElectrodeObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C03CDD1E9CAC5A0094A17A /* ElectrodeObject.swift */; };
+		30C03CE81E9D6E2E0094A17A /* PetAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C03CE71E9D6E2E0094A17A /* PetAPI.swift */; };
 		30C8F4AC1E92DB2400E40221 /* Bridgeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */; };
 		30C8F4D41E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4D31E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift */; };
 		30C8F4DD1E9320E500E40221 /* Processor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C8F4DC1E9320E500E40221 /* Processor.swift */; };
@@ -167,7 +166,6 @@
 /* Begin PBXFileReference section */
 		2238E17E1E8C28A9007FEDA8 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		301940E01E941389002A0C69 /* PersonAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonAPI.swift; sourceTree = "<group>"; };
-		3019418D1E9414A7002A0C69 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		301941901E94153A002A0C69 /* BirthYear.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthYear.swift; sourceTree = "<group>"; };
 		301941921E941D26002A0C69 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		301941941E941D56002A0C69 /* Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
@@ -181,7 +179,6 @@
 		309A03BF1E8B319E00501219 /* ElectrodeBridgeHolderNew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeHolderNew.m; sourceTree = "<group>"; };
 		30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestProcessorTests.swift; sourceTree = "<group>"; };
 		30B705C81E960C8300B8DACE /* PersonEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonEvents.swift; sourceTree = "<group>"; };
-		30B705CA1E960CA000B8DACE /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		30B705CC1E960E6E00B8DACE /* PersonRequests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonRequests.swift; sourceTree = "<group>"; };
 		30B705CE1E96E5B300B8DACE /* None.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = None.swift; sourceTree = "<group>"; };
 		30BA8F021E84972D00D3C440 /* ElectrodeBridgeEventNew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeEventNew.h; sourceTree = "<group>"; };
@@ -211,6 +208,7 @@
 		30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ElectrodeReactNativeBridgeTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeUtilitiesTests.swift; sourceTree = "<group>"; };
 		30C03CDD1E9CAC5A0094A17A /* ElectrodeObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeObject.swift; sourceTree = "<group>"; };
+		30C03CE71E9D6E2E0094A17A /* PetAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PetAPI.swift; sourceTree = "<group>"; };
 		30C8F4AB1E92DB2400E40221 /* Bridgeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bridgeable.swift; sourceTree = "<group>"; };
 		30C8F4D31E9320AD00E40221 /* ElectrodeRequestHandlerProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrodeRequestHandlerProcessor.swift; sourceTree = "<group>"; };
 		30C8F4DC1E9320E500E40221 /* Processor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Processor.swift; sourceTree = "<group>"; };
@@ -302,10 +300,9 @@
 			isa = PBXGroup;
 			children = (
 				301940E01E941389002A0C69 /* PersonAPI.swift */,
-				3019418D1E9414A7002A0C69 /* Event.swift */,
 				30B705C81E960C8300B8DACE /* PersonEvents.swift */,
-				30B705CA1E960CA000B8DACE /* Request.swift */,
 				30B705CC1E960E6E00B8DACE /* PersonRequests.swift */,
+				30C03CE71E9D6E2E0094A17A /* PetAPI.swift */,
 			);
 			name = APIs;
 			sourceTree = "<group>";
@@ -715,12 +712,12 @@
 				DA4BE0CB1E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.m in Sources */,
 				3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */,
 				DA0B9F611E9BFF0F004A4629 /* Person.m in Sources */,
+				30C03CE81E9D6E2E0094A17A /* PetAPI.swift in Sources */,
 				301940E11E941389002A0C69 /* PersonAPI.swift in Sources */,
 				DA0B9F391E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m in Sources */,
 				30B705C91E960C8300B8DACE /* PersonEvents.swift in Sources */,
 				30B705CD1E960E6E00B8DACE /* PersonRequests.swift in Sources */,
 				301941931E941D26002A0C69 /* Person.swift in Sources */,
-				3019418E1E9414A7002A0C69 /* Event.swift in Sources */,
 				3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */,
 				30BFEE591E92082500FE1B4F /* ElectrodeUtilitiesTests.swift in Sources */,
 				301941951E941D56002A0C69 /* Position.swift in Sources */,
@@ -731,7 +728,6 @@
 				DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */,
 				301941911E94153A002A0C69 /* BirthYear.swift in Sources */,
 				DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */,
-				30B705CB1E960CA000B8DACE /* Request.swift in Sources */,
 				7F8E8CBF1E8F0CCA00CF0D8C /* TestRequestHandler.m in Sources */,
 				3019419A1E942F42002A0C69 /* EventProcessorTests.swift in Sources */,
 			);

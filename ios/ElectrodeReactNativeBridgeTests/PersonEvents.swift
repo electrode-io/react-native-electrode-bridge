@@ -8,24 +8,24 @@
 
 import UIKit
 
-public class PersonEvents: NSObject, Event {
-    public func addPersonAddedEventListenr(eventListener: ElectrodeBridgeEventListener) {
-        let listenerProcessor = EventListenerProcessor(eventName: kEventPersonAdded, eventPayloadClass: Person.self, eventListener: eventListener)
+public class PersonEvents:  PersonAPI.Events {
+    override public func addPersonAddedEventListenr(eventListener: ElectrodeBridgeEventListener) {
+        let listenerProcessor = EventListenerProcessor(eventName: PersonAPI.kEventPersonAdded, eventPayloadClass: Person.self, eventListener: eventListener)
         listenerProcessor.execute()
     }
     
-    public func addPersonNameUpdatedEventListener(eventListener: ElectrodeBridgeEventListener) {
-        let listenerProcessor = EventListenerProcessor(eventName: kEventPersonNameUpdated, eventPayloadClass: String.self, eventListener: eventListener)
+    override public func addPersonNameUpdatedEventListener(eventListener: ElectrodeBridgeEventListener) {
+        let listenerProcessor = EventListenerProcessor(eventName: PersonAPI.kEventPersonNameUpdated, eventPayloadClass: String.self, eventListener: eventListener)
         listenerProcessor.execute()
     }
     
-    public func emitEventPersonAdded(person: Person) {
-        let eventProcessor = EventProcessor(eventName: kEventPersonAdded, eventPayload: person)
+    override public func emitEventPersonAdded(person: Person) {
+        let eventProcessor = EventProcessor(eventName: PersonAPI.kEventPersonAdded, eventPayload: person)
         eventProcessor.execute()
         
     }
-    public func emitEventPersonNameUpdated(updatedName: String) {
-        let eventProcessor = EventProcessor(eventName: kEventPersonNameUpdated, eventPayload: updatedName)
+    override public func emitEventPersonNameUpdated(updatedName: String) {
+        let eventProcessor = EventProcessor(eventName: PersonAPI.kEventPersonNameUpdated, eventPayload: updatedName)
         eventProcessor.execute()
     }
 }

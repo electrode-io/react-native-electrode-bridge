@@ -57,7 +57,7 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 -(id<ElectrodeReactBridge> _Nonnull) getReactBridge;
 -(nonnull NSDictionary*) createBridgeRequestForName:(nonnull NSString*)name id:(nonnull NSString*)requestId data:(nullable id)data;
 - (nonnull NSDictionary *)createResponseDataWithName:(nonnull NSString *)name id:(nonnull NSString *)responseId data:(nullable id)data;
-
+- (nonnull NSDictionary *)createEventDataWithName:(nonnull NSString *)eventName id:(nonnull NSString *)eventId data:(nullable id)eventData;
 @end
 
 

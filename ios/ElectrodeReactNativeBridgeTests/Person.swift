@@ -31,7 +31,7 @@ public class Person: ElectrodeObject, Bridgeable {
 
     required public init(dictionary: [AnyHashable: Any]) {
         if let name = dictionary["name"] as? String,
-            let hiredMonth = dictionary["month"] as? Int {
+            let hiredMonth = dictionary["hiredMonth"] as? Int {
             self.name = name
             self.hiredMonth = hiredMonth
         } else {

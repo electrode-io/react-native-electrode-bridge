@@ -8,53 +8,30 @@
 
 import UIKit
 
-public class Position: NSObject, Bridgeable{
+public class Position: ElectrodeObject, Bridgeable{
     let lat: Double
     let lng: Double
     
-    init(lat: Double, lng: Double) {
+    public init(lat: Double, lng: Double) {
         self.lat = lat
         self.lng = lng
         super.init()
     }
     
-    convenience init?(dictionary: [String: Any]) {
-        guard let lat = dictionary["lat"] as? Double else {
-            assertionFailure("Position need lat property")
-            return nil
-        }
-        
-        guard let lng = dictionary["lng"] as? Double else {
+    required public init(dictionary: [AnyHashable: Any]) {
+        if let lat = dictionary["lat"] as? Double,
+            let lng = dictionary["lng"] as? Double {
+            self.lat = lat
+            self.lng = lng
+        } else {
             assertionFailure("Position need lng property")
-            return nil
+            self.lat = dictionary["lat"] as! Double
+            self.lng = dictionary["lng"] as! Double
         }
-        
-        self.init(lat: lat, lng: lng)
-    }
-    
-    convenience init?(data: Data?) {
-        do {
-            guard let validData = data else {
-                return nil
-            }
-            let parsedData: Any = try JSONSerialization.jsonObject(with: validData, options: .allowFragments)
 
-            guard let dict = parsedData as? [String: Any] else {
-                debugPrint("Position could not deserialize")
-                return nil
-            }
-            
-            self.init(dictionary: dict)
-            
-        } catch let error as NSError {
-            debugPrint("Position: \(error)")
-            return nil
-        } catch let error {
-            debugPrint("Position \(error)")
-            return nil
-        }
+        super.init(dictionary: dictionary)
     }
-    
+        
     public func toDictionary() -> NSDictionary {
         return ["lat": self.lat, "lgn": self.lng] as NSDictionary
     }

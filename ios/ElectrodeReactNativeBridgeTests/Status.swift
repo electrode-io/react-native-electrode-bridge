@@ -8,52 +8,28 @@
 
 import UIKit
 
-public class Status: NSObject, Bridgeable{
+public class Status: ElectrodeObject, Bridgeable{
     let log: Bool
     let member: Bool
     private static let tag = String(describing: type(of:self))
     
-    init(log: Bool, member: Bool) {
+    public init(log: Bool, member: Bool) {
         self.log = log
         self.member = member
         super.init()
     }
     
-    convenience init?(dictionary: [String: Any]) {
-        guard let log = dictionary["log"] as? Bool else {
-            assertionFailure("\(Status.tag) need log property")
-            return nil
+    required public init(dictionary: [AnyHashable: Any]) {
+        if let log = dictionary["log"] as? Bool,
+            let member = dictionary["member"] as? Bool {
+            self.log = log
+            self.member = member
+        } else {
+            assertionFailure("Missing required params in Object Status need member property")
+            self.log = dictionary["log"] as! Bool
+            self.member = dictionary["member"] as! Bool
         }
-        
-        guard let member = dictionary["member"] as? Bool else {
-            assertionFailure("\(Status.tag) need member property")
-            return nil
-        }
-        
-        self.init(log: log, member: member)
-    }
-    
-    convenience init?(data: Data?) {
-        guard let validData = data else {
-            debugPrint("\(Status.tag): empty data")
-            return nil
-        }
-        
-        do {
-            let parsedData = try JSONSerialization.jsonObject(with: validData, options: .allowFragments)
-            guard let dict = parsedData as? [String: Any] else {
-                assertionFailure("\(Status.tag) : failed to parse")
-                return nil
-            }
-            
-            self.init(dictionary: dict)
-        } catch let error as NSError {
-            debugPrint("\(Status.tag): \(error)")
-            return nil
-        } catch let error {
-            debugPrint(error)
-            return nil
-        }
+        super.init(dictionary: dictionary)
     }
     
     public func toDictionary() -> NSDictionary {

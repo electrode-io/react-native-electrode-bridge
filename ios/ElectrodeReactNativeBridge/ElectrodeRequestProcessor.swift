@@ -40,7 +40,7 @@ public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject
         let requestDictionary: [AnyHashable: Any]
         let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
         
-        let validRequest = ElectrodeBridgeRequestNew(name: requestName, messageId: UUID().uuidString, data: bridgeMessageData)
+        let validRequest = ElectrodeBridgeRequestNew(name: requestName, data: bridgeMessageData)
                 
         let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: {
             (responseData: Any?) in

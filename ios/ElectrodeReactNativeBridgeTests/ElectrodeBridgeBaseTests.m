@@ -105,9 +105,10 @@
 {
     [self initializeBundle];
 
-    if(self.mockListenerStore) {
-        [self.mockListenerStore removeAllObjects];
-    }
+}
+
+-(void)tearDown {
+    [[MockBridgeTransceiver sharedInstance].myMockListenerStore removeAllObjects];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -119,10 +120,9 @@
 
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
-    self.mockListenerStore = [[NSMutableDictionary alloc] init];
     MockBridgeTransceiver *mockTransceiver = [[MockBridgeTransceiver alloc] init];
     [MockBridgeTransceiver createWithTransceiver:mockTransceiver];
-    mockTransceiver.myMockListenerStore = self.mockListenerStore;
+    mockTransceiver.myMockListenerStore = [[NSMutableDictionary alloc] init];
     return @[mockTransceiver];
 }
 
@@ -150,7 +150,11 @@
 
 -(void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name
 {
-    [_mockListenerStore setValue:mockJsEventListener forKey:name];
+    [self.mockListenerStore setValue:mockJsEventListener forKey:name];
+}
+
+-(void) appendMockEventListener:(MockJSEeventListener *)mockJsEventListener forName:(NSString *)name {
+    [[MockBridgeTransceiver sharedInstance].myMockListenerStore setValue: mockJsEventListener forKey:name];
 }
 
 -(void)removeMockEventListenerWithName: (NSString *)name {

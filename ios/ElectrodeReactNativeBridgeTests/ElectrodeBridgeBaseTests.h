@@ -51,7 +51,9 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 @property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *mockListenerStore;
 
 -(void) addMockEventListener:(MockJSEeventListener *)mockJsEventListener
-                     forName:(NSString *)name;
+                     forName:(NSString *)name; //use this method for bridge test only
+-(void) appendMockEventListener:(MockJSEeventListener *)mockJsEventListener
+                        forName:(NSString *)name;//use this method for test involves processor
 -(void)removeMockEventListenerWithName: (NSString *)name;
 -(id<ElectrodeNativeBridge> _Nonnull) getNativeBridge;
 -(id<ElectrodeReactBridge> _Nonnull) getReactBridge;

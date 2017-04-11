@@ -17,18 +17,8 @@ public class PersonAPI {
     static let kRequestGetStatus = "kRequestGetStatus"
     static let kRequestGetUserName = "kRequestGetUserName"
     static let kRequestGetAge = "kRequestGetAge"
-    
-    var event: Events {
-        get {
-            return PersonEvents()
-        }
-    }
-
-    var request: Requests {
-        get {
-            return PersonRequests()
-        }
-    }
+    lazy var event: Events = { return PersonEvents()}()
+    lazy var request: Requests = {return PersonRequests()}()
     
     public class Events {
         func addPersonAddedEventListenr(eventListener: ElectrodeBridgeEventListener) {

@@ -98,8 +98,18 @@ class ElectrodeUtilitiesTests: XCTestCase {
     }
 }
 
-@objc class AddressWrapper:  NSObject, Bridgeable {
-    var address: Address = Address()
+@objc class AddressWrapper:  ElectrodeObject, Bridgeable {
+    let address: Address
+    
+    required init(dictionary: [AnyHashable : Any]) {
+        if let addressDict = dictionary["address"] as? [AnyHashable: Any] {
+            self.address = Address(dictionary: addressDict)
+        } else {
+            assertionFailure("Failed")
+            self.address = dictionary["address"] as! Address
+        }
+        super.init(dictionary:dictionary)
+    }
     
     func toDictionary() -> NSDictionary {
         var dict = [AnyHashable: Any]()
@@ -108,23 +118,27 @@ class ElectrodeUtilitiesTests: XCTestCase {
     }
 }
 
-@objc class AddressArrayWrapper:NSObject {
-    var addresses: [Address]  = [Address(), Address()]
-}
-
-@objc class Address: NSObject, Bridgeable {
-    var street: String
-    var zipcode: String
+@objc class Address: ElectrodeObject, Bridgeable {
+    let street: String
+    let zipcode: String
     
     init(street: String, zipcode: String) {
         self.street = street
         self.zipcode = zipcode
+        super.init()
     }
     
-    
-    override init() {
-        street = ""
-        zipcode = ""
+    required init(dictionary: [AnyHashable : Any]) {
+        if let street = dictionary["street"] as? String,
+            let zipcode = dictionary["zipcode"] as? String {
+            self.street = street
+            self.zipcode = zipcode
+        } else {
+            assertionFailure("Missing required params")
+            self.street = dictionary["street"] as! String
+            self.zipcode = dictionary["zipcode"] as! String
+        }
+        super.init(dictionary: dictionary)
     }
     
     func toDictionary() -> NSDictionary {

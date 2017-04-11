@@ -11,10 +11,12 @@ import UIKit
 let kElectrodeBridgeRequestTimeoutTime = 10;
 
 let objectiveCPrimitives = [String.self,
+                            (String?.self)!,
                             Double.self,
                             Float.self,
                             Bool.self,
                             Int.self,
+                            (Int?.self)!,
                             Int8.self,
                             Int16.self,
                             Int32.self,
@@ -44,7 +46,7 @@ extension NSObject {
         for child in type.children {
             if child.label! == name {
                 let res = type(of: child.value)
-                let tmp = ElectrodeUtilities.isSupportedPrimitive(type: res)
+                let tmp = ElectrodeUtilities.isObjectiveCPrimitives(type: res)
                 return (!tmp) ? .Class(res) : .Struct
                 
             }
@@ -53,7 +55,7 @@ extension NSObject {
             for child in parent.children {
                 if child.label! == name {
                     let res = type(of: child.value)
-                    let tmp = ElectrodeUtilities.isSupportedPrimitive(type: res)
+                    let tmp = ElectrodeUtilities.isObjectiveCPrimitives(type: res)
                     return (tmp) ? .Class(res) : .Struct
                 }
             }
@@ -74,24 +76,13 @@ extension NSObject {
     
     //TODO: add throws for exception handling
     static func generateObjectFromDict(data: [AnyHashable: Any], passedClass: AnyClass) throws -> AnyObject {
-        let obj = (passedClass as? NSObject.Type)!
-        let res = obj.init()
-        let aMirrorChildren = Mirror(reflecting: res).children
-        for case let(label, _) in aMirrorChildren {
-            let tmpType = res.getTypeOfProperty(label!)! //Claire Todo: FIX force unwrapp
-            switch(tmpType) {
-            case .Class(let classType):
-                let nextVal = data[label!]
-                let obj = try NSObject.generateObject(data: nextVal as AnyObject , classType: classType as! AnyClass)
-                
-                res.setValue(obj, forKey: label!)
-                print(classType)
-            case .Struct:
-                print(tmpType)
-                let actualValue = data[label!]
-                res.setValue(actualValue, forKey: label!)
-            }
+        let stringForClass = String(reflecting: passedClass)
+        guard let obj = NSClassFromString(stringForClass) as? ElectrodeObject.Type else {
+            assertionFailure("Cannot proceed to convert dictionary to object type \(passedClass)")
+            return NSObject()
         }
+        
+        let res = obj.init(dictionary: data)
         return res
     }
     
@@ -146,19 +137,6 @@ extension NSObject {
 
 @objc class ElectrodeUtilities: NSObject {
 
-    
-    static func primitiveSet() -> Set<String> {
-        let des = String(describing: type(of: String.self))
-        let b = String(describing: type(of: Int.self))
-        let c = String(describing: type(of: [String]?.self))
-        return Set([des, b, c])
-    }
-    
-    static func isSupportedPrimitive(type: Any.Type) -> Bool {
-        let str = String(describing: type(of: type))
-        return ElectrodeUtilities.primitiveSet().contains(str)
-    }
-    
     static func isObjectiveCPrimitives(type: Any.Type) -> Bool {
         return (objectiveCPrimitives.contains(where: { (aClass) -> Bool in
             return aClass == type
@@ -199,7 +177,7 @@ extension NSObject {
         }
         
         let type = type(of:validObject)
-        if (ElectrodeUtilities.isSupportedPrimitive(type: type)) {
+        if (ElectrodeUtilities.isObjectiveCPrimitives(type: type)) {
             return validObject
         }
         

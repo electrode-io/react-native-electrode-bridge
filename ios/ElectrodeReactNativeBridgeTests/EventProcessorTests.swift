@@ -17,7 +17,7 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
         let position = Position(lat: 2.3, lng: 3.1)
         let status = Status(log: false, member: true)
         let birthYear = BirthYear(month: 12, year: 2000)
-        let person = Person(name: "A", age: 3, hiredMonth: nil, status: status, position: position, birthYear: birthYear)
+        let person = Person(name: "A", age: 3, hiredMonth: 6, status: status, position: position, birthYear: birthYear)
         let localListener = PersonEventListener { (any) in
             XCTAssertNotNil(any)
             guard let person = any as? Person else {
@@ -27,13 +27,13 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
             
             XCTAssertEqual(person.name, "A")
             XCTAssertEqual(person.age, 3)
-            XCTAssertNil(person.hiredMonth)
-            XCTAssertEqual(person.status.log, false)
-            XCTAssertEqual(person.status.member, true)
-            XCTAssertEqual(person.position.lat, 2.3)
-            XCTAssertEqual(person.position.lng, 3.1)
-            XCTAssertEqual(person.birthYear.month, 12)
-            XCTAssertEqual(person.birthYear.year, 2000)
+            XCTAssertEqual(person.hiredMonth, 6)
+            XCTAssertEqual(person.status?.log, false)
+            XCTAssertEqual(person.status?.member, true)
+            XCTAssertEqual(person.position?.lat, 2.3)
+            XCTAssertEqual(person.position?.lng, 3.1)
+            XCTAssertEqual(person.birthYear?.month, 12)
+            XCTAssertEqual(person.birthYear?.year, 2000)
             asyncExpectation.fulfill()
         }
         

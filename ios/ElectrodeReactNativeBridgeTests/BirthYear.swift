@@ -8,51 +8,30 @@
 
 import UIKit
 
-public class BirthYear: NSObject, Bridgeable {
+public class BirthYear: ElectrodeObject, Bridgeable {
     let month: Int
     let year: Int
     
-    convenience init?(data: Data?) {
-        if let data = data {
-            do {
-                let parsedData: Any = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                guard let dict = parsedData as? [String: Any] else {
-                    debugPrint("BirthYear cannot convert to object")
-                    return nil
-                }
-                
-                self.init(dictionary: dict)
-            } catch let error as NSError {
-                debugPrint(error)
-                return nil
-            } catch let error{
-                debugPrint(error)
-                return nil
-            }
-        } else {
-            return nil
-        }
-    }
-    
-    convenience init?(dictionary: [String: Any]) {
-        guard let month = dictionary["month"] as? Int else {
-            assertionFailure("month property is required")
-            return nil
-        }
-        guard let year = dictionary["year"] as? Int else {
-            assertionFailure("year property is required")
-            return nil
-        }
-        
-        self.init(month: month, year: year)
-    }
-    
-    init(month: Int, year: Int) {
+    public init(month: Int, year: Int) {
         self.month = month
         self.year = year
         super.init()
     }
     
+    required public init(dictionary: [AnyHashable: Any]) {
+        if let month = dictionary["month"] as? Int,
+            let year = dictionary["year"] as? Int{
+            self.month = month
+            self.year = year
+        }else {
+            assertionFailure("year property is required")
+            self.month = dictionary["month"] as! Int
+            self.year = dictionary["year"] as! Int
+        }
+        super.init(dictionary: dictionary)
+    }
+    
+
     public func toDictionary() -> NSDictionary {
         return ["month": self.month, "year": self.year] as NSDictionary
         

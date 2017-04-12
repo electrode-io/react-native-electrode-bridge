@@ -42,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return Returns a request handler for a specific name.
  */
 - (id<ElectrodeBridgeRequestHandler> _Nullable)getRequestHandler:(NSString *)name;
+-(void)reset;
 
 @end
 

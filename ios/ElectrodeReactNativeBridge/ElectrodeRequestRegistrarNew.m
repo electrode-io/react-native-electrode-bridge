@@ -20,13 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
                       requestHandler:(id<ElectrodeBridgeRequestHandler>)handler
                                error:(NSError **)error
 {
-    @synchronized (self) {
-        if ([self.requestHandlerByRequestName objectForKey:name])
-        {
-            *error = [NSError errorWithDomain:@"Name Already In Use" code:37 userInfo:nil];
-            return nil;
-        }
-        
+    @synchronized (self) {        
         NSUUID *requestHandlerUUID = [NSUUID UUID];
         [self.requestHandlerByRequestName setObject:handler forKey:name];
         [self.requestNameByUUID setObject:name forKey:requestHandlerUUID];
@@ -55,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+-(void)reset {
+    self.requestNameByUUID = [[NSMutableDictionary alloc] init];
+    self.requestHandlerByRequestName =  [[NSMutableDictionary alloc] init];
+}
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Lazy Loading
 

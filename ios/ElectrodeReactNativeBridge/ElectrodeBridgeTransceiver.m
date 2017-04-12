@@ -126,6 +126,9 @@ RCT_EXPORT_MODULE();
     return uUID;
 }
 
+-(void)resetRegistrar {
+    [self.requestDispatcher.requestRegistrar reset];
+}
 
 -(void)sendEvent: (ElectrodeBridgeEventNew *)event {
     NSLog(@"ElectrodeBridgeTransceiver: emit event named: %@, id: %@", event.name, event.messageId);
@@ -187,7 +190,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 -(void)emitMessage:(ElectrodeBridgeMessage * _Nonnull)bridgeMessage
 {
     NSLog(@"Sending bridgeMessage(%@) to JS", bridgeMessage);
-    [self sendEventWithName:@"electrode.bridge.message" body:bridgeMessage.data];
+    [self sendEventWithName:@"electrode.bridge.message" body:[bridgeMessage toDictionary]];
 }
 
 -(void)notifyReactNativeEventListenerWithEvent: (ElectrodeBridgeEventNew *) event {

@@ -7,7 +7,6 @@
 //
 
 #import "ElectrodeBridgeBaseTests.h"
-#import "ElectrodeBridgeTransceiver_Internal.h"
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeEventNew.h"
 
@@ -104,11 +103,12 @@
 -(void)setUp
 {
     [self initializeBundle];
-
 }
 
 -(void)tearDown {
     [[MockBridgeTransceiver sharedInstance].myMockListenerStore removeAllObjects];
+    [[MockBridgeTransceiver sharedInstance] resetRegistrar];
+
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -222,23 +222,23 @@
     if(registeredListener) {
         switch (bridgeMessage.type) {
             case ElectrodeMessageTypeEvent:
-                if(!registeredListener.evetBlock)
+                if(!registeredListener.jSCallBackBlock)
                 {
                     NSLog(@"TEST FAILURE: expected a non null event block but found a nil event block for mock listener registered for: %@", bridgeMessage.name);
                 }
                 else
                 {
-                    registeredListener.evetBlock((ElectrodeBridgeEventNew *)bridgeMessage);
+                    registeredListener.jSCallBackBlock((NSDictionary *)[bridgeMessage toDictionary]);
                 }
                 break;
             case ElectrodeMessageTypeRequest:
-                if(!registeredListener.requestBlock)
+                if(!registeredListener.jSCallBackBlock)
                 {
                     NSLog(@"TEST FAILURE: expected a non null request block but found a nil request block for mock listener registered for : %@", bridgeMessage.name);
                 }
                 else
                 {
-                    registeredListener.requestBlock((ElectrodeBridgeRequestNew *)bridgeMessage);
+                    registeredListener.jSCallBackBlock((NSDictionary *)[bridgeMessage toDictionary]);
                 }
                 
                 if (registeredListener.response) {
@@ -248,13 +248,13 @@
                 }
                 break;
             case ElectrodeMessageTypeResponse:
-                if(!registeredListener.responseBlock)
+                if(!registeredListener.jSCallBackBlock)
                 {
                     NSLog(@"TEST FAILURE: expected a non null response block but found a nil response block for mock listener registered for: %@", bridgeMessage.name);
                 }
                 else
                 {
-                    registeredListener.responseBlock((ElectrodeBridgeResponse *)bridgeMessage);
+                    registeredListener.jSCallBackBlock((NSDictionary *)[bridgeMessage toDictionary]);
                 }
                 break;
             default:
@@ -307,4 +307,23 @@
     
     return self;
 }
+
+-(nonnull instancetype) initWithjSBlock: (ElectrodeBaseJSBlock) jSBlock{
+    if(self = [super init]) {
+        self.jSCallBackBlock = jSBlock;
+    }
+    
+    return self;
+}
+
+-(instancetype) initWithjSBlock:(ElectrodeBaseJSBlock)jSBlock response: (NSDictionary *) response {
+    if(self = [super init]) {
+        self.jSCallBackBlock = jSBlock;
+        self.response = response;
+    }
+    
+    return self;
+}
+
+
 @end

@@ -12,7 +12,7 @@
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeResponse.h"
 #import "ElectrodeBridgeProtocols.h"
-#import "ElectrodeBridgeTransceiver.h"
+#import "ElectrodeBridgeTransceiver_Internal.h"
 #import <React/RCTBridgeDelegate.h>
 #import <React/RCTBridge.h>
 
@@ -25,15 +25,24 @@ typedef void (^evetBlock)(ElectrodeBridgeEventNew *request);
 typedef void (^requestBlock)(ElectrodeBridgeRequestNew *request);
 typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 
+typedef void (^ElectrodeBaseJSBlock)(NSDictionary *result);
+
 @interface MockJSEeventListener : NSObject
 -(nonnull instancetype) initWithEventBlock:(nonnull evetBlock) evetBlock;
 -(nonnull instancetype) initWithRequestBlock:(nonnull requestBlock) requestBlock;
 -(nonnull instancetype) initWithResponseBlock:(nonnull responseBlock) responseBlock;
+///////////////
 -(nonnull instancetype) initWithRequestBlock: (nonnull requestBlock) requestBlock response: (NSDictionary *)response;
+-(nonnull instancetype) initWithjSBlock: (ElectrodeBaseJSBlock) jSBlock;
+-(instancetype) initWithjSBlock:(ElectrodeBaseJSBlock)jSBlock response: (NSDictionary *) response;
+///////////////
+
 @property(nonatomic, copy, nullable) evetBlock evetBlock;
 @property(nonatomic, copy, nullable) requestBlock requestBlock;
 @property(nonatomic, copy, nullable) responseBlock responseBlock;
+
 @property(nonatomic, copy, nullable) NSDictionary *response;
+@property(nonatomic, copy, nullable) ElectrodeBaseJSBlock jSCallBackBlock;
 @end
 
 /////MockElectrodeBridgeEventListener
@@ -49,7 +58,7 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 -(void)initializeBundle;
 @property(nonatomic, strong, readonly, nonnull) RCTBridge *bridge;
 @property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *mockListenerStore;
-
+/////
 -(void) addMockEventListener:(MockJSEeventListener *)mockJsEventListener
                      forName:(NSString *)name; //use this method for bridge test only
 -(void) appendMockEventListener:(MockJSEeventListener *)mockJsEventListener
@@ -96,7 +105,9 @@ typedef void (^failureBlock) (_Nullable id<ElectrodeFailureMessage> failureMessa
 
 /////////////////MockBridgeTransceiver
 @interface MockBridgeTransceiver : ElectrodeBridgeTransceiver
++(instancetype)sharedInstance;
 @property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *myMockListenerStore;
+- (void)sendMessage:(NSDictionary *)bridgeMessage;
 @end
 NS_ASSUME_NONNULL_END
 

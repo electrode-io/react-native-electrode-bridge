@@ -93,35 +93,41 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     [messageDict setObject:self.messageId forKey:kElectrodeBridgeMessageId];
     NSString *typeString = [ElectrodeBridgeMessage convertEnumTypeToString:self.type];
     [messageDict setObject:typeString forKey:kElectrodeBridgeMessageType];
+    id simpleObj = [self convertPayloadToSimpleFormat];
+    
+    if(simpleObj)
+    {
+        [messageDict setObject:simpleObj forKey:kElectrodeBridgeMessageData];
+    }
+    else
+    {
+        NSLog(@"data is null, data won't be set in toDictionary");
+    }
+    
+    return [messageDict copy];
+}
+
+-(id _Nullable )convertPayloadToSimpleFormat {
+    id simpleObj = nil;
     if(self.data != nil) {
-        id dataObj;
         if ([self.data conformsToProtocol:@protocol(Bridgeable)]) {
-            dataObj = [self.data toDictionary];
+            simpleObj = [self.data toDictionary];
         } else if ([self.data isKindOfClass:[NSArray class]]) {
             id element = [self.data firstObject];
             if (element) { //assume the array has the same type of object
                 if ([element conformsToProtocol:@protocol(Bridgeable)]) {
                     NSArray *convertedArray = [self convertToArrayOfBridgeable:self.data];
-                    dataObj = convertedArray;
+                    simpleObj = convertedArray;
                 }
             } else {
                 NSLog(@"ElectrodeBridgeMessage: empty array");
             }
         } else {
-            dataObj = self.data;
-        }
-        
-        if(dataObj)
-        {
-            [messageDict setObject:dataObj forKey:kElectrodeBridgeMessageData];
-        }
-        else
-        {
-            NSLog(@"data is null, data won't be set in toDictionary");
+            simpleObj = self.data;
         }
     }
     
-    return [messageDict copy];
+    return simpleObj;
 }
 
 -(NSArray<NSDictionary *> *)convertToArrayOfBridgeable: (NSArray<Bridgeable> *)data {

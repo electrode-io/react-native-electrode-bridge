@@ -10,9 +10,12 @@ import XCTest
 @testable import ElectrodeReactNativeBridge
 
 class RequestProcessorTests: ElectrodeBridgeBaseTests {
-    let personAPI = PersonAPI()
+    var personAPI: PersonAPI? = nil
 
-    
+    override func setUp() {
+        super.setUp()
+        self.personAPI = PersonAPI()
+    }
     func testSampleRequestNativeToNativeFailure() {
         let asyncExpectation = expectation(description: "testSampleRequestNativeToNativeFailure")
 
@@ -21,7 +24,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         }, failureCallBack: { (failureMessage) in
             asyncExpectation.fulfill()
         })
-        self.personAPI.request.getUserName(responseListner: responseListener)
+        self.personAPI?.request.getUserName(responseListner: responseListener)
         waitForExpectations(timeout: 10)
     }
     
@@ -34,20 +37,27 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
                                 kElectrodeBridgeMessageType:kElectrodeBridgeMessageResponse,
                                 kElectrodeBridgeMessageData: expectedResults ]
             
-        let mockJSListener = MockJSEeventListener(request: {(request) in
-            XCTAssertNotNil(request)
-         
+        
+        let mockJSListener = SwiftMockJSEeventListener(jSBlock: {(result) in
+            XCTAssertNotNil(result)
+            guard let requestName = result[kElectrodeBridgeMessageName] as? String else{
+                XCTFail()
+                return
+            }
+            XCTAssertEqual(requestName, PersonAPI.kRequestGetUserName)
         }, response: expectedResponseWithoutId)
 
         self.appendMockEventListener(mockJSListener, forName: PersonAPI.kRequestGetUserName)
         let responseListener = PersonResponseResponseListener(successCallBack: { (any) in
+            XCTAssertNotNil(any)
+            XCTAssertEqual(expectedResults, any as? String)
             asyncExpectation.fulfill()
         }, failureCallBack: { (failureMessage) in
             XCTFail()
         })
-        self.personAPI.request.getUserName(responseListner: responseListener)
+        self.personAPI?.request.getUserName(responseListner: responseListener)
         waitForExpectations(timeout: 10)
-        
+        self.removeMockEventListener(withName: PersonAPI.kRequestGetUserName)
 
     }
     
@@ -56,7 +66,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
 
         //let status = Status(log: true, member: true)
         let person = Person(name: "John", age: nil, hiredMonth: 5, status: nil, position: nil, birthYear: nil)
-        let status = Status(log: true, member: false)
+        let status = Status(log: true, member: true)
         let requestHandler = PersonResponseRequestHandler(completionClosure: { (data, responseListener) in
             XCTAssertNotNil(data)
             guard let returnedPerson = data as? Person else {
@@ -82,15 +92,15 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTFail()
         })
         
-        self.personAPI.request.registerGetStatusRequestHandler(handler: requestHandler)
-        self.personAPI.request.getStatus(person: person, responseListener: responseListener)
+        self.personAPI?.request.registerGetStatusRequestHandler(handler: requestHandler)
+        self.personAPI?.request.getStatus(person: person, responseListener: responseListener)
         waitForExpectations(timeout: 10)
 
     }
     
     func testGetStatusRequestHandlerNativeToJSSuccess() {
         let asyncExpectation = expectation(description: "testRegisterGetStatusRequestHandleNativeToNative")
-        let actualPerson = Person(name: "John", age: 10, hiredMonth: 5, status: nil, position: nil, birthYear: nil)
+        let actualPerson = Person(name: "John", age: 10, hiredMonth: 6, status: nil, position: nil, birthYear: nil)
         let expectedStatus = Status(log: false, member: true)
         let statusDict = expectedStatus.toDictionary()
         
@@ -98,22 +108,29 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
                                          kElectrodeBridgeMessageType:kElectrodeBridgeMessageResponse,
         kElectrodeBridgeMessageData: statusDict ] as [AnyHashable: Any]
         
-        let mockJSListener = MockJSEeventListener(request: {(request: ElectrodeBridgeRequestNew) in
-            XCTAssertNotNil(request)
-            XCTAssertEqual(PersonAPI.kRequestGetStatus, request.name)
-            guard let requestPayload = request.data as? [AnyHashable: Any] else  {
-                XCTFail()
-                return
-            }
-            guard let person = try? NSObject.generateObject(data: requestPayload, classType: Person.self) as? Person else{
-                XCTFail()
-                return
-            }
-            XCTAssertNotNil(person)
+                
+        let mockJSListener = SwiftMockJSEeventListener(jSBlock: {(result) in
+            XCTAssertNotNil(result)
             
-            XCTAssertEqual(actualPerson.name, person?.name)
-            XCTAssertEqual(actualPerson.age, person?.age)
-            XCTAssertEqual(actualPerson.hiredMonth, person?.hiredMonth)
+            guard let returnedStatusDict = result as? [String: Any] else {
+                XCTFail()
+                return
+            }
+            
+            guard let returnedRequestName = returnedStatusDict[kElectrodeBridgeMessageName] as? String else {
+                XCTFail()
+                return
+            }
+            XCTAssertEqual(returnedRequestName, PersonAPI.kRequestGetStatus)
+            
+            guard let returnedPayload = returnedStatusDict[kElectrodeBridgeMessageData] as? [AnyHashable: Any]else {
+                XCTFail()
+                return
+            }
+            
+            XCTAssertEqual(actualPerson.name, returnedPayload["name"] as? String)
+            XCTAssertEqual(actualPerson.age, returnedPayload["age"] as? Int)
+            XCTAssertEqual(actualPerson.hiredMonth, returnedPayload["hiredMonth"] as? Int)
             
         }, response: expectedResponseWithoutId)
         
@@ -132,10 +149,10 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         }, failureCallBack: { (failureMessage) in
             XCTFail()
         })
-        self.personAPI.request.getStatus(person: actualPerson, responseListener: responseListener)
+        self.personAPI?.request.getStatus(person: actualPerson, responseListener: responseListener)
         
         waitForExpectations(timeout: 10)
-
+        self.removeMockEventListener(withName: PersonAPI.kRequestGetStatus)
     }
     
     func testGetStatusRequestHandlerJSToNativeSuccess() {
@@ -156,21 +173,37 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             responseListener.onSuccess(resultStatus)
         })
         
-        let mockJSResponseListener = SwiftMockJSEeventListener(responseBlock: {(response: ElectrodeBridgeResponse) in
-            XCTAssertNotNil(response)
-            guard let returnedStatusDict = response.data as? [String: Any] else {
+        
+        let mockJSResponseListner = SwiftMockJSEeventListener(jSBlock: {(result) in
+            XCTAssertNotNil(result)
+            guard let returnedStatusDict = result as? [String: Any] else {
                 XCTFail()
                 return
             }
-            XCTAssertEqual(resultStatus.log, returnedStatusDict["log"] as! Bool)
-            XCTAssertEqual(resultStatus.member, returnedStatusDict["member"] as! Bool)
+            guard let returnedPayload = returnedStatusDict[kElectrodeBridgeMessageData] as? [AnyHashable: Any]else {
+                XCTFail()
+                return
+            }
+            XCTAssertEqual(resultStatus.log, returnedPayload["log"] as! Bool)
+            XCTAssertEqual(resultStatus.member, returnedPayload["member"] as! Bool)
             asyncExpectation.fulfill()
         })
-        
-        
-        self.addMockEventListener(mockJSResponseListener, forName: kRequestGetStatus)
 
-        self.personAPI.request.registerGetStatusRequestHandler(handler: requestHandler)
+        
+        self.appendMockEventListener(mockJSResponseListner, forName: PersonAPI.kRequestGetStatus)
+
+        self.personAPI?.request.registerGetStatusRequestHandler(handler: requestHandler)
+        let requestPayload = ["name": person.name,
+                       "hiredMonth": person.hiredMonth,
+                       "age":person.age] as [AnyHashable: Any]
+        let requestDict = [kElectrodeBridgeMessageId: UUID().uuidString,
+                       kElectrodeBridgeMessageType: "req",
+                       kElectrodeBridgeMessageName: PersonAPI.kRequestGetStatus,
+                       kElectrodeBridgeMessageData: requestPayload
+        ] as [AnyHashable: Any]
+        
+        
+        MockBridgeTransceiver.sharedInstance().sendMessage(requestDict)
         waitForExpectations(timeout: 100)
 
     }
@@ -213,7 +246,10 @@ class SwiftMockJSEeventListener: MockJSEeventListener {
         super.init(eventBlock: eventBlock)
     }
     
-    override init(request requestBlock: @escaping requestBlock) {
-        super.init(request: requestBlock)
+    override init(jSBlock : @escaping ElectrodeBaseJSBlock) {
+        super.init(jSBlock: jSBlock)
+    }
+    override init(jSBlock : @escaping ElectrodeBaseJSBlock, response: [AnyHashable: Any] ) {
+        super.init(jSBlock: jSBlock, response: response)
     }
 }

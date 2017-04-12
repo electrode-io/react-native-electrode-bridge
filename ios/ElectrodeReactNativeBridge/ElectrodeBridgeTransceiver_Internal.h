@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransceiver ()
 + (instancetype) createWithTransceiver: (ElectrodeBridgeTransceiver *) transceiver;
 -(void) emitMessage:(ElectrodeBridgeMessage * _Nonnull) bridgeMessage;
+-(void)resetRegistrar;
 @end
 
 NS_ASSUME_NONNULL_END

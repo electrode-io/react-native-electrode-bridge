@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2238E19E1E8C29E8007FEDA8 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2238E18A1E8C28A9007FEDA8 /* libReact.a */; };
+		3017869A1E9E007F0051C4C6 /* UpdatePersonRequestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301786991E9E007F0051C4C6 /* UpdatePersonRequestData.swift */; };
 		301940E11E941389002A0C69 /* PersonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301940E01E941389002A0C69 /* PersonAPI.swift */; };
 		301941911E94153A002A0C69 /* BirthYear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941901E94153A002A0C69 /* BirthYear.swift */; };
 		301941931E941D26002A0C69 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941921E941D26002A0C69 /* Person.swift */; };
@@ -165,6 +166,7 @@
 
 /* Begin PBXFileReference section */
 		2238E17E1E8C28A9007FEDA8 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
+		301786991E9E007F0051C4C6 /* UpdatePersonRequestData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdatePersonRequestData.swift; sourceTree = "<group>"; };
 		301940E01E941389002A0C69 /* PersonAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonAPI.swift; sourceTree = "<group>"; };
 		301941901E94153A002A0C69 /* BirthYear.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthYear.swift; sourceTree = "<group>"; };
 		301941921E941D26002A0C69 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
@@ -314,6 +316,7 @@
 				301941921E941D26002A0C69 /* Person.swift */,
 				301941941E941D56002A0C69 /* Position.swift */,
 				301941961E9420C5002A0C69 /* Status.swift */,
+				301786991E9E007F0051C4C6 /* UpdatePersonRequestData.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -730,6 +733,7 @@
 				DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */,
 				7F8E8CBF1E8F0CCA00CF0D8C /* TestRequestHandler.m in Sources */,
 				3019419A1E942F42002A0C69 /* EventProcessorTests.swift in Sources */,
+				3017869A1E9E007F0051C4C6 /* UpdatePersonRequestData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

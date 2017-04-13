@@ -44,7 +44,6 @@ public class RequestHandlerProcessor<TReq, TResp> extends BridgeProcessor {
 
                 if (reqClazz != None.class) {
                     request = (TReq) BridgeArguments.generateObject(bridgeRequest.getData(), reqClazz);
-                    request = (TReq) preProcessObject(request, reqClazz);
                 }
                 Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, bridgeRequest);
 

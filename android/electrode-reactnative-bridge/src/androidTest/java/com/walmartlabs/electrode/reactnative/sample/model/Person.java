@@ -60,9 +60,9 @@ public class Person implements Parcelable, Bridgeable {
         this.status = bundle.containsKey("status") ? new Status(bundle.getBundle("status")) : null;
         this.position = bundle.containsKey("position") ? new Position(bundle.getBundle("position")) : null;
         this.birthYear = bundle.containsKey("birthYear") ? new BirthYear(bundle.getBundle("birthYear")) : null;
-        this.addressList = (List<Address>) (bundle.containsKey("addressList") ? getList(bundle.getParcelableArray("addressList"), Address.class) : new ArrayList<Address>());
-        this.siblingsNames = (List<String>) (bundle.containsKey("siblingsNames") ? getList(bundle.getStringArray("siblingsNames"), String.class) : new ArrayList<String>());
-        this.siblingsAges = getList(bundle.getStringArray("siblingsNames"), Integer.class);
+        this.addressList = bundle.containsKey("addressList") ? getList(bundle.getParcelableArray("addressList"), Address.class) : new ArrayList<Address>();
+        this.siblingsNames = bundle.containsKey("siblingsNames") ? getList(bundle.getStringArray("siblingsNames"), String.class) : new ArrayList<String>();
+        this.siblingsAges = bundle.containsKey("siblingsAges") ? getList(bundle.get("siblingsAges"), Integer.class) : new ArrayList<Integer>();
     }
 
     public static final Creator<Person> CREATOR = new Creator<Person>() {
@@ -117,14 +117,17 @@ public class Person implements Parcelable, Bridgeable {
         return birthYear;
     }
 
+    @NonNull
     public List<Address> getAddressList() {
         return addressList;
     }
 
+    @NonNull
     public List<String> getSiblingsNames() {
         return siblingsNames;
     }
 
+    @NonNull
     public List<Integer> getSiblingsAges() {
         return siblingsAges;
     }

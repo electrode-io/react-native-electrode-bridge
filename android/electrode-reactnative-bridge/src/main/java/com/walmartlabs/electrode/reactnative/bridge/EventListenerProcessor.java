@@ -39,7 +39,6 @@ public class EventListenerProcessor<T> extends BridgeProcessor {
                 T result = null;
                 if (eventPayLoadClass != None.class) {
                     result = (T) BridgeArguments.generateObject(bridgeEvent.getData(), eventPayLoadClass);
-                    result = (T) preProcessObject(result, eventPayLoadClass);
                 }
 
                 eventListener.onEvent(result);

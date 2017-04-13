@@ -242,8 +242,11 @@
                 }
                 
                 if (registeredListener.response) {
-                    NSMutableDictionary *response = [[NSMutableDictionary alloc] initWithDictionary:registeredListener.response];
+                    NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
+                    [response setObject:registeredListener.response forKey:kElectrodeBridgeMessageData];
                     [response setObject:bridgeMessage.messageId forKey:kElectrodeBridgeMessageId];
+                    [response setObject:kElectrodeBridgeMessageResponse forKey:kElectrodeBridgeMessageType];
+                    [response setObject:bridgeMessage.name forKey:kElectrodeBridgeMessageName];
                     [self sendMessage: response];
                 }
                 break;
@@ -316,7 +319,7 @@
     return self;
 }
 
--(instancetype) initWithjSBlock:(ElectrodeBaseJSBlock)jSBlock response: (NSDictionary *) response {
+-(instancetype) initWithjSBlock:(ElectrodeBaseJSBlock)jSBlock response: (id) response {
     if(self = [super init]) {
         self.jSCallBackBlock = jSBlock;
         self.response = response;

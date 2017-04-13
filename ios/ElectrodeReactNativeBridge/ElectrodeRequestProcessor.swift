@@ -11,18 +11,18 @@ import UIKit
 typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
 typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> ()
 
-public class ElectrodeRequestProcessor<TReq: Bridgeable, TResp, TItem>: NSObject {
+public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let tag: String
     private let requestName: String
-    private let requestPayload: TReq?
+    private let requestPayload: Any?
     private let responseClass: TResp.Type
-    private let responseItemType: TItem.Type?
+    private let responseItemType: Any.Type?
     private let responseListener: ElectrodeBridgeResponseListener
     
     public init(requestName: String,
-         requestPayload: TReq?,
+         requestPayload: Any?,
          respClass: TResp.Type,
-         responseItemType: TItem.Type?,
+         responseItemType: Any.Type?,
          responseListener: ElectrodeBridgeResponseListener)
     {
         self.tag              = String(describing: type(of:self))

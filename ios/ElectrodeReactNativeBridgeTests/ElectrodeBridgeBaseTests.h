@@ -34,14 +34,14 @@ typedef void (^ElectrodeBaseJSBlock)(NSDictionary *result);
 ///////////////
 -(nonnull instancetype) initWithRequestBlock: (nonnull requestBlock) requestBlock response: (NSDictionary *)response;
 -(nonnull instancetype) initWithjSBlock: (ElectrodeBaseJSBlock) jSBlock;
--(instancetype) initWithjSBlock:(ElectrodeBaseJSBlock)jSBlock response: (NSDictionary *) response;
+-(instancetype) initWithjSBlock:(ElectrodeBaseJSBlock)jSBlock response: (id _Nullable) response;
 ///////////////
 
 @property(nonatomic, copy, nullable) evetBlock evetBlock;
 @property(nonatomic, copy, nullable) requestBlock requestBlock;
 @property(nonatomic, copy, nullable) responseBlock responseBlock;
 
-@property(nonatomic, copy, nullable) NSDictionary *response;
+@property(nonatomic, copy, nullable) id response;
 @property(nonatomic, copy, nullable) ElectrodeBaseJSBlock jSCallBackBlock;
 @end
 

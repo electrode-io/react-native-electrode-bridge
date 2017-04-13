@@ -17,6 +17,9 @@ public class PersonAPI {
     static let kRequestGetStatus = "kRequestGetStatus"
     static let kRequestGetUserName = "kRequestGetUserName"
     static let kRequestGetAge = "kRequestGetAge"
+    static let kRequestPostPersonUpdate = "kRequestPostPersonUpdate"
+    static let kRequestFindPersonsByStatus = "kRequestFindPersonsByStatus"
+    static let kRequestFindPersonsByName = "kRequestFindPersonsByName"
     lazy var event: Events = { return PersonEvents()}()
     lazy var request: Requests = {return PersonRequests()}()
     
@@ -59,6 +62,18 @@ public class PersonAPI {
             assertionFailure("need override")
         }
         
+        func registerUpdatePersonRequestHandler(handler: ElectrodeBridgeRequestHandler) {
+            assertionFailure("need override")
+        }
+        
+        func registerFindPersonsByStatus(handler: ElectrodeBridgeRequestHandler) {
+            assertionFailure("need override")
+        }
+        
+        func registerFindPersonsAgeByName(handler: ElectrodeBridgeRequestHandler) {
+            assertionFailure("need override")
+        }
+        
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
@@ -90,7 +105,18 @@ public class PersonAPI {
         
         func getAge(name: String, responseListener: ElectrodeBridgeResponseListener) {
             assertionFailure("need override")
-
+        }
+        
+        func updatePersonPost(updatePersonRequestData: UpdatePersonRequestData, responseListener: ElectrodeBridgeResponseListener) {
+            assertionFailure("need override")
+        }
+        
+        func findPersonsByStatus(statusList: [Status], responseListener: ElectrodeBridgeResponseListener) {
+            assertionFailure("need override")
+        }
+        
+        func findPersonByAge(names: [String], responseListener: ElectrodeBridgeResponseListener) {
+            assertionFailure("need override")
         }
         
     }

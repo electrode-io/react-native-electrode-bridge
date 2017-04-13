@@ -23,6 +23,21 @@ class PersonRequests: PersonAPI.Requests {
         requestHandler.execute()
     }
     
+    override func registerUpdatePersonRequestHandler(handler: ElectrodeBridgeRequestHandler) {
+        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestPostPersonUpdate, reqClass: UpdatePersonRequestData.self, respClass: Person.self, requestHandler: handler)
+        requestHandler.execute()
+    }
+    
+    override func registerFindPersonsByStatus(handler: ElectrodeBridgeRequestHandler) {
+        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestFindPersonsByStatus, reqClass: Status.self, respClass: Person.self, requestHandler: handler)
+        requestHandler.execute()
+    }
+    
+    override func registerFindPersonsAgeByName(handler: ElectrodeBridgeRequestHandler) {
+        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestFindPersonsByName, reqClass: String.self, respClass: Int.self, requestHandler: handler)
+        requestHandler.execute()
+    }
+    
     override func getPerson(responseListner responseListener: ElectrodeBridgeResponseListener) {
         let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Person, Any>(requestName: PersonAPI.kRequestGetPerson,
                                                           requestPayload: nil,
@@ -48,13 +63,43 @@ class PersonRequests: PersonAPI.Requests {
     }
     
     override func getAge(name: String, responseListener: ElectrodeBridgeResponseListener) {
-        /*
-        let requestProcessor = ElectrodeRequestProcessor<String, String, Any>(requestName: kRequestGetUserName,
-                                                                            requestPayload: nil,
-                                                                            respClass: String.self,
+        let requestProcessor = ElectrodeRequestProcessor<None, String, Any>(requestName: PersonAPI.kRequestGetAge,
+                                                                             requestPayload: name,
+                                                                             respClass: String.self,
+                                                                             responseItemType: nil,
+                                                                             responseListener: responseListener)
+        requestProcessor.execute()
+ 
+    }
+    
+    override func updatePersonPost(updatePersonRequestData: UpdatePersonRequestData, responseListener: ElectrodeBridgeResponseListener) {
+        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Person, Any>(requestName: PersonAPI.kRequestPostPersonUpdate,
+                                                                            requestPayload: updatePersonRequestData,
+                                                                            respClass: Person.self,
                                                                             responseItemType: nil,
-                                                                            responseListener: responseListner)
- */
+                                                                            responseListener: responseListener)
+        requestProcessor.execute()
+    }
+    
+    
+    override func findPersonsByStatus(statusList: [Status], responseListener: ElectrodeBridgeResponseListener) {
+        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Array<Any>, Any>(requestName: PersonAPI.kRequestFindPersonsByStatus,
+                                                                            requestPayload: statusList,
+                                                                            respClass: Array<Any>.self,
+                                                                            responseItemType: Person.self,
+                                                                            responseListener: responseListener)
+        requestProcessor.execute()
+    }
+    
+    
+    override func findPersonByAge(names: [String], responseListener: ElectrodeBridgeResponseListener) {
+        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Array<Any>, Any>(
+            requestName: PersonAPI.kRequestFindPersonsByName,
+            requestPayload: names,
+            respClass: Array<Any>.self,
+            responseItemType: Int.self,
+            responseListener: responseListener)
+        requestProcessor.execute()
     }
 
 }

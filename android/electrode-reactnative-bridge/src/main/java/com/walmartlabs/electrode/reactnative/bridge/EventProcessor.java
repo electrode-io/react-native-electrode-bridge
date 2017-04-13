@@ -1,11 +1,9 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
-import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
 /**
  * Processes an event that is emitted from Native side
@@ -13,7 +11,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <T> eventPayload
  */
 
-public class EventProcessor<T> extends BridgeProcessor {
+public class EventProcessor<T> implements Processor {
     private static final String TAG = EventProcessor.class.getSimpleName();
 
     private final T eventPayload;

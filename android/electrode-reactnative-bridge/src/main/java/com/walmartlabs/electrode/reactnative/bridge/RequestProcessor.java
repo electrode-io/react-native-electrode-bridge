@@ -12,7 +12,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <TReq>
  * @param <TResp>
  */
-public class RequestProcessor<TReq, TResp> extends BridgeProcessor {
+public class RequestProcessor<TReq, TResp> implements Processor {
     private final String TAG = RequestProcessor.class.getSimpleName();
 
     private final String requestName;

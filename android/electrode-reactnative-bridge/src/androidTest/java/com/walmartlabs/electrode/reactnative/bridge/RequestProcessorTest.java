@@ -14,6 +14,7 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.ArgumentsEx;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.api.UpdatePersonRequestData;
+import com.walmartlabs.electrode.reactnative.sample.model.Address;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -994,4 +995,102 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }
+
+    public void testListInsideModelsNativeToNative() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testListInsideModels";
+        List<Address> addressList = new ArrayList<Address>() {{
+            add(new Address.Builder("1235 Walmart Ave", "94085").build());
+            add(new Address.Builder("1233 SanBruno Ave", "94075").build());
+        }};
+
+        List<String> namesList = new ArrayList<String>() {{
+            add("Name1");
+            add("Name2");
+        }};
+        List<Integer> agesList = new ArrayList<Integer>() {{
+            add(30);
+            add(40);
+        }};
+        final Person inputPerson = new Person.Builder("testName", 10).addresses(addressList).siblingsNames(namesList).siblingsAges(agesList).build();
+
+        new RequestHandlerProcessor<>(requestName, Person.class, Person.class, new ElectrodeBridgeRequestHandler<Person, Person>() {
+            @Override
+            public void onRequest(@Nullable Person payload, @NonNull ElectrodeBridgeResponseListener<Person> responseListener) {
+                assertNotNull(payload);
+                assertEquals(inputPerson, payload);
+                responseListener.onSuccess(payload);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        new RequestProcessor<>(requestName, inputPerson, Person.class, new ElectrodeBridgeResponseListener<Person>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable Person person) {
+                assertNotNull(person);
+                assertEquals(inputPerson, person);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testListInsideModelsNativeToJS() {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String requestName = "testListInsideModels";
+        List<Address> addressList = new ArrayList<Address>() {{
+            add(new Address.Builder("1235 Walmart Ave", "94085").build());
+            add(new Address.Builder("1233 SanBruno Ave", "94075").build());
+        }};
+
+        List<String> namesList = new ArrayList<String>() {{
+            add("Name1");
+            add("Name2");
+        }};
+        List<Integer> agesList = new ArrayList<Integer>() {{
+            add(30);
+            add(40);
+        }};
+        final Person inputPerson = new Person.Builder("testName", 10).addresses(addressList).siblingsNames(namesList).siblingsAges(agesList).build();
+
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onRequest(ReadableMap request, @NonNull MockJsResponseDispatcher jsResponseDispatcher) {
+                assertNotNull(request);
+                WritableMap map = Arguments.createMap();
+                map.merge(request.getMap(BridgeMessage.BRIDGE_MSG_DATA));
+                jsResponseDispatcher.dispatchResponse(map);
+                countDownLatch.countDown();
+            }
+        });
+
+        new RequestProcessor<>(requestName, inputPerson, Person.class, new ElectrodeBridgeResponseListener<Person>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable Person person) {
+                assertNotNull(person);
+                assertNotSame(inputPerson, person);
+                assertEquals(inputPerson.getName(), person.getName());
+                assertEquals(inputPerson.getMonth(), person.getMonth());
+                assertEquals(inputPerson.getAddressList().size(), person.getAddressList().size());
+                assertEquals(inputPerson.getSiblingsNames().size(), person.getSiblingsNames().size());
+                assertEquals(inputPerson.getSiblingsAges().size(), person.getSiblingsAges().size());
+
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
 }

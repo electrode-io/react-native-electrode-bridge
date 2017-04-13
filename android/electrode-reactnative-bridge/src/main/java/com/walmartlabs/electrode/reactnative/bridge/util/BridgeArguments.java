@@ -300,17 +300,6 @@ public final class BridgeArguments {
 
     }
 
-    public static List<Integer> toIntegerList(@Nullable int[] intArray) {
-        List<Integer> result = new ArrayList<>();
-
-        if (intArray != null) {
-            for (int val : intArray) {
-                result.add(val);
-            }
-        }
-        return result;
-    }
-
     private static boolean isSupportedPrimitiveType(@NonNull Class clazz) {
         return SUPPORTED_PRIMITIVE_TYPES.contains(clazz);
     }

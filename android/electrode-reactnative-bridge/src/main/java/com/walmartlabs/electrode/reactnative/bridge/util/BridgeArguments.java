@@ -106,11 +106,15 @@ public final class BridgeArguments {
     }
 
     @NonNull
-    private static Bundle[] bridgeablesToBundleArray(@NonNull List<Bridgeable> objList) {
+    public static Bundle[] bridgeablesToBundleArray(@NonNull List objList) {
         Bundle[] bundleList = new Bundle[objList.size()];
         for (int i = 0; i < objList.size(); i++) {
             Object obj = objList.get(i);
-            bundleList[i] = (((Bridgeable) obj).toBundle());
+            if (obj instanceof Bridgeable) {
+                bundleList[i] = (((Bridgeable) obj).toBundle());
+            } else {
+                throw new IllegalArgumentException("Should never reach here, received a non-bridgeable object, " + obj);
+            }
         }
         return bundleList;
     }
@@ -161,7 +165,7 @@ public final class BridgeArguments {
      * @param listItemClass Defines the conent type of the list
      * @return List
      */
-    private static List getList(Object obj, @Nullable Class listItemClass) {
+    public static List getList(Object obj, @Nullable Class listItemClass) {
         if (!isArray(obj)) {
             throw new IllegalArgumentException("Should never reach here, expected an array, received: " + obj);
         }
@@ -276,6 +280,35 @@ public final class BridgeArguments {
             }
         }
         return output;
+    }
+
+    /**
+     * Converts a list of {@link Integer} to int[], any null value will be replaced with 0 inside the array
+     *
+     * @param integerList {@link List<Integer>}
+     * @return int[]
+     */
+    public static int[] toIntArray(@NonNull List<Integer> integerList) {
+        int array[] = new int[integerList.size()];
+
+        for (int i = 0; i < integerList.size(); i++) {
+            if (integerList.get(i) != null) {
+                array[i] = integerList.get(i);
+            }
+        }
+        return array;
+
+    }
+
+    public static List<Integer> toIntegerList(@Nullable int[] intArray) {
+        List<Integer> result = new ArrayList<>();
+
+        if (intArray != null) {
+            for (int val : intArray) {
+                result.add(val);
+            }
+        }
+        return result;
     }
 
     private static boolean isSupportedPrimitiveType(@NonNull Class clazz) {

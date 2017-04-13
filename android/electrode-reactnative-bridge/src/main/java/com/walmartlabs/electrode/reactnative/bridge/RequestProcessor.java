@@ -12,7 +12,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <TReq>
  * @param <TResp>
  */
-public class RequestProcessor<TReq, TResp> extends BridgeProcessor {
+public class RequestProcessor<TReq, TResp> implements Processor {
     private final String TAG = RequestProcessor.class.getSimpleName();
 
     private final String requestName;
@@ -55,9 +55,7 @@ public class RequestProcessor<TReq, TResp> extends BridgeProcessor {
 
                 TResp response = null;
                 if (responseClass != None.class) {
-                    response = (TResp) BridgeArguments.generateObject(bridgeResponse.getData(), getResponseType(responseType));
-
-                    response = (TResp) preProcessObject(response, responseType);
+                    response = (TResp) BridgeArguments.generateObject(bridgeResponse.getData(), responseType);
                 }
 
                 Logger.d(TAG, "Request processor received the final response(%s) for request(%s)", response, requestName);

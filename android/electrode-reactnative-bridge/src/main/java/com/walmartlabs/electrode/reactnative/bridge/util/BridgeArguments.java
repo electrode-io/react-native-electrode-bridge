@@ -106,11 +106,15 @@ public final class BridgeArguments {
     }
 
     @NonNull
-    private static Bundle[] bridgeablesToBundleArray(@NonNull List<Bridgeable> objList) {
+    public static Bundle[] bridgeablesToBundleArray(@NonNull List objList) {
         Bundle[] bundleList = new Bundle[objList.size()];
         for (int i = 0; i < objList.size(); i++) {
             Object obj = objList.get(i);
-            bundleList[i] = (((Bridgeable) obj).toBundle());
+            if (obj instanceof Bridgeable) {
+                bundleList[i] = (((Bridgeable) obj).toBundle());
+            } else {
+                throw new IllegalArgumentException("Should never reach here, received a non-bridgeable object, " + obj);
+            }
         }
         return bundleList;
     }
@@ -148,7 +152,8 @@ public final class BridgeArguments {
         } else {
             throw new IllegalArgumentException("Should never happen, looks like logic to handle " + data.getClass() + " type is not implemented yet, returnClass:" + returnClass);
         }
-        return response;
+
+        return preProcessObject(response, returnClass);
     }
 
 
@@ -159,18 +164,15 @@ public final class BridgeArguments {
     /**
      * @param obj           input array
      * @param listItemClass Defines the conent type of the list
-     * @return List
+     * @return List<listItemClass>
      */
-    private static List getList(Object obj, @Nullable Class listItemClass) {
+    public static List getList(Object obj, @NonNull Class listItemClass) {
         if (!isArray(obj)) {
             throw new IllegalArgumentException("Should never reach here, expected an array, received: " + obj);
         }
 
         List<Object> convertedList = new ArrayList<>();
         if (obj instanceof Bundle[]) {
-            if (listItemClass == null) {
-                throw new IllegalArgumentException("listItemClass is required to convert Bundle[]");
-            }
             Bundle[] bundles = (Bundle[]) obj;
 
             for (Bundle bundle : bundles) {
@@ -198,7 +200,8 @@ public final class BridgeArguments {
         } else {
             throw new IllegalArgumentException("Array of type " + obj.getClass().getSimpleName() + " is not supported yet");
         }
-        return convertedList;
+
+        return updateListResponseIfRequired(convertedList, listItemClass);
     }
 
     @VisibleForTesting
@@ -241,6 +244,70 @@ public final class BridgeArguments {
         throw new IllegalArgumentException("Unable to generate a Bridgeable from bundle: " + bundle);
     }
 
+    private static Object preProcessObject(Object object, Class expectedObjectType) {
+        if (object instanceof List) {
+            runValidationForListResponse(object, expectedObjectType);
+        } else if (Number.class.isAssignableFrom(expectedObjectType)) {
+            object = updateNumberResponseToMatchReturnType(object, expectedObjectType);
+        }
+        return object;
+    }
+
+    /**
+     * @param listResponse response object
+     * @param listItemType list content type
+     * @return List
+     */
+    //Needed since any response that is coming back from JS will only have number.
+    private static List updateListResponseIfRequired(List listResponse, @NonNull Class listItemType) {
+        if (!listResponse.isEmpty()
+                && isNumberAndNeedsConversion(listResponse.get(0), listItemType)) {
+            Logger.d(TAG, "Performing list Number conversion from %s to %s", listResponse.get(0).getClass(), listItemType);
+            List<Number> updatedResponse = new ArrayList<>(listResponse.size());
+            for (Object number : listResponse) {
+                updatedResponse.add(convertToNumberToResponseType((Number) number, listItemType));
+            }
+            return updatedResponse;
+        }
+        return listResponse;
+    }
+
+    private static Object updateNumberResponseToMatchReturnType(@NonNull Object response, @NonNull Class responseType) {
+
+        if (isNumberAndNeedsConversion(response, responseType)) {
+            Logger.d(TAG, "Performing Number conversion from %s to %s", response.getClass(), responseType);
+            return convertToNumberToResponseType((Number) response, responseType);
+        } else {
+            return response;
+        }
+    }
+
+    private static void runValidationForListResponse(Object response, Class expectedResponseType) {
+        if (response instanceof List) {
+            //Ensure the list content is matching the responseType. This is a workaround to eliminate the limitation of generics preventing the List type being represented inside Class.
+            if (!((List) response).isEmpty()) {
+                if (!expectedResponseType.isAssignableFrom(((List) response).get(0).getClass())) {
+                    throw new IllegalArgumentException("Expected List<" + expectedResponseType + "> but received List<" + ((List) response).get(0).getClass().getSimpleName() + ">");
+                }
+            }
+        }
+    }
+
+    @NonNull
+    private static Number convertToNumberToResponseType(@NonNull Number response, @NonNull Class responseType) {
+        if (responseType == Integer.class) {
+            return response.intValue();
+        } else {
+            throw new IllegalArgumentException("FIXME, add support for " + responseType);
+        }
+    }
+
+    private static boolean isNumberAndNeedsConversion(@NonNull Object obj, Class responseType) {
+        return !responseType.getClass().isAssignableFrom(obj.getClass())//Make sure the expected type and actual type are not same
+                && Number.class.isAssignableFrom(obj.getClass())
+                && Number.class.isAssignableFrom(responseType);
+    }
+
     private static void logException(Exception e) {
         Logger.w(TAG, "FromBundle failed to execute(%s)", e.getMessage() != null ? e.getMessage() : e.getCause());
     }
@@ -276,6 +343,24 @@ public final class BridgeArguments {
             }
         }
         return output;
+    }
+
+    /**
+     * Converts a list of {@link Integer} to int[], any null value will be replaced with 0 inside the array
+     *
+     * @param integerList {@link List<Integer>}
+     * @return int[]
+     */
+    public static int[] toIntArray(@NonNull List<Integer> integerList) {
+        int array[] = new int[integerList.size()];
+
+        for (int i = 0; i < integerList.size(); i++) {
+            if (integerList.get(i) != null) {
+                array[i] = integerList.get(i);
+            }
+        }
+        return array;
+
     }
 
     private static boolean isSupportedPrimitiveType(@NonNull Class clazz) {

@@ -12,7 +12,7 @@ import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
  * @param <T> Event payload type: Accepted types are Primitive wrappers and {@link Bridgeable}
  */
 
-public class EventListenerProcessor<T> extends BridgeProcessor {
+public class EventListenerProcessor<T> implements Processor {
     private static final String TAG = EventListenerProcessor.class.getSimpleName();
 
     private final String eventName;
@@ -39,7 +39,6 @@ public class EventListenerProcessor<T> extends BridgeProcessor {
                 T result = null;
                 if (eventPayLoadClass != None.class) {
                     result = (T) BridgeArguments.generateObject(bridgeEvent.getData(), eventPayLoadClass);
-                    result = (T) preProcessObject(result, eventPayLoadClass);
                 }
 
                 eventListener.onEvent(result);

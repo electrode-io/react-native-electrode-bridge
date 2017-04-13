@@ -142,4 +142,37 @@ public class BridgeArgumentsTest extends TestCase {
         assertEquals(expected, actual);
     }
 
+    public void testToIntArray() {
+        List<Integer> inputList = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+        }};
+
+        int result[] = BridgeArguments.toIntArray(inputList);
+
+        assertEquals(inputList.size(), result.length);
+    }
+
+    public void testToIntArrayWithNull() {
+        List<Integer> inputList = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(null);
+            add(3);
+        }};
+
+        int result[] = BridgeArguments.toIntArray(inputList);
+
+        assertEquals(inputList.size(), result.length);
+    }
+
+    public void testToIntArrayWithEmptyList() {
+        List<Integer> inputList = new ArrayList<>();
+
+        int result[] = BridgeArguments.toIntArray(inputList);
+
+        assertEquals(inputList.size(), result.length);
+    }
+
 }

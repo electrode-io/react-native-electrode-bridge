@@ -8,7 +8,13 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.bridgeablesToBundleArray;
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getList;
 import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
+import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.toIntArray;
 
 public class Person implements Parcelable, Bridgeable {
 
@@ -18,6 +24,9 @@ public class Person implements Parcelable, Bridgeable {
     private Status status;
     private Position position;
     private BirthYear birthYear;
+    private List<Address> addressList;
+    private List<String> siblingsNames;
+    private List<Integer> siblingsAges;
 
     private Person() {
     }
@@ -29,6 +38,9 @@ public class Person implements Parcelable, Bridgeable {
         this.status = builder.status;
         this.position = builder.position;
         this.birthYear = builder.birthYear;
+        this.addressList = builder.addressList;
+        this.siblingsNames = builder.siblingsNames;
+        this.siblingsAges = builder.siblingsAges;
     }
 
     private Person(Parcel in) {
@@ -48,6 +60,9 @@ public class Person implements Parcelable, Bridgeable {
         this.status = bundle.containsKey("status") ? new Status(bundle.getBundle("status")) : null;
         this.position = bundle.containsKey("position") ? new Position(bundle.getBundle("position")) : null;
         this.birthYear = bundle.containsKey("birthYear") ? new BirthYear(bundle.getBundle("birthYear")) : null;
+        this.addressList = bundle.containsKey("addressList") ? getList(bundle.getParcelableArray("addressList"), Address.class) : new ArrayList<Address>();
+        this.siblingsNames = bundle.containsKey("siblingsNames") ? getList(bundle.getStringArray("siblingsNames"), String.class) : new ArrayList<String>();
+        this.siblingsAges = bundle.containsKey("siblingsAges") ? getList(bundle.get("siblingsAges"), Integer.class) : new ArrayList<Integer>();
     }
 
     public static final Creator<Person> CREATOR = new Creator<Person>() {
@@ -102,6 +117,20 @@ public class Person implements Parcelable, Bridgeable {
         return birthYear;
     }
 
+    @NonNull
+    public List<Address> getAddressList() {
+        return addressList;
+    }
+
+    @NonNull
+    public List<String> getSiblingsNames() {
+        return siblingsNames;
+    }
+
+    @NonNull
+    public List<Integer> getSiblingsAges() {
+        return siblingsAges;
+    }
 
     @Override
     public int describeContents() {
@@ -117,19 +146,32 @@ public class Person implements Parcelable, Bridgeable {
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        if(age != null) {
+        if (age != null) {
             bundle.putInt("age", age);
         }
         bundle.putInt("month", month);
-        if(status != null) {
+        if (status != null) {
             bundle.putParcelable("status", status.toBundle());
         }
-        if(position != null) {
+        if (position != null) {
             bundle.putParcelable("position", position.toBundle());
         }
-        if(birthYear != null) {
+        if (birthYear != null) {
             bundle.putParcelable("birthYear", birthYear.toBundle());
         }
+
+        if (addressList != null && !addressList.isEmpty()) {
+            bundle.putParcelableArray("addressList", bridgeablesToBundleArray(addressList));
+        }
+
+        if (siblingsNames != null && !siblingsNames.isEmpty()) {
+            bundle.putStringArray("siblingsNames", siblingsNames.toArray(new String[]{}));
+        }
+
+        if (siblingsAges != null && !siblingsAges.isEmpty()) {
+            bundle.putIntArray("siblingsAges", toIntArray(getSiblingsAges()));
+        }
+
         return bundle;
     }
 
@@ -140,6 +182,9 @@ public class Person implements Parcelable, Bridgeable {
         private Status status;
         private Position position;
         private BirthYear birthYear;
+        private List<Address> addressList;
+        private List<String> siblingsNames;
+        private List<Integer> siblingsAges;
 
         public Builder(@NonNull String name, @NonNull Integer month) {
             this.name = name;
@@ -169,6 +214,22 @@ public class Person implements Parcelable, Bridgeable {
             this.birthYear = birthYear;
             return this;
         }
+
+        public Builder addresses(@Nullable List<Address> addressList) {
+            this.addressList = addressList;
+            return this;
+        }
+
+        public Builder siblingsNames(@Nullable List<String> siblingsNames) {
+            this.siblingsNames = siblingsNames;
+            return this;
+        }
+
+        public Builder siblingsAges(@Nullable List<Integer> siblingsAges) {
+            this.siblingsAges = siblingsAges;
+            return this;
+        }
+
 
         @NonNull
         public Person build() {

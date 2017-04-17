@@ -354,6 +354,8 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
     public void testConstantProviders() {
         assertTrue(getNativeBridge() instanceof ReactContextBaseJavaModule);
         assertNull(((ReactContextBaseJavaModule) getNativeBridge()).getConstants());
+        final CountDownLatch countDownLatch = new CountDownLatch(3);
+
 
         final Map<String, Object> constants1 = new HashMap() {{
             put("map1key1", "value1");
@@ -363,40 +365,55 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             put("map2key1", 10);
         }};
 
-        ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
-            @Nullable
+        new Thread(new Runnable() {
             @Override
-            public Map<String, Object> getConstants() {
-                return constants1;
+            public void run() {
+                ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
+                    @Nullable
+                    @Override
+                    public Map<String, Object> getConstants() {
+                        countDownLatch.countDown();
+                        return constants1;
+                    }
+                });
             }
-        });
+        }).run();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
+                    @Nullable
+                    @Override
+                    public Map<String, Object> getConstants() {
+                        countDownLatch.countDown();
+                        return constants2;
+                    }
+                });
+            }
+        }).run();
+
 
         ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
             @Nullable
             @Override
             public Map<String, Object> getConstants() {
-                return constants2;
-            }
-        });
-
-        ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
-            @Nullable
-            @Override
-            public Map<String, Object> getConstants() {
+                countDownLatch.countDown();
                 return null;
             }
         });
 
-        final Map<String, Object> expectedMap = new HashMap<>();
-        expectedMap.putAll(constants1);
-        expectedMap.putAll(constants2);
 
-        assertEquals(expectedMap.size(), ((ReactContextBaseJavaModule) getNativeBridge()).getConstants().size());
+        final Map<String, Object> expectedMap = ((ReactContextBaseJavaModule) getNativeBridge()).getConstants();
+        assertNotNull(expectedMap);
+        assertEquals(expectedMap.size(), (constants1.size() + constants2.size()));
         for (Map.Entry<String, Object> entry : constants1.entrySet()) {
             assertTrue(expectedMap.containsKey(entry.getKey()));
         }
         for (Map.Entry<String, Object> entry : constants2.entrySet()) {
             assertTrue(expectedMap.containsKey(entry.getKey()));
         }
+
+        waitForCountDownToFinishOrFail(countDownLatch);
     }
 }

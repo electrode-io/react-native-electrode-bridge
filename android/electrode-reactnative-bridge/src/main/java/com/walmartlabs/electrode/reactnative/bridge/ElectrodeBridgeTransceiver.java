@@ -1,6 +1,5 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -16,6 +15,8 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequest.NO_TIMEOUT;
 
 /**
  * Class that is responsible for transmitting messages between native and react native
@@ -232,13 +233,17 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     }
 
     private void startTimeOutCheckForTransaction(@NonNull final BridgeTransaction transaction) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                Logger.d(TAG, "Checking timeout for request(id=%s)", transaction.getRequest().getId());
-                handleResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
-            }
-        }, transaction.getRequest().getTimeoutMs());
+        if (transaction.getRequest().getTimeoutMs() != NO_TIMEOUT) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    Logger.d(TAG, "Checking timeout for request(id=%s)", transaction.getRequest().getId());
+                    handleResponse(ElectrodeBridgeResponse.createResponseForRequest(transaction.getRequest(), null, BridgeFailureMessage.create("EREQUESTTIMEOUT", "Request timeout")));
+                }
+            }, transaction.getRequest().getTimeoutMs());
+        } else {
+            Logger.d(TAG, "NO_TIMEOUT request, Will skip timeout check for request(%s)", transaction.getRequest());
+        }
     }
 
     private void dispatchRequestToLocalHandler(@NonNull final BridgeTransaction transaction) {

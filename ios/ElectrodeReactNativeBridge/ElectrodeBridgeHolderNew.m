@@ -9,7 +9,7 @@
 #import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeHolderNew.h"
-
+#import "ElectrodeBridgeTransceiver.h"
 
 @interface ElectrodeBridgeHolderNew()
 
@@ -29,8 +29,6 @@ static NSMutableDictionary *queuedRequests;
 static NSMutableArray *queuedEvent;
 
 +(void) initialize {
-    isReactNativeReady = YES;
-    electrodeNativeBridge = [ElectrodeBridgeTransceiver sharedInstance];
     queuedRequestHandlerRegistration = [[NSMutableDictionary alloc] init];
     queuedEventListenerRegistration = [[NSMutableDictionary alloc] init];
     queuedRequests = [[NSMutableDictionary alloc] init];
@@ -40,7 +38,9 @@ static NSMutableArray *queuedEvent;
 }
 
 + (void)registerReactReadyListenr {
-    [ElectrodeBridgeTransceiver registerReactNativeReadyListener:^{
+    [ElectrodeBridgeTransceiver registerReactNativeReadyListener:^(ElectrodeBridgeTransceiver * _Nonnull transceiver) {
+        isReactNativeReady = YES;
+        electrodeNativeBridge = transceiver;
         [ElectrodeBridgeHolderNew registerQueuedEventListeners];
         [ElectrodeBridgeHolderNew registerQueuedRequestHandlers];
         [ElectrodeBridgeHolderNew sendQueuedEvents];
@@ -142,4 +142,5 @@ static NSMutableArray *queuedEvent;
     
     [queuedEvent removeAllObjects];
 }
+
 @end

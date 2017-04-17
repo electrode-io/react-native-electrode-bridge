@@ -11,9 +11,9 @@
 #import "ElectrodeBridgeRequestNew.h"
 #import "ElectrodeBridgeEventNew.h"
 
-
+@class ElectrodeBridgeTransceiver;
 NS_ASSUME_NONNULL_BEGIN
-typedef void(^ElectrodeBridgeReactNativeReadyListner)();
+typedef void(^ElectrodeBridgeReactNativeReadyListner)(ElectrodeBridgeTransceiver *transceiver);
 
 
 

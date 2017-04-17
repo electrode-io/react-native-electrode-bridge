@@ -64,28 +64,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction * > *pendingTransaction;
 @property (nonatomic, assign) dispatch_queue_t syncQueue; //this is used to make sure access to pendingTransaction is thread safe.
 
+
 @end
-//CLAIRE TODO: check what are the methods that needs to mark with RCT_EXPORT_METHOD 
 @implementation ElectrodeBridgeTransceiver
 
-static ElectrodeBridgeReactNativeReadyListner reactNativeReadyListener = nil;
-static BOOL isReactNativeReady = NO;
-
-static ElectrodeBridgeTransceiver *sharedInstance;
-static dispatch_once_t onceToken;
 +(instancetype)sharedInstance {
-
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[ElectrodeBridgeTransceiver alloc] init];
-    });
-    return sharedInstance;
-}
-
-+ (instancetype) createWithTransceiver: (ElectrodeBridgeTransceiver *) transceiver {
-
-    dispatch_once(&onceToken, ^{
-        sharedInstance = transceiver;
-    });
     return sharedInstance;
 }
 
@@ -100,19 +83,15 @@ static dispatch_once_t onceToken;
     }
     return self;
 }
-RCT_EXPORT_MODULE();
+RCT_EXPORT_MODULE(ElectrodeBridge);
 + (NSArray *)electrodeModules
 {
     return @[[[ElectrodeBridgeTransceiver alloc] init]];
 }
 
--(NSString *) name {
-    return @"ElectrodeBridgeTransceiver";
-}
-
 -(NSArray *) supportedEvents
 {
-    return @[@"testing1"];
+    return @[@"electrode.bridge.message"];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,7 +322,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 {
     if(isReactNativeReady) {
         if (listner) {
-            listner();
+            listner(sharedInstance);
         }
     }
     
@@ -353,8 +332,10 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 - (void)onReactNativeInitialized
 {
     isReactNativeReady = YES;
+    sharedInstance = self;
+
     if (reactNativeReadyListener) {
-        reactNativeReadyListener();
+        reactNativeReadyListener(self);
     }
 }
 + (BOOL)isReactNativeBridgeReady {

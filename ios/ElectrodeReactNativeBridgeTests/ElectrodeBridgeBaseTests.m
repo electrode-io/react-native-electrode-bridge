@@ -96,6 +96,7 @@
 
 @interface ElectrodeBridgeBaseTests ()
 @property(nonatomic, strong) RCTBridge *bridge;
+@property(nonatomic, strong) MockBridgeTransceiver *transceiver;
 @end
 
 @implementation ElectrodeBridgeBaseTests
@@ -103,11 +104,11 @@
 -(void)setUp
 {
     [self initializeBundle];
+    [self.transceiver onReactNativeInitialized];
 }
 
 -(void)tearDown {
-    [[MockBridgeTransceiver sharedInstance].myMockListenerStore removeAllObjects];
-    [[MockBridgeTransceiver sharedInstance] resetRegistrar];
+    [self.transceiver resetRegistrar];
 
 }
 
@@ -118,20 +119,12 @@
     return [[NSURL alloc] initWithString:absolutePath];
 }
 
-- (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
-{
-    MockBridgeTransceiver *mockTransceiver = [[MockBridgeTransceiver alloc] init];
-    [MockBridgeTransceiver createWithTransceiver:mockTransceiver];
-    mockTransceiver.myMockListenerStore = [[NSMutableDictionary alloc] init];
-    return @[mockTransceiver];
-}
-
 -(void)initializeBundle
 {
     RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:nil];
     self.bridge = bridge;
-    ElectrodeBridgeTransceiver *transceiver = (ElectrodeBridgeTransceiver *) [self getNativeBridge];
-    [transceiver onReactNativeInitialized];
+    MockBridgeTransceiver *transceiver = (MockBridgeTransceiver *) [self getNativeBridge];
+    self.transceiver = transceiver;
 }
 
 -(id<ElectrodeNativeBridge>)getNativeBridge
@@ -200,20 +193,15 @@
 @end
 
 @implementation MockBridgeTransceiver
+RCT_EXPORT_MODULE(MockBridgeTransceiver)
 
--(instancetype)init {
-    if(self = [super init]) {
-
+-(instancetype) init {
+    if (self = [super init]) {
+        _myMockListenerStore = [[NSMutableDictionary alloc] init];
     }
-
+    
     return self;
 }
-
-+ (NSArray *)electrodeModules
-{
-    return @[[MockBridgeTransceiver sharedInstance]];
-}
-
 
 - (void)emitMessage:(ElectrodeBridgeMessage *)bridgeMessage
 {

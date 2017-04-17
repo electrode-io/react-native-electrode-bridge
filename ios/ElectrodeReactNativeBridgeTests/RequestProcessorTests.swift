@@ -50,7 +50,12 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         self.appendMockEventListener(mockJSListener, forName: PersonAPI.kRequestGetUserName)
         let responseListener = PersonResponseResponseListener(successCallBack: { (any) in
             XCTAssertNotNil(any)
-            XCTAssertEqual(expectedResults, any as? String)
+            guard let responseDict = any as? [AnyHashable: Any] else {
+                XCTFail()
+                return
+            }
+            
+            XCTAssertEqual(expectedResults,  responseDict[kElectrodeBridgeMessageData] as? String)
             asyncExpectation.fulfill()
         }, failureCallBack: { (failureMessage) in
             XCTFail()
@@ -132,7 +137,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(actualPerson.age, returnedPayload["age"] as? Int)
             XCTAssertEqual(actualPerson.hiredMonth, returnedPayload["hiredMonth"] as? Int)
             
-        }, response: expectedResponseWithoutId)
+        }, response: statusDict)
         
         self.appendMockEventListener(mockJSListener, forName: PersonAPI.kRequestGetStatus)
         

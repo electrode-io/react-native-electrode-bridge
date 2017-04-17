@@ -48,5 +48,5 @@ public interface ElectrodeNativeBridge {
      *
      * @param constantsProvider
      */
-    void registerConstantsProvider(@NonNull ConstantsProvider constantsProvider);
+    void addConstantsProvider(@NonNull ConstantsProvider constantsProvider);
 }

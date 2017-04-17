@@ -12,6 +12,9 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +41,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
     private static boolean sIsReactNativeReady;
 
-    private ConstantsProvider constantsProvider;
+    private List<ConstantsProvider> constantsProviders = new ArrayList<>();
 
     /**
      * Initializes a new instance of ElectrodeBridgeTransceiver
@@ -101,12 +104,19 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     @Nullable
     @Override
     public Map<String, Object> getConstants() {
-        if (constantsProvider != null) {
+        if (constantsProviders != null && !constantsProviders.isEmpty()) {
+            Map<String, Object> constants = new HashMap<>();
             try {
-                return constantsProvider.getConstants();
+                for (ConstantsProvider provider : constantsProviders) {
+                    Map<String, Object> providerConstants;
+                    if ((providerConstants = provider.getConstants()) != null) {
+                        constants.putAll(providerConstants);
+                    }
+                }
+                return constants;
             } catch (Exception e) {
                 //GOTCHA: Added a try catch since the implementation of this would be on the client side and bridge has no control over unseen errors.
-                Logger.w(TAG, "getConstants() implementation by(%s) failed due to(%s)", constantsProvider, e.getMessage());
+                Logger.w(TAG, "getConstants() implementation by(%s) failed due to(%s)", constantsProviders, e.getMessage());
             }
         }
         return super.getConstants();
@@ -120,8 +130,8 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     }
 
     @Override
-    public void registerConstantsProvider(@NonNull ConstantsProvider constantsProvider) {
-        this.constantsProvider = constantsProvider;
+    public void addConstantsProvider(@NonNull ConstantsProvider constantsProvider) {
+        this.constantsProviders.add(constantsProvider);
     }
 
     @Override

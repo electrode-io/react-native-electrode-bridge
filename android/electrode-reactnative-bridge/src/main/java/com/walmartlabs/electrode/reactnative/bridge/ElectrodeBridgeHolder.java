@@ -35,7 +35,7 @@ public final class ElectrodeBridgeHolder {
     private static final HashMap<String, ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> mQueuedEventListenersRegistration = new HashMap<>();
     private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>> mQueuedRequests = new HashMap<>();
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
-    private static ConstantsProvider constantsProvider;
+    private static List<ConstantsProvider> constantsProviders = new ArrayList<>();
 
     static {
         ElectrodeBridgeTransceiver.registerReactNativeReadyListener(new ElectrodeBridgeTransceiver.ReactNativeReadyListener() {
@@ -47,9 +47,7 @@ public final class ElectrodeBridgeHolder {
                 registerQueuedRequestHandlers();
                 sendQueuedRequests();
                 emitQueuedEvents();
-                if (constantsProvider != null) {
-                    electrodeNativeBridge.registerConstantsProvider(constantsProvider);
-                }
+                addConstantProviders();
             }
         });
 
@@ -124,12 +122,12 @@ public final class ElectrodeBridgeHolder {
         electrodeNativeBridge.addEventListener(name, eventListener);
     }
 
-    public static void registerConstantsProvider(@NonNull ConstantsProvider constantsProvider) {
+    public static void addConstantsProvider(@NonNull ConstantsProvider constantsProvider) {
         if (!isReactNativeReady) {
-            ElectrodeBridgeHolder.constantsProvider = constantsProvider;
+            ElectrodeBridgeHolder.constantsProviders.add(constantsProvider);
             return;
         }
-        electrodeNativeBridge.registerConstantsProvider(constantsProvider);
+        electrodeNativeBridge.addConstantsProvider(constantsProvider);
     }
 
     private static void registerQueuedRequestHandlers() {
@@ -158,6 +156,15 @@ public final class ElectrodeBridgeHolder {
             electrodeNativeBridge.sendEvent(event);
         }
         mQueuedEvents.clear();
+    }
+
+    private static void addConstantProviders() {
+        if (constantsProviders != null) {
+            for (ConstantsProvider provider : constantsProviders) {
+                electrodeNativeBridge.addConstantsProvider(provider);
+            }
+        }
+        constantsProviders.clear();
     }
 
 }

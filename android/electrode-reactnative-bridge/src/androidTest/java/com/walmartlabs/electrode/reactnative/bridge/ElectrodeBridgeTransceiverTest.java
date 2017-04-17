@@ -5,11 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -337,7 +339,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
             }
         });
 
-        ElectrodeBridgeHolder.registerConstantsProvider(new ConstantsProvider() {
+        ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
             @Nullable
             @Override
             public Map<String, Object> getConstants() {
@@ -347,5 +349,54 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         });
 
         waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testConstantProviders() {
+        assertTrue(getNativeBridge() instanceof ReactContextBaseJavaModule);
+        assertNull(((ReactContextBaseJavaModule) getNativeBridge()).getConstants());
+
+        final Map<String, Object> constants1 = new HashMap() {{
+            put("map1key1", "value1");
+        }};
+
+        final Map<String, Object> constants2 = new HashMap() {{
+            put("map2key1", 10);
+        }};
+
+        ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
+            @Nullable
+            @Override
+            public Map<String, Object> getConstants() {
+                return constants1;
+            }
+        });
+
+        ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
+            @Nullable
+            @Override
+            public Map<String, Object> getConstants() {
+                return constants2;
+            }
+        });
+
+        ElectrodeBridgeHolder.addConstantsProvider(new ConstantsProvider() {
+            @Nullable
+            @Override
+            public Map<String, Object> getConstants() {
+                return null;
+            }
+        });
+
+        final Map<String, Object> expectedMap = new HashMap<>();
+        expectedMap.putAll(constants1);
+        expectedMap.putAll(constants2);
+
+        assertEquals(expectedMap.size(), ((ReactContextBaseJavaModule) getNativeBridge()).getConstants().size());
+        for (Map.Entry<String, Object> entry : constants1.entrySet()) {
+            assertTrue(expectedMap.containsKey(entry.getKey()));
+        }
+        for (Map.Entry<String, Object> entry : constants2.entrySet()) {
+            assertTrue(expectedMap.containsKey(entry.getKey()));
+        }
     }
 }

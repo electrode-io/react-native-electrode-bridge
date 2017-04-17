@@ -11,7 +11,6 @@
 #import "ElectrodeBridgeRequestNew.h"
 //#import "ElectrodeBridgeProtocols.h"
 
-typedef void(^ElectrodeBridgeReactNativeReadyListner)();
 @class ElectrodeBridgeTransceiver;
 @protocol ElectrodeBridgeResponseListener, ElectrodeBridgeRequestHandler, ElectrodeBridgeEventListener;
 

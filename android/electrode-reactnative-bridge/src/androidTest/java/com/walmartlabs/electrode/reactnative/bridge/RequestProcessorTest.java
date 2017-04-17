@@ -809,7 +809,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-    public void testEmptyRequestAndResponseRequestWithNativeHandler() {
+    public void testEmptyRequestAndResponseWithNativeHandler() {
         final CountDownLatch countDownLatch = new CountDownLatch(3);
         final String requestName = "testEmptyRequestAndResponseRequestWithNativeHandler";
 
@@ -1089,6 +1089,60 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
                 countDownLatch.countDown();
             }
         }).execute();
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    public void testRequestAndResponseWithNativeHandlerFor() {
+        final CountDownLatch countDownLatch = new CountDownLatch(4);
+        final String requestName = "testEmptyRequestAndResponseRequestWithNativeHandler";
+
+        final String DO_NOT_RESPOND = "do_not_respond";
+
+        new RequestHandlerProcessor<>(requestName, String.class, String.class, new ElectrodeBridgeRequestHandler<String, String>() {
+            @Override
+            public void onRequest(@Nullable String payload, @NonNull ElectrodeBridgeResponseListener<String> responseListener) {
+                assertNotNull(payload);
+                if (!DO_NOT_RESPOND.equalsIgnoreCase(payload)) {
+                    responseListener.onSuccess(payload);
+                    countDownLatch.countDown();//Countdown only when a response is sent back
+                }
+
+            }
+        }).execute();
+
+
+        new RequestProcessor<>(requestName, "native_execute", String.class, new ElectrodeBridgeResponseListener<String>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable String responseData) {
+                assertNotNull(responseData);
+                assertSame("native_execute", responseData);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        addMockEventListener(requestName, new TestMockEventListener() {
+            @Override
+            public void onResponse(ReadableMap response) {
+                assertNotNull(response);
+                assertTrue(response.hasKey(BridgeMessage.BRIDGE_MSG_DATA));
+                assertFalse(DO_NOT_RESPOND.equals(response.getString(BridgeMessage.BRIDGE_MSG_DATA)));//Should never receive a response for DO_NOT_RESPOND request
+                countDownLatch.countDown();
+            }
+        });
+
+        WritableMap requestMap1 = getRequestMap(requestName);
+        requestMap1.putString(BridgeMessage.BRIDGE_MSG_DATA, DO_NOT_RESPOND);
+        WritableMap requestMap2 = getRequestMap(requestName);
+        requestMap2.putString(BridgeMessage.BRIDGE_MSG_DATA, "execute");
+
+        getReactBridge().sendMessage(requestMap1);
+        getReactBridge().sendMessage(requestMap2);
 
         waitForCountDownToFinishOrFail(countDownLatch);
     }

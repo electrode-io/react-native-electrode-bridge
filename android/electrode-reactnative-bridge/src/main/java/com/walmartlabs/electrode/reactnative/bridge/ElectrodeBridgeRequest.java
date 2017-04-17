@@ -9,6 +9,7 @@ import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 public class ElectrodeBridgeRequest extends BridgeMessage {
     private static final String TAG = ElectrodeBridgeRequest.class.getSimpleName();
     private static final int DEFAULT_REQUEST_TIMEOUT_MS = 5000;
+    public static final int NO_TIMEOUT = -1;
 
     private final int mTimeoutMs;
     private boolean isJsInitiated;
@@ -26,7 +27,7 @@ public class ElectrodeBridgeRequest extends BridgeMessage {
 
     private ElectrodeBridgeRequest(@NonNull ReadableMap messageMap) {
         super(messageMap);
-        mTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS;
+        mTimeoutMs = NO_TIMEOUT;
         isJsInitiated = true;
     }
 

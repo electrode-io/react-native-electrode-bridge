@@ -9,6 +9,7 @@
 #import "ElectrodeBridgeRequestNew.h"
 
 const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
+const int kElectrodeBridgeRequestNoTimeOut = -1;
 
 
 @interface ElectrodeBridgeRequestNew()
@@ -33,7 +34,7 @@ const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
 {
     if(self = [super initWithData:data])
     {
-        _timeoutMs = kElectrodeBridgeRequestDefaultTimeOut;
+        _timeoutMs = kElectrodeBridgeRequestNoTimeOut;
         _isJsInitiated = YES;
     }
     return self;

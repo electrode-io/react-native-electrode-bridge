@@ -205,13 +205,15 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(ElectrodeBridgeTransaction *)createTransactionWithRequest: (ElectrodeBridgeRequestNew *)request
-                    responseListner:(id<ElectrodeBridgeResponseListener> _Nullable) responseListener
+                                            responseListner:(id<ElectrodeBridgeResponseListener> _Nullable) responseListener
 {
     ElectrodeBridgeTransaction *transaction = [[ElectrodeBridgeTransaction alloc] initWithRequest:request responseListener:responseListener];
     
     @synchronized (self) {
         [self.pendingTransaction setObject:transaction forKey:request.messageId];
-        [self startTimeOutCheckForTransaction:transaction];
+        if ([request timeoutMs] != kElectrodeBridgeRequestNoTimeOut) {
+            [self startTimeOutCheckForTransaction:transaction];
+        }
     }
     
     return transaction;
@@ -238,7 +240,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     NSLog(@"Sending request(%@) to native handler", transaction.request);
     ElectrodeBridgeRequestNew *request = transaction.request;
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
-
+    
     id<ElectrodeBridgeResponseListener> responseListener = [[ElectrodeBridgeResponseListenerImplementor alloc] initWithSuccessBlock:^(id _Nullable data) {
         ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request
                                                                              withResponseData:data
@@ -265,7 +267,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     NSLog(@"hanlding bridge response: %@", response);
     ElectrodeBridgeTransaction *transaction;
     @synchronized (self) {
-         transaction = (ElectrodeBridgeTransaction *) [self.pendingTransaction objectForKey:response.messageId];
+        transaction = (ElectrodeBridgeTransaction *) [self.pendingTransaction objectForKey:response.messageId];
     }
     if (transaction != nil) {
         transaction.response = response;
@@ -282,7 +284,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         [NSException raise:@"invalid transaction" format:@"Cannot complete transaction, a transaction can only be completed with a valid response"];
     }
     NSLog(@"completing transaction(id=%@", transaction.transactionId);
-
+    
     [self.pendingTransaction removeObjectForKey:transaction.transactionId];
     
     ElectrodeBridgeResponse *response = transaction.response;
@@ -333,7 +335,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 {
     isReactNativeReady = YES;
     sharedInstance = self;
-
+    
     if (reactNativeReadyListener) {
         reactNativeReadyListener(self);
     }

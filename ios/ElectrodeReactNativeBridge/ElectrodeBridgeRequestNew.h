@@ -11,7 +11,7 @@
 @class ElectrodeBridgeMessage;
 NS_ASSUME_NONNULL_BEGIN
 extern const int kElectrodeBridgeRequestDefaultTimeOut;
-
+extern const int kElectrodeBridgeRequestNoTimeOut;
 
 
 @interface ElectrodeBridgeRequestNew : ElectrodeBridgeMessage<NSCopying>

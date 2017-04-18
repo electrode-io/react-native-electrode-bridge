@@ -58,9 +58,7 @@ class ElectrodeBridge extends EventEmitter {
   constructor() {
     super()
 
-    const emitter = Platform.OS === 'ios' ? NativeAppEventEmitter : DeviceEventEmitter
-
-    emitter.addListener(
+    DeviceEventEmitter.addListener(
       ELECTRODE_BRIDGE_MESSAGE_EVENT_NAME,
       this._onMessageFromNative.bind(this))
 

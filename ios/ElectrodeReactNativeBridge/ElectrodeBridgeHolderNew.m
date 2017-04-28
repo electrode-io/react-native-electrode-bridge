@@ -6,10 +6,10 @@
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeHolderNew.h"
 #import "ElectrodeBridgeTransceiver.h"
+
 
 @interface ElectrodeBridgeHolderNew()
 
@@ -29,6 +29,7 @@ static NSMutableDictionary *queuedRequests;
 static NSMutableArray *queuedEvent;
 
 +(void) initialize {
+    NSLog(@"in bridge holder initialization");
     queuedRequestHandlerRegistration = [[NSMutableDictionary alloc] init];
     queuedEventListenerRegistration = [[NSMutableDictionary alloc] init];
     queuedRequests = [[NSMutableDictionary alloc] init];
@@ -83,8 +84,10 @@ static NSMutableArray *queuedEvent;
 {
     if(!isReactNativeReady) {
         [queuedRequestHandlerRegistration setObject:requestHandler forKey:name];
+        NSLog(@"queuedRequestHandlerRegistration when react is not ready %@", queuedRequestHandlerRegistration);
     } else {
         NSError *error;
+        NSLog(@"BridgeHolderNew: registering request handler with name %@",name);
         [electrodeNativeBridge regiesterRequestHandlerWithName:name handler:requestHandler error:&error];
         
         if(error) {
@@ -109,8 +112,11 @@ static NSMutableArray *queuedEvent;
 }
 
 + (void) registerQueuedRequestHandlers {
+    NSLog(@"registering Queued requesters");
+    NSLog(@"queuedRequestHandlerRegistration %@", queuedRequestHandlerRegistration);
     for (NSString *requestName in queuedRequestHandlerRegistration) {
         id<ElectrodeBridgeRequestHandler> requestHandler = queuedRequestHandlerRegistration[requestName];
+        NSLog(@"requestName name for handler");
         [ElectrodeBridgeHolderNew registerRequestHanlderWithName:requestName requestHandler:requestHandler];
     }
     
@@ -141,6 +147,11 @@ static NSMutableArray *queuedEvent;
     }
     
     [queuedEvent removeAllObjects];
+}
+
++ (void) setBridge: (ElectrodeBridgeTransceiver *)bridge{
+    isReactNativeReady = YES;
+    electrodeNativeBridge = bridge;
 }
 
 @end

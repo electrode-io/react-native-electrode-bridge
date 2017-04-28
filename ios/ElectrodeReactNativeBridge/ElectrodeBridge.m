@@ -60,7 +60,7 @@ typedef void (^ElectrodeBridgeRequestBlock)();
   return self;
 }
 
-RCT_EXPORT_MODULE(Somethingelse);
+RCT_EXPORT_MODULE(SomethingElse);
 
 RCT_EXPORT_METHOD(dispatchRequest:(NSString *)name id:(NSString *)id
                   data:(NSDictionary *)data

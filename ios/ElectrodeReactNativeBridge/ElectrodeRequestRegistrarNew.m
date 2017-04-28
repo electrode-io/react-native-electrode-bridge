@@ -20,11 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
                       requestHandler:(id<ElectrodeBridgeRequestHandler>)handler
                                error:(NSError **)error
 {
-    @synchronized (self) {        
+    @synchronized (self) {
+        NSLog(@"***Logging registering requestHandler with Name %@", name);
+        NSLog(@"%@", self);
         NSUUID *requestHandlerUUID = [NSUUID UUID];
         [self.requestHandlerByRequestName setObject:handler forKey:name];
         [self.requestNameByUUID setObject:name forKey:requestHandlerUUID];
-        
+        NSLog(@"***Logging registered requestHandlerDictionary:%@", self.requestHandlerByRequestName);
         return requestHandlerUUID;
     }
 }
@@ -44,6 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id<ElectrodeBridgeRequestHandler> _Nullable)getRequestHandler:(NSString *)name
 {
+    NSLog(@"***Logging getting request handler requestHandlerDictionary:%@", self.requestHandlerByRequestName);
+    NSLog(@"%@", self);
+
     @synchronized (self) {
         return [self.requestHandlerByRequestName objectForKey:name];
     }

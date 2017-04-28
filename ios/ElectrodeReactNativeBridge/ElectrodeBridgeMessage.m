@@ -56,7 +56,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
         _type      = type;
         _data      = data;
     }
-    
+
     return self;
 }
 
@@ -81,7 +81,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
         NSString *messageId = [data objectForKey:kElectrodeBridgeMessageId];
         ElectrodeMessageType type = [ElectrodeBridgeMessage typeFromString:(NSString *)[data objectForKey:kElectrodeBridgeMessageType]];
         // BridgeMessage can be sent from either Native or React Native side. When it's from RN side, it can be
-        // NSDictionary, primitives, NSArray etc; when it's from Native side, it will be a complex object. 
+        // NSDictionary, primitives, NSArray etc; when it's from Native side, it will be a complex object.
         id bridgeMessageData = [data objectForKey:kElectrodeBridgeMessageData]; //TODO: if it's primitive..?
         return [self initWithName:name messageId:messageId type:type data:bridgeMessageData];
     }
@@ -94,7 +94,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     NSString *typeString = [ElectrodeBridgeMessage convertEnumTypeToString:self.type];
     [messageDict setObject:typeString forKey:kElectrodeBridgeMessageType];
     id simpleObj = [self convertPayloadToSimpleFormat];
-    
+
     if(simpleObj)
     {
         [messageDict setObject:simpleObj forKey:kElectrodeBridgeMessageData];
@@ -103,7 +103,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     {
         NSLog(@"data is null, data won't be set in toDictionary");
     }
-    
+
     return [messageDict copy];
 }
 
@@ -126,7 +126,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
             simpleObj = self.data;
         }
     }
-    
+
     return simpleObj;
 }
 

@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ElectrodeBridgeEventNew.h"
 #import "ElectrodeBridgeRequestNew.h"
+
 //#import "ElectrodeBridgeProtocols.h"
 
 @class ElectrodeBridgeTransceiver;
@@ -35,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)addEventListnerWithName: (NSString *)name
                    eventListner: (id<ElectrodeBridgeEventListener>) eventListner;
 
++ (void) setBridge: (ElectrodeBridgeTransceiver *)bridge;
 @end
 NS_ASSUME_NONNULL_END
 

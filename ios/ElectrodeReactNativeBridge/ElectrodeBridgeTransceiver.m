@@ -13,8 +13,24 @@
 #import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeEventRegistrarNew.h"
 #import "ElectrodeRequestRegistrarNew.h"
+
+#if __has_include(<React/RCTLog.h>)
 #import <React/RCTLog.h>
+#elif __has_include("RCTLog.h")
+#import "RCTLog.h"
+#else
+#import "React/RCTLog.h"   // Required when used as a Pod in a Swift project
+#endif
+
+#if __has_include(<React/RCTBridge.h>)
 #import <React/RCTBridge.h>
+#elif __has_include("RCTBridge.h")
+#import "RCTBridge.h"
+#else
+#import "React/RCTBridge.h"   // Required when used as a Pod in a Swift project
+#endif
+
+
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeEventNew.h"
 

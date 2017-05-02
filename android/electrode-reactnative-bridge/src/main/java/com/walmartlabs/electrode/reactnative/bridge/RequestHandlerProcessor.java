@@ -40,11 +40,14 @@ public class RequestHandlerProcessor<TReq, TResp> implements Processor {
                 }
 
                 Logger.d(TAG, "inside onRequest of RequestHandlerProcessor, with payload(%s)", bridgeRequest);
-                TReq request = null;
+                TReq request;
 
-                if (reqClazz != None.class) {
+                if (reqClazz == None.class) {
+                    request = (TReq) None.NONE;
+                } else {
                     request = (TReq) BridgeArguments.generateObject(bridgeRequest.getData(), reqClazz);
                 }
+
                 Logger.d(TAG, "Generated request(%s) from payload(%s) and ready to pass to registered handler", request, bridgeRequest);
 
                 handler.onRequest(request, new ElectrodeBridgeResponseListener<TResp>() {

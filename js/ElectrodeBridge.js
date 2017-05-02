@@ -2,7 +2,7 @@
 
 import {
   DeviceEventEmitter,
-  NativeAppEventEmitter,
+  NativeEventEmitter,
   NativeModules,
   Platform
 } from 'react-native'
@@ -58,7 +58,11 @@ class ElectrodeBridge extends EventEmitter {
   constructor() {
     super()
 
-    DeviceEventEmitter.addListener(
+    let eventEmitter = (Platform.OS === 'ios')
+      ? new NativeEventEmitter(NativeModules.ElectrodeBridge)
+      : DeviceEventEmitter
+
+    eventEmitter.addListener(
       ELECTRODE_BRIDGE_MESSAGE_EVENT_NAME,
       this._onMessageFromNative.bind(this))
 

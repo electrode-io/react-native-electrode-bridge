@@ -308,7 +308,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         PersonApi.requests().registerGetPersonRequestHandler(new ElectrodeBridgeRequestHandler<None, Person>() {
             @Override
             public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<Person> responseListener) {
-                assertNull(payload);
+                assertSame(None.NONE, payload);
                 countDownLatch.countDown();
             }
         });
@@ -816,7 +816,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
             @Override
             public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
-                assertNull(payload);
+                assertSame(None.NONE, payload);
                 responseListener.onSuccess(null);
                 countDownLatch.countDown();
             }
@@ -831,7 +831,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
             @Override
             public void onSuccess(@Nullable None responseData) {
-                assertNull(responseData);
+                assertSame(None.NONE, responseData);
                 countDownLatch.countDown();
             }
         }).execute();
@@ -873,7 +873,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
             @Override
             public void onSuccess(@Nullable None responseData) {
-                assertNull(responseData);
+                assertSame(None.NONE, responseData);
                 countDownLatch.countDown();
             }
         }).execute();
@@ -889,7 +889,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
             @Override
             public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
-                assertNull(payload);
+                assertSame(None.NONE, payload);
                 responseListener.onSuccess(null);
                 countDownLatch.countDown();
             }
@@ -908,7 +908,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
                         @Override
                         public void onSuccess(@Nullable None responseData) {
-                            assertNull(responseData);
+                            assertSame(None.NONE, responseData);
                             countDownLatch.countDown();
                         }
                     }).execute();
@@ -927,7 +927,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
             @Override
             public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
-                assertNull(payload);
+                assertSame(None.NONE, payload);
                 responseListener.onSuccess(null);
                 countDownLatch.countDown();
             }
@@ -984,7 +984,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
                         @Override
                         public void onSuccess(@Nullable None responseData) {
-                            assertNull(responseData);
+                            assertSame(None.NONE, responseData);
                             countDownLatch.countDown();
                         }
                     }).execute();

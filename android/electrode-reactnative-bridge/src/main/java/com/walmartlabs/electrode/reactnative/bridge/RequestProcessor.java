@@ -53,8 +53,10 @@ public class RequestProcessor<TReq, TResp> implements Processor {
                     throw new IllegalArgumentException("BridgeResponse cannot be null, should never reach here");
                 }
 
-                TResp response = null;
-                if (responseClass != None.class) {
+                TResp response;
+                if (responseClass == None.class) {
+                    response = (TResp) None.NONE;
+                } else {
                     response = (TResp) BridgeArguments.generateObject(bridgeResponse.getData(), responseType);
                 }
 

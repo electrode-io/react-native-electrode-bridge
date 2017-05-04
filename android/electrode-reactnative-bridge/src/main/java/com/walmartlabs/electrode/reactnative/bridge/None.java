@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 
 public class None implements Bridgeable {
 
+    public static final None NONE = new None();
 
     @NonNull
     @Override
@@ -16,7 +17,7 @@ public class None implements Bridgeable {
         return Bundle.EMPTY;
     }
 
-    public None(Bundle emptyBundle) {
+    private None() {
 
     }
 }

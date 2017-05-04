@@ -11,12 +11,12 @@ import UIKit
 let kElectrodeBridgeRequestTimeoutTime = 10;
 
 let objectiveCPrimitives = [String.self,
-                            (String?.self)!,
+                            String?.self,
                             Double.self,
                             Float.self,
                             Bool.self,
                             Int.self,
-                            (Int?.self)!,
+                            Int?.self,
                             Int8.self,
                             Int16.self,
                             Int32.self,

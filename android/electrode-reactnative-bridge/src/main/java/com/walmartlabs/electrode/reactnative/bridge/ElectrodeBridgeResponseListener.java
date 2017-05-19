@@ -8,16 +8,16 @@ import android.support.annotation.Nullable;
  */
 public interface ElectrodeBridgeResponseListener<TRsp> {
     /**
-     * Error response
-     *
-     * @param failureMessage {@link FailureMessage} with failure details.
-     */
-    void onFailure(@NonNull FailureMessage failureMessage);
-
-    /**
      * Successful response
      *
      * @param responseData response object{@link TRsp}
      */
     void onSuccess(@Nullable TRsp responseData);
+
+    /**
+     * Error response
+     *
+     * @param failureMessage {@link FailureMessage} with failure details.
+     */
+    void onFailure(@NonNull FailureMessage failureMessage);
 }

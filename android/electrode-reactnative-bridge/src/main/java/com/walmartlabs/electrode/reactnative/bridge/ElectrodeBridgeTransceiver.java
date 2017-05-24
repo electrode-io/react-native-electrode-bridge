@@ -29,15 +29,15 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     private static final String TAG = ElectrodeBridgeTransceiver.class.getSimpleName();
 
     private final ReactContextWrapper mReactContextWrapper;
-    private final EventDispatcher mEventDispatcher;
-    private final RequestDispatcher mRequestDispatcher;
 
     // Singleton instance of the bridge
     private static ElectrodeBridgeTransceiver sInstance;
 
-    private final ConcurrentHashMap<String, BridgeTransaction> pendingTransactions = new ConcurrentHashMap<>();
-    private final EventRegistrar<ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> mEventRegistrar = new EventRegistrarImpl<>();
-    private final RequestRegistrar<ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> mRequestRegistrar = new RequestRegistrarImpl<>();
+    private static final ConcurrentHashMap<String, BridgeTransaction> sPendingTransactions = new ConcurrentHashMap<>();
+    private static final EventRegistrar<ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> sEventRegistrar = new EventRegistrarImpl<>();
+    private static final EventDispatcher sEventDispatcher = new EventDispatcherImpl(sEventRegistrar);
+    private static final RequestRegistrar<ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> sRequestRegistrar = new RequestRegistrarImpl<>();
+    private static final RequestDispatcher sRequestDispatcher = new RequestDispatcherImpl(sRequestRegistrar);
 
     private static boolean sIsReactNativeReady;
 
@@ -51,8 +51,6 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     private ElectrodeBridgeTransceiver(@NonNull ReactContextWrapper reactContextWrapper) {
         super(reactContextWrapper.getContext());
         mReactContextWrapper = reactContextWrapper;
-        mEventDispatcher = new EventDispatcherImpl(mEventRegistrar);
-        mRequestDispatcher = new RequestDispatcherImpl(mRequestRegistrar);
     }
 
     /**
@@ -74,11 +72,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     @VisibleForTesting
     static ElectrodeBridgeTransceiver create(@NonNull ReactContextWrapper reactContextWrapper) {
         Logger.d(TAG, "Creating ElectrodeBridgeTransceiver instance");
-        synchronized (ElectrodeBridgeTransceiver.class) {
-            if (sInstance == null) {
-                sInstance = new ElectrodeBridgeTransceiver(reactContextWrapper);
-            }
-        }
+        sInstance = new ElectrodeBridgeTransceiver(reactContextWrapper);
         return sInstance;
     }
 
@@ -126,7 +120,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     @Override
     public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener) {
         Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
-        return mEventRegistrar.registerEventListener(name, eventListener);
+        return sEventRegistrar.registerEventListener(name, eventListener);
     }
 
     @Override
@@ -136,7 +130,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
     @Override
     public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler) {
-        mRequestRegistrar.registerRequestHandler(name, requestHandler);
+        sRequestRegistrar.registerRequestHandler(name, requestHandler);
     }
 
     /**
@@ -224,7 +218,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
         final BridgeTransaction bridgeTransaction = createTransaction(request, responseListener);
 
-        if (mRequestDispatcher.canHandleRequest(request.getName())) {
+        if (sRequestDispatcher.canHandleRequest(request.getName())) {
             dispatchRequestToLocalHandler(bridgeTransaction);
         } else if (!request.isJsInitiated()) {//GOTCHA: Should not send a request back JS if it was initiated from JS side.
             dispatchRequestToReact(bridgeTransaction);
@@ -237,7 +231,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
     @NonNull
     private BridgeTransaction createTransaction(@NonNull ElectrodeBridgeRequest request, @Nullable ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener) {
         final BridgeTransaction bridgeTransaction = new BridgeTransaction(request, responseListener);
-        pendingTransactions.put(request.getId(), bridgeTransaction);
+        sPendingTransactions.put(request.getId(), bridgeTransaction);
         startTimeOutCheckForTransaction(bridgeTransaction);
         return bridgeTransaction;
     }
@@ -260,7 +254,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         Logger.d(TAG, "Sending request(id=%s) to local handler", transaction.getRequest().getId());
 
         final ElectrodeBridgeRequest request = transaction.getRequest();
-        mRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Object>() {
+        sRequestDispatcher.dispatchRequest(transaction.getRequest(), new ElectrodeBridgeResponseListener<Object>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
                 ElectrodeBridgeResponse response = ElectrodeBridgeResponse.createResponseForRequest(request, null, failureMessage);
@@ -283,7 +277,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
     private void handleResponse(@NonNull ElectrodeBridgeResponse bridgeResponse) {
         Logger.d(TAG, "Handling bridge response");
-        BridgeTransaction transaction = pendingTransactions.get(bridgeResponse.getId());
+        BridgeTransaction transaction = sPendingTransactions.get(bridgeResponse.getId());
         if (transaction != null) {
             transaction.setResponse(bridgeResponse);
             completeTransaction(transaction);
@@ -297,7 +291,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         mReactContextWrapper.runOnUiQueueThread(new Runnable() {
             @Override
             public void run() {
-                mEventDispatcher.dispatchEvent(event);
+                sEventDispatcher.dispatchEvent(event);
             }
         });
     }
@@ -312,7 +306,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         }
         Logger.d(TAG, "completing transaction(%s)", transaction.getId());
 
-        pendingTransactions.remove(transaction.getId());
+        sPendingTransactions.remove(transaction.getId());
 
         final ElectrodeBridgeResponse response = transaction.getResponse();
         logResponse(response);
@@ -385,6 +379,6 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
      */
     @VisibleForTesting
     void debug_ClearRequestHandlerRegistrar() {
-        ((RequestRegistrarImpl) mRequestRegistrar).reset();
+        ((RequestRegistrarImpl) sRequestRegistrar).reset();
     }
 }

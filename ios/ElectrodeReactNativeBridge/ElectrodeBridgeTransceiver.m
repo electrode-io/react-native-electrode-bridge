@@ -82,6 +82,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @end
+
+static dispatch_once_t onceToken;
+static ElectrodeRequestRegistrarNew *requestRegistrar;
+static ElectrodeEventRegistrarNew *eventRegistrar;
+static ElectrodeRequestDispatcherNew *requestDispatcher;
+static ElectrodeEventDispatcherNew *eventDispatcher;
+static NSMutableDictionary *pendingTransaction;
+
 @implementation ElectrodeBridgeTransceiver
 
 +(instancetype)sharedInstance {
@@ -91,11 +99,18 @@ NS_ASSUME_NONNULL_BEGIN
 -(instancetype)init {
     if (self = [super init])
     {
-        ElectrodeRequestRegistrarNew *requestRegistrar = [[ElectrodeRequestRegistrarNew alloc] init];
-        ElectrodeEventRegistrarNew *eventRegistrar = [[ElectrodeEventRegistrarNew alloc] init];
-        _requestDispatcher = [[ElectrodeRequestDispatcherNew alloc] initWithRequestRegistrar:requestRegistrar];
-        _eventDispatcher = [[ElectrodeEventDispatcherNew alloc] initWithEventRegistrar:eventRegistrar];
-        _pendingTransaction = [[NSMutableDictionary alloc] init];
+        dispatch_once(&onceToken, ^{
+            requestRegistrar = [[ElectrodeRequestRegistrarNew alloc] init];
+            eventRegistrar = [[ElectrodeEventRegistrarNew alloc] init];
+            requestDispatcher = [[ElectrodeRequestDispatcherNew alloc] initWithRequestRegistrar:requestRegistrar];
+            eventDispatcher = [[ElectrodeEventDispatcherNew alloc] initWithEventRegistrar:eventRegistrar];
+            pendingTransaction = [[NSMutableDictionary alloc] init];
+        });
+        
+        _requestDispatcher = requestDispatcher;
+        _eventDispatcher = eventDispatcher;
+        _pendingTransaction = pendingTransaction;
+        
     }
     return self;
 }

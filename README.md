@@ -5,7 +5,7 @@ Electrode React Native Bridge
 
 Link to the [demo app](/example)
 
-This project is essentially a react native library, consisting of a JavaScript module and an associated Android Native Module (iOS implementation TBD).
+This project is essentially a react native library, consisting of a JavaScript module and an associated Android Native Module and iOS Native module.
 
 It is built on top of the react native built-in bridging constructs (to communicate between the react native JS side and Native side) and offers a clean bi-directional communication API, exposing methods to send events and/or requests from/to any side of the bridge (JS/Native). It offers more options and flexibility to communicate between the JS/Native side that is offered out of the box by react native. Ultimately it can help with integrating react native applications into existing native code bases. It might be used as one of the basic building block of react native mini apps and native modules.
 
@@ -25,6 +25,12 @@ The bridge API is built around two messaging idioms, `events` and `requests` :
 Both sides of the bridge (JS/Native) expose a similar API (mirrored) to respectively send requests and emit events, and also listen for specific events or requests.
 
 While this bridge can be used a standalone react native plugin to integrate a single react native app into an native host application, this is not the optimal use of it. Indeed multiple native modules using the bridge for communication will be able to exchange messages between themselves or with the react native apps.
+
+```
+For iOS:
+NOTE: Please do yarn add react-native@0.42.0, that installs react-native. This step is necessary to avoid compiling issues in iOS. 
+For eg: b0m00ca@m-C02RW0LJG8WM ~/Documents/Projects/react-native-electrode-bridge (master) $ yarn add react-native@0.42.0
+```
 
 ```
 TODO :

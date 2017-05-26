@@ -28,8 +28,8 @@ While this bridge can be used a standalone react native plugin to integrate a si
 
 ```
 For iOS:
-NOTE: Please do yarn add react-native@0.42.0, that installs react-native. This step is necessary to avoid compiling issues in iOS. 
-For eg: b0m00ca@m-C02RW0LJG8WM ~/Documents/Projects/react-native-electrode-bridge (master) $ yarn add react-native@0.42.0
+NOTE: Please do yarn add react-native@0.42.0, that installs react-native. This step is necessary to avoid compiling issues for iOS. 
+For eg: @m-C02RW0LJG8WM ~/Documents/Projects/react-native-electrode-bridge (master) $ yarn add react-native@0.42.0
 ```
 
 ```

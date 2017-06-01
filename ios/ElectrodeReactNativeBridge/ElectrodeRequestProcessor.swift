@@ -43,6 +43,7 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
         let validRequest = ElectrodeBridgeRequestNew(name: requestName, data: bridgeMessageData)
         let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: { [weak self]
             (responseData: Any?) in
+            print("in sucess block")
             let processedResp: Any?
             if (self?.responseClass != None.self) {
                 processedResp = self?.processSuccessResponse(responseData: responseData)
@@ -51,10 +52,9 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
             }
             self?.responseListener.onSuccess(processedResp)
             
-        }, failureClosure: { [weak self](failureMessage: ElectrodeFailureMessage) in
-            self?.responseListener.onFailure(failureMessage)
+        }, failureClosure: {(failureMessage: ElectrodeFailureMessage) in
+            self.responseListener.onFailure(failureMessage)
         })
-        
         ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
     }
     
@@ -73,6 +73,10 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
         }
        
         return generatedRes
+    }
+    
+    deinit {
+        print("***** ElectrodeRequestProcessor is deinited")
     }
 }
 
@@ -101,5 +105,8 @@ class ElectrodeBridgeResponseListenerImpl: NSObject, ElectrodeBridgeResponseList
             return
         }
         failure(failureMessage)
+    }
+    deinit {
+        print("***** ElectrodeBridgeResponseListenerImpl are deinited")
     }
 }

@@ -226,17 +226,19 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
                 }
                 else
                 {
-                    registeredListener.jSCallBackBlock((NSDictionary *)[bridgeMessage toDictionary]);
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 4 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                        registeredListener.jSCallBackBlock((NSDictionary *)[bridgeMessage toDictionary]);
+                        if (registeredListener.response) {
+                            NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
+                            [response setObject:registeredListener.response forKey:kElectrodeBridgeMessageData];
+                            [response setObject:bridgeMessage.messageId forKey:kElectrodeBridgeMessageId];
+                            [response setObject:kElectrodeBridgeMessageResponse forKey:kElectrodeBridgeMessageType];
+                            [response setObject:bridgeMessage.name forKey:kElectrodeBridgeMessageName];
+                            [self sendMessage: response];
+                        }
+                    });
                 }
                 
-                if (registeredListener.response) {
-                    NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
-                    [response setObject:registeredListener.response forKey:kElectrodeBridgeMessageData];
-                    [response setObject:bridgeMessage.messageId forKey:kElectrodeBridgeMessageId];
-                    [response setObject:kElectrodeBridgeMessageResponse forKey:kElectrodeBridgeMessageType];
-                    [response setObject:bridgeMessage.name forKey:kElectrodeBridgeMessageName];
-                    [self sendMessage: response];
-                }
                 break;
             case ElectrodeMessageTypeResponse:
                 if(!registeredListener.jSCallBackBlock)

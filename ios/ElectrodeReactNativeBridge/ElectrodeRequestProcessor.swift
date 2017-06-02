@@ -52,9 +52,11 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
             }
             self?.responseListener.onSuccess(processedResp)
             
-        }, failureClosure: {(failureMessage: ElectrodeFailureMessage) in
-            self.responseListener.onFailure(failureMessage)
-        })
+        }, failureClosure: {[weak self](failureMessage: ElectrodeFailureMessage) in
+            print("in processor failure")
+            print("\(String(describing: self))")
+            self?.responseListener.onFailure(failureMessage)
+            }, processor: self)
         ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
     }
     
@@ -80,13 +82,15 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     }
 }
 
-class ElectrodeBridgeResponseListenerImpl: NSObject, ElectrodeBridgeResponseListener {
+class ElectrodeBridgeResponseListenerImpl<TReq, TResp, TItem>: NSObject, ElectrodeBridgeResponseListener {
     private let successClosure: ElectrodeRequestProcessorSuccessClosure?
     private let failureClosure: ElectrodeRequestProcessorFailureClosure?
-    init(successClosure: ElectrodeRequestProcessorSuccessClosure?, failureClosure: ElectrodeRequestProcessorFailureClosure?)
+    private let processor: ElectrodeRequestProcessor<TReq, TResp, TItem>?
+    init(successClosure: ElectrodeRequestProcessorSuccessClosure?, failureClosure: ElectrodeRequestProcessorFailureClosure?, processor: ElectrodeRequestProcessor<TReq, TResp, TItem>)
     {
         self.successClosure = successClosure
         self.failureClosure = failureClosure
+        self.processor = processor
     }
     
     func onSuccess(_ responseData: Any?) { //bridge passes responseData back

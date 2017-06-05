@@ -28,7 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 -(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
-  withResponseListener: (id<ElectrodeBridgeResponseListener>) responseListener
+               success: (ElectrodeBridgeResponseListenerSuccessBlock) success
+               failure: (ElectrodeBridgeResponseListenerFailureBlock) failure
 {
     NSString *requestId = bridgeRequest.messageId;
     NSString *requestName = bridgeRequest.name;
@@ -40,11 +41,15 @@ NS_ASSUME_NONNULL_BEGIN
     {
         NSString *errorMessage = [NSString stringWithFormat:@"No registered request handler for request name %@", requestName];
         id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"ENOHANDLER" message:errorMessage];
-        [responseListener onFailure:failureMessage];
+        if(failure)  {
+            failure(failureMessage);
+        } else {
+            NSLog(@"Empty Failure block. Unable to call back using failure block");
+        }
         return;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        [requestHandler onRequest:bridgeRequest.data responseListener:responseListener];
+        [requestHandler onRequest:bridgeRequest.data success:success failure:failure];
     });
 }
 -(BOOL)canHandlerRequestWithName: (NSString *)name

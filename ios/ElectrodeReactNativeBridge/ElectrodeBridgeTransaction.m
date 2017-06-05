@@ -12,21 +12,25 @@
 @interface ElectrodeBridgeTransaction()
 
 @property(nonatomic, strong, nonnull) ElectrodeBridgeRequestNew *request;
-@property(nonatomic, strong, nullable) id<ElectrodeBridgeResponseListener> finalResponseListener;
+@property(nonatomic, copy, nullable) ElectrodeBridgeResponseListenerSuccessBlock success;
+@property(nonatomic, copy, nullable) ElectrodeBridgeResponseListenerFailureBlock failure;
 
 @end
 
 @implementation ElectrodeBridgeTransaction
 
--(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew * _Nonnull)request
-                      responseListener: (id<ElectrodeBridgeResponseListener> _Nullable) responseListener {
+-(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew * _Nonnull) request
+                               success: (ElectrodeBridgeResponseListenerSuccessBlock _Nullable) success
+                               failure: (ElectrodeBridgeResponseListenerFailureBlock _Nullable) failure
+{
     if (request.type != ElectrodeMessageTypeRequest) {
         [NSException raise:@"Invalid type" format:@"BridgeTransaction constrictor expects a request type, did you accidentally pass in a different type"];
     }
     
     if (self = [super init]) {
         _request = request;
-        _finalResponseListener  = responseListener;
+        _success = success;
+        _failure = failure;
     }
     
     return self;

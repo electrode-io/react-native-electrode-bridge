@@ -10,10 +10,10 @@
 #import "ElectrodeBridgeEventNew.h"
 #import "ElectrodeBridgeRequestNew.h"
 
-//#import "ElectrodeBridgeProtocols.h"
+#import "ElectrodeBridgeProtocols.h"
 
 @class ElectrodeBridgeTransceiver;
-@protocol ElectrodeBridgeResponseListener, ElectrodeBridgeRequestHandler, ElectrodeBridgeEventListener;
+@protocol ElectrodeBridgeRequestHandler, ElectrodeBridgeEventListener;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,7 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)sendEvent: (ElectrodeBridgeEventNew *)event;
 
 + (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-   responseListener:(id<ElectrodeBridgeResponseListener> _Nonnull)responseListener;
+            success: (ElectrodeBridgeResponseListenerSuccessBlock _Nonnull) success
+            failure: (ElectrodeBridgeResponseListenerFailureBlock _Nonnull) failure;
 
 + (void)registerRequestHanlderWithName: (NSString *)name
                         requestHandler: (id<ElectrodeBridgeRequestHandler> _Nonnull) requestHandler;

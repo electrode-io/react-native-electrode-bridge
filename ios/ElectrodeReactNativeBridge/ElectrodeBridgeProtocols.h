@@ -43,7 +43,9 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
  @param responseListener The request completion that is executed when a request is
  being processed.
  */
-- (void)onRequest:(id _Nullable)data responseListener:(id<ElectrodeBridgeResponseListener>)responseListener;
+- (void)onRequest:(id _Nullable)data
+          success: (ElectrodeBridgeResponseListenerSuccessBlock) success
+          failure: (ElectrodeBridgeResponseListenerFailureBlock) failure;
 
 @end
 
@@ -74,7 +76,9 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
  * @param request    The ElectrodeBridgeRequest that contains request name, data, destination mode and timeout 
  * @param responseListener The response call back listener to issue success/failure of the request.
  */
--(void)sendRequest:(ElectrodeBridgeRequestNew *)request withResponseListener:(id<ElectrodeBridgeResponseListener>) responseListener;
+-(void)sendRequest:(ElectrodeBridgeRequestNew *)request
+           success:(ElectrodeBridgeResponseListenerSuccessBlock) success
+           failure: (ElectrodeBridgeResponseListenerFailureBlock) failure;
 
 /**
  * Register the request handler

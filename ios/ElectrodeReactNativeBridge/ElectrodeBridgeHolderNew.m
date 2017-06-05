@@ -16,7 +16,7 @@
 @property(nonatomic, assign) BOOL isReactNativeReady;
 @property(nonatomic, copy) NSMutableDictionary<NSString *, id<ElectrodeBridgeRequestHandler>> *queuedRequestHandlerRegistration;
 @property(nonatomic, copy) NSMutableDictionary<NSString *, id<ElectrodeBridgeEventListener>> *queuedEventListenerRegistration;
-@property(nonatomic, copy) NSMutableDictionary<ElectrodeBridgeRequestNew *,id<ElectrodeBridgeResponseListener>> *queuedRequests;
+@property(nonatomic, copy) NSMutableDictionary<ElectrodeBridgeRequestNew *,NSArray *> *queuedRequests;
 @property(nonatomic, copy) NSMutableArray<ElectrodeBridgeEventNew *> *queuedEvents;
 @end
 
@@ -70,12 +70,13 @@ static NSMutableArray *queuedEvent;
 }
 
 + (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-   responseListener:(id<ElectrodeBridgeResponseListener> _Nonnull)responseListener
+            success: (ElectrodeBridgeResponseListenerSuccessBlock _Nonnull) success
+            failure: (ElectrodeBridgeResponseListenerFailureBlock _Nonnull) failure
 {
     if (!isReactNativeReady) {
-        [queuedRequests setObject:responseListener forKey:request];
+        [queuedRequests setObject:@[[success copy], [failure copy]] forKey:request];
     } else {
-        [electrodeNativeBridge sendRequest:request withResponseListener:responseListener];
+        [electrodeNativeBridge sendRequest:request success:success failure:failure];
     }
 }
 
@@ -134,8 +135,10 @@ static NSMutableArray *queuedEvent;
 
 + (void) sendQueuedRequests {
     for (ElectrodeBridgeRequestNew *request in queuedRequests) {
-        id<ElectrodeBridgeResponseListener> responseListener = queuedRequests[request];
-        [ElectrodeBridgeHolderNew sendRequest:request responseListener:responseListener];
+        NSArray *responseBlock = queuedRequests[request];
+        ElectrodeBridgeResponseListenerSuccessBlock successBlock = [responseBlock firstObject];
+        ElectrodeBridgeResponseListenerFailureBlock failureBlock = [responseBlock lastObject];
+        [ElectrodeBridgeHolderNew sendRequest:request success:successBlock failure:failureBlock];
     }
     
     [queuedRequests removeAllObjects];

@@ -18,7 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrarNew *)requestRegistrar;
 -(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
-  withResponseListener: (id<ElectrodeBridgeResponseListener>) responseListener;
+               success: (ElectrodeBridgeResponseListenerSuccessBlock) success
+               failure: (ElectrodeBridgeResponseListenerFailureBlock) failure;
 -(BOOL)canHandlerRequestWithName: (NSString *)name;
 @end
                        

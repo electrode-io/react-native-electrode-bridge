@@ -44,7 +44,10 @@ class ElectrodeBridgeRequestHandlerImpt<TReq>: NSObject, ElectrodeBridgeRequestH
         self.requestClass = requestClass
         self.requestHandler = requestHandler
     }
-    func onRequest(_ data: Any?, responseListener: ElectrodeBridgeResponseListener) {
+    func onRequest(_ data: Any?,
+                   success: @escaping ElectrodeReactNativeBridge.ElectrodeBridgeResponseListenerSuccessBlock,
+                   failure: @escaping ElectrodeReactNativeBridge.ElectrodeBridgeResponseListenerFailureBlock)
+    {
         let request: Any?
         if (requestClass == None.self) {
             request = nil
@@ -55,32 +58,8 @@ class ElectrodeBridgeRequestHandlerImpt<TReq>: NSObject, ElectrodeBridgeRequestH
                 request = nil
             }
         }
-
-        let innerResponseListner = InnerElectrodeBridgeResponseListener(sucessClosure:{ (any) in
-            responseListener.onSuccess(any)
-        }, failureClosure: { (failureMessage) in
-            responseListener.onFailure(failureMessage)
-        })
         
         //this is passed back to Native side. 
-        requestHandler.onRequest(request, responseListener: innerResponseListner)
-    }
-}
-
-class InnerElectrodeBridgeResponseListener: NSObject, ElectrodeBridgeResponseListener {
-    let success: (Any?) ->()
-    let failure: (ElectrodeFailureMessage) -> ()
-    init(sucessClosure: @escaping (Any?)->(), failureClosure:@escaping (ElectrodeFailureMessage) -> ()) {
-        success = sucessClosure
-        failure = failureClosure
-        super.init()
-    }
-    
-    func onSuccess(_ responseData: Any?) {
-        success(responseData)
-    }
-    
-    func onFailure(_ failureMessage: ElectrodeFailureMessage) {
-        failure(failureMessage)
+        requestHandler.onRequest(request, success: success, failure: failure)
     }
 }

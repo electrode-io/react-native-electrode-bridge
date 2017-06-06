@@ -17,47 +17,46 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let requestPayload: Any?
     private let responseClass: TResp.Type
     private let responseItemType: Any.Type?
-    private let responseListener: ElectrodeBridgeResponseListener
+    private let success: ElectrodeBridgeResponseListenerSuccessBlock
+    private let failure: ElectrodeBridgeResponseListenerFailureBlock
     
     public init(requestName: String,
          requestPayload: Any?,
          respClass: TResp.Type,
          responseItemType: Any.Type?,
-         responseListener: ElectrodeBridgeResponseListener)
+         success: @escaping ElectrodeBridgeResponseListenerSuccessBlock,
+         failure: @escaping ElectrodeBridgeResponseListenerFailureBlock)
     {
         self.tag              = String(describing: type(of:self))
         self.requestName      = requestName
         self.requestPayload   = requestPayload
         self.responseClass    = respClass
         self.responseItemType = responseItemType
-        self.responseListener = responseListener //responseListnerOntheAppSide
+        self.success          = success
+        self.failure          = failure
         super.init()
     }
     
     public func execute()
     {
-        print("RequestProcessor started processing request (\(requestName)) with payload (\(requestPayload))")
-        let requestDictionary: [AnyHashable: Any]
+        print("RequestProcessor started processing request (\(requestName)) with payload (\(String(describing: requestPayload)))")
         let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
         
         let validRequest = ElectrodeBridgeRequestNew(name: requestName, data: bridgeMessageData)
-        let intermediateListener = ElectrodeBridgeResponseListenerImpl(successClosure: { [weak self]
-            (responseData: Any?) in
-            print("in sucess block")
+
+       // ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
+        
+        ElectrodeBridgeHolderNew.sendRequest(validRequest, success: { [weak self] (responseData: Any?) in
             let processedResp: Any?
             if (self?.responseClass != None.self) {
                 processedResp = self?.processSuccessResponse(responseData: responseData)
             } else {
                 processedResp = nil
             }
-            self?.responseListener.onSuccess(processedResp)
-            
-        }, failureClosure: {[weak self](failureMessage: ElectrodeFailureMessage) in
-            print("in processor failure")
-            print("\(String(describing: self))")
-            self?.responseListener.onFailure(failureMessage)
-            }, processor: self)
-        ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
+            self?.success(processedResp)
+            }, failure: {[weak self](failureMessage: ElectrodeFailureMessage) in
+                self?.failure(failureMessage)
+            })
     }
     
     private func processSuccessResponse(responseData: Any?) -> Any? {

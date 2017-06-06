@@ -46,16 +46,16 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
 
        // ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
         
-        ElectrodeBridgeHolderNew.sendRequest(validRequest, success: { [weak self] (responseData: Any?) in
+        ElectrodeBridgeHolderNew.sendRequest(validRequest, success: { (responseData: Any?) in
             let processedResp: Any?
-            if (self?.responseClass != None.self) {
-                processedResp = self?.processSuccessResponse(responseData: responseData)
+            if (self.responseClass != None.self) {
+                processedResp = self.processSuccessResponse(responseData: responseData)
             } else {
                 processedResp = nil
             }
-            self?.success(processedResp)
-            }, failure: {[weak self](failureMessage: ElectrodeFailureMessage) in
-                self?.failure(failureMessage)
+            self.success(processedResp)
+            }, failure: {(failureMessage: ElectrodeFailureMessage) in
+                self.failure(failureMessage)
             })
     }
     

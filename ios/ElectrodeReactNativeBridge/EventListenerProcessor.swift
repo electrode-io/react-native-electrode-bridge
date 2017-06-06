@@ -24,8 +24,8 @@ public class EventListenerProcessor<T>: NSObject, Processor {
     
     public func execute() {
         let intermediateListener = ElectrodeEventListenerImplementor(eventPayloadClass: eventPayloadClass, onEventClosure: {
-            [weak self](any: Any?) in
-            self?.appEventListener.onEvent(any)
+            (any: Any?) in
+            self.appEventListener.onEvent(any)
         })
         ElectrodeBridgeHolderNew.addEventListner(withName: eventName, eventListner: intermediateListener)
     }

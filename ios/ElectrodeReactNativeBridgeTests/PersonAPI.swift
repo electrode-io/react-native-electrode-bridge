@@ -32,7 +32,7 @@ public class PersonAPI {
         }
         func emitEventPersonAdded(person: Person) {
             assertionFailure("need override")
-
+            
         }
         func emitEventPersonNameUpdated(updatedName: String) {
             
@@ -47,7 +47,7 @@ public class PersonAPI {
          */
         func registerGetPersonRequestHandler(handler: ElectrodeBridgeRequestHandler) {
             assertionFailure("need override")
-
+            
         }
         /**
          * Registers a handler  that returns the user status when {@link #getStatus(Person, ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
@@ -56,7 +56,7 @@ public class PersonAPI {
          */
         func registerGetStatusRequestHandler(handler: ElectrodeBridgeRequestHandler) {
             assertionFailure("need override")
-
+            
         }
         func registerGetAgeRequestHandler(handler: ElectrodeBridgeRequestHandler) {
             assertionFailure("need override")
@@ -81,9 +81,9 @@ public class PersonAPI {
          *
          * @param response {@link ElectrodeBridgeResponseListener<Person>} Request listener as a call back to be called once the operation is completed.
          */
-        func getPerson(responseListner: ElectrodeBridgeResponseListener) {
+        func getPerson(success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) {
             assertionFailure("need override")
-
+            
         }
         
         /**
@@ -93,32 +93,40 @@ public class PersonAPI {
          *
          * @param response {@link ElectrodeBridgeResponseListener<Status>} Request listener as a call back to be called once the operation is completed.
          */
-        func getStatus(person: Person, responseListener: ElectrodeBridgeResponseListener) {
+        func getStatus(person: Person, success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, failure: @escaping ElectrodeBridgeResponseListenerFailureBlock)
+        {
             assertionFailure("need override")
-
+            
         }
         
-        func getUserName(responseListner: ElectrodeBridgeResponseListener) {
+        func getUserName(success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) {
             assertionFailure("need override")
-
+            
         }
         
-        func getAge(name: String, responseListener: ElectrodeBridgeResponseListener) {
-            assertionFailure("need override")
-        }
-        
-        func updatePersonPost(updatePersonRequestData: UpdatePersonRequestData, responseListener: ElectrodeBridgeResponseListener) {
+        func getAge(name: String, success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) {
             assertionFailure("need override")
         }
         
-        func findPersonsByStatus(statusList: [Status], responseListener: ElectrodeBridgeResponseListener) {
+        func updatePersonPost(updatePersonRequestData: UpdatePersonRequestData,
+                              success: @escaping ElectrodeBridgeResponseListenerSuccessBlock,
+                              failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) {
             assertionFailure("need override")
         }
         
-        func findPersonByAge(names: [String], responseListener: ElectrodeBridgeResponseListener) {
+        func findPersonsByStatus(statusList: [Status],
+                                 success: @escaping ElectrodeBridgeResponseListenerSuccessBlock,
+                                 failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) {
             assertionFailure("need override")
         }
         
+        func findPersonByAge(names: [String],
+                             success: @escaping ElectrodeBridgeResponseListenerSuccessBlock,
+                             failure: @escaping ElectrodeBridgeResponseListenerFailureBlock)
+        {
+            assertionFailure("need override")
+            
+        }
     }
 }
 

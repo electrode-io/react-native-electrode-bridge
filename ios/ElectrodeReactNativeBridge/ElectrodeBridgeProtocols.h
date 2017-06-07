@@ -19,35 +19,16 @@ typedef void(^ElectrodeBridgeReactNativeReadyListner)(ElectrodeBridgeTransceiver
 
 #pragma ElectrodeBridgeResponseListener protocol
 
-typedef void(^ElectrodeBridgeResponseListenerSuccessBlock) (id nullable);
-typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMessage>);
-
-@protocol ElectrodeBridgeResponseListener <NSObject>
-
--(void)onFailure:(id<ElectrodeFailureMessage>)failureMessage;
--(void)onSuccess:(id _Nullable)responseData;
-
-@end
-////////////////////////////////////////////////
-#pragma ElectrodeBridgeRequestHandler protocol
 /**
- ElectrodeRequestHandlers execute when a given request comes through. The
+ 
+ */
+typedef void(^ElectrodeBridgeResponseCompletionBlock) (id _Nullable, id<ElectrodeFailureMessage> _Nullable);
+/**
+ ElectrodeBridgeResponseCompletionBlock execute when a given request comes through. The
  completioners execute once the request has fully been handled.
  */
-@protocol ElectrodeBridgeRequestHandler <NSObject>
+typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable, ElectrodeBridgeResponseCompletionBlock);
 
-/**
- Initial request handling starts. Respond on success or error.
- 
- @param data Data that is associated with a request, can be a NSDictionary or an Object
- @param responseListener The request completion that is executed when a request is
- being processed.
- */
-- (void)onRequest:(id _Nullable)data
-          success: (ElectrodeBridgeResponseListenerSuccessBlock) success
-          failure: (ElectrodeBridgeResponseListenerFailureBlock) failure;
-
-@end
 
 ////////////////////////////////////////////////
 #pragma ElectrodeBridgeEventListener protocol
@@ -77,8 +58,7 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
  * @param responseListener The response call back listener to issue success/failure of the request.
  */
 -(void)sendRequest:(ElectrodeBridgeRequestNew *)request
-           success:(ElectrodeBridgeResponseListenerSuccessBlock) success
-           failure: (ElectrodeBridgeResponseListenerFailureBlock) failure;
+ completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion;
 
 /**
  * Register the request handler
@@ -86,8 +66,7 @@ typedef void(^ElectrodeBridgeResponseListenerFailureBlock)(id<ElectrodeFailureMe
  * @param requestHandler call back to be issued for a given request.
  */
 -(NSUUID *)regiesterRequestHandlerWithName: (NSString *)name
-                                   handler:(id<ElectrodeBridgeRequestHandler>)requestHandler
-                                     error: (NSError **) error;
+                         completionHandler: (ElectrodeBridgeRequestCompletionHandler) completion;
 
 /**
  * Sends an event with payload to all the event listeners

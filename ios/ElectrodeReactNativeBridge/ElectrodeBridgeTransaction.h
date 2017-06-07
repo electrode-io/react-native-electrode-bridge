@@ -14,16 +14,14 @@
 @interface ElectrodeBridgeTransaction : NSObject
 
 @property(nonatomic, readonly, strong, nonnull) ElectrodeBridgeRequestNew *request;
-@property(nonatomic, readonly, copy, nullable) ElectrodeBridgeResponseListenerSuccessBlock success;
-@property(nonatomic, readonly, copy, nullable) ElectrodeBridgeResponseListenerFailureBlock failure;
+@property(nonatomic, readonly, copy, nullable) ElectrodeBridgeResponseCompletionBlock completion;
 
 
 // Note: response can be set
 @property(nonatomic, readwrite, strong,nullable) ElectrodeBridgeResponse *response;
 
 -(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew * _Nonnull) request
-                               success: (ElectrodeBridgeResponseListenerSuccessBlock _Nullable) success
-                               failure: (ElectrodeBridgeResponseListenerFailureBlock _Nullable) failure;
+                     completionHandler: (ElectrodeBridgeResponseCompletionBlock _Nullable ) completion;
 -(nonnull NSString *) transactionId;
 -(BOOL) isJsInitiated;
 

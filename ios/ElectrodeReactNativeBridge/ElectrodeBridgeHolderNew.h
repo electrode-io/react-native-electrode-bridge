@@ -28,11 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)sendEvent: (ElectrodeBridgeEventNew *)event;
 
 + (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-            success: (ElectrodeBridgeResponseListenerSuccessBlock _Nonnull) success
-            failure: (ElectrodeBridgeResponseListenerFailureBlock _Nonnull) failure;
+  completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion;
 
 + (void)registerRequestHanlderWithName: (NSString *)name
-                        requestHandler: (id<ElectrodeBridgeRequestHandler> _Nonnull) requestHandler;
+              requestCompletionHandler: (ElectrodeBridgeRequestCompletionHandler) completion;
 
 + (void)addEventListnerWithName: (NSString *)name
                    eventListner: (id<ElectrodeBridgeEventListener>) eventListner;

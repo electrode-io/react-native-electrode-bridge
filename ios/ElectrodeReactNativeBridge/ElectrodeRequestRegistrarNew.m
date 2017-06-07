@@ -16,15 +16,15 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation ElectrodeRequestRegistrarNew
-- (NSUUID *)registerRequestHandler:(NSString *)name
-                      requestHandler:(id<ElectrodeBridgeRequestHandler>)handler
-                               error:(NSError **)error
+
+- (NSUUID *)registerRequestCompletionHandlerWithName: (NSString *) name
+                                          completion: (ElectrodeBridgeRequestCompletionHandler) completion
 {
     @synchronized (self) {
         NSLog(@"***Logging registering requestHandler with Name %@", name);
         NSLog(@"%@", self);
         NSUUID *requestHandlerUUID = [NSUUID UUID];
-        [self.requestHandlerByRequestName setObject:handler forKey:name];
+        [self.requestHandlerByRequestName setObject:[completion copy] forKey:name];
         [self.requestNameByUUID setObject:name forKey:requestHandlerUUID];
         NSLog(@"***Logging registered requestHandlerDictionary:%@", self.requestHandlerByRequestName);
         return requestHandlerUUID;
@@ -44,13 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (id<ElectrodeBridgeRequestHandler> _Nullable)getRequestHandler:(NSString *)name
+- (nullable ElectrodeBridgeRequestCompletionHandler)getRequestHandler:(NSString *)name;
 {
     NSLog(@"***Logging getting request handler requestHandlerDictionary:%@", self.requestHandlerByRequestName);
     NSLog(@"%@", self);
 
     @synchronized (self) {
-        return [self.requestHandlerByRequestName objectForKey:name];
+        return [[self.requestHandlerByRequestName objectForKey:name] copy];
     }
 }
 

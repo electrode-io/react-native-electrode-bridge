@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)sendEvent: (ElectrodeBridgeEventNew *)event;
 
 + (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-  completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion;
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
 
 + (void)registerRequestHanlderWithName: (NSString *)name
               requestCompletionHandler: (ElectrodeBridgeRequestCompletionHandler) completion;

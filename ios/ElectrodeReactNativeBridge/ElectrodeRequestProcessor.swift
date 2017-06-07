@@ -5,7 +5,6 @@
 //  Created by Cody Garvin on 3/10/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
-
 import UIKit
 
 typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
@@ -17,13 +16,13 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let requestPayload: Any?
     private let responseClass: TResp.Type
     private let responseItemType: Any.Type?
-    private let completion: ElectrodeBridgeResponseCompletionBlock
+    private let completion: ElectrodeBridgeResponseCompletionHandler
     
     public init(requestName: String,
          requestPayload: Any?,
          respClass: TResp.Type,
          responseItemType: Any.Type?,
-         completion: @escaping ElectrodeBridgeResponseCompletionBlock)
+         completion: @escaping ElectrodeBridgeResponseCompletionHandler)
     {
         self.tag              = String(describing: type(of:self))
         self.requestName      = requestName

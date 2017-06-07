@@ -9,10 +9,7 @@
 #import "ElectrodeRequestDispatcherNew.h"
 #import "ElectrodeBridgeFailureMessage.h"
 
-
 NS_ASSUME_NONNULL_BEGIN
-
-
 @interface ElectrodeRequestDispatcherNew()
 @property(nonatomic, strong) ElectrodeRequestRegistrarNew *requestRegistrar;
 
@@ -28,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 -(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
-     completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion
+     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 
 {
     NSString *requestId = bridgeRequest.messageId;

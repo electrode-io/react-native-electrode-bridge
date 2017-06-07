@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSLog(@"***Logging registering requestHandler with Name %@", name);
         NSLog(@"%@", self);
         NSUUID *requestHandlerUUID = [NSUUID UUID];
-        [self.requestHandlerByRequestName setObject:[completion copy] forKey:name];
+        [self.requestHandlerByRequestName setObject:completion forKey:name];
         [self.requestNameByUUID setObject:name forKey:requestHandlerUUID];
         NSLog(@"***Logging registered requestHandlerDictionary:%@", self.requestHandlerByRequestName);
         return requestHandlerUUID;
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog(@"%@", self);
 
     @synchronized (self) {
-        return [[self.requestHandlerByRequestName objectForKey:name] copy];
+        return [self.requestHandlerByRequestName objectForKey:name];
     }
 }
 

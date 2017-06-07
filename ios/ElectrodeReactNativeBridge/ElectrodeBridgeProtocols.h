@@ -22,12 +22,12 @@ typedef void(^ElectrodeBridgeReactNativeReadyListner)(ElectrodeBridgeTransceiver
 /**
  
  */
-typedef void(^ElectrodeBridgeResponseCompletionBlock) (id _Nullable, id<ElectrodeFailureMessage> _Nullable);
+typedef void(^ElectrodeBridgeResponseCompletionHandler) (id _Nullable data, id<ElectrodeFailureMessage> _Nullable message);
 /**
- ElectrodeBridgeResponseCompletionBlock execute when a given request comes through. The
+ ElectrodeBridgeResponseCompletionHandler execute when a given request comes through. The
  completioners execute once the request has fully been handled.
  */
-typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable, ElectrodeBridgeResponseCompletionBlock);
+typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, ElectrodeBridgeResponseCompletionHandler block);
 
 
 ////////////////////////////////////////////////
@@ -55,17 +55,17 @@ typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable, ElectrodeBr
 /**
  * Send a request from iOS native side to either native or React Native side depending on where the request handler is registered.
  * @param request    The ElectrodeBridgeRequest that contains request name, data, destination mode and timeout 
- * @param responseListener The response call back listener to issue success/failure of the request.
+ * @param completion The response call back listener to issue success/failure of the request.
  */
 -(void)sendRequest:(ElectrodeBridgeRequestNew *)request
- completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion;
+ completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
 
 /**
  * Register the request handler
  * @param name name of the request
- * @param requestHandler call back to be issued for a given request.
+ * @param completion call back to be issued for a given request.
  */
--(NSUUID *)regiesterRequestHandlerWithName: (NSString *)name
+-(NSUUID *)registerRequestCompletionHandlerWithName: (NSString *)name
                          completionHandler: (ElectrodeBridgeRequestCompletionHandler) completion;
 
 /**

@@ -92,12 +92,12 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ElectrodeNativeBridge implementation
 - (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-  completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
     [self handleRequest:request completionHandler:completion];
 }
 
--(NSUUID *)regiesterRequestHandlerWithName: (NSString *) name completionHandler:(nonnull ElectrodeBridgeRequestCompletionHandler)completion {
+-(NSUUID *)registerRequestCompletionHandlerWithName: (NSString *) name completionHandler:(nonnull ElectrodeBridgeRequestCompletionHandler)completion {
     NSUUID *uUID = [self.requestDispatcher.requestRegistrar registerRequestCompletionHandlerWithName:name completion:completion];
     return uUID;
 }
@@ -178,7 +178,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(void)handleRequest:(ElectrodeBridgeRequestNew *)request
-  completionHandler: (ElectrodeBridgeResponseCompletionBlock _Nullable) completion
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion
 {
     [self logRequest:request];
     
@@ -201,7 +201,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(ElectrodeBridgeTransaction *)createTransactionWithRequest: (ElectrodeBridgeRequestNew *)request
-     completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion
+     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
     ElectrodeBridgeTransaction *transaction = [[ElectrodeBridgeTransaction alloc] initWithRequest:request completionHandler:completion];
     
@@ -220,7 +220,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     // Add the timeout handler
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(transaction.request.timeoutMs * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-        ElectrodeBridgeResponseCompletionBlock completionBlock = transaction.completion;
+        ElectrodeBridgeResponseCompletionHandler completionBlock = transaction.completion;
         if (completionBlock)
         {
             id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"TIMEOUT" message:@"transaction timed out for request"];

@@ -10,7 +10,7 @@
 #import "ElectrodeBridgeHolderNew.h"
 #import "ElectrodeBridgeTransceiver.h"
 
-
+NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeHolderNew()
 
 @property(nonatomic, assign) BOOL isReactNativeReady;
@@ -70,10 +70,10 @@ static NSMutableArray *queuedEvent;
 }
 
 + (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-  completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
     if (!isReactNativeReady) {
-        [queuedRequests setObject: [completion copy] forKey:request];
+        [queuedRequests setObject: completion forKey:request];
     } else {
         [electrodeNativeBridge sendRequest:request completionHandler: completion];
     }
@@ -83,12 +83,12 @@ static NSMutableArray *queuedEvent;
                         requestCompletionHandler: (ElectrodeBridgeRequestCompletionHandler) completion
 {
     if(!isReactNativeReady) {
-        [queuedRequestHandlerRegistration setObject:[completion copy] forKey:name];
+        [queuedRequestHandlerRegistration setObject:completion forKey:name];
         NSLog(@"queuedRequestHandlerRegistration when react is not ready %@", queuedRequestHandlerRegistration);
     } else {
         NSError *error;
         NSLog(@"BridgeHolderNew: registering request handler with name %@",name);
-        [electrodeNativeBridge regiesterRequestHandlerWithName:name completionHandler:completion];
+        [electrodeNativeBridge registerRequestCompletionHandlerWithName:name completionHandler:completion];
         
         if(error) {
             [NSException raise:@"registration failed" format:@"registration for request handler failed"];
@@ -134,7 +134,7 @@ static NSMutableArray *queuedEvent;
 
 + (void) sendQueuedRequests {
     for (ElectrodeBridgeRequestNew *request in queuedRequests) {
-        ElectrodeBridgeResponseCompletionBlock completion = queuedRequests[request];
+        ElectrodeBridgeResponseCompletionHandler completion = queuedRequests[request];
         [ElectrodeBridgeHolderNew sendRequest:request completionHandler: completion];
     }
     
@@ -155,3 +155,4 @@ static NSMutableArray *queuedEvent;
 }
 
 @end
+NS_ASSUME_NONNULL_END

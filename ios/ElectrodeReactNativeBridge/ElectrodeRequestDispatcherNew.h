@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrarNew *)requestRegistrar;
 -(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
-     completionHandler: (ElectrodeBridgeResponseCompletionBlock) completion;
+     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
 -(BOOL)canHandlerRequestWithName: (NSString *)name;
 @end
                        

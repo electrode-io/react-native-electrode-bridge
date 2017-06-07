@@ -29,7 +29,7 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
     }
     
     public func execute() {
-        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName) { [weak self](data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionBlock) in
+        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName) { [weak self](data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionHandler) in
             guard let strongSelf = self else { return }
             let request: Any?
             if (strongSelf.reqClass == None.self) {

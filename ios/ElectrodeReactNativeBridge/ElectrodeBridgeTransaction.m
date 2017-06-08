@@ -8,20 +8,18 @@
 
 #import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeBridgeMessage.h"
-
+NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransaction()
 
 @property(nonatomic, strong, nonnull) ElectrodeBridgeRequestNew *request;
-@property(nonatomic, copy, nullable) ElectrodeBridgeResponseListenerSuccessBlock success;
-@property(nonatomic, copy, nullable) ElectrodeBridgeResponseListenerFailureBlock failure;
+@property(nonatomic, strong, nullable) ElectrodeBridgeResponseCompletionHandler completion;
 
 @end
 
 @implementation ElectrodeBridgeTransaction
 
--(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew * _Nonnull) request
-                               success: (ElectrodeBridgeResponseListenerSuccessBlock _Nullable) success
-                               failure: (ElectrodeBridgeResponseListenerFailureBlock _Nullable) failure
+-(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew *) request
+                     completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion;
 {
     if (request.type != ElectrodeMessageTypeRequest) {
         [NSException raise:@"Invalid type" format:@"BridgeTransaction constrictor expects a request type, did you accidentally pass in a different type"];
@@ -29,8 +27,7 @@
     
     if (self = [super init]) {
         _request = request;
-        _success = success;
-        _failure = failure;
+        _completion = completion;
     }
     
     return self;
@@ -44,3 +41,4 @@
 }
 
 @end
+NS_ASSUME_NONNULL_END

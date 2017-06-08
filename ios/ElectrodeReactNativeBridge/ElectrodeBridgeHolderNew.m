@@ -10,7 +10,7 @@
 #import "ElectrodeBridgeHolderNew.h"
 #import "ElectrodeBridgeTransceiver.h"
 
-
+NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeHolderNew()
 
 @property(nonatomic, assign) BOOL isReactNativeReady;
@@ -70,26 +70,25 @@ static NSMutableArray *queuedEvent;
 }
 
 + (void)sendRequest: (ElectrodeBridgeRequestNew *)request
-            success: (ElectrodeBridgeResponseListenerSuccessBlock _Nonnull) success
-            failure: (ElectrodeBridgeResponseListenerFailureBlock _Nonnull) failure
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
     if (!isReactNativeReady) {
-        [queuedRequests setObject:@[[success copy], [failure copy]] forKey:request];
+        [queuedRequests setObject: completion forKey:request];
     } else {
-        [electrodeNativeBridge sendRequest:request success:success failure:failure];
+        [electrodeNativeBridge sendRequest:request completionHandler: completion];
     }
 }
 
 + (void)registerRequestHanlderWithName: (NSString *)name
-                        requestHandler: (id<ElectrodeBridgeRequestHandler> _Nonnull) requestHandler
+                        requestCompletionHandler: (ElectrodeBridgeRequestCompletionHandler) completion
 {
     if(!isReactNativeReady) {
-        [queuedRequestHandlerRegistration setObject:requestHandler forKey:name];
+        [queuedRequestHandlerRegistration setObject:completion forKey:name];
         NSLog(@"queuedRequestHandlerRegistration when react is not ready %@", queuedRequestHandlerRegistration);
     } else {
         NSError *error;
         NSLog(@"BridgeHolderNew: registering request handler with name %@",name);
-        [electrodeNativeBridge regiesterRequestHandlerWithName:name handler:requestHandler error:&error];
+        [electrodeNativeBridge registerRequestCompletionHandlerWithName:name completionHandler:completion];
         
         if(error) {
             [NSException raise:@"registration failed" format:@"registration for request handler failed"];
@@ -116,9 +115,9 @@ static NSMutableArray *queuedEvent;
     NSLog(@"registering Queued requesters");
     NSLog(@"queuedRequestHandlerRegistration %@", queuedRequestHandlerRegistration);
     for (NSString *requestName in queuedRequestHandlerRegistration) {
-        id<ElectrodeBridgeRequestHandler> requestHandler = queuedRequestHandlerRegistration[requestName];
+        ElectrodeBridgeRequestCompletionHandler requestHandler = queuedRequestHandlerRegistration[requestName];
         NSLog(@"requestName name for handler");
-        [ElectrodeBridgeHolderNew registerRequestHanlderWithName:requestName requestHandler:requestHandler];
+        [ElectrodeBridgeHolderNew registerRequestHanlderWithName:requestName requestCompletionHandler:requestHandler];
     }
     
     [queuedRequestHandlerRegistration removeAllObjects];
@@ -135,10 +134,8 @@ static NSMutableArray *queuedEvent;
 
 + (void) sendQueuedRequests {
     for (ElectrodeBridgeRequestNew *request in queuedRequests) {
-        NSArray *responseBlock = queuedRequests[request];
-        ElectrodeBridgeResponseListenerSuccessBlock successBlock = [responseBlock firstObject];
-        ElectrodeBridgeResponseListenerFailureBlock failureBlock = [responseBlock lastObject];
-        [ElectrodeBridgeHolderNew sendRequest:request success:successBlock failure:failureBlock];
+        ElectrodeBridgeResponseCompletionHandler completion = queuedRequests[request];
+        [ElectrodeBridgeHolderNew sendRequest:request completionHandler: completion];
     }
     
     [queuedRequests removeAllObjects];
@@ -158,3 +155,4 @@ static NSMutableArray *queuedEvent;
 }
 
 @end
+NS_ASSUME_NONNULL_END

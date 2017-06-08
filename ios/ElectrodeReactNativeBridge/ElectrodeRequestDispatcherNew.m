@@ -9,10 +9,7 @@
 #import "ElectrodeRequestDispatcherNew.h"
 #import "ElectrodeBridgeFailureMessage.h"
 
-
 NS_ASSUME_NONNULL_BEGIN
-
-
 @interface ElectrodeRequestDispatcherNew()
 @property(nonatomic, strong) ElectrodeRequestRegistrarNew *requestRegistrar;
 
@@ -28,28 +25,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 -(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
-               success: (ElectrodeBridgeResponseListenerSuccessBlock) success
-               failure: (ElectrodeBridgeResponseListenerFailureBlock) failure
+     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
+
 {
     NSString *requestId = bridgeRequest.messageId;
     NSString *requestName = bridgeRequest.name;
     
     NSLog(@"ElectrodeRequestDispatcherNew dispatching request(id=%@) locally", requestId);
     
-    id<ElectrodeBridgeRequestHandler> requestHandler = [self.requestRegistrar getRequestHandler:requestName];
-    if (requestHandler == nil || ![requestHandler conformsToProtocol:@protocol(ElectrodeBridgeRequestHandler)])
+    ElectrodeBridgeRequestCompletionHandler requestCompletionHandler = [self.requestRegistrar getRequestHandler:requestName];
+    if (requestCompletionHandler == nil)
     {
         NSString *errorMessage = [NSString stringWithFormat:@"No registered request handler for request name %@", requestName];
         id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"ENOHANDLER" message:errorMessage];
-        if(failure)  {
-            failure(failureMessage);
-        } else {
-            NSLog(@"Empty Failure block. Unable to call back using failure block");
+        if (completion) {
+            completion(nil, failureMessage);
         }
         return;
     }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [requestHandler onRequest:bridgeRequest.data success:success failure:failure];
+        requestCompletionHandler(bridgeRequest.data, completion);
     });
 }
 -(BOOL)canHandlerRequestWithName: (NSString *)name

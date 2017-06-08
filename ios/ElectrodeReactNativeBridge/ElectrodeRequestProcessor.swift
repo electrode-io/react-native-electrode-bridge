@@ -5,7 +5,6 @@
 //  Created by Cody Garvin on 3/10/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
-
 import UIKit
 
 typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
@@ -17,46 +16,42 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let requestPayload: Any?
     private let responseClass: TResp.Type
     private let responseItemType: Any.Type?
-    private let success: ElectrodeBridgeResponseListenerSuccessBlock
-    private let failure: ElectrodeBridgeResponseListenerFailureBlock
+    private let completion: ElectrodeBridgeResponseCompletionHandler
     
     public init(requestName: String,
          requestPayload: Any?,
          respClass: TResp.Type,
          responseItemType: Any.Type?,
-         success: @escaping ElectrodeBridgeResponseListenerSuccessBlock,
-         failure: @escaping ElectrodeBridgeResponseListenerFailureBlock)
+         completion: @escaping ElectrodeBridgeResponseCompletionHandler)
     {
         self.tag              = String(describing: type(of:self))
         self.requestName      = requestName
         self.requestPayload   = requestPayload
         self.responseClass    = respClass
         self.responseItemType = responseItemType
-        self.success          = success
-        self.failure          = failure
+        self.completion = completion
         super.init()
     }
     
-    public func execute()
-    {
+    public func execute() {
         print("RequestProcessor started processing request (\(requestName)) with payload (\(String(describing: requestPayload)))")
         let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
         
         let validRequest = ElectrodeBridgeRequestNew(name: requestName, data: bridgeMessageData)
 
-       // ElectrodeBridgeHolderNew.sendRequest(validRequest, responseListener: intermediateListener)
-        
-        ElectrodeBridgeHolderNew.sendRequest(validRequest, success: { (responseData: Any?) in
-            let processedResp: Any?
-            if (self.responseClass != None.self) {
-                processedResp = self.processSuccessResponse(responseData: responseData)
+        ElectrodeBridgeHolderNew.sendRequest(validRequest) { (responseData: Any?, failureMessage: ElectrodeFailureMessage?) in
+            if let failureMessage = failureMessage {
+                self.completion(nil, failureMessage)
             } else {
-                processedResp = nil
+                let processedResp: Any?
+                if (self.responseClass != None.self) {
+                    processedResp = self.processSuccessResponse(responseData: responseData)
+                } else {
+                    processedResp = nil
+                }
+                self.completion(processedResp, nil)
             }
-            self.success(processedResp)
-            }, failure: {(failureMessage: ElectrodeFailureMessage) in
-                self.failure(failureMessage)
-            })
+        }
     }
     
     private func processSuccessResponse(responseData: Any?) -> Any? {
@@ -74,42 +69,5 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
         }
        
         return generatedRes
-    }
-    
-    deinit {
-        print("***** ElectrodeRequestProcessor is deinited")
-    }
-}
-
-class ElectrodeBridgeResponseListenerImpl<TReq, TResp, TItem>: NSObject, ElectrodeBridgeResponseListener {
-    private let successClosure: ElectrodeRequestProcessorSuccessClosure?
-    private let failureClosure: ElectrodeRequestProcessorFailureClosure?
-    private let processor: ElectrodeRequestProcessor<TReq, TResp, TItem>?
-    init(successClosure: ElectrodeRequestProcessorSuccessClosure?, failureClosure: ElectrodeRequestProcessorFailureClosure?, processor: ElectrodeRequestProcessor<TReq, TResp, TItem>)
-    {
-        self.successClosure = successClosure
-        self.failureClosure = failureClosure
-        self.processor = processor
-    }
-    
-    func onSuccess(_ responseData: Any?) { //bridge passes responseData back
-        guard let success = successClosure else {
-            assertionFailure("no success block on sucess callback ")
-            return
-        }
-        
-        success(responseData)
-    }
-    
-    
-    func onFailure(_ failureMessage: ElectrodeFailureMessage) {
-        guard let failure = failureClosure else {
-            assertionFailure("no failure block on sucess callback ")
-            return
-        }
-        failure(failureMessage)
-    }
-    deinit {
-        print("***** ElectrodeBridgeResponseListenerImpl are deinited")
     }
 }

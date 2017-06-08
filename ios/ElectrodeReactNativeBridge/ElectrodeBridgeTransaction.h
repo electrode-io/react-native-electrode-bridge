@@ -10,21 +10,18 @@
 #import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeRequestNew.h"
 #import "ElectrodeBridgeResponse.h"
-
+NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransaction : NSObject
 
-@property(nonatomic, readonly, strong, nonnull) ElectrodeBridgeRequestNew *request;
-@property(nonatomic, readonly, copy, nullable) ElectrodeBridgeResponseListenerSuccessBlock success;
-@property(nonatomic, readonly, copy, nullable) ElectrodeBridgeResponseListenerFailureBlock failure;
-
-
+@property(nonatomic, readonly, strong) ElectrodeBridgeRequestNew *request;
+@property(nonatomic, readonly, strong, nullable) ElectrodeBridgeResponseCompletionHandler completion;
 // Note: response can be set
 @property(nonatomic, readwrite, strong,nullable) ElectrodeBridgeResponse *response;
 
--(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew * _Nonnull) request
-                               success: (ElectrodeBridgeResponseListenerSuccessBlock _Nullable) success
-                               failure: (ElectrodeBridgeResponseListenerFailureBlock _Nullable) failure;
--(nonnull NSString *) transactionId;
+-(instancetype)initWithRequest: (ElectrodeBridgeRequestNew *) request
+                     completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion;
+-(NSString *) transactionId;
 -(BOOL) isJsInitiated;
 
 @end
+NS_ASSUME_NONNULL_END

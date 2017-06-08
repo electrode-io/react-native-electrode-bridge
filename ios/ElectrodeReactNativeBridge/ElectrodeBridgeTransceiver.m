@@ -91,15 +91,14 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ElectrodeNativeBridge implementation
--(void)sendRequest:(ElectrodeBridgeRequestNew *)request
-           success:(ElectrodeBridgeResponseListenerSuccessBlock) success
-           failure: (ElectrodeBridgeResponseListenerFailureBlock) failure
+- (void)sendRequest: (ElectrodeBridgeRequestNew *)request
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
-    [self handleRequest:request success:success failure:failure];
+    [self handleRequest:request completionHandler:completion];
 }
 
--(NSUUID *)regiesterRequestHandlerWithName: (NSString *)name handler:(id<ElectrodeBridgeRequestHandler>) requestHandler error:(NSError * _Nullable __autoreleasing * _Nullable)error{
-    NSUUID *uUID = [self.requestDispatcher.requestRegistrar registerRequestHandler:name requestHandler:requestHandler error:error]; //CLAIRE TODO: Check if need to return UUID
+-(NSUUID *)registerRequestCompletionHandlerWithName: (NSString *) name completionHandler:(nonnull ElectrodeBridgeRequestCompletionHandler)completion {
+    NSUUID *uUID = [self.requestDispatcher.requestRegistrar registerRequestCompletionHandlerWithName:name completion:completion];
     return uUID;
 }
 
@@ -129,7 +128,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         case ElectrodeMessageTypeRequest:
         {
             ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:bridgeMessage];
-            [self handleRequest:request success:nil failure:nil];
+            [self handleRequest:request completionHandler:nil];
             break;
         }
             
@@ -179,17 +178,16 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(void)handleRequest:(ElectrodeBridgeRequestNew *)request
-             success:(ElectrodeBridgeResponseListenerSuccessBlock _Nullable) success
-             failure: (ElectrodeBridgeResponseListenerFailureBlock _Nullable) failure
+  completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion
 {
     [self logRequest:request];
     
-    if (success == nil && failure == nil && !request.isJsInitiated) {
+    if (completion == nil && !request.isJsInitiated) {
         [NSException raise:@"invalid operation" format:@"A response lister is required for a native initiated request"];
     }
     
 
-    ElectrodeBridgeTransaction *transaction = [self createTransactionWithRequest:request success:success failure:failure];
+    ElectrodeBridgeTransaction *transaction = [self createTransactionWithRequest:request completionHandler:completion];
     if ([self.requestDispatcher canHandlerRequestWithName:request.name] ) {
         [self dispatchRequestToNativeHandlerForTransaction:transaction];
     } else if (!request.isJsInitiated) { //GOTCHA: Make sure not send a request back to JS if it's initiated on JS side
@@ -203,10 +201,9 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(ElectrodeBridgeTransaction *)createTransactionWithRequest: (ElectrodeBridgeRequestNew *)request
-                                               success: (ElectrodeBridgeResponseListenerSuccessBlock) success
-                                               failure: (ElectrodeBridgeResponseListenerFailureBlock) failure
+     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
-    ElectrodeBridgeTransaction *transaction = [[ElectrodeBridgeTransaction alloc] initWithRequest:request success:success failure:failure];
+    ElectrodeBridgeTransaction *transaction = [[ElectrodeBridgeTransaction alloc] initWithRequest:request completionHandler:completion];
     
     @synchronized (self) {
         [self.pendingTransaction setObject:transaction forKey:request.messageId];
@@ -223,8 +220,8 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     // Add the timeout handler
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(transaction.request.timeoutMs * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-        ElectrodeBridgeResponseListenerFailureBlock failureBlock = transaction.failure;
-        if (failureBlock)
+        ElectrodeBridgeResponseCompletionHandler completionBlock = transaction.completion;
+        if (completionBlock)
         {
             id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"TIMEOUT" message:@"transaction timed out for request"];
             ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:transaction.request withResponseData:nil withFailureMessage:failureMessage];
@@ -240,20 +237,20 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     NSLog(@"Sending request(%@) to native handler", transaction.request);
     ElectrodeBridgeRequestNew *request = transaction.request;
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
-    
-
-    [self.requestDispatcher dispatchRequest:request success: ^(id _Nullable data)
-        {
+        
+    [self.requestDispatcher dispatchRequest:request completionHandler:^(id _Nullable data, id<ElectrodeFailureMessage> _Nullable failureMessage) {
+        if (failureMessage != nil) {
+            ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request
+                                                                                 withResponseData:nil
+                                                                               withFailureMessage:failureMessage];
+            [weakSelf handleResponse:response];
+        } else {
             ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request
                                                                                  withResponseData:data
                                                                                withFailureMessage:nil];
             [weakSelf handleResponse:response];
-        } failure: ^(id<ElectrodeFailureMessage> _Nonnull message) {
-            ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request
-                                                                                 withResponseData:nil
-                                                                               withFailureMessage:message];
-            [weakSelf handleResponse:response];
-        }];
+        }
+    }];
 }
 
 -(void)dispatchRequestToReactHandlerForTransaction:(ElectrodeBridgeTransaction *)transaction
@@ -294,27 +291,20 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         NSLog(@"Completing transaction by emitting event back to JS since the request is initiated from JS side");
         [self emitMessage:response];
     } else {
-        if (transaction.success == nil && transaction.failure == nil) {
+        if (transaction.completion == nil) {
             [NSException raise:@"invalid transaction" format:@"Should never reach here. A response listener should always be set for a local transaction"];
         } else {
             if(response.failureMessage != nil) {
-                if (transaction.failure != nil) {
-                    NSLog(@"Completing transaction by issuing a failure call back to local response listener");
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        transaction.failure(response.failureMessage);
-                    });
-                } else {
-                    NSLog(@"Empty failure block. Transaction will time out");
-                }
+                
+                NSLog(@"Completing transaction by issuing a failure call back to local response listener");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    transaction.completion(nil, response.failureMessage);
+                });
             } else {
-                if (transaction.success)  {
                     NSLog(@"Completing transaction by issuing a success call back to local response listener");
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        transaction.success(response.data);
+                        transaction.completion(response.data, nil);
                     });
-                } else {
-                    NSLog(@"Empty success block. Transaction will time out");
-                }
             }
         }
     }

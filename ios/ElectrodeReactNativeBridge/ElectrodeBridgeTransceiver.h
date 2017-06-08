@@ -30,13 +30,15 @@
 /**
  * A class that is responsible for transmitting messages between native side and react native side.
  */
-
+NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransceiver : RCTEventEmitter<ElectrodeNativeBridge, ElectrodeReactBridge>
 
-@property(nonatomic, copy, readonly) NSString *name;
+@property(nonatomic, copy, readonly, nonnull) NSString *name;
 
 + (instancetype)sharedInstance;
-+ (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) reactNativeReadyListner;
++ (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner _Nonnull) reactNativeReadyListner;
 - (void)onReactNativeInitialized;
 + (BOOL)isReactNativeBridgeReady;
 @end
+
+NS_ASSUME_NONNULL_END

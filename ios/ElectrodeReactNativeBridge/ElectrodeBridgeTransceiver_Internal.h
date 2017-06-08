@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 static ElectrodeBridgeReactNativeReadyListner reactNativeReadyListener = nil;
 static BOOL isReactNativeReady = NO;
 static ElectrodeBridgeTransceiver *sharedInstance;
+
 @interface ElectrodeBridgeTransceiver ()
 -(void) emitMessage:(ElectrodeBridgeMessage * _Nonnull) bridgeMessage;
 -(void)resetRegistrar;

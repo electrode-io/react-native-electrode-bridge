@@ -13,53 +13,37 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
     let requestName: String
     let reqClass: TReq.Type
     let respClass: TResp.Type
-    let requestHandler: ElectrodeBridgeRequestHandler
+    let requestCompletionHandler: ElectrodeBridgeRequestCompletionHandler
     
     public init(requestName: String,
          reqClass: TReq.Type,
          respClass: TResp.Type,
-         requestHandler: ElectrodeBridgeRequestHandler)
+         requestCompletionHandler: @escaping ElectrodeBridgeRequestCompletionHandler)
     {
         self.tag = String(describing: type(of:self))
         self.requestName = requestName
         self.reqClass = reqClass
         self.respClass = respClass
-        self.requestHandler = requestHandler
+        self.requestCompletionHandler = requestCompletionHandler
         super.init()
     }
     
     public func execute() {
-        let intermediateRequestHandler = ElectrodeBridgeRequestHandlerImpt(requestClass:reqClass , requestHandler: requestHandler)
-        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName, requestHandler: intermediateRequestHandler)
-    }
-    
-    
-}
-
-class ElectrodeBridgeRequestHandlerImpt<TReq>: NSObject, ElectrodeBridgeRequestHandler {
-    let requestClass: TReq.Type
-    let requestHandler: ElectrodeBridgeRequestHandler
-    
-    init(requestClass: TReq.Type, requestHandler: ElectrodeBridgeRequestHandler) {
-        self.requestClass = requestClass
-        self.requestHandler = requestHandler
-    }
-    func onRequest(_ data: Any?,
-                   success: @escaping ElectrodeReactNativeBridge.ElectrodeBridgeResponseListenerSuccessBlock,
-                   failure: @escaping ElectrodeReactNativeBridge.ElectrodeBridgeResponseListenerFailureBlock)
-    {
-        let request: Any?
-        if (requestClass == None.self) {
-            request = nil
-        } else {
-            if let nonnilData = data {
-                request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: requestClass)
-            } else {
+        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName) { [weak self](data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionHandler) in
+            guard let strongSelf = self else { return }
+            let request: Any?
+            if (strongSelf.reqClass == None.self) {
                 request = nil
+            } else {
+                if let nonnilData = data {
+                    request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: strongSelf.reqClass)
+                } else {
+                    request = nil
+                }
             }
+            
+            //this is passed back to Native side.
+            strongSelf.requestCompletionHandler(request, responseCompletion)
         }
-        
-        //this is passed back to Native side. 
-        requestHandler.onRequest(request, success: success, failure: failure)
     }
 }

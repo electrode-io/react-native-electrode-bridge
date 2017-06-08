@@ -18,13 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
  already exists for the given name. Only one request is allowed per name.
  
  @param name The name of the event in reverse url format.
- @param handler The request handler that will parse and process a request.
- @param error The error is returned if a request already exists for that name.
+ @param completion The request handler that will parse and process a request.
  @return A UUID is returned for a request being added.
  */
-- (NSUUID *)registerRequestHandler:(NSString *)name
-                      requestHandler:(id<ElectrodeBridgeRequestHandler>)handler
-                               error:(NSError **)error;
+- (NSUUID *)registerRequestCompletionHandlerWithName: (NSString *) name
+                                          completion: (ElectrodeBridgeRequestCompletionHandler) completion;
 
 /**
  * Unregisters a request handler
@@ -41,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param name The name of the request, in reverse url format.
  @return Returns a request handler for a specific name.
  */
-- (id<ElectrodeBridgeRequestHandler> _Nullable)getRequestHandler:(NSString *)name;
+- (nullable ElectrodeBridgeRequestCompletionHandler)getRequestHandler:(NSString *)name;
 -(void)reset;
 
 @end

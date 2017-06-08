@@ -90,19 +90,6 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 typedef void (^successBlock) (_Nullable id data);
 typedef void (^failureBlock) (_Nullable id<ElectrodeFailureMessage> failureMessage);
 
-@interface MockElectrodeBridgeResponseListener : XCTestCase<ElectrodeBridgeResponseListener>
-- (nonnull instancetype) initWithExpectation: (nonnull XCTestExpectation *) expectation successBlock:(nonnull successBlock) success NS_DESIGNATED_INITIALIZER;
-- (nonnull instancetype) initWithExpectation: (nonnull XCTestExpectation *) expectation failureBlock:(nonnull failureBlock) failure NS_DESIGNATED_INITIALIZER;
-
-@property(nonatomic, assign) BOOL isSuccessListener;
-@property(nonatomic, assign) int testTimeOutMs;
-@property(nonatomic, strong, nonnull) XCTestExpectation* expectation;
-
-@property(nonatomic, copy, nullable) successBlock successBlk;
-@property(nonatomic, copy, nullable) failureBlock failureBlk;
-@end
-
-
 /////////////////MockBridgeTransceiver
 @interface MockBridgeTransceiver : ElectrodeBridgeTransceiver
 +(instancetype)sharedInstance;

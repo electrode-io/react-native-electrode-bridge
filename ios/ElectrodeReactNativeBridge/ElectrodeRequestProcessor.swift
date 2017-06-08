@@ -16,20 +16,20 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let requestPayload: Any?
     private let responseClass: TResp.Type
     private let responseItemType: Any.Type?
-    private let completion: ElectrodeBridgeResponseCompletionHandler
+    private let responseCompletionHandler: ElectrodeBridgeResponseCompletionHandler
     
     public init(requestName: String,
          requestPayload: Any?,
          respClass: TResp.Type,
          responseItemType: Any.Type?,
-         completion: @escaping ElectrodeBridgeResponseCompletionHandler)
+         responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
     {
         self.tag              = String(describing: type(of:self))
         self.requestName      = requestName
         self.requestPayload   = requestPayload
         self.responseClass    = respClass
         self.responseItemType = responseItemType
-        self.completion = completion
+        self.responseCompletionHandler = responseCompletionHandler
         super.init()
     }
     
@@ -41,7 +41,7 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
 
         ElectrodeBridgeHolderNew.sendRequest(validRequest) { (responseData: Any?, failureMessage: ElectrodeFailureMessage?) in
             if let failureMessage = failureMessage {
-                self.completion(nil, failureMessage)
+                self.responseCompletionHandler(nil, failureMessage)
             } else {
                 let processedResp: Any?
                 if (self.responseClass != None.self) {
@@ -49,7 +49,7 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
                 } else {
                     processedResp = nil
                 }
-                self.completion(processedResp, nil)
+                self.responseCompletionHandler(processedResp, nil)
             }
         }
     }

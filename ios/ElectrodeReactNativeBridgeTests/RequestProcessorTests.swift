@@ -19,25 +19,26 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
     func testSampleRequestNativeToNativeFailure() {
         let asyncExpectation = expectation(description: "testSampleRequestNativeToNativeFailure")
         
-        self.personAPI?.request.getUserName (success: { (any) in
-            XCTFail()
-        }, failure: { (failureMessage) in
-            asyncExpectation.fulfill()
+        self.personAPI?.request.getUserName(responseCompletionHandler:{ (data, failureMessage) in
+            if let data = data {
+                XCTFail()
+            } else {
+                guard let failure = failureMessage else {
+                    XCTFail()
+                    return
+                }
+                asyncExpectation.fulfill()
+            }
         })
-        
         waitForExpectations(timeout: 10)
     }
     
     func testSampleRequestNativeToJSSuccess() {
-        
         let asyncExpectation = expectation(description: "testSampleRequestNativeToJSSuccess")
-
         let expectedResults = "Your boss"
         let expectedResponseWithoutId = [kElectrodeBridgeMessageName : PersonAPI.kRequestGetUserName,
                                 kElectrodeBridgeMessageType:kElectrodeBridgeMessageResponse,
                                 kElectrodeBridgeMessageData: expectedResults ]
-            
-        
         let mockJSListener = SwiftMockJSEeventListener(jSBlock: {(result) in
             XCTAssertNotNil(result)
             guard let requestName = result[kElectrodeBridgeMessageName] as? String else{
@@ -46,10 +47,10 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             }
             XCTAssertEqual(requestName, PersonAPI.kRequestGetUserName)
         }, response: expectedResponseWithoutId)
-
         self.appendMockEventListener(mockJSListener, forName: PersonAPI.kRequestGetUserName)
-        self.personAPI?.request.getUserName(success: { (any) in
+        self.personAPI?.request.getUserName(responseCompletionHandler: { (any, failureMessage) in
             XCTAssertNotNil(any)
+            XCTAssertNil(failureMessage)
             guard let responseDict = any as? [AnyHashable: Any] else {
                 XCTFail()
                 return
@@ -57,13 +58,10 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             
             XCTAssertEqual(expectedResults,  responseDict[kElectrodeBridgeMessageData] as? String)
             asyncExpectation.fulfill()
-        }, failure: { (failureMessage) in
-            XCTFail()
         })
-
+        
         waitForExpectations(timeout: 10)
         self.removeMockEventListener(withName: PersonAPI.kRequestGetUserName)
-
     }
     
     func testRegisterGetStatusRequestHandleNativeToNative() {
@@ -72,8 +70,9 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         //let status = Status(log: true, member: true)
         let person = Person(name: "John", age: nil, hiredMonth: 5, status: nil, position: nil, birthYear: nil)
         let status = Status(log: true, member: true)
-        let requestHandler = PersonResponseRequestHandler(completionClosure: { (data, success, failure) in
+        self.personAPI?.request.registerGetStatusRequestHandler(handler: { (data, responseCompletionHandler) in
             XCTAssertNotNil(data)
+            XCTAssertNotNil(responseCompletionHandler)
             guard let returnedPerson = data as? Person else {
                 XCTFail()
                 return
@@ -81,26 +80,20 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             
             XCTAssertEqual(returnedPerson.name, person.name)
             XCTAssertEqual(returnedPerson.hiredMonth, person.hiredMonth)
-            success(status)
+            responseCompletionHandler(status, nil)
         })
-        
-        self.personAPI?.request.registerGetStatusRequestHandler(handler: requestHandler)
-        self.personAPI?.request.getStatus(person: person, success: { (any) in
+        self.personAPI?.request.getStatus(person: person, responseCompletionHandler: { (any, failureMessage) in
             XCTAssertNotNil(any)
+            XCTAssertNil(failureMessage)
             guard let returnedStatus = any as? Status else {
                 XCTFail()
                 return
             }
-            
             XCTAssertEqual(returnedStatus.log, status.log)
             XCTAssertEqual(returnedStatus.member, status.member)
             asyncExpectation.fulfill()
-        }, failure: { (failureMessage) in
-            XCTFail()
         })
-
         waitForExpectations(timeout: 10)
-
     }
     
     func testGetStatusRequestHandlerNativeToJSSuccess() {
@@ -140,8 +133,9 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         }, response: statusDict)
         
         self.appendMockEventListener(mockJSListener, forName: PersonAPI.kRequestGetStatus)
-        self.personAPI?.request.getStatus(person: actualPerson, success: { (any) in
+        self.personAPI?.request.getStatus(person: actualPerson, responseCompletionHandler: {(any, failureMessage) in
             XCTAssertNotNil(any)
+            XCTAssertNil(failureMessage)
             guard let returnedStatus = any as? Status else {
                 XCTFail()
                 return
@@ -150,10 +144,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(returnedStatus.log, expectedStatus.log)
             XCTAssertEqual(returnedStatus.member, expectedStatus.member)
             asyncExpectation.fulfill()
-        }, failure: { (failureMessage) in
-            XCTFail()
         })
-
         
         waitForExpectations(timeout: 10)
         self.removeMockEventListener(withName: PersonAPI.kRequestGetStatus)
@@ -163,21 +154,6 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         let asyncExpectation = expectation(description: "testGetStatusRequestHandlerJSToNativeSuccess")
         let person = Person(name: "Shiba", age: 3, hiredMonth: 11, status: nil, position: nil, birthYear: nil)
         let resultStatus = Status(log: true, member: false)
-        
-        let requestHandler = PersonResponseRequestHandler(completionClosure: { (data, success, failure) in
-            XCTAssertNotNil(data)
-            guard let returnedPerson = data as? Person else {
-                XCTFail()
-                return
-            }
-            
-            XCTAssertEqual(returnedPerson.name, person.name)
-            XCTAssertEqual(returnedPerson.hiredMonth, person.hiredMonth)
-            XCTAssertEqual(returnedPerson.age, person.age)
-            success(resultStatus)
-        })
-        
-        
         let mockJSResponseListner = SwiftMockJSEeventListener(jSBlock: {(result) in
             XCTAssertNotNil(result)
             guard let returnedStatusDict = result as? [String: Any] else {
@@ -193,10 +169,20 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             asyncExpectation.fulfill()
         })
 
-        
         self.appendMockEventListener(mockJSResponseListner, forName: PersonAPI.kRequestGetStatus)
-
-        self.personAPI?.request.registerGetStatusRequestHandler(handler: requestHandler)
+        self.personAPI?.request.registerGetStatusRequestHandler(handler: { (data, responseCompletionHandler) in
+            XCTAssertNotNil(data)
+            guard let returnedPerson = data as? Person else {
+                XCTFail()
+                return
+            }
+            
+            XCTAssertEqual(returnedPerson.name, person.name)
+            XCTAssertEqual(returnedPerson.hiredMonth, person.hiredMonth)
+            XCTAssertEqual(returnedPerson.age, person.age)
+            responseCompletionHandler(resultStatus, nil)
+        }
+)
         let requestPayload = ["name": person.name,
                        "hiredMonth": person.hiredMonth,
                        "age":person.age] as [AnyHashable: Any]
@@ -213,27 +199,20 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
     
     func testPrimitiveTypesForRequestAndResponseNativeToNative() {
         let asyncExpectation = expectation(description: "testPrimitiveTypesForRequestAndResponseNativeToNative")
-
-        let requestHandler = PersonResponseRequestHandler { (payload, success, failure) in
+        self.personAPI?.request.registerGetAgeRequestHandler(handler: { (payload, responseCompletionHandler) in
             XCTAssertNotNil(payload)
-            XCTAssertNotNil(success)
-            XCTAssertNotNil(failure)
+            XCTAssertNotNil(responseCompletionHandler)
             XCTAssertEqual(payload as! String, "San Francisco")
-            success(100)
-        }
+            responseCompletionHandler(100, nil)
+        })
         
-        self.personAPI?.request.registerGetAgeRequestHandler(handler: requestHandler)
-        self.personAPI?.request.getAge(name: "San Francisco", success: { (any) in
+        self.personAPI?.request.getAge(name: "San Francisco", responseCompletionHandler: {(any, failureMessage) in
             XCTAssertNotNil(any)
+            XCTAssertNil(failureMessage)
             XCTAssertEqual(any as! Int, 100)
             asyncExpectation.fulfill()
-            
-        }, failure: { (failureMessage) in
-            XCTFail()
         })
-
         waitForExpectations(timeout: 10)
-
     }
     
     func testIntegerForResponseNativeToJS() {
@@ -250,15 +229,12 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         }, response: expectedResponse)
         
         self.appendMockEventListener(mockJSListener, forName: PersonAPI.kRequestGetAge)
-        
-        self.personAPI?.request.getAge(name: "SF", success: { (res) in
-            XCTAssertNotNil(res)
-            XCTAssertEqual(res as! Int, expectedResponse)
+        self.personAPI?.request.getAge(name:"SF", responseCompletionHandler: { (any, failureMessage) in
+            XCTAssertNotNil(any)
+            XCTAssertNil(failureMessage)
+            XCTAssertEqual(any as! Int, expectedResponse)
             asyncExpectation.fulfill()
-        }, failure: { (fail) in
-            XCTFail()
         })
-
         waitForExpectations(timeout: 10)
     }
     
@@ -272,14 +248,6 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
                            kElectrodeBridgeMessageName: PersonAPI.kRequestGetAge,
                            kElectrodeBridgeMessageData: requestPayload
             ] as [AnyHashable: Any]
-
-        let requestHandler = PersonResponseRequestHandler { (any, success, failure) in
-            XCTAssertNotNil(any)
-            XCTAssertNotNil(success)
-            XCTAssertNotNil(failure)
-            XCTAssertEqual(any as! String, "testName")
-            success(expectedAge)
-        }
         
         let mockJSResponseListner = SwiftMockJSEeventListener(jSBlock: {(result) in
             XCTAssertNotNil(result)
@@ -296,9 +264,13 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         
         
         self.appendMockEventListener(mockJSResponseListner, forName: PersonAPI.kRequestGetAge)
-        self.personAPI?.request.registerGetAgeRequestHandler(handler: requestHandler)
+        self.personAPI?.request.registerGetAgeRequestHandler(handler: { (any, responseCompletionHandler) in
+            XCTAssertNotNil(any)
+            XCTAssertNotNil(responseCompletionHandler)
+            XCTAssertEqual(any as! String, "testName")
+            responseCompletionHandler(expectedAge, nil)
+        })
         MockBridgeTransceiver.sharedInstance().sendMessage(requestDict)
-
         waitForExpectations(timeout: 10)
     }
     
@@ -310,13 +282,10 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
                            kElectrodeBridgeMessageName: PersonAPI.kRequestGetPerson,
             ] as [AnyHashable: Any]
         
-        let requestHandler = PersonResponseRequestHandler { (any, success, failure) in
+        self.personAPI?.request.registerGetPersonRequestHandler(handler: { (any, responseCompletionHandler) in
             XCTAssertNil(any)
             asyncExpectation.fulfill()
-        }
-        
-        
-        self.personAPI?.request.registerGetPersonRequestHandler(handler: requestHandler)
+        })
         MockBridgeTransceiver.sharedInstance().sendMessage(requestDict)
         waitForExpectations(timeout: 10)
     }
@@ -328,23 +297,21 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         let firstName = "Apple"
         let lastName = "Pear"
         let updatePersonRequestData = UpdatePersonRequestData(firstName: firstName, lastName: lastName, status: status)
-        
-        
-        let requestHandler = PersonResponseRequestHandler { (any, success, failure) in
+        self.personAPI?.request.registerUpdatePersonRequestHandler(handler: { (any, responseCompletionHandler) in
             XCTAssertNotNil(any)
+            XCTAssertNotNil(responseCompletionHandler)
             guard let updateRequestData = any as? UpdatePersonRequestData else {
                 XCTFail()
                 return
             }
             
             let person = Person(name: "\(firstName)\(lastName)", age: nil, hiredMonth: 2, status: status, position: nil, birthYear: nil)
-            success(person)
-        }
+            responseCompletionHandler(person, nil)
+        })
         
-        self.personAPI?.request.registerUpdatePersonRequestHandler(handler: requestHandler)
-        
-        self.personAPI?.request.updatePersonPost(updatePersonRequestData: updatePersonRequestData, success: { (any) in
+        self.personAPI?.request.updatePersonPost(updatePersonRequestData: updatePersonRequestData, responseCompletionHandler: { (any, failureMessage) in
             XCTAssertNotNil(any)
+            XCTAssertNil(failureMessage)
             guard let person = any as? Person else {
                 XCTFail()
                 return
@@ -355,30 +322,12 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(status.log, person.status?.log)
             XCTAssertEqual(status.member, person.status?.member)
             asyncExpectation.fulfill()
-        }, failure: { (failure) in
-            XCTFail()
         })
-
-        
         waitForExpectations(timeout: 10)
-
     }
 }
-
-
 
 //MARK: Helper
-private class PersonResponseRequestHandler: NSObject, ElectrodeBridgeRequestHandler  {
-    let completionClosure: (_ data: Any?, _ success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, _ failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) -> ()
-    init(completionClosure: @escaping (_ data: Any?, _ success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, _ failure: @escaping ElectrodeBridgeResponseListenerFailureBlock) -> ()) {
-        self.completionClosure = completionClosure
-    }
-    func onRequest(_ data: Any?, success: @escaping ElectrodeBridgeResponseListenerSuccessBlock, failure: @escaping ElectrodeBridgeResponseListenerFailureBlock )
-    {
-        self.completionClosure(data, success, failure)
-    }
-}
-
 class SwiftMockJSEeventListener: MockJSEeventListener {
     override init(responseBlock: @escaping responseBlock) {
         super.init(responseBlock: responseBlock)

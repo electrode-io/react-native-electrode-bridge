@@ -29,21 +29,20 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
     }
     
     public func execute() {
-        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName) { [weak self](data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionHandler) in
-            guard let strongSelf = self else { return }
+        ElectrodeBridgeHolderNew.registerRequestHanlder(withName: requestName) {(data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionHandler) in
             let request: Any?
-            if (strongSelf.reqClass == None.self) {
+            if (self.reqClass == None.self) {
                 request = nil
             } else {
                 if let nonnilData = data {
-                    request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: strongSelf.reqClass)
+                    request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: self.reqClass)
                 } else {
                     request = nil
                 }
             }
             
             //this is passed back to Native side.
-            strongSelf.requestCompletionHandler(request, responseCompletion)
+            self.requestCompletionHandler(request, responseCompletion)
         }
     }
 }

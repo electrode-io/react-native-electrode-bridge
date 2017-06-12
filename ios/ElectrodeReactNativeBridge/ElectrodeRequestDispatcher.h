@@ -1,5 +1,5 @@
 //
-//  ElectrodeRequestDispatcherNew.h
+//  ElectrodeRequestDispatcher.h
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/24/17.
@@ -7,17 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ElectrodeRequestRegistrarNew.h"
-#import "ElectrodeBridgeRequestnew.h"
+#import "ElectrodeRequestRegistrar.h"
+#import "ElectrodeBridgeRequest.h"
 #import "ElectrodeBridgeProtocols.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeRequestDispatcherNew : NSObject
+@interface ElectrodeRequestDispatcher : NSObject
 
-@property(nonatomic, strong, readonly) ElectrodeRequestRegistrarNew *requestRegistrar;
+@property(nonatomic, strong, readonly) ElectrodeRequestRegistrar *requestRegistrar;
 
--(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrarNew *)requestRegistrar;
--(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
+-(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrar *)requestRegistrar;
+-(void)dispatchRequest: (ElectrodeBridgeRequest *)bridgeRequest
      completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
 -(BOOL)canHandlerRequestWithName: (NSString *)name;
 @end

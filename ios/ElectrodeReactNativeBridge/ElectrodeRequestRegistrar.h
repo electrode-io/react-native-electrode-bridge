@@ -1,5 +1,5 @@
 //
-//  ElectrodeRequestRegistrarNew.h
+//  ElectrodeRequestRegistrar.h
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/23/17.
@@ -10,7 +10,7 @@
 #import "ElectrodeBridgeProtocols.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeRequestRegistrarNew : NSObject
+@interface ElectrodeRequestRegistrar : NSObject
 
 
 /**

@@ -8,11 +8,11 @@
 
 #import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeBridgeTransceiver_Internal.h"
-#import "ElectrodeEventDispatcherNew.h"
-#import "ElectrodeRequestDispatcherNew.h"
+#import "ElectrodeEventDispatcher.h"
+#import "ElectrodeRequestDispatcher.h"
 #import "ElectrodeBridgeTransaction.h"
-#import "ElectrodeEventRegistrarNew.h"
-#import "ElectrodeRequestRegistrarNew.h"
+#import "ElectrodeEventRegistrar.h"
+#import "ElectrodeRequestRegistrar.h"
 
 #if __has_include(<React/RCTLog.h>)
 #import <React/RCTLog.h>
@@ -32,15 +32,15 @@
 
 
 #import "ElectrodeBridgeMessage.h"
-#import "ElectrodeBridgeEventNew.h"
+#import "ElectrodeBridgeEvent.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ElectrodeBridgeTransceiver()
 
 @property(nonatomic, copy) NSString *name;
-@property(nonatomic, strong) ElectrodeEventDispatcherNew *eventDispatcher;
-@property(nonatomic, strong) ElectrodeRequestDispatcherNew *requestDispatcher;
+@property(nonatomic, strong) ElectrodeEventDispatcher *eventDispatcher;
+@property(nonatomic, strong) ElectrodeRequestDispatcher *requestDispatcher;
 @property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction * > *pendingTransaction;
 @property (nonatomic, assign) dispatch_queue_t syncQueue; //this is used to make sure access to pendingTransaction is thread safe.
 
@@ -48,10 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 static dispatch_once_t onceToken;
-static ElectrodeRequestRegistrarNew *requestRegistrar;
-static ElectrodeEventRegistrarNew *eventRegistrar;
-static ElectrodeRequestDispatcherNew *requestDispatcher;
-static ElectrodeEventDispatcherNew *eventDispatcher;
+static ElectrodeRequestRegistrar *requestRegistrar;
+static ElectrodeEventRegistrar *eventRegistrar;
+static ElectrodeRequestDispatcher *requestDispatcher;
+static ElectrodeEventDispatcher *eventDispatcher;
 static NSMutableDictionary *pendingTransaction;
 
 @implementation ElectrodeBridgeTransceiver
@@ -64,10 +64,10 @@ static NSMutableDictionary *pendingTransaction;
     if (self = [super init])
     {
         dispatch_once(&onceToken, ^{
-            requestRegistrar = [[ElectrodeRequestRegistrarNew alloc] init];
-            eventRegistrar = [[ElectrodeEventRegistrarNew alloc] init];
-            requestDispatcher = [[ElectrodeRequestDispatcherNew alloc] initWithRequestRegistrar:requestRegistrar];
-            eventDispatcher = [[ElectrodeEventDispatcherNew alloc] initWithEventRegistrar:eventRegistrar];
+            requestRegistrar = [[ElectrodeRequestRegistrar alloc] init];
+            eventRegistrar = [[ElectrodeEventRegistrar alloc] init];
+            requestDispatcher = [[ElectrodeRequestDispatcher alloc] initWithRequestRegistrar:requestRegistrar];
+            eventDispatcher = [[ElectrodeEventDispatcher alloc] initWithEventRegistrar:eventRegistrar];
             pendingTransaction = [[NSMutableDictionary alloc] init];
         });
         
@@ -91,7 +91,7 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ElectrodeNativeBridge implementation
-- (void)sendRequest: (ElectrodeBridgeRequestNew *)request
+- (void)sendRequest: (ElectrodeBridgeRequest *)request
   completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
     [self handleRequest:request completionHandler:completion];
@@ -106,7 +106,7 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
     [self.requestDispatcher.requestRegistrar reset];
 }
 
--(void)sendEvent: (ElectrodeBridgeEventNew *)event {
+-(void)sendEvent: (ElectrodeBridgeEvent *)event {
     NSLog(@"ElectrodeBridgeTransceiver: emit event named: %@, id: %@", event.name, event.messageId);
     [self notifyNativeEventListenerWithEvent:event];
     [self notifyReactNativeEventListenerWithEvent:event];
@@ -127,7 +127,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     switch (type) {
         case ElectrodeMessageTypeRequest:
         {
-            ElectrodeBridgeRequestNew *request = [ElectrodeBridgeRequestNew createRequestWithData:bridgeMessage];
+            ElectrodeBridgeRequest *request = [ElectrodeBridgeRequest createRequestWithData:bridgeMessage];
             [self handleRequest:request completionHandler:nil];
             break;
         }
@@ -144,7 +144,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         }
         case ElectrodeMessageTypeEvent:
         {
-            ElectrodeBridgeEventNew *event = [ElectrodeBridgeEventNew createEventWithData:bridgeMessage];
+            ElectrodeBridgeEvent *event = [ElectrodeBridgeEvent createEventWithData:bridgeMessage];
             if (event != nil) {
                 [self notifyNativeEventListenerWithEvent:event];
             } else {
@@ -169,15 +169,15 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     [self sendEventWithName:@"electrode.bridge.message" body:[bridgeMessage toDictionary]];
 }
 
--(void)notifyReactNativeEventListenerWithEvent: (ElectrodeBridgeEventNew *) event {
+-(void)notifyReactNativeEventListenerWithEvent: (ElectrodeBridgeEvent *) event {
     [self emitMessage:event];
 }
 
--(void)notifyNativeEventListenerWithEvent: (ElectrodeBridgeEventNew *)event {
+-(void)notifyNativeEventListenerWithEvent: (ElectrodeBridgeEvent *)event {
     [self.eventDispatcher dispatchEvent:event];
 }
 
--(void)handleRequest:(ElectrodeBridgeRequestNew *)request
+-(void)handleRequest:(ElectrodeBridgeRequest *)request
   completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion
 {
     [self logRequest:request];
@@ -200,7 +200,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     }
 }
 
--(ElectrodeBridgeTransaction *)createTransactionWithRequest: (ElectrodeBridgeRequestNew *)request
+-(ElectrodeBridgeTransaction *)createTransactionWithRequest: (ElectrodeBridgeRequest *)request
      completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 {
     ElectrodeBridgeTransaction *transaction = [[ElectrodeBridgeTransaction alloc] initWithRequest:request completionHandler:completion];
@@ -235,7 +235,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 -(void)dispatchRequestToNativeHandlerForTransaction: (ElectrodeBridgeTransaction *)transaction
 {
     NSLog(@"Sending request(%@) to native handler", transaction.request);
-    ElectrodeBridgeRequestNew *request = transaction.request;
+    ElectrodeBridgeRequest *request = transaction.request;
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
         
     [self.requestDispatcher dispatchRequest:request completionHandler:^(id _Nullable data, id<ElectrodeFailureMessage> _Nullable failureMessage) {
@@ -310,7 +310,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     }
 }
 
--(void)logRequest: (ElectrodeBridgeRequestNew *)request {
+-(void)logRequest: (ElectrodeBridgeRequest *)request {
     NSLog(@"--> --> --> --> --> Request(%@)", request);
 }
 

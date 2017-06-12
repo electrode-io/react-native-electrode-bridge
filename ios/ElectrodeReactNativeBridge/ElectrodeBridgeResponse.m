@@ -30,7 +30,7 @@ NSString * const kElectrodeBridgeResponseUnknownErrorCode = @"EUNKNOWN";
     return nil;
 }
 
-+(nullable instancetype)createResponseForRequest: (ElectrodeBridgeRequestNew *)request
++(nullable instancetype)createResponseForRequest: (ElectrodeBridgeRequest *)request
                                         withResponseData: (nullable id)data
                               withFailureMessage: (nullable id<ElectrodeFailureMessage>)failureMessage {
     return [[ElectrodeBridgeResponse alloc] initWithName:request.name

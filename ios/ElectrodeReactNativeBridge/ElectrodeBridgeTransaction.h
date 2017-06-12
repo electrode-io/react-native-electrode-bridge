@@ -8,17 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import "ElectrodeBridgeProtocols.h"
-#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeRequest.h"
 #import "ElectrodeBridgeResponse.h"
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransaction : NSObject
 
-@property(nonatomic, readonly, strong) ElectrodeBridgeRequestNew *request;
+@property(nonatomic, readonly, strong) ElectrodeBridgeRequest *request;
 @property(nonatomic, readonly, strong, nullable) ElectrodeBridgeResponseCompletionHandler completion;
 // Note: response can be set
 @property(nonatomic, readwrite, strong,nullable) ElectrodeBridgeResponse *response;
 
--(instancetype)initWithRequest: (ElectrodeBridgeRequestNew *) request
+-(instancetype)initWithRequest: (ElectrodeBridgeRequest *) request
                      completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion;
 -(NSString *) transactionId;
 -(BOOL) isJsInitiated;

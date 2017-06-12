@@ -7,7 +7,7 @@
 //
 
 #import "ElectrodeBridgeFailureMessage.h"
-#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,7 +27,7 @@ extern NSString * const kElectrodeBridgeResponseUnknownErrorCode;
 @property(readonly, nonatomic, strong, nullable) id<ElectrodeFailureMessage> failureMessage;
 
 +(nullable instancetype)createResponseWithData: (NSDictionary *)data;
-+(nullable instancetype)createResponseForRequest: (ElectrodeBridgeRequestNew *)request
++(nullable instancetype)createResponseForRequest: (ElectrodeBridgeRequest *)request
                                         withResponseData: (nullable NSDictionary *)data
                               withFailureMessage: (nullable id<ElectrodeFailureMessage>)failureMessage;
 @end

@@ -1,21 +1,21 @@
 //
-//  ElectrodeRequestRegistrarNew.m
+//  ElectrodeRequestRegistrar.m
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/23/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeRequestRegistrarNew.h"
+#import "ElectrodeRequestRegistrar.h"
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeRequestRegistrarNew ()
+@interface ElectrodeRequestRegistrar ()
 
 @property (nonatomic, strong) NSMutableDictionary *requestNameByUUID;
 @property (nonatomic, strong) NSMutableDictionary *requestHandlerByRequestName;
 
 @end
 
-@implementation ElectrodeRequestRegistrarNew
+@implementation ElectrodeRequestRegistrar
 
 - (NSUUID *)registerRequestCompletionHandlerWithName: (NSString *) name
                                           completion: (ElectrodeBridgeRequestCompletionHandler) completion

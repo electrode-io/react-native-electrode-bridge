@@ -1,32 +1,32 @@
 //
-//  ElectrodeBridgeRequestNew.m
+//  ElectrodeBridgeRequest.m
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/21/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeRequest.h"
 
 const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
 const int kElectrodeBridgeRequestNoTimeOut = -1;
 
 
-@interface ElectrodeBridgeRequestNew()
+@interface ElectrodeBridgeRequest()
 
 @property(nonatomic, assign) int timeoutMs;
 @property(nonatomic, assign) BOOL isJsInitiated;
 
 @end
 
-@implementation ElectrodeBridgeRequestNew
+@implementation ElectrodeBridgeRequest
 
 +(nullable instancetype)createRequestWithData: (NSDictionary *)data {
     if ([super isValidFromData:data withType:ElectrodeMessageTypeRequest]) {
         return [[self alloc] initWithData:data];
     }
     
-    NSLog(@"cannot create class ElectrodeBridgeRequestNew with data");
+    NSLog(@"cannot create class ElectrodeBridgeRequest with data");
     return nil;
 }
 

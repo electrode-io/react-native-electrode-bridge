@@ -1,23 +1,23 @@
 //
-//  ElectrodeEventDispatcherNew.m
+//  ElectrodeEventDispatcher.m
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/24/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeEventDispatcherNew.h"
+#import "ElectrodeEventDispatcher.h"
 #import "ElectrodeBridgeProtocols.h"
 
-@interface ElectrodeEventRegistrarNew()
+@interface ElectrodeEventRegistrar()
 
-@property(nonatomic, strong) ElectrodeEventRegistrarNew *eventRegistrar;
+@property(nonatomic, strong) ElectrodeEventRegistrar *eventRegistrar;
 
 @end
 
-@implementation ElectrodeEventDispatcherNew
+@implementation ElectrodeEventDispatcher
 
--(instancetype)initWithEventRegistrar: (ElectrodeEventRegistrarNew *)eventRegistrar
+-(instancetype)initWithEventRegistrar: (ElectrodeEventRegistrar *)eventRegistrar
 {
     if (self = [super init]) {
         _eventRegistrar = eventRegistrar;
@@ -26,7 +26,7 @@
     return self;
 }
 
--(void)dispatchEvent: (ElectrodeBridgeEventNew *)bridgeEvent
+-(void)dispatchEvent: (ElectrodeBridgeEvent *)bridgeEvent
 {
     NSArray<ElectrodeBridgeEventListener> *eventListeners = [self.eventRegistrar getEventListnersForName:bridgeEvent.name];
     

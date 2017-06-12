@@ -1,37 +1,37 @@
 //
-//  ElectrodeRequestDispatcherNew.m
+//  ElectrodeRequestDispatcher.m
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/24/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeRequestDispatcherNew.h"
+#import "ElectrodeRequestDispatcher.h"
 #import "ElectrodeBridgeFailureMessage.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeRequestDispatcherNew()
-@property(nonatomic, strong) ElectrodeRequestRegistrarNew *requestRegistrar;
+@interface ElectrodeRequestRegistrar()
+@property(nonatomic, strong) ElectrodeRequestRegistrar *requestRegistrar;
 
 @end
 
-@implementation ElectrodeRequestDispatcherNew
--(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrarNew *)requestRegistrar
+@implementation ElectrodeRequestDispatcher
+-(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrar *)requestRegistrar
 {
     if (self = [super init]) {
-        _requestRegistrar = [[ElectrodeRequestRegistrarNew alloc] init];
+        _requestRegistrar = [[ElectrodeRequestRegistrar alloc] init];
     }
     return self;
 }
 
--(void)dispatchRequest: (ElectrodeBridgeRequestNew *)bridgeRequest
+-(void)dispatchRequest: (ElectrodeBridgeRequest *)bridgeRequest
      completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
 
 {
     NSString *requestId = bridgeRequest.messageId;
     NSString *requestName = bridgeRequest.name;
     
-    NSLog(@"ElectrodeRequestDispatcherNew dispatching request(id=%@) locally", requestId);
+    NSLog(@"ElectrodeRequestDispatcher dispatching request(id=%@) locally", requestId);
     
     ElectrodeBridgeRequestCompletionHandler requestCompletionHandler = [self.requestRegistrar getRequestHandler:requestName];
     if (requestCompletionHandler == nil)

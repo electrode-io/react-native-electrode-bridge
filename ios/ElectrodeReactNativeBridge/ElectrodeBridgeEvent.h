@@ -1,5 +1,5 @@
 //
-//  ElectrodeBridgeEventNew.h
+//  ElectrodeBridgeEvent.h
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/21/17.
@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeBridgeEventNew : ElectrodeBridgeMessage
+@interface ElectrodeBridgeEvent : ElectrodeBridgeMessage
 
 +(nullable instancetype)createEventWithData: (NSDictionary *)data; //CLAIRE TODO: Why static methods vs just instance
 - (instancetype)initWithName:(NSString *)name data:(id)data;

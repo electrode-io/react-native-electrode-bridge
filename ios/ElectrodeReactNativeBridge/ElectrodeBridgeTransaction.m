@@ -11,14 +11,14 @@
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransaction()
 
-@property(nonatomic, strong, nonnull) ElectrodeBridgeRequestNew *request;
+@property(nonatomic, strong, nonnull) ElectrodeBridgeRequest *request;
 @property(nonatomic, strong, nullable) ElectrodeBridgeResponseCompletionHandler completion;
 
 @end
 
 @implementation ElectrodeBridgeTransaction
 
--(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequestNew *) request
+-(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequest *) request
                      completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion;
 {
     if (request.type != ElectrodeMessageTypeRequest) {

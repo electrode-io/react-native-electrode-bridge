@@ -1,5 +1,5 @@
 //
-//  ElectrodeBridgeRequestNew.h
+//  ElectrodeBridgeRequest.h
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/21/17.
@@ -15,7 +15,7 @@ extern const int kElectrodeBridgeRequestNoTimeOut;
 
 
 
-@interface ElectrodeBridgeRequestNew : ElectrodeBridgeMessage<NSCopying>
+@interface ElectrodeBridgeRequest : ElectrodeBridgeMessage<NSCopying>
 /**
  * return timeout of the request in ms.
  */

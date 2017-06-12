@@ -1,5 +1,5 @@
 //
-//  ElectrodeEventRegistrarNew.h
+//  ElectrodeEventRegistrar.h
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/22/17.
@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ElectrodeBridgeProtocols.h"
 
-@interface ElectrodeEventRegistrarNew : NSObject
+@interface ElectrodeEventRegistrar : NSObject
 
 /**
  Add a specific event listener that will respond to a given event name.

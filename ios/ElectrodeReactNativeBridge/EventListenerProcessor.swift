@@ -27,7 +27,7 @@ public class EventListenerProcessor<T>: NSObject, Processor {
             (any: Any?) in
             self.appEventListener.onEvent(any)
         })
-        ElectrodeBridgeHolderNew.addEventListner(withName: eventName, eventListner: intermediateListener)
+        ElectrodeBridgeHolder.addEventListner(withName: eventName, eventListner: intermediateListener)
     }
 }
 

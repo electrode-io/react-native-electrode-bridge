@@ -37,9 +37,9 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
         print("RequestProcessor started processing request (\(requestName)) with payload (\(String(describing: requestPayload)))")
         let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
         
-        let validRequest = ElectrodeBridgeRequestNew(name: requestName, data: bridgeMessageData)
+        let validRequest = ElectrodeBridgeRequest(name: requestName, data: bridgeMessageData)
 
-        ElectrodeBridgeHolderNew.sendRequest(validRequest) { (responseData: Any?, failureMessage: ElectrodeFailureMessage?) in
+        ElectrodeBridgeHolder.send(validRequest) { (responseData: Any?, failureMessage: ElectrodeFailureMessage?) in
             if let failureMessage = failureMessage {
                 self.responseCompletionHandler(nil, failureMessage)
             } else {

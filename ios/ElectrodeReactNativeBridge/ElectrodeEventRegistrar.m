@@ -1,15 +1,15 @@
 //
-//  ElectrodeEventRegistrarNew.m
+//  ElectrodeEventRegistrar.m
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/22/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeEventRegistrarNew.h"
+#import "ElectrodeEventRegistrar.h"
 
 
-@interface ElectrodeEventRegistrarNew ()
+@interface ElectrodeEventRegistrar ()
 
 @property (nonatomic, strong) NSMutableDictionary *eventListenerByUUID;
 @property (nonatomic, strong) NSMutableDictionary *eventListenersByEventName;
@@ -17,7 +17,7 @@
 
 @end
 
-@implementation ElectrodeEventRegistrarNew
+@implementation ElectrodeEventRegistrar
 - (NSUUID  * _Nonnull)registerEventListener:(NSString * _Nonnull)name
                               eventListener:(id<ElectrodeBridgeEventListener> _Nonnull)eventListener
 {

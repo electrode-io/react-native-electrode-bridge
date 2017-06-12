@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "ElectrodeBridgeEventNew.h"
+#import "ElectrodeBridgeEvent.h"
 
 @interface ElectrodeBridgeEventTests : XCTestCase
 
@@ -26,7 +26,7 @@
                            kElectrodeBridgeMessageType : [ElectrodeBridgeMessage convertEnumTypeToString:eventType] ,
                            kElectrodeBridgeMessageData : eventData
                            };
-    ElectrodeBridgeEventNew* event = [ElectrodeBridgeEventNew createEventWithData:data];
+    ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithData:data];
     
     XCTAssertNotNil(event, @"event object is not created");
     XCTAssertEqual(event.name, eventName, @"Invalid assignment");

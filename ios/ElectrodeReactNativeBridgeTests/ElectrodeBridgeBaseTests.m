@@ -8,29 +8,29 @@
 
 #import "ElectrodeBridgeBaseTests.h"
 #import "ElectrodeBridgeMessage.h"
-#import "ElectrodeBridgeEventNew.h"
+#import "ElectrodeBridgeEvent.h"
 
-@implementation ElectrodeBridgeRequestNew (CustomeBuilder)
+@implementation ElectrodeBridgeRequest (CustomeBuilder)
 
 + (instancetype)createRequestWithName:(NSString *)name
 {
-    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name data:nil];
+    ElectrodeBridgeRequest *request = [[ElectrodeBridgeRequest alloc] initWithName:name data:nil];
     return request;
 }
 
 + (instancetype)createRequestWithName:(NSString *)name data:(nullable id)data
 {
-    ElectrodeBridgeRequestNew *request = [[ElectrodeBridgeRequestNew alloc] initWithName:name data:data];
+    ElectrodeBridgeRequest *request = [[ElectrodeBridgeRequest alloc] initWithName:name data:data];
     return request;
 }
 
 @end
 
 
-@implementation ElectrodeBridgeEventNew (ElectrodeBridgeEventNewAddition)
+@implementation ElectrodeBridgeEvent (ElectrodeBridgeEventAddition)
 
 + (nonnull instancetype)createEventWithName:(nonnull NSString *)name data:(nullable id)eventData {
-    ElectrodeBridgeEventNew *event = [[ElectrodeBridgeEventNew alloc] initWithName:name data:eventData];
+    ElectrodeBridgeEvent *event = [[ElectrodeBridgeEvent alloc] initWithName:name data:eventData];
     return event;
 }
 @end

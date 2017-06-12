@@ -16,7 +16,7 @@ FOUNDATION_EXPORT const unsigned char ElectrodeReactNativeBridgeVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <ElectrodeReactNativeBridge/PublicHeader.h>
 
-#import <ElectrodeReactNativeBridge/ElectrodeBridgeHolderNew.h>
+#import <ElectrodeReactNativeBridge/ElectrodeBridgeHolder.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeProtocols.h>
-#import <ElectrodeReactNativeBridge/ElectrodeBridgeEventNew.h>
-#import <ElectrodeReactNativeBridge/ElectrodeBridgeRequestNew.h>
+#import <ElectrodeReactNativeBridge/ElectrodeBridgeEvent.h>
+#import <ElectrodeReactNativeBridge/ElectrodeBridgeRequest.h>

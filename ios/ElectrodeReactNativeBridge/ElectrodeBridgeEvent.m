@@ -1,22 +1,22 @@
 //
-//  ElectrodeBridgeEventNew.m
+//  ElectrodeBridgeEvent.m
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/21/17.
 //  Copyright © 2017 Walmart. All rights reserved.
 //
 
-#import "ElectrodeBridgeEventNew.h"
+#import "ElectrodeBridgeEvent.h"
 #import "ElectrodeBridgeMessage.h"
 
-@implementation ElectrodeBridgeEventNew
+@implementation ElectrodeBridgeEvent
 
 +(nullable instancetype)createEventWithData: (NSDictionary *)data {
     if ([ElectrodeBridgeMessage isValidFromData:data withType:ElectrodeMessageTypeEvent]) {
         return [[super alloc] initWithData:data];
     }
     
-    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEventNew className], data);
+    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
     return nil;
 }
 
@@ -24,7 +24,7 @@
     if (self = [super initWithName:name type:ElectrodeMessageTypeEvent data:data]) {
         return self;
     }
-    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEventNew className], data);
+    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
     return nil;
 }
 

@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "ElectrodeBridgeFailureMessage.h"
-#import "ElectrodeBridgeRequestNew.h"
-#import "ElectrodeBridgeEventNew.h"
+#import "ElectrodeBridgeRequest.h"
+#import "ElectrodeBridgeEvent.h"
 
 @class ElectrodeBridgeTransceiver;
 NS_ASSUME_NONNULL_BEGIN
@@ -57,7 +57,7 @@ typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, Electr
  * @param request    The ElectrodeBridgeRequest that contains request name, data, destination mode and timeout 
  * @param completion The response call back listener to issue success/failure of the request.
  */
--(void)sendRequest:(ElectrodeBridgeRequestNew *)request
+-(void)sendRequest:(ElectrodeBridgeRequest *)request
  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
 
 /**
@@ -72,7 +72,7 @@ typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, Electr
  * Sends an event with payload to all the event listeners
  * @param event The event to emit
  */
--(void)sendEvent: (ElectrodeBridgeEventNew *)event;
+-(void)sendEvent: (ElectrodeBridgeEvent *)event;
 
 /**
  * Add an event listener for the passed event

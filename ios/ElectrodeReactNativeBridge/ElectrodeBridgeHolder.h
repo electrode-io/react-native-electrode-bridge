@@ -1,5 +1,5 @@
 //
-//  ElectrodeBridgeHolderNew.h
+//  ElectrodeBridgeHolder.h
 //  ElectrodeReactNativeBridge
 //
 //  Created by Claire Weijie Li on 3/28/17.
@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ElectrodeBridgeEventNew.h"
-#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeEvent.h"
+#import "ElectrodeBridgeRequest.h"
 
 #import "ElectrodeBridgeProtocols.h"
 
@@ -23,11 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Handles queuing every method calls until react native is ready.
  */
 
-@interface ElectrodeBridgeHolderNew : NSObject
+@interface ElectrodeBridgeHolder : NSObject
 
-+ (void)sendEvent: (ElectrodeBridgeEventNew *)event;
++ (void)sendEvent: (ElectrodeBridgeEvent *)event;
 
-+ (void)sendRequest: (ElectrodeBridgeRequestNew *)request
++ (void)sendRequest: (ElectrodeBridgeRequest *)request
   completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
 
 + (void)registerRequestHanlderWithName: (NSString *)name

@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeRequest.h"
 
 @interface ElectrodeBridgeRequestTests : XCTestCase
 
@@ -26,7 +26,7 @@
                            kElectrodeBridgeMessageType : [ElectrodeBridgeMessage convertEnumTypeToString:messageType] ,
                            kElectrodeBridgeMessageData : messageData
                            };
-    ElectrodeBridgeRequestNew* requestMessage = [ElectrodeBridgeRequestNew createRequestWithData:data];
+    ElectrodeBridgeRequest* requestMessage = [ElectrodeBridgeRequest createRequestWithData:data];
     XCTAssertNotNil(requestMessage, @"requestMessage is not created");
     XCTAssertEqual(requestMessage.name, messageName, @"Invalid assignment");
     XCTAssertEqual(requestMessage.data, messageData, @"Invalid assignment");

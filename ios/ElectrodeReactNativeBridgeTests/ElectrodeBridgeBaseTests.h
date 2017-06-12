@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "ElectrodeBridgeRequestNew.h"
+#import "ElectrodeBridgeRequest.h"
 #import <Foundation/Foundation.h>
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeResponse.h"
@@ -21,8 +21,8 @@ extern  NSString* _Nonnull  const ktestId;
 
 /////////////////MockJSEeventListener
 NS_ASSUME_NONNULL_BEGIN
-typedef void (^evetBlock)(ElectrodeBridgeEventNew *request);
-typedef void (^requestBlock)(ElectrodeBridgeRequestNew *request);
+typedef void (^evetBlock)(ElectrodeBridgeEvent *request);
+typedef void (^requestBlock)(ElectrodeBridgeRequest *request);
 typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
 
 typedef void (^ElectrodeBaseJSBlock)(NSDictionary *result);
@@ -72,8 +72,8 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 @end
 
 
-/////////////////ElectrodeBridgeRequestNew
-@interface ElectrodeBridgeRequestNew (CustomeBuilder)
+/////////////////ElectrodeBridgeRequest
+@interface ElectrodeBridgeRequest (CustomeBuilder)
 
 +(nonnull instancetype)createRequestWithName: (NSString *)name;
 
@@ -82,7 +82,7 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 @end
 
 
-@interface ElectrodeBridgeEventNew (ElectrodeBridgeEventNewAddition)
+@interface ElectrodeBridgeEvent (ElectrodeBridgeEventAddition)
 + (nonnull instancetype)createEventWithName:(nonnull NSString *)name data:(nullable id)eventData;
 @end
 

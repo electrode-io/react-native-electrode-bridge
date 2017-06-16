@@ -32,11 +32,13 @@
     ElectrodeBridgeRequest* request = [ElectrodeBridgeRequest createRequestWithData:data];
     XCTAssertNotNil(request, @"request instance error");
     ElectrodeBridgeTransaction* transaction = [[ElectrodeBridgeTransaction alloc] initWithRequest:request completionHandler:^(id  _Nullable data, id<ElectrodeFailureMessage>  _Nullable message) {
+        XCTAssert([data isEqualToString:@"blah"]);
     }];
     XCTAssertNotNil(transaction, @"transaction instance error");
     XCTAssertNotNil(transaction.completion, @"transaction's completion handler is nil");
     XCTAssertEqual(transaction.request, request, @"invalid assignment");
     XCTAssertEqual(transaction.transactionId, request.messageId, @"invalid assignment");
+    transaction.completion(@"blah", nil);
 }
 
 @end

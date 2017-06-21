@@ -69,6 +69,7 @@
 		DA0B9F611E9BFF0F004A4629 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B9F5F1E9BFF0F004A4629 /* Person.m */; };
 		DA4BE0C61E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4BE0BC1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.framework */; };
 		DA4BE0CD1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = DA4BE0BF1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA889BA41EF4A08800EAFA43 /* ElectrodeTransceiverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA889BA31EF4A08800EAFA43 /* ElectrodeTransceiverTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -211,6 +212,7 @@
 		DA4BE0C01E36DBCD00DBA1ED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA4BE0C51E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ElectrodeReactNativeBridgeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA4BE0CC1E36DBCD00DBA1ED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA889BA31EF4A08800EAFA43 /* ElectrodeTransceiverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeTransceiverTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -357,6 +359,7 @@
 				3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */,
 				3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */,
 				3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */,
+				DA889BA31EF4A08800EAFA43 /* ElectrodeTransceiverTests.m */,
 				DA0B9F5E1E9BFF0F004A4629 /* Person.h */,
 				DA0B9F5F1E9BFF0F004A4629 /* Person.m */,
 				30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */,
@@ -650,6 +653,7 @@
 				DA0B9F381E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m in Sources */,
 				301941911E94153A002A0C69 /* BirthYear.swift in Sources */,
 				DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */,
+				DA889BA41EF4A08800EAFA43 /* ElectrodeTransceiverTests.m in Sources */,
 				3019419A1E942F42002A0C69 /* EventProcessorTests.swift in Sources */,
 				3017869A1E9E007F0051C4C6 /* UpdatePersonRequestData.swift in Sources */,
 			);

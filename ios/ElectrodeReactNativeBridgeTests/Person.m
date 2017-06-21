@@ -17,4 +17,12 @@
     return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    id personObject = [[[self class] alloc] init];
+    if (personObject) {
+        [personObject setAttributes:[self.attributes copyWithZone:zone]];
+    }
+    return personObject;
+}
+
 @end

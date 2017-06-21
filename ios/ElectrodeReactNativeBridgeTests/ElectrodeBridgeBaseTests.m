@@ -82,35 +82,32 @@
     self.transceiver = transceiver;
 }
 
--(id<ElectrodeNativeBridge>)getNativeBridge
-{
+- (id<ElectrodeNativeBridge>)getNativeBridge {
     id <ElectrodeNativeBridge> nativeBridge = [self.bridge moduleForClass:[MockBridgeTransceiver class]];
     XCTAssertNotNil(nativeBridge, @"Native bridge instance is nil");
     return nativeBridge;
 }
 
-- (id<ElectrodeReactBridge>)getReactBridge
-{
+- (id<ElectrodeReactBridge>)getReactBridge {
     id <ElectrodeReactBridge> reactBridge = [self.bridge moduleForClass:[MockBridgeTransceiver class]];
     XCTAssertNotNil(reactBridge, @"React bridge instance is nil");
     return reactBridge;
 }
 
--(void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name
-{
-    [self.mockListenerStore setValue:mockJsEventListener forKey:name];
+- (void) addMockEventListener:(MockJSEeventListener *) mockJsEventListener forName:(NSString *)name {
+    [[MockBridgeTransceiver sharedInstance].myMockListenerStore setValue: mockJsEventListener forKey:name];
+    NSLog(@"Mock Listener Store = %@", [MockBridgeTransceiver sharedInstance].myMockListenerStore);
 }
 
--(void) appendMockEventListener:(MockJSEeventListener *)mockJsEventListener forName:(NSString *)name {
+- (void) appendMockEventListener:(MockJSEeventListener *)mockJsEventListener forName:(NSString *)name {
     [[MockBridgeTransceiver sharedInstance].myMockListenerStore setValue: mockJsEventListener forKey:name];
 }
 
--(void)removeMockEventListenerWithName: (NSString *)name {
-    [self.mockListenerStore removeObjectForKey:name];
+- (void)removeMockEventListenerWithName: (NSString *)name {
+    [[MockBridgeTransceiver sharedInstance].myMockListenerStore removeObjectForKey:name];
 }
 
-- (NSDictionary *)createBridgeRequestForName:(NSString *)name id:(NSString *)requestId data:(id)data
-{
+- (NSDictionary *)createBridgeRequestForName:(NSString *)name id:(NSString *)requestId data:(id)data {
     NSMutableDictionary *jsRequest = [[NSMutableDictionary alloc] init];
     [jsRequest setObject:name forKey:kElectrodeBridgeMessageName];
     [jsRequest setObject:requestId forKey:kElectrodeBridgeMessageId];
@@ -162,6 +159,7 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
 {
     NSLog(@"Trying to emit messgae to JS, mock JS implemenation here.");
     MockJSEeventListener* registeredListener = [self.myMockListenerStore objectForKey:bridgeMessage.name];
+    
     if(registeredListener) {
         switch (bridgeMessage.type) {
             case ElectrodeMessageTypeEvent:

@@ -92,9 +92,7 @@ typedef void (^failureBlock) (_Nullable id<ElectrodeFailureMessage> failureMessa
 
 /////////////////MockBridgeTransceiver
 @interface MockBridgeTransceiver : ElectrodeBridgeTransceiver
-+(instancetype)sharedInstance;
 @property(nonatomic, strong, nonnull) NSMutableDictionary<NSString *, MockJSEeventListener *> *myMockListenerStore;
-- (void)sendMessage:(NSDictionary *)bridgeMessage;
 @end
 NS_ASSUME_NONNULL_END
 

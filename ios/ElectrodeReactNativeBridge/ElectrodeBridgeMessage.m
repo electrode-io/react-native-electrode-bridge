@@ -122,11 +122,11 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
             } else {
                 NSLog(@"ElectrodeBridgeMessage: empty array");
             }
-        } else {
-            simpleObj = self.data;
         }
     }
-
+    if (simpleObj == nil) {
+        simpleObj = self.data;
+    }
     return simpleObj;
 }
 

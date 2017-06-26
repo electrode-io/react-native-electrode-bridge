@@ -10,6 +10,30 @@
 #import "ElectrodeBridgeBaseTests.h"
 #import "ElectrodeBridgeResponse.h"
 #import "Person.h"
+#import "ElectrodeBridgeHolder.h"
+
+
+@interface MockConstantProvider : XCTestCase <ConstantsProvider>
+- (instancetype)initWithConstant:(NSDictionary *)constant;
+@property (nonatomic, strong) NSDictionary* constant;
+@end
+
+@implementation MockConstantProvider
+
+- (instancetype)initWithConstant:(NSDictionary *)constant {
+    self = [super init];
+    if (self) {
+        self.constant = constant;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *,id> *)constantsToExport {
+    return self.constant;
+}
+
+@end
+
 
 @interface ElectrodeTransceiverTests : ElectrodeBridgeBaseTests <ElectrodeFailureMessage>
 
@@ -314,6 +338,32 @@
     NSDictionary* eventMessage = [self createEventDataWithName:testEventName id:[ElectrodeBridgeMessage UUID] data:data];
     [reactBridge sendMessage:eventMessage];
     [self waitForExpectationToFullFillOrTimeOut];
+}
+
+- (void)testConstantsThruTransceiver {
+    NSMutableDictionary* constantsConcatenate = [NSMutableDictionary new];
+    id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
+    MockConstantProvider* mockConstantProvider = [[MockConstantProvider alloc] initWithConstant:@{@"key1" : @"value1"}];
+    [constantsConcatenate addEntriesFromDictionary:mockConstantProvider.constant];
+    [nativeBridge addConstantsProvider:mockConstantProvider];
+    MockConstantProvider* testConstantProvider = [[MockConstantProvider alloc] initWithConstant:@{@"key2" : @"value2"}];
+    [nativeBridge addConstantsProvider:testConstantProvider];
+    [constantsConcatenate addEntriesFromDictionary:testConstantProvider.constant];
+    NSDictionary* constantsExported =  [((id<RCTBridgeModule>)nativeBridge) constantsToExport];
+    XCTAssertTrue([constantsExported isEqualToDictionary:constantsConcatenate]);
+}
+
+- (void)testConstantsThruBridgeHolder {
+    NSMutableDictionary* constantsConcatenate = [NSMutableDictionary new];
+    id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
+    MockConstantProvider* mockConstantProvider = [[MockConstantProvider alloc] initWithConstant:@{@"key1" : @"value1"}];
+    [constantsConcatenate addEntriesFromDictionary:mockConstantProvider.constant];
+    [ElectrodeBridgeHolder addConstantsProvider:mockConstantProvider];
+    MockConstantProvider* testConstantProvider = [[MockConstantProvider alloc] initWithConstant:@{@"key2" : @"value2"}];
+    [ElectrodeBridgeHolder addConstantsProvider:testConstantProvider];
+    [constantsConcatenate addEntriesFromDictionary:testConstantProvider.constant];
+    NSDictionary* constantsExported =  [((id<RCTBridgeModule>)nativeBridge) constantsToExport];
+    XCTAssertTrue([constantsExported isEqualToDictionary:constantsConcatenate]);
 }
 
 @end

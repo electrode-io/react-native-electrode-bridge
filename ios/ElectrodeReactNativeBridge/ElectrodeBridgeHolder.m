@@ -68,13 +68,14 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
         for (id<ConstantsProvider> cp in queuedConstantsProvider) {
             [electrodeNativeBridge addConstantsProvider:cp];
         }
+        [queuedConstantsProvider removeAllObjects];
     }
-    [queuedConstantsProvider removeAllObjects];
 }
 
 + (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider {
-    if (!isReactNativeReady) {        
+    if (!isReactNativeReady) {
         [queuedConstantsProvider addObject:constantsProvider];
+        return;
     }
     [electrodeNativeBridge addConstantsProvider:constantsProvider];
 }

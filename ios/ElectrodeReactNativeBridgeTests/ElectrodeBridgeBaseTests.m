@@ -144,6 +144,7 @@
 }
 @end
 
+
 @implementation MockBridgeTransceiver
 RCT_EXPORT_MODULE(MockBridgeTransceiver)
 
@@ -215,6 +216,7 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
      return @[@"bridgeTest"];
 }
 
+
 @end
 
 
@@ -250,7 +252,6 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
         self.requestBlock = requestBlock;
         self.response = response;
     }
-    
     return self;
 }
 
@@ -258,7 +259,6 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
     if(self = [super init]) {
         self.jSCallBackBlock = jSBlock;
     }
-    
     return self;
 }
 
@@ -267,9 +267,6 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
         self.jSCallBackBlock = jSBlock;
         self.response = response;
     }
-    
     return self;
 }
-
-
 @end

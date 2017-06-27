@@ -24,9 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^evetBlock)(ElectrodeBridgeEvent *request);
 typedef void (^requestBlock)(ElectrodeBridgeRequest *request);
 typedef void (^responseBlock)(ElectrodeBridgeResponse *response);
-
 typedef void (^ElectrodeBaseJSBlock)(NSDictionary *result);
-
 @interface MockJSEeventListener : NSObject
 -(nonnull instancetype) initWithEventBlock:(nonnull evetBlock) evetBlock;
 -(nonnull instancetype) initWithRequestBlock:(nonnull requestBlock) requestBlock;
@@ -52,8 +50,8 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 - (_Nonnull instancetype)initWithonEventBlock:(nullable onEventBlock)eventBlock;
 @end
 
-/////////////////ElectrodeBridgeBaseTests
 
+/////////////////ElectrodeBridgeBaseTests
 @interface ElectrodeBridgeBaseTests : XCTestCase<RCTBridgeDelegate>
 -(void)initializeBundle;
 @property(nonatomic, strong, readonly, nonnull) RCTBridge *bridge;
@@ -74,13 +72,9 @@ typedef void (^onEventBlock)(_Nullable id payLoad);
 
 /////////////////ElectrodeBridgeRequest
 @interface ElectrodeBridgeRequest (CustomeBuilder)
-
 +(nonnull instancetype)createRequestWithName: (NSString *)name;
-
 +(nonnull instancetype)createRequestWithName: (NSString *)name data:(nullable id)data;
-
 @end
-
 
 @interface ElectrodeBridgeEvent (ElectrodeBridgeEventAddition)
 + (nonnull instancetype)createEventWithName:(nonnull NSString *)name data:(nullable id)eventData;

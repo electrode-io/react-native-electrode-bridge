@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
                    eventListner: (id<ElectrodeBridgeEventListener>) eventListner;
 
 + (void) setBridge: (ElectrodeBridgeTransceiver *)bridge;
++ (void)addConstantsProvider;
++ (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider;
 @end
 NS_ASSUME_NONNULL_END
 

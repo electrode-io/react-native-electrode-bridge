@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction * > *pendingTransaction;
 @property (nonatomic, assign) dispatch_queue_t syncQueue; //this is used to make sure access to pendingTransaction is thread safe.
 
-
+@property (nonatomic, copy) NSMutableArray <id<ConstantsProvider>>* constantsProviders;
 @end
 
 static dispatch_once_t onceToken;
@@ -69,6 +69,7 @@ static NSMutableDictionary *pendingTransaction;
             requestDispatcher = [[ElectrodeRequestDispatcher alloc] initWithRequestRegistrar:requestRegistrar];
             eventDispatcher = [[ElectrodeEventDispatcher alloc] initWithEventRegistrar:eventRegistrar];
             pendingTransaction = [[NSMutableDictionary alloc] init];
+            _constantsProviders = [[NSMutableArray alloc] init];
         });
         
         _requestDispatcher = requestDispatcher;
@@ -87,6 +88,24 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 -(NSArray *) supportedEvents
 {
     return @[@"electrode.bridge.message"];
+}
+
+#pragma ConstantsProvider implementation
+
+- (NSDictionary<NSString *,id> *)constantsToExport {
+    NSMutableDictionary <NSString*, id> *constants = [NSMutableDictionary new];
+    if (_constantsProviders != nil && [_constantsProviders count] > 0) {
+        for (id<ConstantsProvider> constant in _constantsProviders) {
+            [constants addEntriesFromDictionary:[constant constantsToExport]];
+        }
+        return constants;
+    }
+    NSLog(@"Constants provider is empty %@", _constantsProviders);
+    return nil;
+}
+
+- (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider {
+    [self.constantsProviders addObject:constantsProvider];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

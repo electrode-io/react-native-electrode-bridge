@@ -45,6 +45,16 @@ typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, Electr
 
 @end
 
+
+@protocol ConstantsProvider <NSObject>
+/**
+ * Returns constant values exposed to JavaScript.
+ * Its implementation is not required but is very useful to key pre-defined values that need to be propagated from JavaScript to NativeiOS in sync
+ * @return Dictionary containing a constant values
+ */
+- (NSDictionary<NSString *,id> *)constantsToExport;
+@end
+
 ////////////////////////////////////////////////
 #pragma ElectrodeNativeBridge protocol
 /*
@@ -82,6 +92,8 @@ typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, Electr
  */
 
 -(NSUUID *)addEventListenerWithName: (NSString *)name eventListener: (id<ElectrodeBridgeEventListener>) eventListener;
+
+- (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider;
 
 @end
 

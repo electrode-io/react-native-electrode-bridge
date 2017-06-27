@@ -27,6 +27,7 @@ static NSMutableDictionary *queuedRequestHandlerRegistration;
 static NSMutableDictionary *queuedEventListenerRegistration;
 static NSMutableDictionary *queuedRequests;
 static NSMutableArray *queuedEvent;
+static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 
 +(void) initialize {
     NSLog(@"in bridge holder initialization");
@@ -34,7 +35,7 @@ static NSMutableArray *queuedEvent;
     queuedEventListenerRegistration = [[NSMutableDictionary alloc] init];
     queuedRequests = [[NSMutableDictionary alloc] init];
     queuedEvent = [[NSMutableArray alloc] init];
-    
+    queuedConstantsProvider = [[NSMutableArray alloc] init];
     [ElectrodeBridgeHolder registerReactReadyListenr];
 }
 
@@ -46,6 +47,7 @@ static NSMutableArray *queuedEvent;
         [ElectrodeBridgeHolder registerQueuedRequestHandlers];
         [ElectrodeBridgeHolder sendQueuedEvents];
         [ElectrodeBridgeHolder sendQueuedRequests];
+        [ElectrodeBridgeHolder addConstantsProvider];
     }];
 }
 
@@ -58,6 +60,23 @@ static NSMutableArray *queuedEvent;
     });
     
     return sharedInstance;
+}
+
+
++ (void)addConstantsProvider {
+    if (queuedConstantsProvider != NULL) {
+        for (id<ConstantsProvider> cp in queuedConstantsProvider) {
+            [electrodeNativeBridge addConstantsProvider:cp];
+        }
+    }
+    [queuedConstantsProvider removeAllObjects];
+}
+
++ (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider {
+    if (!isReactNativeReady) {        
+        [queuedConstantsProvider addObject:constantsProvider];
+    }
+    [electrodeNativeBridge addConstantsProvider:constantsProvider];
 }
 
 + (void)sendEvent: (ElectrodeBridgeEvent *)event

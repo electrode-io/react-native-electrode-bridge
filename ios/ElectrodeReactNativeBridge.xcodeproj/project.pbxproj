@@ -18,6 +18,8 @@
 		3019419C1E94340F002A0C69 /* ElectrodeBridgeBaseTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */; };
 		3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */; };
+		30799ABD1F1D3CFB006D5044 /* CompleteAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */; };
+		30799AC61F1D5AAD006D5044 /* Person.json in Resources */ = {isa = PBXBuildFile; fileRef = 30799AC51F1D5AAD006D5044 /* Person.json */; };
 		309A03A31E8AE8F900501219 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 309A03A21E8AE8F900501219 /* MiniApp.jsbundle */; };
 		309A03C01E8B319E00501219 /* ElectrodeBridgeHolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		309A03C11E8B319E00501219 /* ElectrodeBridgeHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */; };
@@ -157,6 +159,8 @@
 		3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeTransceiverTests.m; sourceTree = "<group>"; };
 		3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeBaseTests.h; sourceTree = "<group>"; };
 		3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeBaseTests.m; sourceTree = "<group>"; };
+		30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompleteAddress.swift; sourceTree = "<group>"; };
+		30799AC51F1D5AAD006D5044 /* Person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Person.json; sourceTree = "<group>"; };
 		309A03A21E8AE8F900501219 /* MiniApp.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp.jsbundle; sourceTree = "<group>"; };
 		309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeHolder.h; sourceTree = "<group>"; };
 		309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeHolder.m; sourceTree = "<group>"; };
@@ -278,6 +282,8 @@
 				301941941E941D56002A0C69 /* Position.swift */,
 				301941961E9420C5002A0C69 /* Status.swift */,
 				301786991E9E007F0051C4C6 /* UpdatePersonRequestData.swift */,
+				30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */,
+				30799AC51F1D5AAD006D5044 /* Person.json */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -285,6 +291,7 @@
 		301941981E942F0A002A0C69 /* Swift */ = {
 			isa = PBXGroup;
 			children = (
+				30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */,
 				301941991E942F42002A0C69 /* EventProcessorTests.swift */,
 				30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */,
 			);
@@ -362,7 +369,6 @@
 				DA889BA31EF4A08800EAFA43 /* ElectrodeTransceiverTests.m */,
 				DA0B9F5E1E9BFF0F004A4629 /* Person.h */,
 				DA0B9F5F1E9BFF0F004A4629 /* Person.m */,
-				30BFEE581E92082500FE1B4F /* ElectrodeUtilitiesTests.swift */,
 				30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */,
 			);
 			path = ElectrodeReactNativeBridgeTests;
@@ -595,6 +601,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30799AC61F1D5AAD006D5044 /* Person.json in Resources */,
 				309A03A31E8AE8F900501219 /* MiniApp.jsbundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -655,6 +662,7 @@
 				DA0B9F221E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m in Sources */,
 				DA889BA41EF4A08800EAFA43 /* ElectrodeTransceiverTests.m in Sources */,
 				3019419A1E942F42002A0C69 /* EventProcessorTests.swift in Sources */,
+				30799ABD1F1D3CFB006D5044 /* CompleteAddress.swift in Sources */,
 				3017869A1E9E007F0051C4C6 /* UpdatePersonRequestData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

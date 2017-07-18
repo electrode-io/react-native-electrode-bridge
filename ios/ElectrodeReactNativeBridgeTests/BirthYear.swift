@@ -18,6 +18,12 @@ public class BirthYear: ElectrodeObject, Bridgeable {
         super.init()
     }
     
+    public override init() {
+        self.month = 0
+        self.year = 0
+        super.init()
+    }
+    
     required public init(dictionary: [AnyHashable: Any]) {
         if let month = dictionary["month"] as? Int,
             let year = dictionary["year"] as? Int{

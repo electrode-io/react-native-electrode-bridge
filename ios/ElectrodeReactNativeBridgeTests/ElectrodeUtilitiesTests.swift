@@ -96,6 +96,31 @@ class ElectrodeUtilitiesTests: XCTestCase {
         XCTAssert(res[1].street == "b")
         XCTAssert(res[1].zipcode == "94087")
     }
+    
+    func testGeneratePersonWithCompleteAddress() {
+        guard let path = Bundle(for: type(of: self)).path(forResource: "Person", ofType: ".json") else {
+            XCTFail("invalid path")
+            return
+        }
+        let pathURL = URL(fileURLWithPath: path)
+        let data = try! Data(contentsOf: pathURL)
+        let json  =  try? JSONSerialization.jsonObject(with: data, options: [])
+        
+        guard let jsonDict = json as? NSDictionary else{
+            XCTFail("not a valid json")
+            return
+        }
+        
+        let person = Person(dictionary: jsonDict as! [AnyHashable: Any])
+        
+        XCTAssert(person.addresses?.count == 2)
+        XCTAssert(person.addresses?[0].city == "Sunnyvale")
+        XCTAssert(person.addresses?[0].streetOne == "860 W California Ave")
+        XCTAssert(person.addresses?[0].state == "California")
+        XCTAssert(person.addresses?[1].city == "Mountain View")
+
+        
+    }
 }
 
 @objc class AddressWrapper:  ElectrodeObject, Bridgeable {

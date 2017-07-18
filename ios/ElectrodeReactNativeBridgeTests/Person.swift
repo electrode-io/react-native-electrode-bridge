@@ -16,18 +16,19 @@ public class Person: ElectrodeObject, Bridgeable {
     var status: Status?
     var position: Position?
     var birthYear: BirthYear?
+    var addresses: [CompleteAddress]?
     
-    public init(name: String, age: Int?, hiredMonth: Int, status: Status?, position: Position?, birthYear: BirthYear?) {
+    public init(name: String, age: Int?, hiredMonth: Int, status: Status?, position: Position?, birthYear: BirthYear?, addresses: [CompleteAddress]? = nil) {
         self.name = name
         self.age = age
         self.hiredMonth = hiredMonth
         self.status = status
         self.position = position
         self.birthYear = birthYear
+        self.addresses = addresses
         super.init()
     }
     
-
 
     required public init(dictionary: [AnyHashable: Any]) {
         if let name = dictionary["name"] as? String,
@@ -35,9 +36,14 @@ public class Person: ElectrodeObject, Bridgeable {
             self.name = name
             self.hiredMonth = hiredMonth
         } else {
-            assertionFailure("\(Person.tag) need month property")
+            assertionFailure("\(Person.tag) need hiredMonth property")
             self.hiredMonth = dictionary["month"] as! Int
             self.name = dictionary["name"] as! String
+        }
+        
+        if let generatedCompleteAddress = try? NSObject.generateObject(data: dictionary["addresses"], classType: Array<Any>.self, itemType: CompleteAddress.self),
+            let completeAddressList = generatedCompleteAddress as? [CompleteAddress] {
+            self.addresses = completeAddressList
         }
         
         //optional params
@@ -68,15 +74,14 @@ public class Person: ElectrodeObject, Bridgeable {
             birthYearObj = nil
         }
         self.birthYear = birthYearObj
-        
         super.init(dictionary: dictionary)
-
     }
     
     public func toDictionary() -> NSDictionary {
         var dict = ["name": self.name,
                     "hiredMonth": self.hiredMonth
                     ] as [AnyHashable : Any]
+
         if let nonNullAge = self.age {
             dict["age"] = nonNullAge
         }
@@ -91,7 +96,12 @@ public class Person: ElectrodeObject, Bridgeable {
         
         if let nonnullBirthYear = self.birthYear {
             dict["birthYear"] = nonnullBirthYear.toDictionary()
-        }   
+        }
+        
+        if let nonNullAddresses = self.addresses {
+            dict["addresses"] = nonNullAddresses.map{ address in
+                address.toDictionary()}
+        }
         
         return dict as NSDictionary
     }

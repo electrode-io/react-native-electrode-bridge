@@ -91,8 +91,6 @@ extension NSObject {
     // how to handle BOOL ?
     public static func generateObject(data: Any, classType: Any.Type, itemType: Any.Type? = nil) throws -> Any {
         var res: Any
-        print(type(of:data))
-        
         // check to see if the type already matches. so no need to serialize or deserialize 
         if (type(of:data) == classType && !(data is Array<Any>)) {
             return data

@@ -1,0 +1,31 @@
+{
+    "name" : "blah",
+    "age": 234,
+    "hiredMonth": 2,
+    "status" : {
+        "log": true,
+        "member": false
+    },
+    "position": {
+        "lat":2.4,
+        "lng":4.5
+    },
+    "birthYear": {
+        "month":2,
+        "year":2934
+    },
+    "addresses": [
+        {
+            "streetOne": "860 W California Ave",
+            "zipcode":"94086",
+            "state": "California",
+            "city": "Sunnyvale"
+        },
+          {
+          "streetOne": "760 E California Ave",
+          "zipcode":"94086",
+          "state": "California",
+          "city": "Mountain View"
+          }
+    ]
+}

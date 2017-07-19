@@ -18,6 +18,12 @@ public class Position: ElectrodeObject, Bridgeable{
         super.init()
     }
     
+    public override init() {
+        self.lat = 0
+        self.lng = 0
+        super.init()
+    }
+    
     required public init(dictionary: [AnyHashable: Any]) {
         if let lat = dictionary["lat"] as? Double,
             let lng = dictionary["lng"] as? Double {

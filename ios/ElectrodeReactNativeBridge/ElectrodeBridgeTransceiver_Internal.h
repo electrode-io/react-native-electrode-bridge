@@ -9,7 +9,9 @@
 #import "ElectrodeBridgeTransceiver.h"
 NS_ASSUME_NONNULL_BEGIN
 static ElectrodeBridgeReactNativeReadyListner reactNativeReadyListener = nil;
+static ElectrodeBridgeReactNativeReadyListner reactNativeTransceiver = nil;
 static BOOL isReactNativeReady = NO;
+static BOOL isTransceiverReady = NO;
 static ElectrodeBridgeTransceiver *sharedInstance;
 
 @interface ElectrodeBridgeTransceiver ()

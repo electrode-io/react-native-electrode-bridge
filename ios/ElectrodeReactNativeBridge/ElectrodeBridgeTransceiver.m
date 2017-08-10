@@ -44,7 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction * > *pendingTransaction;
 @property (nonatomic, assign) dispatch_queue_t syncQueue; //this is used to make sure access to pendingTransaction is thread safe.
 
-@property (nonatomic, copy) NSMutableArray <id<ConstantsProvider>>* constantsProviders;
 @end
 
 static dispatch_once_t onceToken;
@@ -53,6 +52,7 @@ static ElectrodeEventRegistrar *eventRegistrar;
 static ElectrodeRequestDispatcher *requestDispatcher;
 static ElectrodeEventDispatcher *eventDispatcher;
 static NSMutableDictionary *pendingTransaction;
+static NSMutableArray <id<ConstantsProvider>>* constantsProviders;
 
 @implementation ElectrodeBridgeTransceiver
 
@@ -69,7 +69,7 @@ static NSMutableDictionary *pendingTransaction;
             requestDispatcher = [[ElectrodeRequestDispatcher alloc] initWithRequestRegistrar:requestRegistrar];
             eventDispatcher = [[ElectrodeEventDispatcher alloc] initWithEventRegistrar:eventRegistrar];
             pendingTransaction = [[NSMutableDictionary alloc] init];
-            _constantsProviders = [[NSMutableArray alloc] init];
+            constantsProviders = [[NSMutableArray alloc] init];
         });
         
         _requestDispatcher = requestDispatcher;
@@ -94,18 +94,20 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 
 - (NSDictionary<NSString *,id> *)constantsToExport {
     NSMutableDictionary <NSString*, id> *constants = [NSMutableDictionary new];
-    if (_constantsProviders != nil && [_constantsProviders count] > 0) {
-        for (id<ConstantsProvider> constant in _constantsProviders) {
+    if (constantsProviders != nil && [constantsProviders count] > 0) {
+        for (id<ConstantsProvider> constant in constantsProviders) {
             [constants addEntriesFromDictionary:[constant constantsToExport]];
         }
         return constants;
     }
-    NSLog(@"Constants provider is empty %@", _constantsProviders);
+    NSLog(@"Constants provider is empty %@", constantsProviders);
     return nil;
 }
 
 - (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider {
-    [self.constantsProviders addObject:constantsProvider];
+    @synchronized (self) {
+        [constantsProviders addObject:constantsProvider];
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,14 +353,27 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 - (void)onReactNativeInitialized
 {
     isReactNativeReady = YES;
-    sharedInstance = self;
     
     if (reactNativeReadyListener) {
         reactNativeReadyListener(self);
     }
 }
-+ (BOOL)isReactNativeBridgeReady {
-    return isReactNativeReady;
++ (void)registerReactTransceiverReadyListner: (ElectrodeBridgeReactNativeReadyListner) listener
+{
+    if(isTransceiverReady) {
+        if (listener) {
+            listener(sharedInstance);
+        }
+    }
+    reactNativeTransceiver = listener;
 }
+
+- (void) onTransceiverModuleInitialized {
+    isTransceiverReady = YES;
+    if (reactNativeTransceiver) {
+        reactNativeTransceiver(self);
+    }
+}
+
 @end
 NS_ASSUME_NONNULL_END

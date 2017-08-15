@@ -35,10 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, copy, readonly, nonnull) NSString *name;
 
-+ (instancetype)sharedInstance;
 + (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner _Nonnull) reactNativeReadyListner;
++ (void)registerReactTransceiverReadyListner: (ElectrodeBridgeReactNativeReadyListner _Nonnull) reactNativeReadyListner;
 - (void)onReactNativeInitialized;
-+ (BOOL)isReactNativeBridgeReady;
 @end
 
 NS_ASSUME_NONNULL_END

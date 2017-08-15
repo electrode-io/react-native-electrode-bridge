@@ -11,18 +11,11 @@
 #import "ElectrodeBridgeTransceiver.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeBridgeHolder()
-
-@property(nonatomic, assign) BOOL isReactNativeReady;
-@property(nonatomic, copy) NSMutableDictionary<NSString *, id<ElectrodeBridgeRequestHandler>> *queuedRequestHandlerRegistration;
-@property(nonatomic, copy) NSMutableDictionary<NSString *, id<ElectrodeBridgeEventListener>> *queuedEventListenerRegistration;
-@property(nonatomic, copy) NSMutableDictionary<ElectrodeBridgeRequest *,NSArray *> *queuedRequests;
-@property(nonatomic, copy) NSMutableArray<ElectrodeBridgeEvent *> *queuedEvents;
-@end
 
 @implementation ElectrodeBridgeHolder
 static ElectrodeBridgeTransceiver *electrodeNativeBridge;
 static BOOL isReactNativeReady = NO;
+static BOOL isTransceiverReady = NO;
 static NSMutableDictionary *queuedRequestHandlerRegistration;
 static NSMutableDictionary *queuedEventListenerRegistration;
 static NSMutableDictionary *queuedRequests;
@@ -37,6 +30,8 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
     queuedEvent = [[NSMutableArray alloc] init];
     queuedConstantsProvider = [[NSMutableArray alloc] init];
     [ElectrodeBridgeHolder registerReactReadyListenr];
+    [ElectrodeBridgeHolder registerReactTransceiverReadyListner];
+
 }
 
 + (void)registerReactReadyListenr {
@@ -51,33 +46,26 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
     }];
 }
 
-+ (instancetype)sharedInstance
-{
-    static ElectrodeBridgeHolder* sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[ElectrodeBridgeHolder alloc] init];
-    });
-    
-    return sharedInstance;
++ (void) registerReactTransceiverReadyListner {
+    [ElectrodeBridgeTransceiver registerReactTransceiverReadyListner:^(ElectrodeBridgeTransceiver * _Nonnull transceiver) {
+        isTransceiverReady = YES;
+        electrodeNativeBridge = transceiver;
+        [ElectrodeBridgeHolder addQueuedConstantsProvider];
+    }];
 }
 
-
-+ (void)addConstantsProvider {
-    if (queuedConstantsProvider != NULL) {
-        for (id<ConstantsProvider> cp in queuedConstantsProvider) {
-            [electrodeNativeBridge addConstantsProvider:cp];
-        }
-        [queuedConstantsProvider removeAllObjects];
++ (void) addQueuedConstantsProvider {
+    for (id<ConstantsProvider> provider in queuedConstantsProvider) {
+        [ElectrodeBridgeHolder addConstantsProvider:provider];
     }
 }
 
 + (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider {
-    if (!isReactNativeReady) {
+    if (!isTransceiverReady) {
         [queuedConstantsProvider addObject:constantsProvider];
-        return;
+    } else{
+        [electrodeNativeBridge addConstantsProvider:constantsProvider];
     }
-    [electrodeNativeBridge addConstantsProvider:constantsProvider];
 }
 
 + (void)sendEvent: (ElectrodeBridgeEvent *)event

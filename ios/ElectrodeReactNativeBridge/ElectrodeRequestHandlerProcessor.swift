@@ -12,17 +12,20 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
     let tag: String
     let requestName: String
     let reqClass: TReq.Type
+    let reqItemType: Any.Type?
     let respClass: TResp.Type
     let requestCompletionHandler: ElectrodeBridgeRequestCompletionHandler
     
     public init(requestName: String,
          reqClass: TReq.Type,
+         reqItemType: Any.Type? = nil,
          respClass: TResp.Type,
          requestCompletionHandler: @escaping ElectrodeBridgeRequestCompletionHandler)
     {
         self.tag = String(describing: type(of:self))
         self.requestName = requestName
         self.reqClass = reqClass
+        self.reqItemType = reqItemType
         self.respClass = respClass
         self.requestCompletionHandler = requestCompletionHandler
         super.init()
@@ -35,12 +38,11 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
                 request = nil
             } else {
                 if let nonnilData = data {
-                    request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: self.reqClass)
+                    request = try? ElectrodeUtilities.generateObject(data: nonnilData, classType: self.reqClass, itemType: self.reqItemType)
                 } else {
                     request = nil
                 }
             }
-            
             //this is passed back to Native side.
             self.requestCompletionHandler(request, responseCompletion)
         }

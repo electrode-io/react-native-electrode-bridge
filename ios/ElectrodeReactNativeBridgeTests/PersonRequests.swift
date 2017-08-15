@@ -29,7 +29,7 @@ class PersonRequests: PersonAPI.Requests {
     }
     
     override func registerFindPersonsByStatus(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
-        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestFindPersonsByStatus, reqClass: Status.self, respClass: Person.self, requestCompletionHandler: handler)
+        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestFindPersonsByStatus, reqClass: Array<Any>.self, reqItemType: Status.self, respClass: Person.self, requestCompletionHandler: handler)
         requestHandler.execute()
     }
     

@@ -261,8 +261,6 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             asyncExpectation.fulfill()
         })
         
-        
-        
         self.appendMockEventListener(mockJSResponseListner, forName: PersonAPI.kRequestGetAge)
         self.personAPI?.request.registerGetAgeRequestHandler(handler: { (any, responseCompletionHandler) in
             XCTAssertNotNil(any)
@@ -323,6 +321,32 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(status.member, person.status?.member)
             asyncExpectation.fulfill()
         })
+        waitForExpectations(timeout: 10)
+    }
+    
+    func testRequestWithParamsAsListOfObjJStoNative() {
+        let asyncExpectation = expectation(description: "testRequestWithParamsAsListOfObjJStoNative")
+        self.personAPI?.request.registerFindPersonsByStatus(handler:  { (any, responseCompletionHandler) in
+            XCTAssertNotNil(any)
+            XCTAssertNotNil(responseCompletionHandler)
+            
+            guard let statusList = any as? [Status] else {
+                XCTFail()
+                return
+            }
+            
+            responseCompletionHandler(nil, nil)
+            asyncExpectation.fulfill()
+        })
+        
+        let requestStatusArray = [["log": true, "member": true], ["log": false, "member": false], ["log": false, "member": true]]
+        
+        let requestDict = [kElectrodeBridgeMessageId: UUID().uuidString,
+                           kElectrodeBridgeMessageType: "req",
+                           kElectrodeBridgeMessageName: PersonAPI.kRequestFindPersonsByStatus,
+                           kElectrodeBridgeMessageData: requestStatusArray
+            ] as [AnyHashable: Any]
+        MockBridgeTransceiver.sharedInstance().sendMessage(requestDict)
         waitForExpectations(timeout: 10)
     }
 }

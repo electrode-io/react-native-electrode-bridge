@@ -282,6 +282,7 @@ public final class BridgeArguments {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void runValidationForListResponse(Object response, Class expectedResponseType) {
         if (response instanceof List) {
             //Ensure the list content is matching the responseType. This is a workaround to eliminate the limitation of generics preventing the List type being represented inside Class.

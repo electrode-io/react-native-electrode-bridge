@@ -25,6 +25,7 @@ public class EventListenerProcessor<T> implements Processor {
         this.eventListener = eventListener;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() {
         ElectrodeBridgeEventListener<ElectrodeBridgeEvent> intermediateEventListener = new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {

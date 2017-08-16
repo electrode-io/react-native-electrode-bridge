@@ -29,6 +29,7 @@ public class RequestHandlerProcessor<TReq, TResp> implements Processor {
         this.handler = handler;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() {
         final ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>() {

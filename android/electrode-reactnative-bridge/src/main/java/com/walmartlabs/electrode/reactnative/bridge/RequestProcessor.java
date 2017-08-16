@@ -33,7 +33,7 @@ public class RequestProcessor<TReq, TResp> implements Processor {
         this.responseListener = responseListener;
     }
 
-
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() {
         Logger.d(TAG, "Request processor started processing request(%s)", requestName);

@@ -9,6 +9,7 @@
 #import "ElectrodeBridgeBaseTests.h"
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeEvent.h"
+#import "ElectrodeBridgeHolder.h"
 
 @implementation ElectrodeBridgeRequest (CustomeBuilder)
 
@@ -59,6 +60,8 @@
 -(void)setUp
 {
     [self initializeBundle];
+    [ElectrodeBridgeHolder initialize];
+    [self.transceiver onTransceiverModuleInitialized];
     [self.transceiver onReactNativeInitialized];
 }
 

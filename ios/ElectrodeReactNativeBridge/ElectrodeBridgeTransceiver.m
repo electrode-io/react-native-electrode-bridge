@@ -14,6 +14,7 @@
 #import "ElectrodeEventRegistrar.h"
 #import "ElectrodeRequestRegistrar.h"
 
+
 #if __has_include(<React/RCTLog.h>)
 #import <React/RCTLog.h>
 #elif __has_include("RCTLog.h")
@@ -353,7 +354,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 - (void)onReactNativeInitialized
 {
     isReactNativeReady = YES;
-    
+    sharedInstance = self;
     if (reactNativeReadyListener) {
         reactNativeReadyListener(self);
     }
@@ -370,6 +371,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 - (void) onTransceiverModuleInitialized {
     isTransceiverReady = YES;
+    sharedInstance = self;
     if (reactNativeTransceiver) {
         reactNativeTransceiver(self);
     }

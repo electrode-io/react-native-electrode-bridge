@@ -42,7 +42,7 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
         [ElectrodeBridgeHolder registerQueuedRequestHandlers];
         [ElectrodeBridgeHolder sendQueuedEvents];
         [ElectrodeBridgeHolder sendQueuedRequests];
-        [ElectrodeBridgeHolder addConstantsProvider];
+        [ElectrodeBridgeHolder addQueuedConstantsProvider];
     }];
 }
 

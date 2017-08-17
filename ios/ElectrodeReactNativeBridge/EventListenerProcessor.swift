@@ -32,7 +32,7 @@ public class EventListenerProcessor<T>: NSObject, Processor {
 }
 
 private class ElectrodeEventListenerImplementor<T>: NSObject, ElectrodeBridgeEventListener {
-    
+    private let logger = ElectrodeConsoleLogger.sharedInstance()
     private let eventPayloadClass: T.Type
     private let onEventClosure: (Any?) -> ()
     
@@ -42,7 +42,7 @@ private class ElectrodeEventListenerImplementor<T>: NSObject, ElectrodeBridgeEve
     }
     
     func onEvent(_ eventPayload: Any?) {
-        print("Processing final result for the event with payload bundle (\(eventPayload))")
+        logger.debug("Processing final result for the event with payload bundle (\(eventPayload))")
         let result = try? NSObject.generateObject(data: eventPayload as AnyObject, classType: eventPayloadClass)
         onEventClosure(result)
     }

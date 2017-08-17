@@ -9,6 +9,7 @@
 #import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeHolder.h"
 #import "ElectrodeBridgeTransceiver.h"
+#import "ElectrodeLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,7 +24,7 @@ static NSMutableArray *queuedEvent;
 static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 
 +(void) initialize {
-    NSLog(@"in bridge holder initialization");
+    ERNDebug(@"in bridge holder initialization");
     queuedRequestHandlerRegistration = [[NSMutableDictionary alloc] init];
     queuedEventListenerRegistration = [[NSMutableDictionary alloc] init];
     queuedRequests = [[NSMutableDictionary alloc] init];
@@ -92,10 +93,10 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 {
     if(!isReactNativeReady) {
         [queuedRequestHandlerRegistration setObject:completion forKey:name];
-        NSLog(@"queuedRequestHandlerRegistration when react is not ready %@", queuedRequestHandlerRegistration);
+        ERNDebug(@"queuedRequestHandlerRegistration when react is not ready %@", queuedRequestHandlerRegistration);
     } else {
         NSError *error;
-        NSLog(@"BridgeHolderNew: registering request handler with name %@",name);
+        ERNDebug(@"BridgeHolderNew: registering request handler with name %@",name);
         [electrodeNativeBridge registerRequestCompletionHandlerWithName:name completionHandler:completion];
         
         if(error) {
@@ -120,11 +121,11 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 }
 
 + (void) registerQueuedRequestHandlers {
-    NSLog(@"registering Queued requesters");
-    NSLog(@"queuedRequestHandlerRegistration %@", queuedRequestHandlerRegistration);
+    ERNDebug(@"registering Queued requesters");
+    ERNDebug(@"queuedRequestHandlerRegistration %@", queuedRequestHandlerRegistration);
     for (NSString *requestName in queuedRequestHandlerRegistration) {
         ElectrodeBridgeRequestCompletionHandler requestHandler = queuedRequestHandlerRegistration[requestName];
-        NSLog(@"requestName name for handler");
+        ERNDebug(@"requestName name for handler");
         [ElectrodeBridgeHolder registerRequestHanlderWithName:requestName requestCompletionHandler:requestHandler];
     }
     
@@ -141,6 +142,7 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 }
 
 + (void) sendQueuedRequests {
+    ERNDebug(@"Start sending queued request: %@", queuedRequests);
     for (ElectrodeBridgeRequest *request in queuedRequests) {
         ElectrodeBridgeResponseCompletionHandler completion = queuedRequests[request];
         [ElectrodeBridgeHolder sendRequest:request completionHandler: completion];

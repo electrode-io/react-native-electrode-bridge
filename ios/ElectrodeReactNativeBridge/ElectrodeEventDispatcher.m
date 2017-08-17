@@ -8,6 +8,7 @@
 
 #import "ElectrodeEventDispatcher.h"
 #import "ElectrodeBridgeProtocols.h"
+#import "ElectrodeLogger.h"
 
 @interface ElectrodeEventRegistrar()
 
@@ -31,7 +32,7 @@
     NSArray<ElectrodeBridgeEventListener> *eventListeners = [self.eventRegistrar getEventListnersForName:bridgeEvent.name];
     
     for (id<ElectrodeBridgeEventListener> eventListener in eventListeners) {
-        NSLog(@"ElectrodeEventDispatcher is dispatching events %@, id(%@) to listener %@", bridgeEvent.name, bridgeEvent.messageId, eventListener);
+        ERNDebug(@"ElectrodeEventDispatcher is dispatching events %@, id(%@) to listener %@", bridgeEvent.name, bridgeEvent.messageId, eventListener);
         dispatch_async(dispatch_get_main_queue(), ^{
             [eventListener onEvent:bridgeEvent.data];
         });

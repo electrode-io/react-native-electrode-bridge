@@ -13,6 +13,7 @@
 #import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeEventRegistrar.h"
 #import "ElectrodeRequestRegistrar.h"
+#import "ElectrodeLogger.h"
 
 
 #if __has_include(<React/RCTLog.h>)
@@ -101,7 +102,7 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
         }
         return constants;
     }
-    NSLog(@"Constants provider is empty %@", constantsProviders);
+    ERNDebug(@"Constants provider is empty %@", constantsProviders);
     return nil;
 }
 
@@ -129,13 +130,13 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 }
 
 -(void)sendEvent: (ElectrodeBridgeEvent *)event {
-    NSLog(@"ElectrodeBridgeTransceiver: emit event named: %@, id: %@", event.name, event.messageId);
+    ERNDebug(@"ElectrodeBridgeTransceiver: emit event named: %@, id: %@", event.name, event.messageId);
     [self notifyNativeEventListenerWithEvent:event];
     [self notifyReactNativeEventListenerWithEvent:event];
 }
 
 -(NSUUID *)addEventListenerWithName: (NSString *)name eventListener: (id<ElectrodeBridgeEventListener>) eventListener {
-    NSLog(@"%@, Adding eventListener %@ for event %@", NSStringFromClass([self class]), eventListener, name);
+    ERNDebug(@"%@, Adding eventListener %@ for event %@", NSStringFromClass([self class]), eventListener, name);
     NSUUID *uUID = [self.eventDispatcher.eventRegistrar registerEventListener:name eventListener:eventListener];
     return uUID;
 }
@@ -143,7 +144,7 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
 
 RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 {
-    NSLog(@"Received message from JS(data=%@)", bridgeMessage);
+    ERNDebug(@"Received message from JS(data=%@)", bridgeMessage);
     NSString *typeString = (NSString *)[bridgeMessage objectForKey:kElectrodeBridgeMessageType];
     ElectrodeMessageType type = [ElectrodeBridgeMessage typeFromString:typeString];
     switch (type) {
@@ -187,7 +188,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 -(void)emitMessage:(ElectrodeBridgeMessage * _Nonnull)bridgeMessage
 {
-    NSLog(@"Sending bridgeMessage(%@) to JS", bridgeMessage);
+    ERNDebug(@"Sending bridgeMessage(%@) to JS", bridgeMessage);
     [self sendEventWithName:@"electrode.bridge.message" body:[bridgeMessage toDictionary]];
 }
 
@@ -215,7 +216,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     } else if (!request.isJsInitiated) { //GOTCHA: Make sure not send a request back to JS if it's initiated on JS side
         [self dispatchRequestToReactHandlerForTransaction:transaction];
     }else {
-        NSLog(@"No handler available to handle request(%@)", request);
+        ERNDebug(@"No handler available to handle request(%@)", request);
         id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"ENOHANDLER" message:@"No registered request handler found"];
         ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:request withResponseData:nil withFailureMessage:failureMessage];
         [self handleResponse:response];
@@ -249,14 +250,14 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
             ElectrodeBridgeResponse *response = [ElectrodeBridgeResponse createResponseForRequest:transaction.request withResponseData:nil withFailureMessage:failureMessage];
             [weakSelf handleResponse:response];
         } else {
-            NSLog(@"Empty failure block. Time out may not be handled property");
+            ERNDebug(@"Empty failure block. Time out may not be handled property");
         }
     });
 }
 
 -(void)dispatchRequestToNativeHandlerForTransaction: (ElectrodeBridgeTransaction *)transaction
 {
-    NSLog(@"Sending request(%@) to native handler", transaction.request);
+    ERNDebug(@"Sending request(%@) to native handler", transaction.request);
     ElectrodeBridgeRequest *request = transaction.request;
     __weak ElectrodeBridgeTransceiver *weakSelf = self;
         
@@ -277,13 +278,13 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 
 -(void)dispatchRequestToReactHandlerForTransaction:(ElectrodeBridgeTransaction *)transaction
 {
-    NSLog(@"Sending request(%@) over to JS handler because there is no local request handler available", transaction.request);
+    ERNDebug(@"Sending request(%@) over to JS handler because there is no local request handler available", transaction.request);
     [self emitMessage:transaction.request];
 }
 
 -(void)handleResponse:(ElectrodeBridgeResponse *)response
 {
-    NSLog(@"hanlding bridge response: %@", response);
+    ERNDebug(@"hanlding bridge response: %@", response);
     ElectrodeBridgeTransaction *transaction;
     @synchronized (self) {
         transaction = (ElectrodeBridgeTransaction *) [self.pendingTransaction objectForKey:response.messageId];
@@ -292,7 +293,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         transaction.response = response;
         [self completeTransaction:transaction];
     } else {
-        NSLog(@"Response(%@) will be ignored because the transcation for this request has been removed from the queue. Perhaps it's already timed-out or completed.", response);
+        ERNDebug(@"Response(%@) will be ignored because the transcation for this request has been removed from the queue. Perhaps it's already timed-out or completed.", response);
     }
     
 }
@@ -302,7 +303,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     if(transaction.response == nil) {
         [NSException raise:@"invalid transaction" format:@"Cannot complete transaction, a transaction can only be completed with a valid response"];
     }
-    NSLog(@"completing transaction(id=%@", transaction.transactionId);
+    ERNDebug(@"completing transaction(id=%@", transaction.transactionId);
     
     [self.pendingTransaction removeObjectForKey:transaction.transactionId];
     
@@ -310,7 +311,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
     [self logResponse:response];
     
     if(transaction.isJsInitiated) {
-        NSLog(@"Completing transaction by emitting event back to JS since the request is initiated from JS side");
+        ERNDebug(@"Completing transaction by emitting event back to JS since the request is initiated from JS side");
         [self emitMessage:response];
     } else {
         if (transaction.completion == nil) {
@@ -318,12 +319,12 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
         } else {
             if(response.failureMessage != nil) {
                 
-                NSLog(@"Completing transaction by issuing a failure call back to local response listener");
+                ERNDebug(@"Completing transaction by issuing a failure call back to local response listener");
                 dispatch_async(dispatch_get_main_queue(), ^{
                     transaction.completion(nil, response.failureMessage);
                 });
             } else {
-                    NSLog(@"Completing transaction by issuing a success call back to local response listener");
+                    ERNDebug(@"Completing transaction by issuing a success call back to local response listener");
                     dispatch_async(dispatch_get_main_queue(), ^{
                         transaction.completion(response.data, nil);
                     });
@@ -333,11 +334,11 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)bridgeMessage)
 }
 
 -(void)logRequest: (ElectrodeBridgeRequest *)request {
-    NSLog(@"--> --> --> --> --> Request(%@)", request);
+    ERNDebug(@"--> --> --> --> --> Request(%@)", request);
 }
 
 -(void)logResponse: (ElectrodeBridgeResponse *)response {
-    NSLog(@"<-- <-- <-- <-- <-- Response(%@)", response);
+    ERNDebug(@"<-- <-- <-- <-- <-- Response(%@)", response);
 }
 
 + (void)registerReactNativeReadyListener: (ElectrodeBridgeReactNativeReadyListner) listner

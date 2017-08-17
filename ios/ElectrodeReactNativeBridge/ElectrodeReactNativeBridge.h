@@ -20,3 +20,5 @@ FOUNDATION_EXPORT const unsigned char ElectrodeReactNativeBridgeVersionString[];
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeProtocols.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeEvent.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeRequest.h>
+#import <ElectrodeReactNativeBridge/ElectrodeLogger.h>
+

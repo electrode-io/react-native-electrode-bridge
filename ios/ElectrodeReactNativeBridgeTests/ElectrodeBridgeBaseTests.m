@@ -9,6 +9,7 @@
 #import "ElectrodeBridgeBaseTests.h"
 #import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeEvent.h"
+#import "ElectrodeLogger.h"
 #import "ElectrodeBridgeHolder.h"
 
 @implementation ElectrodeBridgeRequest (CustomeBuilder)
@@ -63,6 +64,7 @@
     [ElectrodeBridgeHolder initialize];
     [self.transceiver onTransceiverModuleInitialized];
     [self.transceiver onReactNativeInitialized];
+    ElectrodeConsoleLogger.sharedInstance.logLevel = ElectrodeLogLevelVerbose;
 }
 
 -(void)tearDown {

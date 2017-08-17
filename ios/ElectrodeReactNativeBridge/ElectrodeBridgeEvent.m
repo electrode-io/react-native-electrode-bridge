@@ -8,15 +8,15 @@
 
 #import "ElectrodeBridgeEvent.h"
 #import "ElectrodeBridgeMessage.h"
+#import "ElectrodeLogger.h"
 
 @implementation ElectrodeBridgeEvent
-
 +(nullable instancetype)createEventWithData: (NSDictionary *)data {
     if ([ElectrodeBridgeMessage isValidFromData:data withType:ElectrodeMessageTypeEvent]) {
         return [[super alloc] initWithData:data];
     }
     
-    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
+    ERNDebug(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
     return nil;
 }
 
@@ -24,7 +24,7 @@
     if (self = [super initWithName:name type:ElectrodeMessageTypeEvent data:data]) {
         return self;
     }
-    NSLog(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
+    ERNDebug(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
     return nil;
 }
 
@@ -32,6 +32,4 @@
     return NSStringFromClass(self.class);
 }
 
-
-//CLAIRE TODO: Ask what's the purpose of Builder
 @end

@@ -72,6 +72,4 @@ NSString * const kElectrodeBridgeResponseUnknownErrorCode = @"EUNKNOWN";
     return [NSString stringWithFormat:@"%@, failureMessage:%@", [super description], self.failureMessage];
 }
 
-//CLAIRE TODO: What's the purpose of WritableMap map() override 
-
 @end

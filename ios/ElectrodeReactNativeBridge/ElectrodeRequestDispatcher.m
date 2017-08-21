@@ -8,6 +8,7 @@
 
 #import "ElectrodeRequestDispatcher.h"
 #import "ElectrodeBridgeFailureMessage.h"
+#import "ElectrodeLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeRequestRegistrar()
@@ -31,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *requestId = bridgeRequest.messageId;
     NSString *requestName = bridgeRequest.name;
     
-    NSLog(@"ElectrodeRequestDispatcher dispatching request(id=%@) locally", requestId);
+    ERNDebug(@"ElectrodeRequestDispatcher dispatching request(id=%@) locally", requestId);
     
     ElectrodeBridgeRequestCompletionHandler requestCompletionHandler = [self.requestRegistrar getRequestHandler:requestName];
     if (requestCompletionHandler == nil)

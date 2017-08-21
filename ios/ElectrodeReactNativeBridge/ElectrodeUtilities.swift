@@ -100,7 +100,6 @@ extension NSObject {
             res = data
         } else if (data is NSDictionary) {
             if let convertableData = data as? [AnyHashable: AnyObject] {
-                print(classType)
                 let obj =  try NSObject.generateObjectFromDict(data: convertableData, passedClass: classType as! AnyClass)
                 res = obj
             } else {
@@ -111,7 +110,6 @@ extension NSObject {
             if let arrayData = data as? Array<Any> {
                 var tmpRes = Array<AnyObject>()
                 guard let validItemType = itemType else { throw GenerateObjectError.emptyArrayItemType}
-                print("valid item type is \(validItemType)")
                 for item in arrayData {
                     var obj: AnyObject
                     if (ElectrodeUtilities.isObjectiveCPrimitives(type: validItemType)) {

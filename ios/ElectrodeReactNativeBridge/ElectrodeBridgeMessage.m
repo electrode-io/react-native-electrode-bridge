@@ -8,6 +8,7 @@
 
 #import "ElectrodeBridgeMessage.h"
 #import <ElectrodeReactNativeBridge/ElectrodeReactNativeBridge-Swift.h>
+#import "ElectrodeLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -101,7 +102,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
     }
     else
     {
-        NSLog(@"data is null, data won't be set in toDictionary");
+        ERNDebug(@"data is null, data won't be set in toDictionary");
     }
 
     return [messageDict copy];
@@ -120,7 +121,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
                     simpleObj = convertedArray;
                 }
             } else {
-                NSLog(@"ElectrodeBridgeMessage: empty array");
+                ERNDebug(@"ElectrodeBridgeMessage: empty array");
             }
         }
     }
@@ -137,7 +138,7 @@ NSString * const kElectordeBridgeMessageUnknown = @"unknown";
             NSDictionary *serialized = [element toDictionary];
             [res addObject:serialized];
         } else {
-            NSLog(@"ElectrodeBridgeMessage: element does not conform to protocol in toDictionary");
+            ERNDebug(@"ElectrodeBridgeMessage: element does not conform to protocol in toDictionary");
         }
     }
     return [res copy];

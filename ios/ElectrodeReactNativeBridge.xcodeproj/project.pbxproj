@@ -20,6 +20,8 @@
 		3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */; };
 		30799ABD1F1D3CFB006D5044 /* CompleteAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */; };
 		30799AC61F1D5AAD006D5044 /* Person.json in Resources */ = {isa = PBXBuildFile; fileRef = 30799AC51F1D5AAD006D5044 /* Person.json */; };
+		307AC5D91F44C16000F3B7BD /* ElectrodeLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		307AC5DA1F44C16000F3B7BD /* ElectrodeLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 307AC5D81F44C16000F3B7BD /* ElectrodeLogger.m */; };
 		309A03A31E8AE8F900501219 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 309A03A21E8AE8F900501219 /* MiniApp.jsbundle */; };
 		309A03C01E8B319E00501219 /* ElectrodeBridgeHolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		309A03C11E8B319E00501219 /* ElectrodeBridgeHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */; };
@@ -161,6 +163,8 @@
 		3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeBaseTests.m; sourceTree = "<group>"; };
 		30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompleteAddress.swift; sourceTree = "<group>"; };
 		30799AC51F1D5AAD006D5044 /* Person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Person.json; sourceTree = "<group>"; };
+		307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeLogger.h; sourceTree = "<group>"; };
+		307AC5D81F44C16000F3B7BD /* ElectrodeLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeLogger.m; sourceTree = "<group>"; };
 		309A03A21E8AE8F900501219 /* MiniApp.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp.jsbundle; sourceTree = "<group>"; };
 		309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeHolder.h; sourceTree = "<group>"; };
 		309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeHolder.m; sourceTree = "<group>"; };
@@ -404,6 +408,8 @@
 				30BA8FA11E85A3A200D3C440 /* ElectrodeRequestDispatcher.m */,
 				309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */,
 				309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */,
+				307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */,
+				307AC5D81F44C16000F3B7BD /* ElectrodeLogger.m */,
 				9678D2601E68CADF00719AD5 /* Swift */,
 			);
 			name = Source;
@@ -439,6 +445,7 @@
 				30BA8F161E84972D00D3C440 /* ElectrodeBridgeEvent.h in Headers */,
 				DA4BE0CD1E36DBCD00DBA1ED /* ElectrodeReactNativeBridge.h in Headers */,
 				30BA8F281E84972D00D3C440 /* ElectrodeRequestRegistrar.h in Headers */,
+				307AC5D91F44C16000F3B7BD /* ElectrodeLogger.h in Headers */,
 				30BA8F181E84972D00D3C440 /* ElectrodeBridgeFailureMessage.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -632,6 +639,7 @@
 				30BA8FA31E85A3A200D3C440 /* ElectrodeRequestDispatcher.m in Sources */,
 				30BA8F251E84972D00D3C440 /* ElectrodeBridgeTransceiver.m in Sources */,
 				30BA8F1B1E84972D00D3C440 /* ElectrodeBridgeMessage.m in Sources */,
+				307AC5DA1F44C16000F3B7BD /* ElectrodeLogger.m in Sources */,
 				9678D33E1E7332F200719AD5 /* ElectrodeRequestProcessor.swift in Sources */,
 				309A03C11E8B319E00501219 /* ElectrodeBridgeHolder.m in Sources */,
 				30BA8F191E84972D00D3C440 /* ElectrodeBridgeFailureMessage.m in Sources */,

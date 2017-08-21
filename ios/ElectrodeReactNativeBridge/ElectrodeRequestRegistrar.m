@@ -7,6 +7,7 @@
 //
 
 #import "ElectrodeRequestRegistrar.h"
+#import "ElectrodeLogger.h"
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeRequestRegistrar ()
 
@@ -21,12 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
                                           completion: (ElectrodeBridgeRequestCompletionHandler) completion
 {
     @synchronized (self) {
-        NSLog(@"***Logging registering requestHandler with Name %@", name);
-        NSLog(@"%@", self);
+        ERNDebug(@"***Logging registering requestHandler with Name %@", name);
         NSUUID *requestHandlerUUID = [NSUUID UUID];
         [self.requestHandlerByRequestName setObject:completion forKey:name];
         [self.requestNameByUUID setObject:name forKey:requestHandlerUUID];
-        NSLog(@"***Logging registered requestHandlerDictionary:%@", self.requestHandlerByRequestName);
+        ERNDebug(@"***Logging registered requestHandlerDictionary:%@", self.requestHandlerByRequestName);
         return requestHandlerUUID;
     }
 }
@@ -46,8 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable ElectrodeBridgeRequestCompletionHandler)getRequestHandler:(NSString *)name;
 {
-    NSLog(@"***Logging getting request handler requestHandlerDictionary:%@", self.requestHandlerByRequestName);
-    NSLog(@"%@", self);
+    ERNDebug(@"***Logging getting request handler requestHandlerDictionary:%@", self.requestHandlerByRequestName);
+    ERNDebug(@"%@", self);
 
     @synchronized (self) {
         return [self.requestHandlerByRequestName objectForKey:name];

@@ -7,6 +7,7 @@
 //
 
 #import "ElectrodeBridgeRequest.h"
+#import "ElectrodeLogger.h"
 
 const int kElectrodeBridgeRequestDefaultTimeOut = 5000;
 const int kElectrodeBridgeRequestNoTimeOut = -1;
@@ -26,7 +27,7 @@ const int kElectrodeBridgeRequestNoTimeOut = -1;
         return [[self alloc] initWithData:data];
     }
     
-    NSLog(@"cannot create class ElectrodeBridgeRequest with data");
+    ERNDebug(@"cannot create class ElectrodeBridgeRequest with data");
     return nil;
 }
 

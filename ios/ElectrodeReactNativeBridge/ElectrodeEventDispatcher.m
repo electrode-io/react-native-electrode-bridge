@@ -31,10 +31,12 @@
 {
     NSArray<ElectrodeBridgeEventListener> *eventListeners = [self.eventRegistrar getEventListnersForName:bridgeEvent.name];
     
-    for (id<ElectrodeBridgeEventListener> eventListener in eventListeners) {
+    for (ElectrodeBridgeEventListener eventListener in eventListeners) {
         ERNDebug(@"ElectrodeEventDispatcher is dispatching events %@, id(%@) to listener %@", bridgeEvent.name, bridgeEvent.messageId, eventListener);
         dispatch_async(dispatch_get_main_queue(), ^{
-            [eventListener onEvent:bridgeEvent.data];
+            if (eventListener) {
+                eventListener(bridgeEvent.data);
+            }
         });
     }
 }

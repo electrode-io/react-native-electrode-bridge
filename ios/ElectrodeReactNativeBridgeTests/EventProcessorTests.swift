@@ -18,7 +18,9 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
         let status = Status(log: false, member: true)
         let birthYear = BirthYear(month: 12, year: 2000)
         let person = Person(name: "A", age: 3, hiredMonth: 6, status: status, position: position, birthYear: birthYear)
-        let localListener = PersonEventListener { (any) in
+
+        let personAPI = PersonAPI()
+        personAPI.event.addPersonAddedEventListenr(eventListener: { (any) in
             XCTAssertNotNil(any)
             guard let person = any as? Person else {
                 XCTFail()
@@ -35,18 +37,16 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(person.birthYear?.month, 12)
             XCTAssertEqual(person.birthYear?.year, 2000)
             asyncExpectation.fulfill()
-        }
-        
-        let personAPI = PersonAPI()
-        personAPI.event.addPersonAddedEventListenr(eventListener: localListener)
+        })
         personAPI.event.emitEventPersonAdded(person: person)
         waitForExpectations(timeout: 5)
     }
     
     func testEventsForPrimitivesNativeToNative() {
         let asyncExpectation = expectation(description: "testEventsForPrimitivesNativeToNative")
-
-        let localListener = PersonEventListener(validationBlock: { (any) in
+        let personAPI = PersonAPI()
+        let personName = "Claire"
+        personAPI.event.addPersonNameUpdatedEventListener(eventListener: { (any) in
             XCTAssertNotNil(any)
             
             guard let name = any as? String else {
@@ -57,20 +57,7 @@ class EventProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(name, "Claire")
             asyncExpectation.fulfill()
         })
-        let personAPI = PersonAPI()
-        let personName = "Claire"
-        personAPI.event.addPersonNameUpdatedEventListener(eventListener: localListener)
         personAPI.event.emitEventPersonNameUpdated(updatedName: personName)
         waitForExpectations(timeout: 10)
-    }
-}
-
-private class PersonEventListener: NSObject, ElectrodeBridgeEventListener {
-    let validationBlock:(Any?) -> ()
-    init(validationBlock: @escaping (Any?) -> ()) {
-        self.validationBlock = validationBlock
-    }
-    func onEvent(_ eventPayload: Any?) {
-        self.validationBlock(eventPayload)
     }
 }

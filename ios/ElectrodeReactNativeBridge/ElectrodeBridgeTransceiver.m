@@ -135,7 +135,7 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
     [self notifyReactNativeEventListenerWithEvent:event];
 }
 
--(NSUUID *)addEventListenerWithName: (NSString *)name eventListener: (id<ElectrodeBridgeEventListener>) eventListener {
+-(NSUUID *)addEventListenerWithName: (NSString *)name eventListener: (ElectrodeBridgeEventListener) eventListener {
     ERNDebug(@"%@, Adding eventListener %@ for event %@", NSStringFromClass([self class]), eventListener, name);
     NSUUID *uUID = [self.eventDispatcher.eventRegistrar registerEventListener:name eventListener:eventListener];
     return uUID;

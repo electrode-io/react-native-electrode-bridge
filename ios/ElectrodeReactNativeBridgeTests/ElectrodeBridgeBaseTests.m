@@ -37,20 +37,6 @@
 }
 @end
 
-@implementation MockElectrodeBridgeEventListener
-
-- (_Nonnull instancetype)initWithonEventBlock:(nullable onEventBlock)eventBlock {
-    if (self = [super init]) {
-        self.eventBlock = eventBlock;
-    }
-    return self;
-}
-
-- (void)onEvent:(id)eventPayload {
-    self.eventBlock(eventPayload);
-}
-@end
-
 @interface ElectrodeBridgeBaseTests ()
 @property(nonatomic, strong) RCTBridge *bridge;
 @property(nonatomic, strong) MockBridgeTransceiver *transceiver;

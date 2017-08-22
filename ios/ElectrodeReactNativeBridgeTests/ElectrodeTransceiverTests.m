@@ -277,14 +277,12 @@
     NSString* testEventName = @"com.walmart.ern.nativetonativeevent";
     NSString* data = @"nativeeventdata";
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
-    MockElectrodeBridgeEventListener* eventListener = [[MockElectrodeBridgeEventListener alloc] initWithonEventBlock:^(id  _Nullable payLoad) {
+    [nativeBridge addEventListenerWithName:testEventName eventListener:^(id _Nullable payLoad) {
         NSLog(@"Event result = %@", payLoad);
         XCTAssertEqual(payLoad, data, @"Failure, received a different event!!");
         [expectation fulfill];
         expectation = nil;
     }];
-    XCTAssertNotNil(eventListener, @"EventListener instance is nil");
-    [nativeBridge addEventListenerWithName:testEventName eventListener:eventListener];
     //then dispatch an event to the native
     [nativeBridge sendEvent:event];
     [self waitForExpectationToFullFillOrTimeOut];
@@ -298,12 +296,11 @@
    __weak __block XCTestExpectation* expectation = [self createExpectationWithDescription:@"waitforreacteventtocomplete"];
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
     XCTAssertNotNil(event, @"event instance is nil");
-    MockElectrodeBridgeEventListener* eventListener = [[MockElectrodeBridgeEventListener alloc] initWithonEventBlock:^(id  _Nullable payLoad) {
+    [nativeBridge addEventListenerWithName:testEventName eventListener:^(id _Nullable payLoad) {
         XCTAssertEqual(payLoad, data, @"Failure, received a different event!!");
         [expectation fulfill];
         expectation = nil;
     }];
-    [nativeBridge addEventListenerWithName:testEventName eventListener:eventListener];
     NSDictionary* eventMessage = [self createEventDataWithName:testEventName id:[ElectrodeBridgeMessage UUID] data:data];
     [reactBridge sendMessage:eventMessage];
     [self waitForExpectationToFullFillOrTimeOut];
@@ -324,7 +321,8 @@
    __weak __block XCTestExpectation* expectation = [self createExpectationWithDescription:@"waitforreacteventtocomplete"];
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
     XCTAssertNotNil(event, @"event instance is nil");
-    MockElectrodeBridgeEventListener* eventListener = [[MockElectrodeBridgeEventListener alloc] initWithonEventBlock:^(id  _Nullable payLoad) {
+
+    [nativeBridge addEventListenerWithName:testEventName eventListener:^(id _Nullable payLoad) {
         XCTAssertEqual([[data objectForKey:@"array"] firstObject], [[payLoad objectForKey:@"array"] firstObject]);
         XCTAssertEqual([data objectForKey:@"string"] , [payLoad objectForKey:@"string"]);
         XCTAssertEqual([data objectForKey:@"integer"] , [payLoad objectForKey:@"integer"]);
@@ -334,7 +332,6 @@
         [expectation fulfill];
         expectation = nil;
     }];
-    [nativeBridge addEventListenerWithName:testEventName eventListener:eventListener];
     NSDictionary* eventMessage = [self createEventDataWithName:testEventName id:[ElectrodeBridgeMessage UUID] data:data];
     [reactBridge sendMessage:eventMessage];
     [self waitForExpectationToFullFillOrTimeOut];

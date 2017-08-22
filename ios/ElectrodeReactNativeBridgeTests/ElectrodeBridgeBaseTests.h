@@ -43,14 +43,6 @@ typedef void (^ElectrodeBaseJSBlock)(NSDictionary *result);
 @property(nonatomic, copy, nullable) ElectrodeBaseJSBlock jSCallBackBlock;
 @end
 
-/////MockElectrodeBridgeEventListener
-typedef void (^onEventBlock)(_Nullable id payLoad);
-@interface MockElectrodeBridgeEventListener : XCTestCase<ElectrodeBridgeEventListener>
-@property (nonatomic, copy, nullable) onEventBlock eventBlock;
-- (_Nonnull instancetype)initWithonEventBlock:(nullable onEventBlock)eventBlock;
-@end
-
-
 /////////////////ElectrodeBridgeBaseTests
 @interface ElectrodeBridgeBaseTests : XCTestCase<RCTBridgeDelegate>
 -(void)initializeBundle;

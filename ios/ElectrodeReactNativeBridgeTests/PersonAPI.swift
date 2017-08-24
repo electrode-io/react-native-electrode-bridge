@@ -24,10 +24,10 @@ public class PersonAPI {
     lazy var request: Requests = {return PersonRequests()}()
     
     public class Events {
-        func addPersonAddedEventListenr(eventListener: ElectrodeBridgeEventListener) {
+        func addPersonAddedEventListenr(eventListener: @escaping ElectrodeBridgeEventListener) {
             assertionFailure("need override")
         }
-        func addPersonNameUpdatedEventListener(eventListener: ElectrodeBridgeEventListener) {
+        func addPersonNameUpdatedEventListener(eventListener: @escaping ElectrodeBridgeEventListener) {
             assertionFailure("need override")
         }
         func emitEventPersonAdded(person: Person) {

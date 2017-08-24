@@ -106,7 +106,7 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 }
 
 + (void)addEventListnerWithName: (NSString *)name
-                   eventListner: (id<ElectrodeBridgeEventListener>) eventListner
+                   eventListner: (ElectrodeBridgeEventListener) eventListner
 {
     if (!isReactNativeReady) {
         [queuedEventListenerRegistration setObject:eventListner forKey:name];
@@ -134,7 +134,7 @@ static NSMutableArray <id<ConstantsProvider>>* queuedConstantsProvider;
 
 + (void) registerQueuedEventListeners {
     for (NSString *eventListnerName in queuedEventListenerRegistration) {
-        id<ElectrodeBridgeEventListener> eventListener = queuedEventListenerRegistration[eventListnerName];
+        ElectrodeBridgeEventListener eventListener = queuedEventListenerRegistration[eventListnerName];
         [ElectrodeBridgeHolder addEventListnerWithName:eventListnerName eventListner:eventListener];
     }
     

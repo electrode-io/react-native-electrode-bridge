@@ -19,7 +19,7 @@
  @return The UUID of the registered event listener.
  */
 - (NSUUID  * _Nonnull)registerEventListener:(NSString * _Nonnull)name
-                                eventListener:(id<ElectrodeBridgeEventListener> _Nonnull)eventListener;
+                                eventListener:(ElectrodeBridgeEventListener _Nonnull)eventListener;
 
 /**
  Remove an event listener by a given UUID. It is possible to have multiple event

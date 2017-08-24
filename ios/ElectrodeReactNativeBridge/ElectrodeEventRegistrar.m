@@ -19,9 +19,9 @@
 
 @implementation ElectrodeEventRegistrar
 - (NSUUID  * _Nonnull)registerEventListener:(NSString * _Nonnull)name
-                              eventListener:(id<ElectrodeBridgeEventListener> _Nonnull)eventListener
+                              eventListener:(ElectrodeBridgeEventListener _Nonnull)eventListener
 {
-    @synchronized (self) { //CLAIRE TODO: change to dispatch later to increase performance
+    @synchronized (self) { 
         if ([self.eventListenersByEventName objectForKey:name])
         {
             NSMutableArray *eventListenerArray = [self.eventListenersByEventName objectForKey:name];
@@ -44,11 +44,11 @@
 - (void)unregisterEventListener:(NSUUID  * _Nonnull)eventListenerUUID
 {
     @synchronized (self) { //CLAIRE TODO: change to dispatch later to increase performance
-        id<ElectrodeBridgeEventListener> eventListener = [self.eventListenerByUUID objectForKey:eventListenerUUID];
+        ElectrodeBridgeEventListener eventListener = [self.eventListenerByUUID objectForKey:eventListenerUUID];
         [self.eventListenerByUUID removeObjectForKey:eventListenerUUID];
         
         
-        if (eventListener && [eventListener conformsToProtocol:@protocol(ElectrodeBridgeEventListener)])
+        if (eventListener)
         {
             NSArray *keys = [self.eventListenersByEventName allKeys];
             for (NSString *key in keys)

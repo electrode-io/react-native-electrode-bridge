@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
               requestCompletionHandler: (ElectrodeBridgeRequestCompletionHandler) completion;
 
 + (void)addEventListnerWithName: (NSString *)name
-                   eventListner: (id<ElectrodeBridgeEventListener>) eventListner;
+                   eventListner: (ElectrodeBridgeEventListener) eventListner;
 
 + (void) setBridge: (ElectrodeBridgeTransceiver *)bridge;
 + (void)addConstantsProvider;

@@ -28,18 +28,10 @@ typedef void(^ElectrodeBridgeResponseCompletionHandler) (id _Nullable data, id<E
  completioners execute once the request has fully been handled.
  */
 typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, ElectrodeBridgeResponseCompletionHandler block);
-
-
-////////////////////////////////////////////////
-#pragma ElectrodeBridgeEventListener protocol
-@protocol ElectrodeBridgeEventListener <NSObject>
-
 /*
- * @param eventPayload that associated with the event. Can be an object or NSDictionary. 
+ * ElectrodeBridgeEventListener execute when an event is dispatched.
  */
-- (void)onEvent:(id _Nullable)eventPayload;
-
-@end
+typedef void(^ElectrodeBridgeEventListener) (id _Nullable eventPayload);
 
 @interface ElectrodeBridgeProtocols : NSObject
 
@@ -91,7 +83,7 @@ typedef void(^ElectrodeBridgeRequestCompletionHandler)(id _Nullable data, Electr
  * @return A UUID to pass back to unregisterEventListener
  */
 
--(NSUUID *)addEventListenerWithName: (NSString *)name eventListener: (id<ElectrodeBridgeEventListener>) eventListener;
+- (NSUUID *)addEventListenerWithName: (NSString *)name eventListener: (ElectrodeBridgeEventListener) eventListener;
 
 - (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider;
 

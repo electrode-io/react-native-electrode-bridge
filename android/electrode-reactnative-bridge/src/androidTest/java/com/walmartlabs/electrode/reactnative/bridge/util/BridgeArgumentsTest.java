@@ -60,7 +60,7 @@ public class BridgeArgumentsTest extends TestCase {
         assertEquals(person.getPosition().getLng(), personCopy.getPosition().getLng());
     }
 
-    public void testGenerateBundleForList() {
+    public void testGenerateDataBundleForList() {
         final Person person = new Person.Builder("test1", 1).build();
         final Person person1 = new Person.Builder("test2", 2).build();
         final Person person2 = new Person.Builder("test3", 3).build();
@@ -82,6 +82,122 @@ public class BridgeArgumentsTest extends TestCase {
             assertNotNull(actual);
             assertEquals(expected.getName(), actual.getName());
             assertEquals(expected.getMonth(), actual.getMonth());
+        }
+    }
+
+    public void testUpdateBundleForListWithParcelable() {
+        final Person person = new Person.Builder("test1", 1).build();
+        final Person person1 = new Person.Builder("test2", 2).build();
+        final Person person2 = new Person.Builder("test3", 3).build();
+        List<Person> personList = new ArrayList<Person>() {{
+            add(person);
+            add(person1);
+            add(person2);
+        }};
+
+
+        Bundle bundle = new Bundle();
+        BridgeArguments.updateBundleWithList(personList, bundle, "testKey");
+
+        List<Person> personListCopy = BridgeArguments.getList(bundle.getParcelableArray("testKey"), Person.class);
+        assertNotNull(personListCopy);
+        assertEquals(personList.size(), personListCopy.size());
+        for (int i = 0; i < personList.size(); i++) {
+            Person expected = personList.get(i);
+            Person actual = personListCopy.get(i);
+            assertNotNull(actual);
+            assertEquals(expected.getName(), actual.getName());
+            assertEquals(expected.getMonth(), actual.getMonth());
+        }
+    }
+
+    public void testUpdateBundleForListWithInteger() {
+        List<Integer> personList = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+        }};
+
+
+        Bundle bundle = new Bundle();
+        BridgeArguments.updateBundleWithList(personList, bundle, "testKey");
+
+        List<Integer> personListCopy = BridgeArguments.getList(bundle.getIntArray("testKey"), Integer.class);
+        assertNotNull(personListCopy);
+        assertEquals(personList.size(), personListCopy.size());
+        for (int i = 0; i < personList.size(); i++) {
+            Integer expected = personList.get(i);
+            Integer actual = personListCopy.get(i);
+            assertNotNull(actual);
+            assertEquals(expected, actual);
+            assertEquals(expected, actual);
+        }
+    }
+    public void testUpdateBundleForListWithDouble() {
+        List<Double> personList = new ArrayList<Double>() {{
+            add(1.1);
+            add(2.2);
+            add(3.3);
+        }};
+
+
+        Bundle bundle = new Bundle();
+        BridgeArguments.updateBundleWithList(personList, bundle, "testKey");
+
+        List<Double> personListCopy = BridgeArguments.getList(bundle.getDoubleArray("testKey"), Double.class);
+        assertNotNull(personListCopy);
+        assertEquals(personList.size(), personListCopy.size());
+        for (int i = 0; i < personList.size(); i++) {
+            Double expected = personList.get(i);
+            Double actual = personListCopy.get(i);
+            assertNotNull(actual);
+            assertEquals(expected, actual);
+            assertEquals(expected, actual);
+        }
+    }
+    public void testUpdateBundleForListWithBoolean() {
+        List<Boolean> personList = new ArrayList<Boolean>() {{
+            add(true);
+            add(false);
+            add(true);
+        }};
+
+
+        Bundle bundle = new Bundle();
+        BridgeArguments.updateBundleWithList(personList, bundle, "testKey");
+
+        List<Boolean> personListCopy = BridgeArguments.getList(bundle.getBooleanArray("testKey"), Boolean.class);
+        assertNotNull(personListCopy);
+        assertEquals(personList.size(), personListCopy.size());
+        for (int i = 0; i < personList.size(); i++) {
+            Boolean expected = personList.get(i);
+            Boolean actual = personListCopy.get(i);
+            assertNotNull(actual);
+            assertEquals(expected, actual);
+            assertEquals(expected, actual);
+        }
+    }
+
+    public void testUpdateBundleForListWithFloat() {
+        List<Float> personList = new ArrayList<Float>() {{
+            add(1.4f);
+            add(2.5f);
+            add(3.6f);
+        }};
+
+
+        Bundle bundle = new Bundle();
+        BridgeArguments.updateBundleWithList(personList, bundle, "testKey");
+
+        List<Float> personListCopy = BridgeArguments.getList(bundle.getFloatArray("testKey"), Float.class);
+        assertNotNull(personListCopy);
+        assertEquals(personList.size(), personListCopy.size());
+        for (int i = 0; i < personList.size(); i++) {
+            Float expected = personList.get(i);
+            Float actual = personListCopy.get(i);
+            assertNotNull(actual);
+            assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 

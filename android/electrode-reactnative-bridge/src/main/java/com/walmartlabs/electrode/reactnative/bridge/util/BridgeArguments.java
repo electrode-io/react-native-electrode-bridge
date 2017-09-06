@@ -33,9 +33,13 @@ public final class BridgeArguments {
         add(int[].class);
         add(Boolean.class);
         add(Boolean[].class);
+        add(boolean[].class);
         add(Double.class);
         add(Double[].class);
         add(double[].class);
+        add(Float.class);
+        add(Float[].class);
+        add(float[].class);
         add(Number.class);
     }};
 
@@ -61,6 +65,17 @@ public final class BridgeArguments {
     }
 
     private static void updateBundleWithList(@NonNull List objList, Bundle bundle) {
+        updateBundleWithList(objList, bundle, BridgeMessage.BRIDGE_MSG_DATA);
+    }
+
+    /**
+     * Helper method to convert a list of object to be put inside a bundle
+     *
+     * @param objList List of items
+     * @param bundle  bundle that needs to be populated
+     * @param key     key to be used while putting the array into the bundle
+     */
+    public static void updateBundleWithList(@NonNull List objList, @NonNull Bundle bundle, @NonNull String key) {
         if (!objList.isEmpty()) {
             Object firstItem = null;
             for (Object o : objList) {
@@ -71,27 +86,44 @@ public final class BridgeArguments {
             }
 
             if (firstItem == null) {
-                bundle.putParcelableArray(BridgeMessage.BRIDGE_MSG_DATA, new Bundle[0]);
+                bundle.putParcelableArray(key, new Bundle[0]);
             }
 
             if (firstItem instanceof Bridgeable) {
-                bundle.putParcelableArray(BridgeMessage.BRIDGE_MSG_DATA, bridgeablesToBundleArray(objList));
+                bundle.putParcelableArray(key, bridgeablesToBundleArray(objList));
             } else if (isSupportedPrimitiveType(firstItem.getClass())) {
+                int arraySize = objList.size();
                 if (firstItem instanceof String) {
-                    String[] stringArray = (String[]) objList.toArray(new String[objList.size()]);
-                    bundle.putStringArray(BridgeMessage.BRIDGE_MSG_DATA, stringArray);
+                    String[] stringArray = (String[]) objList.toArray(new String[arraySize]);
+                    bundle.putStringArray(key, stringArray);
                 } else if (firstItem instanceof Integer) {
-                    int[] intArray = new int[objList.size()];
-                    for (int i = 0; i < objList.size(); i++) {
+                    Logger.d(TAG, "converting List<Integer> to int[]");
+                    int[] intArray = new int[arraySize];
+                    for (int i = 0; i < arraySize; i++) {
                         intArray[i] = (Integer) objList.get(i);
                     }
-                    bundle.putIntArray(BridgeMessage.BRIDGE_MSG_DATA, intArray);
+                    bundle.putIntArray(key, intArray);
                 } else if (firstItem instanceof Double) {
-                    double[] doubleArray = new double[objList.size()];
-                    for (int i = 0; i < objList.size(); i++) {
+                    Logger.d(TAG, "converting List<Double> to double[]");
+                    double[] doubleArray = new double[arraySize];
+                    for (int i = 0; i < arraySize; i++) {
                         doubleArray[i] = (double) objList.get(i);
                     }
-                    bundle.putDoubleArray(BridgeMessage.BRIDGE_MSG_DATA, doubleArray);
+                    bundle.putDoubleArray(key, doubleArray);
+                } else if (firstItem instanceof Boolean) {
+                    Logger.d(TAG, "converting List<Boolean> to boolean[]");
+                    boolean[] boolArray = new boolean[arraySize];
+                    for (int i = 0; i < arraySize; i++) {
+                        boolArray[i] = (boolean) objList.get(i);
+                    }
+                    bundle.putBooleanArray(key, boolArray);
+                } else if (firstItem instanceof Float) {
+                    Logger.d(TAG, "converting List<Float> to float[]");
+                    float[] floatArray = new float[arraySize];
+                    for (int i = 0; i < arraySize; i++) {
+                        floatArray[i] = (float) objList.get(i);
+                    }
+                    bundle.putFloatArray(key, floatArray);
                 } else {
                     throw new IllegalArgumentException("Should never happen, looks like logic to handle " + firstItem.getClass() + " is not implemented yet");
                 }
@@ -100,8 +132,8 @@ public final class BridgeArguments {
             }
 
         } else {
-            Logger.d(TAG, "Received empty list, will put empty bundle array for BRIDGE_MSG_DATA");
-            bundle.putParcelableArray(BridgeMessage.BRIDGE_MSG_DATA, new Bundle[0]);
+            Logger.d(TAG, "Received empty list, will put empty bundle array(parcelable) for key:%s", key);
+            bundle.putParcelableArray(key, new Bundle[0]);
         }
     }
 
@@ -180,23 +212,32 @@ public final class BridgeArguments {
                 convertedList.add(item);
             }
 
-        } else if (Object[].class.isAssignableFrom(obj.getClass())
-                && isSupportedPrimitiveType(obj.getClass())) {
-            Collections.addAll(convertedList, (Object[]) obj);
-        } else if (int[].class.isAssignableFrom(obj.getClass())
-                && isSupportedPrimitiveType(obj.getClass())) {
-            int[] objectArray = (int[]) obj;
-            for (Object o : objectArray) {
-                convertedList.add(o);
+        } else if (isSupportedPrimitiveType(obj.getClass())) {
+            if (Object[].class.isAssignableFrom(obj.getClass())) {
+                Collections.addAll(convertedList, (Object[]) obj);
+            } else if (int[].class.isAssignableFrom(obj.getClass())) {
+                int[] objectArray = (int[]) obj;
+                for (Object o : objectArray) {
+                    convertedList.add(o);
+                }
+            } else if (double[].class.isAssignableFrom(obj.getClass())) {
+                double[] objectArray = (double[]) obj;
+                for (Object o : objectArray) {
+                    convertedList.add(o);
+                }
+            } else if (boolean[].class.isAssignableFrom(obj.getClass())) {
+                boolean[] boolArray = (boolean[]) obj;
+                for (Object o : boolArray) {
+                    convertedList.add(o);
+                }
+            } else if (float[].class.isAssignableFrom(obj.getClass())) {
+                float[] floatArray = (float[]) obj;
+                for (Object o : floatArray) {
+                    convertedList.add(o);
+                }
+            } else {
+                throw new IllegalArgumentException("Array of type " + obj.getClass().getSimpleName() + " is not supported yet");
             }
-
-        } else if (double[].class.isAssignableFrom(obj.getClass())
-                && isSupportedPrimitiveType(obj.getClass())) {
-            double[] objectArray = (double[]) obj;
-            for (Object o : objectArray) {
-                convertedList.add(o);
-            }
-
         } else {
             throw new IllegalArgumentException("Array of type " + obj.getClass().getSimpleName() + " is not supported yet");
         }
@@ -299,7 +340,7 @@ public final class BridgeArguments {
         if (responseType == Integer.class) {
             return response.intValue();
         } else {
-            throw new IllegalArgumentException("FIXME, add support for " + responseType);
+            return response;
         }
     }
 

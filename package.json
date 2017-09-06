@@ -1,6 +1,6 @@
 {
   "name": "@walmart/react-native-electrode-bridge",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Low level communication bridge between reaact native js and native",
   "repository": {
     "type": "git",

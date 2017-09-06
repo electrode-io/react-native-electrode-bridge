@@ -299,7 +299,7 @@ public final class BridgeArguments {
         if (responseType == Integer.class) {
             return response.intValue();
         } else {
-            throw new IllegalArgumentException("FIXME, add support for " + responseType);
+            return response;
         }
     }
 

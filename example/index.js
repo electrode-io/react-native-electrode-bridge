@@ -16,7 +16,7 @@ import {
 import {
   electrodeBridge,
   DispatchMode
-} from '@walmart/react-native-electrode-bridge';
+} from 'react-native-electrode-bridge';
 
 import { RadioButtons, SegmentedControls } from 'react-native-radio-buttons';
 

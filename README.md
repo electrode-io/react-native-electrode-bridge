@@ -43,7 +43,7 @@ ANDROID :
 ### JavaScript API Reference
 
 ```javascript
-import { electrodeBridge } from '@walmart/react-native-electrode-bridge';
+import { electrodeBridge } from 'react-native-electrode-bridge';
 ```
 
 Once you import the module, you can interact with the ```electrodeBridge``` instance through a few API methods:

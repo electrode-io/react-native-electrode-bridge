@@ -6,7 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "@walmart/react-native-electrode-bridge": "../",
+    "react-native-electrode-bridge": "../",
     "react": "15.4.1",
     "react-native": "0.38.0",
     "react-native-radio-buttons": "^0.13.0",

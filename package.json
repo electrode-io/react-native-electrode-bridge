@@ -4,7 +4,7 @@
   "description": "Low level communication bridge between reaact native js and native",
   "repository": {
     "type": "git",
-    "url": "https://gecgithub01.walmart.com/Electrode-Mobile-Platform/react-native-electrode-bridge.git"
+    "url": "https://github.com/electrode-io/react-native-electrode-bridge"
   },
   "main": "js/ElectrodeBridge.js",
   "dependencies": {

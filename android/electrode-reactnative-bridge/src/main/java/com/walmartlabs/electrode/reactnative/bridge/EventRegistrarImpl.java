@@ -6,6 +6,7 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,13 +17,14 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
     /**
      * Registers an event listener
      *
-     * @param name          The event name this listener is interested in
-     * @param eventListener The event listener
-     * @return A UUID to pass back to unregisterEventListener
+     * @param name              event name for the event listener
+     * @param eventListener     event listener to register
+     * @param eventListenerUuid event {@link UUID} for uniqueness
+     * @return Returns true if the {@code eventListener} is registered
      */
     @NonNull
-    public UUID registerEventListener(@NonNull String name, @NonNull T eventListener) {
-        UUID eventListenerUuid = UUID.randomUUID();
+    public boolean registerEventListener(@NonNull String name, @NonNull T eventListener, @NonNull UUID eventListenerUuid) {
+        boolean isRegistered;
         if (mEventListenersByEventName.containsKey(name)) {
             mEventListenersByEventName.get(name).add(eventListener);
         } else {
@@ -31,15 +33,17 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
             mEventListenersByEventName.put(name, eventListeners);
         }
         mEventListenerByUUID.put(eventListenerUuid, eventListener);
-        return eventListenerUuid;
+        isRegistered = true;
+        return isRegistered;
     }
 
     /**
      * Unregisters an event listener
      *
-     * @param eventListenerUuid The UUID that was obtained through initial registerEventListener call
+     * @param eventListenerUuid {@link UUID} that was obtained with registerEventListener method
+     * @return eventListener unregistered
      */
-    public void unregisterEventListener(@NonNull UUID eventListenerUuid) {
+    public T unregisterEventListener(@NonNull UUID eventListenerUuid) {
         T eventListener = mEventListenerByUUID.remove(eventListenerUuid);
         if (eventListener != null) {
             for (List<T> eventListeners : mEventListenersByEventName.values()) {
@@ -49,13 +53,15 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
                 }
             }
         }
+        return eventListener;
     }
 
     /**
      * Gets the list of all event listeners registered for a given event name
      *
-     * @param name The event name
+     * @param name The name of the event
      * @return A list of event listeners registered for the given event name or an empty list if no
+     * <p>
      * event listeners are currently registered for this event name
      */
     @NonNull
@@ -66,6 +72,17 @@ public class EventRegistrarImpl<T> implements EventRegistrar<T> {
         }
 
         return Collections.unmodifiableList(mEventListenersByEventName.get(name));
+    }
+
+    @NonNull
+    @Override
+    public UUID getEventListenerId(@NonNull T eventListener) {
+        for (Map.Entry entry : mEventListenerByUUID.entrySet()) {
+            if (eventListener != null && eventListener.equals(entry.getValue())) {
+                return (UUID) entry.getKey();
+            }
+        }
+        return null;
     }
 
     /**

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,28 +16,32 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
     /**
      * Registers a request handler
      *
-     * @param name           The request name this handler can handle
-     * @param requestHandler The request handler instance
-     * @return UUID to provide when calling unregisterRequestHandler
+     * @param name               The request name this handler can handle
+     * @param requestHandler     The request handler instance
+     * @param requestHandlerUuid {@link UUID} of {@code requestHandler}
+     * @return Returns true if the {@code requestHandler} is registered
      */
     @NonNull
-    public UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler) {
-        UUID requestHandlerUuid = UUID.randomUUID();
+    public boolean registerRequestHandler(@NonNull String name, @NonNull T requestHandler, @NonNull UUID requestHandlerUuid) {
+        boolean isRegistered;
         mRequestHandlerByRequestName.put(name, requestHandler);
         mRequestNameByUUID.put(requestHandlerUuid, name);
-        return requestHandlerUuid;
+        isRegistered = true;
+        return isRegistered;
     }
 
     /**
      * Unregisters a request handler
      *
-     * @param requestHandlerUuid The UUID that was obtained through initial registerRequestHandler call
+     * @param requestHandlerUuid {@link UUID} of registerRequestHandler
+     * @return registerRequestHandler unregistered
      */
-    public void unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
+    public T unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
         String requestName = mRequestNameByUUID.remove(requestHandlerUuid);
         if (requestName != null) {
-            mRequestHandlerByRequestName.remove(requestName);
+            return mRequestHandlerByRequestName.remove(requestName);
         }
+        return null;
     }
 
     /**
@@ -49,6 +54,17 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
     @Nullable
     public T getRequestHandler(@NonNull String name) {
         return mRequestHandlerByRequestName.get(name);
+    }
+
+    @NonNull
+    @Override
+    public UUID getRequestHandlerId(@NonNull String name) {
+        for (Map.Entry entry : mRequestNameByUUID.entrySet()) {
+            if (name != null && name.equals(entry.getValue())) {
+                return (UUID) entry.getKey();
+            }
+        }
+        return null;
     }
 
     /**

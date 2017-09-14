@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Client facing class.
@@ -31,8 +32,8 @@ public final class ElectrodeBridgeHolder {
     // This solution does not really scale in the sense that if the user sends a 1000 requests
     // upon native app start, it can become problematic. But I don't see why a user would do that
     // unless it's a bug in its app
-    private static final HashMap<String, ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> mQueuedRequestHandlersRegistration = new HashMap<>();
-    private static final HashMap<String, ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> mQueuedEventListenersRegistration = new HashMap<>();
+    private static final HashMap<String, RequestHandlerPlaceholder> mQueuedRequestHandlersRegistration = new HashMap<>();
+    private static final HashMap<String, EventListenerPlaceholder> mQueuedEventListenersRegistration = new HashMap<>();
     private static final HashMap<ElectrodeBridgeRequest, ElectrodeBridgeResponseListener<ElectrodeBridgeResponse>> mQueuedRequests = new HashMap<>();
     private static final List<ElectrodeBridgeEvent> mQueuedEvents = new ArrayList<>();
     private static List<ConstantsProvider> constantsProviders = new ArrayList<>();
@@ -93,16 +94,19 @@ public final class ElectrodeBridgeHolder {
      *
      * @param name           The request name this handler can handle
      * @param requestHandler The request handler instance
+     * @return {@link UUID} of the {@code requestHandler}
      */
-    public static void registerRequestHandler(@NonNull String name,
+    public static UUID registerRequestHandler(@NonNull String name,
                                               @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler) {
+        UUID handlerUUID = UUID.randomUUID();
         if (!isReactNativeReady) {
             Logger.d(TAG, "Queuing request handler registration for request(name=%s). Will register once react native initialization is complete.", name);
-            mQueuedRequestHandlersRegistration.put(name, requestHandler);
-            return;
+            mQueuedRequestHandlersRegistration.put(name, new RequestHandlerPlaceholder(handlerUUID, requestHandler));
+            return handlerUUID;
         }
 
-        electrodeNativeBridge.registerRequestHandler(name, requestHandler);
+        electrodeNativeBridge.registerRequestHandler(name, requestHandler, handlerUUID);
+        return handlerUUID;
     }
 
     /**
@@ -110,16 +114,19 @@ public final class ElectrodeBridgeHolder {
      *
      * @param name          The event name this listener is interested in
      * @param eventListener The event listener
+     * @return {@link UUID} of the {@code eventListener}
      */
-    public static void addEventListener(@NonNull String name,
+    public static UUID addEventListener(@NonNull String name,
                                         @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener) {
+        UUID eventUUID = UUID.randomUUID();
         if (!isReactNativeReady) {
             Logger.d(TAG, "Queuing event handler registration for event(name=%s). Will register once react native initialization is complete.", name);
-            mQueuedEventListenersRegistration.put(name, eventListener);
-            return;
+            mQueuedEventListenersRegistration.put(name, new EventListenerPlaceholder(eventUUID, eventListener));
+            return eventUUID;
         }
 
-        electrodeNativeBridge.addEventListener(name, eventListener);
+        electrodeNativeBridge.addEventListener(name, eventListener, eventUUID);
+        return eventUUID;
     }
 
     public static void addConstantsProvider(@NonNull ConstantsProvider constantsProvider) {
@@ -130,16 +137,42 @@ public final class ElectrodeBridgeHolder {
         electrodeNativeBridge.addConstantsProvider(constantsProvider);
     }
 
+    /**
+     * Remove the event listener
+     *
+     * @param eventListenerUuid {@link UUID}
+     * @return
+     */
+    public static ElectrodeBridgeEventListener<ElectrodeBridgeEvent> removeEventListener(@NonNull UUID eventListenerUuid) {
+        return electrodeNativeBridge.removeEventListener(eventListenerUuid);
+    }
+
+    /**
+     * Unregisters a request handler
+     *
+     * @param requestHandlerUuid {@link UUID} of registerRequestHandler
+     * @return registerRequestHandler unregistered
+     */
+    ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
+        return electrodeNativeBridge.unregisterRequestHandler(requestHandlerUuid);
+    }
+
     private static void registerQueuedRequestHandlers() {
-        for (Map.Entry<String, ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>> entry : mQueuedRequestHandlersRegistration.entrySet()) {
-            electrodeNativeBridge.registerRequestHandler(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, RequestHandlerPlaceholder> entry : mQueuedRequestHandlersRegistration.entrySet()) {
+            electrodeNativeBridge.registerRequestHandler(
+                    entry.getKey(),
+                    entry.getValue().getRequestHandler(),
+                    entry.getValue().getUUID());
         }
         mQueuedRequestHandlersRegistration.clear();
     }
 
     private static void registerQueuedEventListeners() {
-        for (Map.Entry<String, ElectrodeBridgeEventListener<ElectrodeBridgeEvent>> entry : mQueuedEventListenersRegistration.entrySet()) {
-            electrodeNativeBridge.addEventListener(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, EventListenerPlaceholder> entry : mQueuedEventListenersRegistration.entrySet()) {
+            electrodeNativeBridge.addEventListener(
+                    entry.getKey(),
+                    entry.getValue().getEventListener(),
+                    entry.getValue().getUUID());
         }
         mQueuedEventListenersRegistration.clear();
     }
@@ -166,5 +199,4 @@ public final class ElectrodeBridgeHolder {
         }
         constantsProviders.clear();
     }
-
 }

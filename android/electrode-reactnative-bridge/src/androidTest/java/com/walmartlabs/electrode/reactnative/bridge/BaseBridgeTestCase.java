@@ -181,8 +181,9 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
     private static final EventRegistrar<MockElectrodeEventListener> mockEventRegistrar = new EventRegistrarImpl<>();
 
     UUID addMockEventListener(@NonNull String eventName, @NonNull MockElectrodeEventListener mockElectrodeEventListener) {
-        UUID uuid = mockEventRegistrar.registerEventListener(eventName, mockElectrodeEventListener);
-        assertNotNull(uuid);
+        final UUID uuid = UUID.randomUUID();
+        boolean isRegistered = mockEventRegistrar.registerEventListener(eventName, mockElectrodeEventListener, uuid);
+        assertTrue(isRegistered);
         assertTrue(mockEventRegistrar.getEventListeners(eventName).size() > 0);
         return uuid;
     }

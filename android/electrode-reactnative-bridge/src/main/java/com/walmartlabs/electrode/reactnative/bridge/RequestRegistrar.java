@@ -12,18 +12,20 @@ public interface RequestRegistrar<T> {
      *
      * @param name           The request name this handler can handle
      * @param requestHandler The request handler instance
-     * @return UUID to provide when calling unregisterRequestHandler
+     * @param uuid           {@link UUID} of {@code requestHandler}
+     * @return Returns true if the {@code requestHandler} is registered
      */
     @NonNull
-    UUID registerRequestHandler(@NonNull String name, @NonNull T requestHandler);
+    boolean registerRequestHandler(@NonNull String name, @NonNull T requestHandler, @NonNull UUID uuid);
 
     /**
      * Unregisters a request handler
      *
-     * @param requestHandlerUuid The UUID that was obtained through initial registerRequestHandler call
+     * @param requestHandlerUuid {@link UUID} of registerRequestHandler
+     * @return registerRequestHandler unregistered
      */
     @SuppressWarnings("unused")
-    void unregisterRequestHandler(@NonNull UUID requestHandlerUuid);
+    T unregisterRequestHandler(@NonNull UUID requestHandlerUuid);
 
     /**
      * Gets the request handler registered for a given request name
@@ -34,4 +36,13 @@ public interface RequestRegistrar<T> {
      */
     @Nullable
     T getRequestHandler(@NonNull String name);
+
+    /**
+     * Query UUID of the request handler
+     *
+     * @param name
+     * @return {@link UUID} of the request handler
+     */
+    @NonNull
+    UUID getRequestHandlerId(@NonNull String name);
 }

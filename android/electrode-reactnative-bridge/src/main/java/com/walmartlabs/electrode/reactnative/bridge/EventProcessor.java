@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
+import java.util.UUID;
+
 /**
  * Processes an event that is emitted from Native side
  *
@@ -23,10 +25,11 @@ public class EventProcessor<T> implements Processor {
     }
 
     @Override
-    public void execute() {
+    public UUID execute() {
         Logger.d(TAG, "EventProcessor is emitting event(%s), with payload(%s)", eventName, eventPayload);
         ElectrodeBridgeHolder.emitEvent(new ElectrodeBridgeEvent.Builder(eventName)
                 .withData(eventPayload)
                 .build());
+        return null;
     }
 }

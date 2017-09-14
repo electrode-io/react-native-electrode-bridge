@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
+import java.util.UUID;
+
 /**
  * Class that takes care of registering an event listener to the bridge.
  *
@@ -27,7 +29,7 @@ public class EventListenerProcessor<T> implements Processor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void execute() {
+    public UUID execute() {
         ElectrodeBridgeEventListener<ElectrodeBridgeEvent> intermediateEventListener = new ElectrodeBridgeEventListener<ElectrodeBridgeEvent>() {
             @Override
             public void onEvent(@Nullable ElectrodeBridgeEvent bridgeEvent) {
@@ -45,6 +47,6 @@ public class EventListenerProcessor<T> implements Processor {
                 eventListener.onEvent(result);
             }
         };
-        ElectrodeBridgeHolder.addEventListener(eventName, intermediateEventListener);
+        return ElectrodeBridgeHolder.addEventListener(eventName, intermediateEventListener);
     }
 }

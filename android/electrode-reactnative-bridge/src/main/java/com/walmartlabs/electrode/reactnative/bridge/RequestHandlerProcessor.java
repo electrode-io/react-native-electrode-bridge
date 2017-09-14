@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments;
 
+import java.util.UUID;
+
 /**
  * Class that handles a native request handler.
  * This class is responsible for converting the received bundle to a full fledged object before sending the request to the registered request handler
@@ -31,7 +33,7 @@ public class RequestHandlerProcessor<TReq, TResp> implements Processor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void execute() {
+    public UUID execute() {
         final ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> intermediateRequestHandler = new ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object>() {
 
             @Override
@@ -66,6 +68,6 @@ public class RequestHandlerProcessor<TReq, TResp> implements Processor {
             }
         };
 
-        ElectrodeBridgeHolder.registerRequestHandler(requestName, intermediateRequestHandler);
+        return ElectrodeBridgeHolder.registerRequestHandler(requestName, intermediateRequestHandler);
     }
 }

@@ -13,23 +13,24 @@ public interface ElectrodeNativeBridge {
     /**
      * Send a request from Android native to either Native or React Native side depending on where the request handler is registered.
      *
-     * @param request          The ElectrodeBridgeRequest that will contain the request name,data, destination mode, and timeout
-     * @param responseListener the response call back listener to issue success or failure of the {@param request}.
+     * @param request          {@link ElectrodeBridgeRequest} that will contain the request name,data, destination mode, and timeout
+     * @param responseListener the response call back listener to issue success or failure of the {@code request}.
      */
     void sendRequest(@NonNull final ElectrodeBridgeRequest request, @NonNull final ElectrodeBridgeResponseListener<ElectrodeBridgeResponse> responseListener);
 
     /**
-     * Registere the request handler, which will be used to handle any
+     * Register the request handler, which will be used to handle any
      *
      * @param name           name of the request
      * @param requestHandler call back to be issued for a given request.
+     * @param uuid           Returns true if the {@code requestHandler} is registered
      */
-    void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler);
+    boolean registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler, UUID uuid);
 
     /**
      * Sends an event with some data to the all the even listeners.
      *
-     * @param event The event to emit
+     * @param event {@link ElectrodeBridgeEvent} to emit
      */
     void sendEvent(@NonNull ElectrodeBridgeEvent event);
 
@@ -38,10 +39,11 @@ public interface ElectrodeNativeBridge {
      *
      * @param name          The event name this listener is interested in
      * @param eventListener The event listener
-     * @return A UUID to pass back to unregisterEventListener
+     * @param uuid          {@link UUID} of the {@code name}
+     * @return Returns true if the {@code eventListener} is registered
      */
     @NonNull
-    UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener);
+    boolean addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener, UUID uuid);
 
     /**
      * Registers the listen that will be used by the bridge module to get the constant values exposed to JavaScript
@@ -49,4 +51,39 @@ public interface ElectrodeNativeBridge {
      * @param constantsProvider
      */
     void addConstantsProvider(@NonNull ConstantsProvider constantsProvider);
+
+    /**
+     * Query UUID of the request handler
+     *
+     * @param name
+     * @return {@link UUID} of the request handler
+     */
+    @NonNull
+    UUID getRequestHandlerId(@NonNull String name);
+
+    /**
+     * Query UUID of the event listener
+     *
+     * @param eventListener
+     * @return {@link UUID} of the event listener
+     */
+    @NonNull
+    UUID getEventListenerId(@NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener);
+
+    /**
+     * Remove the event listener
+     * @param eventListenerUuid {@link UUID}
+     * @return
+     */
+    ElectrodeBridgeEventListener<ElectrodeBridgeEvent> removeEventListener(@NonNull UUID eventListenerUuid);
+
+    /**
+     * Unregisters a request handler
+     *
+     * @param requestHandlerUuid {@link UUID} of registerRequestHandler
+     * @return registerRequestHandler unregistered
+     */
+    @SuppressWarnings("unused")
+    ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> unregisterRequestHandler(@NonNull UUID requestHandlerUuid);
+
 }

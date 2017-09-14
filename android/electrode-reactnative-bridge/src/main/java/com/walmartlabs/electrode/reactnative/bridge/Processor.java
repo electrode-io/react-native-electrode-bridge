@@ -1,5 +1,7 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import java.util.UUID;
+
 public interface Processor {
-    void execute();
+    UUID execute();
 }

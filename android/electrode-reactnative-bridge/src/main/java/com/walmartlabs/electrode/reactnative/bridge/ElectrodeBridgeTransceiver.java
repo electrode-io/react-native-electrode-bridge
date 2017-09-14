@@ -118,9 +118,9 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
 
     @NonNull
     @Override
-    public UUID addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener) {
+    public boolean addEventListener(@NonNull String name, @NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener, @NonNull UUID uuid) {
         Logger.d(TAG, "Adding eventListener(%s) for event(%s)", eventListener, name);
-        return sEventRegistrar.registerEventListener(name, eventListener);
+        return sEventRegistrar.registerEventListener(name, eventListener, uuid);
     }
 
     @Override
@@ -128,9 +128,31 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         this.constantsProviders.add(constantsProvider);
     }
 
+    @NonNull
     @Override
-    public void registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler) {
-        sRequestRegistrar.registerRequestHandler(name, requestHandler);
+    public UUID getRequestHandlerId(@NonNull String name) {
+        return sRequestRegistrar.getRequestHandlerId(name);
+    }
+
+    @NonNull
+    @Override
+    public UUID getEventListenerId(@NonNull ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener) {
+        return sEventRegistrar.getEventListenerId(eventListener);
+    }
+
+    @Override
+    public ElectrodeBridgeEventListener<ElectrodeBridgeEvent> removeEventListener(@NonNull UUID eventListenerUuid) {
+        return sEventRegistrar.unregisterEventListener(eventListenerUuid);
+    }
+
+    @Override
+    public ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
+        return sRequestRegistrar.unregisterRequestHandler(requestHandlerUuid);
+    }
+
+    @Override
+    public boolean registerRequestHandler(@NonNull String name, @NonNull ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler, @NonNull UUID uuid) {
+        return sRequestRegistrar.registerRequestHandler(name, requestHandler, uuid);
     }
 
     /**

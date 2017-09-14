@@ -153,7 +153,7 @@ public final class ElectrodeBridgeHolder {
      * @param requestHandlerUuid {@link UUID} of registerRequestHandler
      * @return registerRequestHandler unregistered
      */
-    ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
+    public static ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> unregisterRequestHandler(@NonNull UUID requestHandlerUuid) {
         return electrodeNativeBridge.unregisterRequestHandler(requestHandlerUuid);
     }
 

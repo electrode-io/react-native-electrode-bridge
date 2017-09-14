@@ -68,6 +68,7 @@ class ElectrodeBridge extends EventEmitter {
 
     this.requestHandlerByRequestName = new Map()
     this.pendingResponseCallbackById = new Map()
+    this.eventListenerUUIDRef = new Map()
   }
 
   //============================================================================
@@ -144,8 +145,25 @@ class ElectrodeBridge extends EventEmitter {
    */
   registerEventListener(
     name /*:string */ ,
-    handler /*:Function*/ ) {
+    handler /*:Function*/ ) /*:string */ {
     this.addListener(name, handler)
+    let event = { name , handler}
+    let eventUUID = uuid.v4()
+    this.eventListenerUUIDRef.set(eventUUID, event)
+    return eventUUID
+  }
+
+  /**
+   * Removes event listener for a given event UUID returned while registering EventListener
+   *
+   * @param {string} name - UUID of the event
+   */
+  removeEventListener(
+    uuid /*:string */ ) /*:EventEmitter*/ {
+    if(this.eventListenerUUIDRef.has(uuid)) {
+      const event = this.eventListenerUUIDRef.get(uuid)
+      return this.removeListener(event.name, event.handler)
+    }
   }
 
   //============================================================================

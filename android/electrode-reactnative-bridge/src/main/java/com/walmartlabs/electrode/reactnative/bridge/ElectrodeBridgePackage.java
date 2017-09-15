@@ -24,7 +24,11 @@ public class ElectrodeBridgePackage implements ReactPackage {
         return modules;
     }
 
-    @Override
+    // Do not annotate the method with @Override
+    // We want to provide backward compatibility starting react-native version 0.42
+    // Breaking change in react-native version 0.47 : Android Remove unused createJSModules calls
+    // Find more information here : https://github.com/facebook/react-native/releases/tag/v0.47.2
+    // https://github.com/facebook/react-native/commit/ce6fb337a146e6f261f2afb564aa19363774a7a8
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

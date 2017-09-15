@@ -1,5 +1,6 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
+import android.app.Instrumentation;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -38,46 +39,41 @@ public class BaseBridgeTestCase extends InstrumentationTestCase {
 
     private void initBridge() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        ReactInstanceManager reactInstanceManager = null;
         final ElectrodeBridgePackage mockElectrodePackage = new MockElectrodePackage();
-        try {
-            reactInstanceManager = ReactInstanceManager.builder()
-                    .setApplication(this.getInstrumentation().newApplication(MyTestApplication.class.getClassLoader(), MyTestApplication.class.getName(), getInstrumentation().getContext()))
-                    .setBundleAssetName("index.android.bundle")
-                    .setJSMainModuleName("index.android")
-                    .addPackage(new MainReactPackage())
-                    .setUseDeveloperSupport(false)
-                    .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
-                    .addPackage(mockElectrodePackage)
-                    .build();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-        if (reactInstanceManager != null) {
-            final ReactInstanceManager finalReactInstanceManager = reactInstanceManager;
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    finalReactInstanceManager.createReactContextInBackground();
+        final Instrumentation instrumentation = this.getInstrumentation();
+        // Fixes : com.facebook.react.bridge.AssertionException: Expected to run on UI thread!
+        // react-native version : 0.45
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ReactInstanceManager reactInstanceManager;
+                try {
+                    reactInstanceManager = ReactInstanceManager.builder()
+                            .setApplication(instrumentation.newApplication(MyTestApplication.class.getClassLoader(), MyTestApplication.class.getName(), getInstrumentation().getContext()))
+                            .setBundleAssetName("index.android.bundle")
+                            .setJSMainModuleName("index.android")
+                            .addPackage(new MainReactPackage())
+                            .setUseDeveloperSupport(false)
+                            .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
+                            .addPackage(mockElectrodePackage)
+                            .build();
+                    reactInstanceManager.createReactContextInBackground();
+                    reactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
+                        @Override
+                        public void onReactContextInitialized(ReactContext context) {
+                            mockElectrodePackage.onReactNativeInitialized();
+                            countDownLatch.countDown();
+                        }
+                    });
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
-            });
-
-            reactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
-                @Override
-                public void onReactContextInitialized(ReactContext context) {
-                    mockElectrodePackage.onReactNativeInitialized();
-                    countDownLatch.countDown();
-                }
-            });
-        }
-
+            }
+        });
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 

@@ -60,9 +60,7 @@
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-    NSString *absolutePath = @"/Users/w0l00qx/Code/react-native-electrode-bridge/ios/ElectrodeReactNativeBridge/ElectrodeReactNativeBridgeTests/MiniApp.jsbundle";
-
-    return [[NSURL alloc] initWithString:absolutePath];
+    return [self allJSBundleFiles][0];
 }
 
 -(void)initializeBundle
@@ -78,6 +76,27 @@
     XCTAssertNotNil(nativeBridge, @"Native bridge instance is nil");
     return nativeBridge;
 }
+
+
+- (NSArray *)allJSBundleFiles
+{
+    NSArray *returnFiles = nil;
+    NSURL *bundle = [[NSBundle bundleForClass:self.class] bundleURL];
+    NSError *error = nil;
+    
+    NSArray *files =
+    [[NSFileManager defaultManager] contentsOfDirectoryAtURL:bundle
+                                  includingPropertiesForKeys:nil
+                                                     options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                       error:&error];
+    if (!error)
+    {
+        NSPredicate *jsBundlePredicate = [NSPredicate predicateWithFormat:@"pathExtension='jsbundle'"];
+        returnFiles = [files filteredArrayUsingPredicate:jsBundlePredicate];
+    }
+    return returnFiles;
+}
+
 
 - (id<ElectrodeReactBridge>)getReactBridge {
     id <ElectrodeReactBridge> reactBridge = [self.bridge moduleForClass:[MockBridgeTransceiver class]];
@@ -137,7 +156,6 @@
 
 
 @implementation MockBridgeTransceiver
-RCT_EXPORT_MODULE(MockBridgeTransceiver)
 
 -(instancetype) init {
     if (self = [super init]) {
@@ -145,6 +163,12 @@ RCT_EXPORT_MODULE(MockBridgeTransceiver)
     }
     
     return self;
+}
+RCT_EXPORT_MODULE();
+
++ (NSArray *)electrodeModules
+{
+    return @[[[MockBridgeTransceiver alloc] init]];
 }
 
 - (void)emitMessage:(ElectrodeBridgeMessage *)bridgeMessage

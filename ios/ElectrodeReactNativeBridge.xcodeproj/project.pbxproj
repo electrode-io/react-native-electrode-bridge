@@ -20,6 +20,7 @@
 		3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */; };
 		30488CC51F6C82F5009ACF89 /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 30488CAF1F6C82E6009ACF89 /* libRCTWebSocket.a */; };
 		30488CF01F7041FD009ACF89 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 30488CEF1F7041FD009ACF89 /* MiniApp.jsbundle */; };
+		30488CF81F704743009ACF89 /* MiniApp42.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 30488CF71F704743009ACF89 /* MiniApp42.jsbundle */; };
 		30799ABD1F1D3CFB006D5044 /* CompleteAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */; };
 		30799AC61F1D5AAD006D5044 /* Person.json in Resources */ = {isa = PBXBuildFile; fileRef = 30799AC51F1D5AAD006D5044 /* Person.json */; };
 		307AC5D91F44C16000F3B7BD /* ElectrodeLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -178,6 +179,7 @@
 		3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeBaseTests.m; sourceTree = "<group>"; };
 		30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
 		30488CEF1F7041FD009ACF89 /* MiniApp.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp.jsbundle; sourceTree = "<group>"; };
+		30488CF71F704743009ACF89 /* MiniApp42.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp42.jsbundle; sourceTree = "<group>"; };
 		30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompleteAddress.swift; sourceTree = "<group>"; };
 		30799AC51F1D5AAD006D5044 /* Person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Person.json; sourceTree = "<group>"; };
 		307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeLogger.h; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 		DA4BE0C91E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests */ = {
 			isa = PBXGroup;
 			children = (
+				30488CF71F704743009ACF89 /* MiniApp42.jsbundle */,
 				301941981E942F0A002A0C69 /* Swift */,
 				301940D71E941369002A0C69 /* Sample */,
 				DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */,
@@ -653,6 +656,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30488CF81F704743009ACF89 /* MiniApp42.jsbundle in Resources */,
 				30799AC61F1D5AAD006D5044 /* Person.json in Resources */,
 				30488CF01F7041FD009ACF89 /* MiniApp.jsbundle in Resources */,
 			);

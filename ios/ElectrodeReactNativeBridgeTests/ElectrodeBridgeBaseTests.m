@@ -171,6 +171,11 @@ RCT_EXPORT_MODULE();
     return @[[[MockBridgeTransceiver alloc] init]];
 }
 
+-(NSArray *) supportedEvents
+{
+    return @[@"electrode.bridge.message"];
+}
+
 - (void)emitMessage:(ElectrodeBridgeMessage *)bridgeMessage
 {
     NSLog(@"Trying to emit messgae to JS, mock JS implemenation here.");
@@ -225,12 +230,6 @@ RCT_EXPORT_MODULE();
         }
     }
 }
-
-- (NSArray<NSString *> *)supportedEvents
-{
-     return @[@"bridgeTest"];
-}
-
 
 @end
 

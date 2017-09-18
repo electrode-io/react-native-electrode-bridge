@@ -18,11 +18,13 @@
 		3019419C1E94340F002A0C69 /* ElectrodeBridgeBaseTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */; };
 		3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */; };
+		30488CC51F6C82F5009ACF89 /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 30488CAF1F6C82E6009ACF89 /* libRCTWebSocket.a */; };
+		30488CF01F7041FD009ACF89 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 30488CEF1F7041FD009ACF89 /* MiniApp.jsbundle */; };
+		30488CF81F704743009ACF89 /* MiniApp42.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 30488CF71F704743009ACF89 /* MiniApp42.jsbundle */; };
 		30799ABD1F1D3CFB006D5044 /* CompleteAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */; };
 		30799AC61F1D5AAD006D5044 /* Person.json in Resources */ = {isa = PBXBuildFile; fileRef = 30799AC51F1D5AAD006D5044 /* Person.json */; };
 		307AC5D91F44C16000F3B7BD /* ElectrodeLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		307AC5DA1F44C16000F3B7BD /* ElectrodeLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 307AC5D81F44C16000F3B7BD /* ElectrodeLogger.m */; };
-		309A03A31E8AE8F900501219 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 309A03A21E8AE8F900501219 /* MiniApp.jsbundle */; };
 		309A03C01E8B319E00501219 /* ElectrodeBridgeHolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		309A03C11E8B319E00501219 /* ElectrodeBridgeHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */; };
 		30B705C01E960BCE00B8DACE /* RequestProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */; };
@@ -140,6 +142,20 @@
 			remoteGlobalIDString = 83CBBA2D1A601D0E00E9B192;
 			remoteInfo = React;
 		};
+		30488CAE1F6C82E6009ACF89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3C86DF461ADF2C930047B81A;
+			remoteInfo = RCTWebSocket;
+		};
+		30488CB01F6C82E6009ACF89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2D2A28881D9B049200D4039D;
+			remoteInfo = "RCTWebSocket-tvOS";
+		};
 		DA4BE0C71E36DBCD00DBA1ED /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA4BE0B31E36DBCD00DBA1ED /* Project object */;
@@ -161,11 +177,13 @@
 		3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeTransceiverTests.m; sourceTree = "<group>"; };
 		3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeBaseTests.h; sourceTree = "<group>"; };
 		3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeBaseTests.m; sourceTree = "<group>"; };
+		30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
+		30488CEF1F7041FD009ACF89 /* MiniApp.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp.jsbundle; sourceTree = "<group>"; };
+		30488CF71F704743009ACF89 /* MiniApp42.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp42.jsbundle; sourceTree = "<group>"; };
 		30799ABC1F1D3CFB006D5044 /* CompleteAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompleteAddress.swift; sourceTree = "<group>"; };
 		30799AC51F1D5AAD006D5044 /* Person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Person.json; sourceTree = "<group>"; };
 		307AC5D71F44C16000F3B7BD /* ElectrodeLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeLogger.h; sourceTree = "<group>"; };
 		307AC5D81F44C16000F3B7BD /* ElectrodeLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeLogger.m; sourceTree = "<group>"; };
-		309A03A21E8AE8F900501219 /* MiniApp.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MiniApp.jsbundle; sourceTree = "<group>"; };
 		309A03BE1E8B319E00501219 /* ElectrodeBridgeHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeHolder.h; sourceTree = "<group>"; };
 		309A03BF1E8B319E00501219 /* ElectrodeBridgeHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeHolder.m; sourceTree = "<group>"; };
 		30B705BF1E960BCE00B8DACE /* RequestProcessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestProcessorTests.swift; sourceTree = "<group>"; };
@@ -228,6 +246,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30488CC51F6C82F5009ACF89 /* libRCTWebSocket.a in Frameworks */,
 				2238E19E1E8C29E8007FEDA8 /* libReact.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,6 +321,15 @@
 			name = Swift;
 			sourceTree = "<group>";
 		};
+		30488CAA1F6C82E6009ACF89 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				30488CAF1F6C82E6009ACF89 /* libRCTWebSocket.a */,
+				30488CB11F6C82E6009ACF89 /* libRCTWebSocket-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		9678D2601E68CADF00719AD5 /* Swift */ = {
 			isa = PBXGroup;
 			children = (
@@ -321,6 +349,7 @@
 		968332881E53C9EF0031C565 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */,
 				2238E17E1E8C28A9007FEDA8 /* React.xcodeproj */,
 			);
 			name = Libraries;
@@ -358,6 +387,7 @@
 		DA4BE0C91E36DBCD00DBA1ED /* ElectrodeReactNativeBridgeTests */ = {
 			isa = PBXGroup;
 			children = (
+				30488CF71F704743009ACF89 /* MiniApp42.jsbundle */,
 				301941981E942F0A002A0C69 /* Swift */,
 				301940D71E941369002A0C69 /* Sample */,
 				DA0B9F411E8DCD14004A4629 /* ElectrodeBridgeMessageTests.m */,
@@ -365,7 +395,6 @@
 				DA0B9F351E8DCC6D004A4629 /* ElectrodeBridgeRequestTests.m */,
 				DA0B9F361E8DCC6D004A4629 /* ElectrodeBridgeResponseTests.m */,
 				DA0B9F211E8DC323004A4629 /* ElectrodeBridgeTransactionTests.m */,
-				309A03A21E8AE8F900501219 /* MiniApp.jsbundle */,
 				DA4BE0CC1E36DBCD00DBA1ED /* Info.plist */,
 				3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */,
 				3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */,
@@ -374,6 +403,7 @@
 				DA0B9F5E1E9BFF0F004A4629 /* Person.h */,
 				DA0B9F5F1E9BFF0F004A4629 /* Person.m */,
 				30BFEE571E92082400FE1B4F /* ElectrodeReactNativeBridgeTests-Bridging-Header.h */,
+				30488CEF1F7041FD009ACF89 /* MiniApp.jsbundle */,
 			);
 			path = ElectrodeReactNativeBridgeTests;
 			sourceTree = "<group>";
@@ -525,6 +555,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 30488CAA1F6C82E6009ACF89 /* Products */;
+					ProjectRef = 30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */;
+				},
+				{
 					ProductGroup = 2238E17F1E8C28A9007FEDA8 /* Products */;
 					ProjectRef = 2238E17E1E8C28A9007FEDA8 /* React.xcodeproj */;
 				},
@@ -594,6 +628,20 @@
 			remoteRef = 2238E1971E8C28A9007FEDA8 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		30488CAF1F6C82E6009ACF89 /* libRCTWebSocket.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTWebSocket.a;
+			remoteRef = 30488CAE1F6C82E6009ACF89 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		30488CB11F6C82E6009ACF89 /* libRCTWebSocket-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRCTWebSocket-tvOS.a";
+			remoteRef = 30488CB01F6C82E6009ACF89 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -608,8 +656,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30488CF81F704743009ACF89 /* MiniApp42.jsbundle in Resources */,
 				30799AC61F1D5AAD006D5044 /* Person.json in Resources */,
-				309A03A31E8AE8F900501219 /* MiniApp.jsbundle in Resources */,
+				30488CF01F7041FD009ACF89 /* MiniApp.jsbundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

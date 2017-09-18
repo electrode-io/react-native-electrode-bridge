@@ -68,6 +68,18 @@ NSString * const kElectrodeBridgeResponseUnknownErrorCode = @"EUNKNOWN";
     return self;
 }
 
+- (NSDictionary *)toDictionary {
+    if(_failureMessage) {
+        NSMutableDictionary *messageDict = [[NSMutableDictionary alloc] initWithDictionary:[super toDictionary]];
+        NSMutableDictionary *errorDict = [[NSMutableDictionary alloc] init];
+        [errorDict setObject:_failureMessage.message forKey:kElectrodeBridgeResponseErrorMessage];
+        [errorDict setObject:_failureMessage.code forKey:kElectrodeBridgeResponseErrorCode];
+        [messageDict setObject:errorDict forKey:kElectrodeBridgeResponseError];
+        return messageDict;
+    }
+    return [super toDictionary];
+}
+
 - (NSString *)description{
     return [NSString stringWithFormat:@"%@, failureMessage:%@", [super description], self.failureMessage];
 }

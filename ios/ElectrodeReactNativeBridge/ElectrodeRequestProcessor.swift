@@ -7,8 +7,8 @@
 //
 import UIKit
 
-typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> ()
-typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> ()
+typealias ElectrodeRequestProcessorSuccessClosure = (Any?) -> Void
+typealias ElectrodeRequestProcessorFailureClosure = (ElectrodeFailureMessage) -> Void
 
 public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let tag: String
@@ -17,26 +17,25 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
     private let responseClass: TResp.Type
     private let responseItemType: Any.Type?
     private let responseCompletionHandler: ElectrodeBridgeResponseCompletionHandler
-    
+
     public init(requestName: String,
-         requestPayload: Any?,
-         respClass: TResp.Type,
-         responseItemType: Any.Type?,
-         responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
-    {
-        self.tag              = String(describing: type(of:self))
-        self.requestName      = requestName
-        self.requestPayload   = requestPayload
-        self.responseClass    = respClass
+                requestPayload: Any?,
+                respClass: TResp.Type,
+                responseItemType: Any.Type?,
+                responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+        tag = String(describing: type(of: self))
+        self.requestName = requestName
+        self.requestPayload = requestPayload
+        responseClass = respClass
         self.responseItemType = responseItemType
         self.responseCompletionHandler = responseCompletionHandler
         super.init()
     }
-    
+
     public func execute() {
         ElectrodeConsoleLogger.sharedInstance().debug("RequestProcessor started processing request (\(requestName)) with payload (\(String(describing: requestPayload)))")
         let bridgeMessageData = ElectrodeUtilities.convertObjectToBridgeMessageData(object: requestPayload)
-        
+
         let validRequest = ElectrodeBridgeRequest(name: requestName, data: bridgeMessageData)
 
         ElectrodeBridgeHolder.send(validRequest) { (responseData: Any?, failureMessage: ElectrodeFailureMessage?) in
@@ -44,7 +43,7 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
                 self.responseCompletionHandler(nil, failureMessage)
             } else {
                 let processedResp: Any?
-                if (self.responseClass != None.self) {
+                if self.responseClass != None.self {
                     processedResp = self.processSuccessResponse(responseData: responseData)
                 } else {
                     processedResp = nil
@@ -53,7 +52,7 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
             }
         }
     }
-    
+
     private func processSuccessResponse(responseData: Any?) -> Any? {
         guard let anyData = responseData else {
             return nil
@@ -67,7 +66,7 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
             assertionFailure("Failed to convert responseData to valid obj")
             generatedRes = nil
         }
-       
+
         return generatedRes
     }
 }

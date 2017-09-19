@@ -9,10 +9,10 @@
 import UIKit
 
 open class ElectrodeObject: NSObject {
-    public required init(dictionary: [AnyHashable: Any]) {
+    public required init(dictionary _: [AnyHashable: Any]) {
         super.init()
     }
-    
+
     public override init() {
         super.init()
     }

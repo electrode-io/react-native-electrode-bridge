@@ -22,35 +22,35 @@ public class CompleteAddress: ElectrodeObject, Bridgeable {
         self.city = city
         super.init()
     }
-    
-    required public init(dictionary: [AnyHashable: Any]) {
+
+    public required init(dictionary: [AnyHashable: Any]) {
         if let validStreetOne = dictionary["streetOne"] as? String,
-               let validZipcode = dictionary["zipcode"] as? String,
-               let validState = dictionary["state"] as? String,
-               let validCity = dictionary["city"] as? String {
-            self.streetOne = validStreetOne
-            self.zipcode = validZipcode
-            self.state = validState
-            self.city = validCity
+            let validZipcode = dictionary["zipcode"] as? String,
+            let validState = dictionary["state"] as? String,
+            let validCity = dictionary["city"] as? String {
+            streetOne = validStreetOne
+            zipcode = validZipcode
+            state = validState
+            city = validCity
         } else {
             assertionFailure("Invalid Address dictionary")
-            self.streetOne = dictionary["streetOne"] as! String
-            self.zipcode = dictionary["zipcode"] as! String
-            self.state = dictionary["state"] as! String
-            self.city = dictionary["city"] as! String
+            streetOne = dictionary["streetOne"] as! String
+            zipcode = dictionary["zipcode"] as! String
+            state = dictionary["state"] as! String
+            city = dictionary["city"] as! String
         }
-        
-        self.streetTwo = dictionary["streetTwo"] as? String
+
+        streetTwo = dictionary["streetTwo"] as? String
         super.init()
     }
-    
+
     public func toDictionary() -> NSDictionary {
-        var dict = ["streetOne": self.streetOne, "zipcode":self.zipcode, "state":self.state, "city": self.city]
-        
+        var dict = ["streetOne": self.streetOne, "zipcode": self.zipcode, "state": self.state, "city": self.city]
+
         if let nonNullStreetTwo = self.streetTwo {
             dict["streetTwo"] = nonNullStreetTwo
         }
-        
+
         return dict as NSDictionary
     }
 }

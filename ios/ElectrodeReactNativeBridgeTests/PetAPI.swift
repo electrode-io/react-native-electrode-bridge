@@ -10,22 +10,19 @@ import UIKit
 
 class PetAPI {
     var event: Events {
-        get {
-            return PetEvents()
-        }
+        return PetEvents()
     }
+
     var request: Requests {
-        get {
-            return PetRequest()
-        }
+        return PetRequest()
     }
-    
+
     class Events {
         func doSomething() {
             assertionFailure("required override")
         }
     }
-    
+
     class Requests {
         func sendMyRequest() {
             assertionFailure("required override")
@@ -52,8 +49,4 @@ class MyOwnPetEvents: PetAPI.Events {
 }
 
 class MyOwnPetAPI: PetAPI {
-
 }
-
-
-

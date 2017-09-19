@@ -8,8 +8,6 @@
 
 import Foundation
 
-
-
 public class PersonAPI {
     static let kEventPersonAdded = "kEventPersonAdded"
     static let kEventPersonNameUpdated = "kEventPersonNameUpdated"
@@ -20,60 +18,61 @@ public class PersonAPI {
     static let kRequestPostPersonUpdate = "kRequestPostPersonUpdate"
     static let kRequestFindPersonsByStatus = "kRequestFindPersonsByStatus"
     static let kRequestFindPersonsByName = "kRequestFindPersonsByName"
-    lazy var event: Events = { return PersonEvents()}()
-    lazy var request: Requests = {return PersonRequests()}()
-    
+    lazy var event: Events = { PersonEvents() }()
+    lazy var request: Requests = { PersonRequests() }()
+
     public class Events {
-        func addPersonAddedEventListenr(eventListener: @escaping ElectrodeBridgeEventListener) {
+        func addPersonAddedEventListenr(eventListener _: @escaping ElectrodeBridgeEventListener) {
             assertionFailure("need override")
         }
-        func addPersonNameUpdatedEventListener(eventListener: @escaping ElectrodeBridgeEventListener) {
+
+        func addPersonNameUpdatedEventListener(eventListener _: @escaping ElectrodeBridgeEventListener) {
             assertionFailure("need override")
         }
-        func emitEventPersonAdded(person: Person) {
+
+        func emitEventPersonAdded(person _: Person) {
             assertionFailure("need override")
-            
         }
-        func emitEventPersonNameUpdated(updatedName: String) {
-            
+
+        func emitEventPersonNameUpdated(updatedName _: String) {
         }
     }
-    
+
     public class Requests {
         /***
          * Registers a handler that returns the current user when {@link #getPerson(ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
          * @param handler {@link ElectrodeBridgeRequestHandler}
          */
-        func registerGetPersonRequestHandler(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+        func registerGetPersonRequestHandler(handler _: @escaping ElectrodeBridgeRequestCompletionHandler) {
             assertionFailure("need override")
-            
         }
+
         /**
          * Registers a handler  that returns the user status when {@link #getStatus(Person, ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
          * @param handler {@link ElectrodeBridgeRequestHandler}
          */
-        func registerGetStatusRequestHandler(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
-            assertionFailure("need override")
-            
-        }
-        func registerGetAgeRequestHandler(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+        func registerGetStatusRequestHandler(handler _: @escaping ElectrodeBridgeRequestCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func registerUpdatePersonRequestHandler(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+
+        func registerGetAgeRequestHandler(handler _: @escaping ElectrodeBridgeRequestCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func registerFindPersonsByStatus(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+
+        func registerUpdatePersonRequestHandler(handler _: @escaping ElectrodeBridgeRequestCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func registerFindPersonsAgeByName(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+
+        func registerFindPersonsByStatus(handler _: @escaping ElectrodeBridgeRequestCompletionHandler) {
             assertionFailure("need override")
         }
-        
+
+        func registerFindPersonsAgeByName(handler _: @escaping ElectrodeBridgeRequestCompletionHandler) {
+            assertionFailure("need override")
+        }
+
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
@@ -81,10 +80,10 @@ public class PersonAPI {
          *
          * @param response {@link ElectrodeBridgeResponseListener<Person>} Request listener as a call back to be called once the operation is completed.
          */
-        func getPerson(responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+        func getPerson(responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
-        
+
         /**
          * Calling this method will trigger a bridge request to call the registered handler for a response.
          * <p>
@@ -92,33 +91,31 @@ public class PersonAPI {
          *
          * @param response {@link ElectrodeBridgeResponseListener<Status>} Request listener as a call back to be called once the operation is completed.
          */
-        func getStatus(person: Person, responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+        func getStatus(person _: Person, responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func getUserName(responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+
+        func getUserName(responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func getAge(name: String, responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+
+        func getAge(name _: String, responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func updatePersonPost(updatePersonRequestData: UpdatePersonRequestData,
-                              responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+
+        func updatePersonPost(updatePersonRequestData _: UpdatePersonRequestData,
+                              responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func findPersonsByStatus(statusList: [Status],
-                                 responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+
+        func findPersonsByStatus(statusList _: [Status],
+                                 responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
-        
-        func findPersonByAge(names: [String],
-                             responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+
+        func findPersonByAge(names _: [String],
+                             responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
             assertionFailure("need override")
         }
     }
 }
-
-

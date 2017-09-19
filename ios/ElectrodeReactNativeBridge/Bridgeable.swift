@@ -8,7 +8,7 @@
 
 import Foundation
 
-//@objc requires this protocol to be a class protocol
+// @objc requires this protocol to be a class protocol
 // mark public because ElectrodeBridgeMessage is public
 @objc public protocol Bridgeable {
     func toDictionary() -> NSDictionary

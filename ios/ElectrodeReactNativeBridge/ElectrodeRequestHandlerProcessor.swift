@@ -15,14 +15,13 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
     let reqItemType: Any.Type?
     let respClass: TResp.Type
     let requestCompletionHandler: ElectrodeBridgeRequestCompletionHandler
-    
+
     public init(requestName: String,
-         reqClass: TReq.Type,
-         reqItemType: Any.Type? = nil,
-         respClass: TResp.Type,
-         requestCompletionHandler: @escaping ElectrodeBridgeRequestCompletionHandler)
-    {
-        self.tag = String(describing: type(of:self))
+                reqClass: TReq.Type,
+                reqItemType: Any.Type? = nil,
+                respClass: TResp.Type,
+                requestCompletionHandler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+        tag = String(describing: type(of: self))
         self.requestName = requestName
         self.reqClass = reqClass
         self.reqItemType = reqItemType
@@ -30,11 +29,11 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
         self.requestCompletionHandler = requestCompletionHandler
         super.init()
     }
-    
+
     public func execute() {
-        ElectrodeBridgeHolder.registerRequestHanlder(withName: requestName) {(data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionHandler) in
+        ElectrodeBridgeHolder.registerRequestHanlder(withName: requestName) { (data: Any?, responseCompletion: @escaping ElectrodeBridgeResponseCompletionHandler) in
             let request: Any?
-            if (self.reqClass == None.self) {
+            if self.reqClass == None.self {
                 request = nil
             } else {
                 if let nonnilData = data {

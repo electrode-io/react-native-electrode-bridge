@@ -39,6 +39,7 @@ registerEventListener:(NSString *_Nonnull)name
 
 - (void)unregisterEventListener:(NSUUID *_Nonnull)eventListenerUUID {
   @synchronized(self) {
+
     ElectrodeBridgeEventListener eventListener =
         [self.eventListenerByUUID objectForKey:eventListenerUUID];
     [self.eventListenerByUUID removeObjectForKey:eventListenerUUID];

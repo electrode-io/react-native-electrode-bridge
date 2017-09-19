@@ -16,8 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, strong, readonly) ElectrodeEventRegistrar *eventRegistrar;
 
--(instancetype)initWithEventRegistrar: (ElectrodeEventRegistrar *)eventRegistrar;
--(void)dispatchEvent: (ElectrodeBridgeEvent *)bridgeEvent;
+- (instancetype)initWithEventRegistrar:(ElectrodeEventRegistrar *)eventRegistrar;
+- (void)dispatchEvent:(ElectrodeBridgeEvent *)bridgeEvent;
 
 @end
 

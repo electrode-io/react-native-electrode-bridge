@@ -14,11 +14,11 @@ FOUNDATION_EXPORT double ElectrodeReactNativeBridgeVersionNumber;
 //! Project version string for ElectrodeReactNativeBridge.
 FOUNDATION_EXPORT const unsigned char ElectrodeReactNativeBridgeVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <ElectrodeReactNativeBridge/PublicHeader.h>
+// In this header, you should import all the public headers of your framework
+// using statements like #import <ElectrodeReactNativeBridge/PublicHeader.h>
 
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeHolder.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeProtocols.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeEvent.h>
 #import <ElectrodeReactNativeBridge/ElectrodeBridgeRequest.h>
 #import <ElectrodeReactNativeBridge/ElectrodeLogger.h>
-

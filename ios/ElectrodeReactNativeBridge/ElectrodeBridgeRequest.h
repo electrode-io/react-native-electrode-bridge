@@ -13,9 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern const int kElectrodeBridgeRequestDefaultTimeOut;
 extern const int kElectrodeBridgeRequestNoTimeOut;
 
-
-
-@interface ElectrodeBridgeRequest : ElectrodeBridgeMessage<NSCopying>
+@interface ElectrodeBridgeRequest : ElectrodeBridgeMessage <NSCopying>
 /**
  * return timeout of the request in ms.
  */
@@ -26,7 +24,7 @@ extern const int kElectrodeBridgeRequestNoTimeOut;
  */
 @property(nonatomic, assign, readonly) BOOL isJsInitiated;
 
-+(nullable instancetype)createRequestWithData: (NSDictionary *)data;
++ (nullable instancetype)createRequestWithData:(NSDictionary *)data;
 
 - (instancetype)initWithName:(NSString *)name data:(nullable id)data;
 

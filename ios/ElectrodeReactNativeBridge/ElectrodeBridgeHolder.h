@@ -13,7 +13,8 @@
 #import "ElectrodeBridgeProtocols.h"
 
 @class ElectrodeBridgeTransceiver;
-@protocol ElectrodeBridgeRequestHandler, ElectrodeBridgeEventListener;
+@protocol ElectrodeBridgeRequestHandler
+, ElectrodeBridgeEventListener;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,21 +26,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ElectrodeBridgeHolder : NSObject
 
-+ (void)sendEvent: (ElectrodeBridgeEvent *)event;
++ (void)sendEvent:(ElectrodeBridgeEvent *)event;
 
-+ (void)sendRequest: (ElectrodeBridgeRequest *)request
-  completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
++ (void)sendRequest:(ElectrodeBridgeRequest *)request
+    completionHandler:(ElectrodeBridgeResponseCompletionHandler)completion;
 
-+ (void)registerRequestHanlderWithName: (NSString *)name
-              requestCompletionHandler: (ElectrodeBridgeRequestCompletionHandler) completion;
++ (void)registerRequestHanlderWithName:(NSString *)name
+              requestCompletionHandler:
+                  (ElectrodeBridgeRequestCompletionHandler)completion;
 
-+ (void)addEventListnerWithName: (NSString *)name
-                   eventListner: (ElectrodeBridgeEventListener) eventListner;
++ (void)addEventListnerWithName:(NSString *)name
+                   eventListner:(ElectrodeBridgeEventListener)eventListner;
 
-+ (void) setBridge: (ElectrodeBridgeTransceiver *)bridge;
++ (void)setBridge:(ElectrodeBridgeTransceiver *)bridge;
 + (void)addConstantsProvider;
 + (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider;
 @end
 NS_ASSUME_NONNULL_END
-
-

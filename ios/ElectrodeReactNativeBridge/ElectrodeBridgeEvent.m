@@ -11,25 +11,29 @@
 #import "ElectrodeLogger.h"
 
 @implementation ElectrodeBridgeEvent
-+(nullable instancetype)createEventWithData: (NSDictionary *)data {
-    if ([ElectrodeBridgeMessage isValidFromData:data withType:ElectrodeMessageTypeEvent]) {
-        return [[super alloc] initWithData:data];
-    }
-    
-    ERNDebug(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
-    return nil;
++ (nullable instancetype)createEventWithData:(NSDictionary *)data {
+  if ([ElectrodeBridgeMessage isValidFromData:data
+                                     withType:ElectrodeMessageTypeEvent]) {
+    return [[super alloc] initWithData:data];
+  }
+
+  ERNDebug(@"%@ : unable to create with data %@",
+           [ElectrodeBridgeEvent className], data);
+  return nil;
 }
 
 - (instancetype)initWithName:(NSString *)name data:(id)data {
-    if (self = [super initWithName:name type:ElectrodeMessageTypeEvent data:data]) {
-        return self;
-    }
-    ERNDebug(@"%@ : unable to create with data %@", [ElectrodeBridgeEvent className], data);
-    return nil;
+  if (self =
+          [super initWithName:name type:ElectrodeMessageTypeEvent data:data]) {
+    return self;
+  }
+  ERNDebug(@"%@ : unable to create with data %@",
+           [ElectrodeBridgeEvent className], data);
+  return nil;
 }
 
 + (NSString *)className {
-    return NSStringFromClass(self.class);
+  return NSStringFromClass(self.class);
 }
 
 @end

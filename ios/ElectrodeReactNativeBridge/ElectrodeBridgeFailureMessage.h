@@ -17,20 +17,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 @property(readonly, copy, nonatomic, nullable) NSString *debugMessage;
-@property(readonly, copy, nonatomic, nullable) NSException *exception; //Claire todo: how to handle this in Obj-c
+@property(readonly, copy, nonatomic, nullable) NSException *exception;
 
 @end
 
-@interface ElectrodeBridgeFailureMessage : NSObject<ElectrodeFailureMessage>
+@interface ElectrodeBridgeFailureMessage : NSObject <ElectrodeFailureMessage>
 
 @property(readonly, copy, nonatomic) NSString *code;
 @property(readonly, copy, nonatomic) NSString *message;
 @property(readonly, copy, nonatomic, nullable) NSString *debugMessage;
 @property(readonly, copy, nonatomic, nullable) NSException *exception;
 
-+(instancetype)createFailureMessageWithCode: (NSString *)code message: (NSString *)message;
-+(instancetype)createFailureMessageWithCode: (NSString *)code message: (NSString *)message exception: (nullable NSException *)exception; //CLAIRE TODO
-+(instancetype)createFailureMessageWithCode: (NSString *)code message: (NSString *)message debugMessage: (nullable NSString *)debugMessage;
++ (instancetype)createFailureMessageWithCode:(NSString *)code
+                                     message:(NSString *)message;
++ (instancetype)createFailureMessageWithCode:(NSString *)code
+                                     message:(NSString *)message
+                                   exception:(nullable NSException *)exception;
++ (instancetype)createFailureMessageWithCode:(NSString *)code
+                                     message:(NSString *)message
+                                debugMessage:(nullable NSString *)debugMessage;
 
 @end
 

@@ -15,8 +15,8 @@ static BOOL isTransceiverReady = NO;
 static ElectrodeBridgeTransceiver *sharedInstance;
 
 @interface ElectrodeBridgeTransceiver ()
--(void) emitMessage:(ElectrodeBridgeMessage * _Nonnull) bridgeMessage;
--(void)resetRegistrar;
+- (void)emitMessage:(ElectrodeBridgeMessage *_Nonnull)bridgeMessage;
+- (void)resetRegistrar;
 @end
 
 NS_ASSUME_NONNULL_END

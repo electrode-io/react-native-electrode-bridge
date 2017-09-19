@@ -74,7 +74,6 @@ extension NSObject {
         return res as NSDictionary
     }
     
-    //TODO: add throws for exception handling
     static func generateObjectFromDict(data: [AnyHashable: Any], passedClass: AnyClass) throws -> AnyObject {
         let stringForClass = String(reflecting: passedClass)
         guard let obj = NSClassFromString(stringForClass) as? ElectrodeObject.Type else {
@@ -86,9 +85,6 @@ extension NSObject {
         return res
     }
     
-    // assume data has to be NSObject and return type has to be NSObject too
-    // TODO: check with Deepu. What is it's a List of [AddressObject, primitives]
-    // how to handle BOOL ?
     public static func generateObject(data: Any, classType: Any.Type, itemType: Any.Type? = nil) throws -> Any {
         var res: Any
         // check to see if the type already matches. so no need to serialize or deserialize 

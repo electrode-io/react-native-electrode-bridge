@@ -11,25 +11,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-
-/**
- *
- */
-
-extern NSString * const kElectrodeBridgeResponseError;
-extern NSString * const kElectrodeBridgeResponseErrorCode;
-extern NSString * const kElectrodeBridgeResponseErrorMessage;
-extern NSString * const kElectrodeBridgeResponseUnknownErrorCode;
+extern NSString *const kElectrodeBridgeResponseError;
+extern NSString *const kElectrodeBridgeResponseErrorCode;
+extern NSString *const kElectrodeBridgeResponseErrorMessage;
+extern NSString *const kElectrodeBridgeResponseUnknownErrorCode;
 
 @interface ElectrodeBridgeResponse : ElectrodeBridgeMessage
 
-@property(readonly, nonatomic, strong, nullable) id<ElectrodeFailureMessage> failureMessage;
+@property(readonly, nonatomic, strong, nullable) id<ElectrodeFailureMessage>
+    failureMessage;
 
-+(nullable instancetype)createResponseWithData: (NSDictionary *)data;
-+(nullable instancetype)createResponseForRequest: (ElectrodeBridgeRequest *)request
-                                        withResponseData: (nullable NSDictionary *)data
-                              withFailureMessage: (nullable id<ElectrodeFailureMessage>)failureMessage;
++ (nullable instancetype)createResponseWithData:(NSDictionary *)data;
++ (nullable instancetype)
+createResponseForRequest:(ElectrodeBridgeRequest *)request
+        withResponseData:(nullable NSDictionary *)data
+      withFailureMessage:(nullable id<ElectrodeFailureMessage>)failureMessage;
 @end
 
 NS_ASSUME_NONNULL_END

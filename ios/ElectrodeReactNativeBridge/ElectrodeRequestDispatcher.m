@@ -11,47 +11,51 @@
 #import "ElectrodeLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeRequestRegistrar()
+@interface ElectrodeRequestRegistrar ()
 @property(nonatomic, strong) ElectrodeRequestRegistrar *requestRegistrar;
 
 @end
 
 @implementation ElectrodeRequestDispatcher
--(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrar *)requestRegistrar
-{
-    if (self = [super init]) {
-        _requestRegistrar = [[ElectrodeRequestRegistrar alloc] init];
-    }
-    return self;
+- (instancetype)initWithRequestRegistrar:
+    (ElectrodeRequestRegistrar *)requestRegistrar {
+  if (self = [super init]) {
+    _requestRegistrar = [[ElectrodeRequestRegistrar alloc] init];
+  }
+  return self;
 }
 
--(void)dispatchRequest: (ElectrodeBridgeRequest *)bridgeRequest
-     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion
+- (void)dispatchRequest:(ElectrodeBridgeRequest *)bridgeRequest
+      completionHandler:(ElectrodeBridgeResponseCompletionHandler)completion
 
 {
-    NSString *requestId = bridgeRequest.messageId;
-    NSString *requestName = bridgeRequest.name;
-    
-    ERNDebug(@"ElectrodeRequestDispatcher dispatching request(id=%@) locally", requestId);
-    
-    ElectrodeBridgeRequestCompletionHandler requestCompletionHandler = [self.requestRegistrar getRequestHandler:requestName];
-    if (requestCompletionHandler == nil)
-    {
-        NSString *errorMessage = [NSString stringWithFormat:@"No registered request handler for request name %@", requestName];
-        id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage createFailureMessageWithCode:@"ENOHANDLER" message:errorMessage];
-        if (completion) {
-            completion(nil, failureMessage);
-        }
-        return;
+  NSString *requestId = bridgeRequest.messageId;
+  NSString *requestName = bridgeRequest.name;
+
+  ERNDebug(@"ElectrodeRequestDispatcher dispatching request(id=%@) locally",
+           requestId);
+
+  ElectrodeBridgeRequestCompletionHandler requestCompletionHandler =
+      [self.requestRegistrar getRequestHandler:requestName];
+  if (requestCompletionHandler == nil) {
+    NSString *errorMessage = [NSString
+        stringWithFormat:@"No registered request handler for request name %@",
+                         requestName];
+    id<ElectrodeFailureMessage> failureMessage = [ElectrodeBridgeFailureMessage
+        createFailureMessageWithCode:@"ENOHANDLER"
+                             message:errorMessage];
+    if (completion) {
+      completion(nil, failureMessage);
     }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        requestCompletionHandler(bridgeRequest.data, completion);
-    });
+    return;
+  }
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    requestCompletionHandler(bridgeRequest.data, completion);
+  });
 }
--(BOOL)canHandlerRequestWithName: (NSString *)name
-{
-    return ([self.requestRegistrar getRequestHandler:name] != nil);
+- (BOOL)canHandlerRequestWithName:(NSString *)name {
+  return ([self.requestRegistrar getRequestHandler:name] != nil);
 }
 @end
 

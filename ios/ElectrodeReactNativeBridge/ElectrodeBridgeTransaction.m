@@ -1,3 +1,10 @@
+ 
+                            
+                          
+                        
+        
+    
+  
 //
 //  ElectrodeBridgeTransaction.m
 //  ElectrodeReactNativeBridge
@@ -9,35 +16,40 @@
 #import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeBridgeMessage.h"
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeBridgeTransaction()
+@interface ElectrodeBridgeTransaction ()
 
 @property(nonatomic, strong, nonnull) ElectrodeBridgeRequest *request;
-@property(nonatomic, strong, nullable) ElectrodeBridgeResponseCompletionHandler completion;
+@property(nonatomic, strong, nullable)
+    ElectrodeBridgeResponseCompletionHandler completion;
 
 @end
 
 @implementation ElectrodeBridgeTransaction
 
--(nonnull instancetype)initWithRequest: (ElectrodeBridgeRequest *) request
-                     completionHandler: (ElectrodeBridgeResponseCompletionHandler _Nullable) completion;
+- (nonnull instancetype)initWithRequest:(ElectrodeBridgeRequest *)request
+                      completionHandler:
+                          (ElectrodeBridgeResponseCompletionHandler _Nullable)
+                              completion;
 {
-    if (request.type != ElectrodeMessageTypeRequest) {
-        [NSException raise:@"Invalid type" format:@"BridgeTransaction constrictor expects a request type, did you accidentally pass in a different type"];
-    }
-    
-    if (self = [super init]) {
-        _request = request;
-        _completion = completion;
-    }
-    
-    return self;
+  if (request.type != ElectrodeMessageTypeRequest) {
+    [NSException raise:@"Invalid type"
+                format:@"BridgeTransaction constrictor expects a request type, "
+                       @"did you accidentally pass in a different type"];
+  }
+
+  if (self = [super init]) {
+    _request = request;
+    _completion = completion;
+  }
+
+  return self;
 }
 
--(nonnull NSString *)transactionId {
-    return self.request.messageId;
+- (nonnull NSString *)transactionId {
+  return self.request.messageId;
 }
--(BOOL)isJsInitiated {
-    return self.request.isJsInitiated;
+- (BOOL)isJsInitiated {
+  return self.request.isJsInitiated;
 }
 
 @end

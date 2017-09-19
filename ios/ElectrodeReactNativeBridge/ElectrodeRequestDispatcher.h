@@ -16,10 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, strong, readonly) ElectrodeRequestRegistrar *requestRegistrar;
 
--(instancetype)initWithRequestRegistrar: (ElectrodeRequestRegistrar *)requestRegistrar;
--(void)dispatchRequest: (ElectrodeBridgeRequest *)bridgeRequest
-     completionHandler: (ElectrodeBridgeResponseCompletionHandler) completion;
--(BOOL)canHandlerRequestWithName: (NSString *)name;
+- (instancetype)initWithRequestRegistrar:(ElectrodeRequestRegistrar *)requestRegistrar;
+- (void)dispatchRequest:(ElectrodeBridgeRequest *)bridgeRequest
+      completionHandler:(ElectrodeBridgeResponseCompletionHandler)completion;
+- (BOOL)canHandlerRequestWithName:(NSString *)name;
 @end
-                       
+
 NS_ASSUME_NONNULL_END

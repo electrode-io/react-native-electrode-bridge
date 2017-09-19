@@ -12,7 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeEvent : ElectrodeBridgeMessage
 
-+(nullable instancetype)createEventWithData: (NSDictionary *)data; //CLAIRE TODO: Why static methods vs just instance
++ (nullable instancetype)createEventWithData:(NSDictionary *)data;
 - (instancetype)initWithName:(NSString *)name data:(id)data;
 @end
 

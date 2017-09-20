@@ -11,20 +11,19 @@ import XCTest
 @testable import ElectrodeReactNativeBridge
 
 class ElectrodeUtilitiesTests: XCTestCase {
-    
 
     func testGenerateObjectWithIntInput() {
         let primitiveData = 2
-        let returnType = type(of:primitiveData)
+        let returnType = type(of: primitiveData)
         let primitiveGen = try? NSObject.generateObject(data: primitiveData as AnyObject, classType: returnType)
         guard let res = primitiveGen as? Int else {
             XCTAssert(false)
             return
         }
-        
+
         XCTAssert(res == 2)
     }
-    
+
     func testGenerateObjectWithStringAsInput() {
         let str = "MyString"
         let returnType = String.self
@@ -34,14 +33,13 @@ class ElectrodeUtilitiesTests: XCTestCase {
             return
         }
         XCTAssert(res == str)
-        
     }
-    
+
     func testGenerateObjectWithDicionaryAsInput() {
-        let addressDict = ["street": "860", "zipcode":"94086"]
+        let addressDict = ["street": "860", "zipcode": "94086"]
         let returnType = Address.self
         let addressGen = try? NSObject.generateObject(data: addressDict, classType: returnType)
-        
+
         guard let res = addressGen as? Address else {
             XCTAssert(false)
             return
@@ -49,12 +47,12 @@ class ElectrodeUtilitiesTests: XCTestCase {
         XCTAssert(res.street == "860")
         XCTAssert(res.zipcode == "94086")
     }
-    
+
     func testGenerateObjectWithObjectInsideAnotherObjAsInput() {
-        let addressWrapperDict = ["address": ["street": "860", "zipcode":"94086"]]
+        let addressWrapperDict = ["address": ["street": "860", "zipcode": "94086"]]
         let returnType = AddressWrapper.self
         let addressWrapperGen = try? NSObject.generateObject(data: addressWrapperDict, classType: returnType)
-        
+
         guard let res = addressWrapperGen as? AddressWrapper else {
             XCTAssert(false)
             return
@@ -62,9 +60,8 @@ class ElectrodeUtilitiesTests: XCTestCase {
         XCTAssert(res.address.isKind(of: Address.self))
         XCTAssert(res.address.zipcode == "94086")
         XCTAssert(res.address.street == "860")
-        
     }
-    
+
     func testGenerateObjectWithArrayOfPrimitivesAsInput() {
         let strArray = ["a", "b"]
         let returnType = Array<Any>.self
@@ -77,11 +74,10 @@ class ElectrodeUtilitiesTests: XCTestCase {
         XCTAssert(strArray.count == res.count)
         XCTAssert(res[0] == "a")
         XCTAssert(res[1] == "b")
-        
     }
-    
+
     func testGenerateObjectWithArrayOfComplexObjectAsInput() {
-        let addressArray = [["street": "a", "zipcode":"94086"], ["street": "b", "zipcode":"94087"]]
+        let addressArray = [["street": "a", "zipcode": "94086"], ["street": "b", "zipcode": "94087"]]
         let returnType = Array<Any>.self
         let itemType = Address.self
         let arrayAddressGen = try? NSObject.generateObject(data: addressArray, classType: returnType, itemType: itemType)
@@ -89,14 +85,14 @@ class ElectrodeUtilitiesTests: XCTestCase {
             XCTAssert(false)
             return
         }
-        
+
         XCTAssert(res.count == addressArray.count)
         XCTAssert(res[0].street == "a")
         XCTAssert(res[0].zipcode == "94086")
         XCTAssert(res[1].street == "b")
         XCTAssert(res[1].zipcode == "94087")
     }
-    
+
     func testGeneratePersonWithCompleteAddress() {
         guard let path = Bundle(for: type(of: self)).path(forResource: "Person", ofType: ".json") else {
             XCTFail("invalid path")
@@ -104,38 +100,36 @@ class ElectrodeUtilitiesTests: XCTestCase {
         }
         let pathURL = URL(fileURLWithPath: path)
         let data = try! Data(contentsOf: pathURL)
-        let json  =  try? JSONSerialization.jsonObject(with: data, options: [])
-        
-        guard let jsonDict = json as? NSDictionary else{
+        let json = try? JSONSerialization.jsonObject(with: data, options: [])
+
+        guard let jsonDict = json as? NSDictionary else {
             XCTFail("not a valid json")
             return
         }
-        
+
         let person = Person(dictionary: jsonDict as! [AnyHashable: Any])
-        
+
         XCTAssert(person.addresses?.count == 2)
         XCTAssert(person.addresses?[0].city == "Sunnyvale")
         XCTAssert(person.addresses?[0].streetOne == "860 W California Ave")
         XCTAssert(person.addresses?[0].state == "California")
         XCTAssert(person.addresses?[1].city == "Mountain View")
-
-        
     }
 }
 
-@objc class AddressWrapper:  ElectrodeObject, Bridgeable {
+@objc class AddressWrapper: ElectrodeObject, Bridgeable {
     let address: Address
-    
-    required init(dictionary: [AnyHashable : Any]) {
+
+    required init(dictionary: [AnyHashable: Any]) {
         if let addressDict = dictionary["address"] as? [AnyHashable: Any] {
-            self.address = Address(dictionary: addressDict)
+            address = Address(dictionary: addressDict)
         } else {
             assertionFailure("Failed")
-            self.address = dictionary["address"] as! Address
+            address = dictionary["address"] as! Address
         }
-        super.init(dictionary:dictionary)
+        super.init(dictionary: dictionary)
     }
-    
+
     func toDictionary() -> NSDictionary {
         var dict = [AnyHashable: Any]()
         dict["address"] = address.toDictionary()
@@ -146,31 +140,30 @@ class ElectrodeUtilitiesTests: XCTestCase {
 @objc class Address: ElectrodeObject, Bridgeable {
     let street: String
     let zipcode: String
-    
+
     init(street: String, zipcode: String) {
         self.street = street
         self.zipcode = zipcode
         super.init()
     }
-    
-    required init(dictionary: [AnyHashable : Any]) {
+
+    required init(dictionary: [AnyHashable: Any]) {
         if let street = dictionary["street"] as? String,
             let zipcode = dictionary["zipcode"] as? String {
             self.street = street
             self.zipcode = zipcode
         } else {
             assertionFailure("Missing required params")
-            self.street = dictionary["street"] as! String
-            self.zipcode = dictionary["zipcode"] as! String
+            street = dictionary["street"] as! String
+            zipcode = dictionary["zipcode"] as! String
         }
         super.init(dictionary: dictionary)
     }
-    
+
     func toDictionary() -> NSDictionary {
         var dict = [AnyHashable: Any]()
         dict["street"] = street
         dict["zipcode"] = zipcode
         return dict as NSDictionary
     }
-    
 }

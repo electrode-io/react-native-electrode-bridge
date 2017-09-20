@@ -8,31 +8,31 @@
 
 import UIKit
 
-public class Status: ElectrodeObject, Bridgeable{
+public class Status: ElectrodeObject, Bridgeable {
     let log: Bool
     let member: Bool
-    private static let tag = String(describing: type(of:self))
-    
+    private static let tag = String(describing: type(of: self))
+
     public init(log: Bool, member: Bool) {
         self.log = log
         self.member = member
         super.init()
     }
-    
-    required public init(dictionary: [AnyHashable: Any]) {
+
+    public required init(dictionary: [AnyHashable: Any]) {
         if let log = dictionary["log"] as? Bool,
             let member = dictionary["member"] as? Bool {
             self.log = log
             self.member = member
         } else {
             assertionFailure("Missing required params in Object Status need member property")
-            self.log = dictionary["log"] as! Bool
-            self.member = dictionary["member"] as! Bool
+            log = dictionary["log"] as! Bool
+            member = dictionary["member"] as! Bool
         }
         super.init(dictionary: dictionary)
     }
-    
+
     public func toDictionary() -> NSDictionary {
-        return ["log": self.log, "member":self.member] as NSDictionary
+        return ["log": self.log, "member": self.member] as NSDictionary
     }
 }

@@ -11,35 +11,33 @@ import UIKit
 public class BirthYear: ElectrodeObject, Bridgeable {
     let month: Int
     let year: Int
-    
+
     public init(month: Int, year: Int) {
         self.month = month
         self.year = year
         super.init()
     }
-    
+
     public override init() {
-        self.month = 0
-        self.year = 0
+        month = 0
+        year = 0
         super.init()
     }
-    
-    required public init(dictionary: [AnyHashable: Any]) {
+
+    public required init(dictionary: [AnyHashable: Any]) {
         if let month = dictionary["month"] as? Int,
-            let year = dictionary["year"] as? Int{
+            let year = dictionary["year"] as? Int {
             self.month = month
             self.year = year
-        }else {
+        } else {
             assertionFailure("year property is required")
-            self.month = dictionary["month"] as! Int
-            self.year = dictionary["year"] as! Int
+            month = dictionary["month"] as! Int
+            year = dictionary["year"] as! Int
         }
         super.init(dictionary: dictionary)
     }
-    
 
     public func toDictionary() -> NSDictionary {
         return ["month": self.month, "year": self.year] as NSDictionary
-        
     }
 }

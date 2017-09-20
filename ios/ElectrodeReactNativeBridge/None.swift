@@ -12,8 +12,7 @@ public class None: NSObject, Bridgeable {
     public func toDictionary() -> NSDictionary {
         return NSDictionary()
     }
-    
-    public init(emptyData: Data? ) {
-        
+
+    public init(emptyData _: Data?) {
     }
 }

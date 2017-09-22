@@ -16,7 +16,6 @@
 		301941971E9420C5002A0C69 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941961E9420C5002A0C69 /* Status.swift */; };
 		3019419A1E942F42002A0C69 /* EventProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301941991E942F42002A0C69 /* EventProcessorTests.swift */; };
 		3019419C1E94340F002A0C69 /* ElectrodeBridgeBaseTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */; };
 		3029B1FE1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */; };
 		30488CC51F6C82F5009ACF89 /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 30488CAF1F6C82E6009ACF89 /* libRCTWebSocket.a */; };
 		30488CF01F7041FD009ACF89 /* MiniApp.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 30488CEF1F7041FD009ACF89 /* MiniApp.jsbundle */; };
@@ -174,7 +173,6 @@
 		301941941E941D56002A0C69 /* Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		301941961E9420C5002A0C69 /* Status.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
 		301941991E942F42002A0C69 /* EventProcessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventProcessorTests.swift; sourceTree = "<group>"; };
-		3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeTransceiverTests.m; sourceTree = "<group>"; };
 		3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElectrodeBridgeBaseTests.h; sourceTree = "<group>"; };
 		3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElectrodeBridgeBaseTests.m; sourceTree = "<group>"; };
 		30488CA91F6C82E6009ACF89 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
@@ -398,7 +396,6 @@
 				DA4BE0CC1E36DBCD00DBA1ED /* Info.plist */,
 				3029B1FC1E89D72E0041C665 /* ElectrodeBridgeBaseTests.h */,
 				3029B1FD1E89D72E0041C665 /* ElectrodeBridgeBaseTests.m */,
-				3029B1DB1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m */,
 				DA889BA31EF4A08800EAFA43 /* ElectrodeTransceiverTests.m */,
 				DA0B9F5E1E9BFF0F004A4629 /* Person.h */,
 				DA0B9F5F1E9BFF0F004A4629 /* Person.m */,
@@ -699,7 +696,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3029B1DC1E89CF240041C665 /* ElectrodeBridgeTransceiverTests.m in Sources */,
 				DA0B9F611E9BFF0F004A4629 /* Person.m in Sources */,
 				30C03CE81E9D6E2E0094A17A /* PetAPI.swift in Sources */,
 				301940E11E941389002A0C69 /* PersonAPI.swift in Sources */,

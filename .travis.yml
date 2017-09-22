@@ -1,0 +1,20 @@
+language: objective-c
+
+osx_image: xcode8.3
+
+install:
+  - nvm install 8
+  - rm -Rf "${TMPDIR}/jest_preprocess_cache"
+  - brew install yarn --ignore-dependencies
+  - yarn add react-native@0.48.3
+script:
+  - ./scripts/objc-test-ios.sh;
+cache:
+  - yarn
+
+matrix:
+  - fast_finish: true # Fail the whole build as soon as one test type fails. Should help with Travis capacity issues (very long queues).
+
+branches:
+  only:
+    - master

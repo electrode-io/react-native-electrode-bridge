@@ -1,20 +1,56 @@
-language: objective-c
-
-osx_image: xcode8.3
-
-install:
-  - nvm install 8
-  - rm -Rf "${TMPDIR}/jest_preprocess_cache"
-  - brew install yarn --ignore-dependencies
-  - yarn add react-native@0.48.3
-script:
-  - ./scripts/objc-test-ios.sh;
-cache:
-  - yarn
-
 matrix:
-  - fast_finish: true # Fail the whole build as soon as one test type fails. Should help with Travis capacity issues (very long queues).
+  include:
+    - language: android
+      os: linux
+      jdk: oraclejdk8
+      node_js: false
+      before_install:
+          - nvm install 8
+          - node --version
+          - travis_retry curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          - travis_retry sudo apt-get update -qq
+          - travis_retry sudo apt-get install -y -qq yarn
+          - yarn add react-native@0.48.3
+      android:
+        components:
+          - build-tools-26.0.0
+          - android-24
+          - android-22
+          - extra-android-m2repository
+          - extra-google-google_play_services
+          - extra-google-m2repository
+          - addon-google_apis-google-16
+          - sys-img-armeabi-v7a-android-22
 
-branches:
-  only:
-    - master
+        licenses:
+          - 'android-sdk-license-.+'
+      before_script:
+        - android list target
+        - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+        - emulator -avd test -no-skin -no-audio -no-window &
+        - android-wait-for-emulator
+        - adb shell input keyevent 82 &
+      script:
+        - cd android && ./gradlew connectedAndroidTest
+      branches:
+       only:
+         - master
+
+    - language: objective-c
+      osx_image: xcode8.3
+      install:
+        - nvm install 8
+        - rm -Rf "${TMPDIR}/jest_preprocess_cache"
+        - brew install yarn --ignore-dependencies
+        - yarn add react-native@0.48.3
+      script:
+        - ./scripts/objc-test-ios.sh;
+      cache:
+        - yarn
+      matrix:
+        - fast_finish: true
+      branches:
+       only:
+         - master
+         

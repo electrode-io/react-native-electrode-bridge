@@ -23,7 +23,7 @@
 #import "ElectrodeRequestRegistrar.h"
 #import "ElectrodeLogger.h"
 
-#if __has_include(<React / RCTLog.h>)
+#if __has_include(<React/RCTLog.h>)
 #import <React/RCTLog.h>
 #elif __has_include("RCTLog.h")
 #import "RCTLog.h"
@@ -31,7 +31,7 @@
 #import "React/RCTLog.h" // Required when used as a Pod in a Swift project
 #endif
 
-#if __has_include(<React / RCTBridge.h>)
+#if __has_include(<React/RCTBridge.h>)
 #import <React/RCTBridge.h>
 #elif __has_include("RCTBridge.h")
 #import "RCTBridge.h"
@@ -49,11 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) NSString *name;
 @property(nonatomic, strong) ElectrodeEventDispatcher *eventDispatcher;
 @property(nonatomic, strong) ElectrodeRequestDispatcher *requestDispatcher;
-@property(nonatomic, copy)
-    NSMutableDictionary<NSString *, ElectrodeBridgeTransaction *>
-        *pendingTransaction;
-@property(nonatomic, assign)
-    dispatch_queue_t syncQueue; // this is used to make sure access to
+@property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction *> *pendingTransaction;
+@property(nonatomic, assign) dispatch_queue_t syncQueue; // this is used to make sure access to
                                 // pendingTransaction is thread safe.
 
 @end

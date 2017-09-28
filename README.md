@@ -4,7 +4,7 @@
 Electrode React Native Bridge
 -----------------------------
 
-This project is essentially a react native library, consisting of a JavaScript module and an associated Android Native Module and iOS Native module.
+This project is essentially a react native library, consisting of a JavaScript module and an associated Android and iOS Native modules.
 
 It is built on top of the react native built-in bridging constructs (to communicate between the react native JS side and Native side) and offers a clean bi-directional communication API, exposing methods to send events and/or requests from/to any side of the bridge (JS/Native).
 It offers more options and flexibility to communicate between the JS/Native side that is not offered out of the box by react native. Ultimately it can help with integrating react native applications into existing native code bases.
@@ -16,40 +16,10 @@ Here is a non-exhaustive list of a few reasons to use this library as the low le
 - Messages can be sent either to the other side of the bridge or on the same side (or both)
 - Request timeout supported
 - Offer an easy way to send requests from Native to JS side.
-- Supports strong types
-- More than a bridge, it can be used as a message hub allow react native apps / native modules intercommunication
+- Offers type safety on native side while communicating to JS side.
+- More than a bridge, it can be used as a message hub that allows react native apps / native modules intercommunication
 
-The bridge API is built around two messaging idioms, `events` and `requests` :
-
-
-##### Events
-- An event is a fire & forget message type.
-- You should emit an event whenever you are not expecting any kind of response back from whoever is listening for this specific event. Because of this, there can be multiple listeners for a given event name.
-- When an event is emitted from one side of the spectrum (Native or JS), the bridge sends notification to both native and react native bridge and all the registered listeners will be notified.
-
-##### Requests/Responses
-- On the other hand, a request expects some kind of response.
-- You should send a request whenever you are asking for something (be it some data or just an acknowledgment that the request was successfully handled or not).
-- A request can only have one "handler" registered for it.
-- Due to the fact that sending a request expects a response back; you can specify a timeout when sending the request.
-- When a request is invoked from one side of the spectrum (Native or JS) the bridge implementation will first look for a request handler on the side where the request is initiated. If not found then sends it over to the other side.
-  if no request handler is found for a request on both sides, a response will be sent back with a `No Handler Found` error.
-
-##### Processors
-
-- Processors are added to the native side of bridge to support sending/receiving data between JS and native sides.
-- Processors performs the heavy lifting of serializing and  de-serializing strongly typed data sent/received through event, requests or responses.
-
-
-#### Bridgeable
-
-- An interface that defines the contract to make a complex object transferable via bridge.
-- Helps to send strongly typed data from native to JS side.
-
-Both sides of the bridge (JS/Native) expose a similar API (mirrored) to respectively send requests and emit events, and also listen for specific events or requests.
-
-While this bridge can be used as a standalone react native plugin to integrate a single react native app into an native host application, this is not the optimal use of it. Indeed multiple native modules using the bridge for communication will be able to exchange messages between themselves or with the react native apps.
-
+Read more about bridge [HERE](https://electrode.gitbooks.io/electrode-native/content/platform-parts/bridge.html#leveraging-the-bridge-with-apis)
 
 ### Getting Started
 
@@ -63,7 +33,12 @@ $ yarn install
 $ yarn add react-native@0.48.3
 ```
 
-# JavaScript
+Now depending on which part of the bridge(Android|iOS|JS) you are working on open the code in respective IDEs.
+
+
+# How to use Electrode Native Bridge
+
+## JavaScript
 
 ```javascript
 import { electrodeBridge } from 'react-native-electrode-bridge';
@@ -336,3 +311,8 @@ This bridge implementation does not make use any third party library, so that we
 The client native app might want to build a specific adapter around the bridge, so that the native app can make use of whatever framework fits them best (Rx/Bolts/Otto ... for communication ... Jackson/Gson for serialization ...).
 
 It would be nice at some point to see adapters for a specific frameworks being redistributed as libraries to be used by others.
+
+
+## iOS
+
+TBD

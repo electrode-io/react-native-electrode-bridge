@@ -315,4 +315,153 @@ It would be nice at some point to see adapters for a specific frameworks being r
 
 ## iOS
 
-TBD
+First step is to install `ElectrodeReactNativeBridge` as dependency through your preferred way. 
+Next step is to import `ElectrodeReactNativeBridge.h` into your app
+
+```objectivec
+#import <ElectrodeReactNativeBridge/ElectrodeReactNativeBridge.h>
+
+```
+
+Then, access to API methods is provided through static methods of the `ElectrodeBridgeHolder` class.
+
+`ElectrodeBridgeHolder` can deal with any `primitives` or `Bridgeable` as the request and response types.
+
+#### sendRequest:completionHandler:
+```objectivec
++ (void)sendRequest:(ElectrodeBridgeRequest *)request
+    completionHandler:(ElectrodeBridgeResponseCompletionHandler)completion;
+```
+
+Sends a request through the bridge.
+
+*Nonnull*
+
+- `request` : A request instance created by `ElectrodeBridgeRequest` class
+
+- `completionHandler` : An block that takes an `id _Nullable data` and an `id<ElectrodeFailureMessage> _Nullable message` to notify its listener on completion of a request. When the request failed, a failure message must be send back; Otherwise, the request is assumed to be successful. In the case of success, `data` associated with the request could be pass back to the listener(optional).
+ 
+
+To make it easier to construct a request and send it via bridge the `ElectrodeRequestProcessor` class can be used
+
+Example usage :
+
+```java
+
+new RequestProcessor<>("my.request.name", <input data>, <ExpectedResponse>.class, new ElectrodeBridgeResponseListener<ExpetedObjectType>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+              //Handle failure
+            }
+
+            @Override
+            public void onSuccess(@Nullable ExpetedObjectType responseData) {
+              // Do whatever you need to do with the response
+            }
+        }).execute();
+```
+
+
+```swift
+let requestProcessor = ElectrodeRequestProcessor<TReq, TResp, TItem>(requestName: "my.request.name",
+                                                                                  requestPayload: <request data>,
+                                                                                  respClass: <ExpectedResponseObjectType>.self,
+                                                                                  responseItemType: <ItemObjectType>.self,//only needed if response is an array. e.g. for [Person], it will be Person.self
+                                                                                  responseCompletionHandler: responseCompletionHandler: { any, failureMessage in
+                                                                                     if let failure = failureMessage {
+                                                                                     // handle failure
+                                                                                     } else {
+                                                                                     // handle success
+                                                                                     }
+                                                                                  })
+requestProcessor.execute()
+```
+The `ElectrodeRequestProcessor` takes care of generating a `ElectrodeBridgeRequest` and sending it over to the `ElectrodeBridge`
+
+In case of a request not expecting any `ElectrodeBridgeRequest` use `None` as the type.
+
+`requestPayload` and `responseItemType` are `Optional`.
+
+#### sendEvent:
+
+```objectivec
++ (void)sendEvent:(ElectrodeBridgeEvent *)event;
+```
+
+Emits an event through the bridge.
+
+*Nonnull*
+
+- `event` : An event instance of `ElectrodeBridgeEvent`
+
+To make is easier to construct an event and emit it via bridge the `EventProcessor` class can be used
+
+
+Example usage :
+
+```objectivec
+let eventProcessor = EventProcessor(eventName: "<event name>", eventPayload: <event payload>)
+eventProcessor.execute()
+```
+
+`eventPayload` is `Optional`
+
+#### registerRequestHanlderWithName:requestCompletionHandler
+
+```objectivec
++ (void)registerRequestHanlderWithName:(NSString *)name
+              requestCompletionHandler:
+                  (ElectrodeBridgeRequestCompletionHandler)completion;
+```
+
+Registers a handler that can handle a specific request `name`.
+When a request is fired, for example from JS side, `ElectrodeBridge` first looks for a registered request handler on JS side, if not found bridge will forward the request to Native side.
+
+*Nonnull*
+
+- `name` : The name of the request this handler can handle
+
+- `requestHandler` a `ElectrodeBridgeRequestCompletionHandler` block that should take care of handling the request and completing it.
+
+To make is easier to construct a request handler and register it to the bridge a `ElectrodeRequestHandlerProcessor` class can be used
+
+Example usage :
+
+```swift
+let requestHandlerProcessor = ElectrodeRequestHandlerProcessor(requestName: "<your request name>", 
+                                                               reqClass: <YourRequestParamClass>.self, 
+                                                               respClass: <ExpectedResponseClass>.self, 
+                                                               requestCompletionHandler: { data, responseCompletionHandler in
+                                                                    // data is of type <ExpectedResponseClass>
+                                                                    // responseCompletionHandler is a block of ElectrodeBridgeRequestCompletionHandler
+                                                               
+                                                               })
+requestHandlerProcessor.execute()
+
+```
+
+#### addEventListnerWithName:eventListner:
+
+```objectivec
++ (void)addEventListnerWithName:(NSString *)name
+                   eventListner:(ElectrodeBridgeEventListener)eventListner;
+```
+
+*Nonnull*
+
+- `name` : The name of the event that this listener is interested in
+
+- `eventListener` a `ElectrodeBridgeEventListener` ElectrodeBridgeEventListener that is interested in knowing when an event is emitted.
+
+Example usage :
+```swift
+let listenerProcessor = EventListenerProcessor(eventName: "<YourEventName>", 
+                                               eventPayloadClass: <PayloadClass>.self, 
+                                               eventListener: { payload in
+                                                  // the payload emitted with the event
+                                               })
+listenerProcessor.execute()
+
+```
+
+Note: Multiple event listeners can be registered for the same event.

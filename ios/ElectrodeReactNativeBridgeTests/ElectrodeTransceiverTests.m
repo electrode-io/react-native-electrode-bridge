@@ -299,7 +299,7 @@
 - (void)testSendEventWithSimpleDataFromRCTToNative {
     id <ElectrodeReactBridge> reactBridge = [self getReactBridge];
     id <ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
-    NSString* testEventName = @"com.walmart.ern.reacttonativeevent";
+    NSString* testEventName = @"com.walmart.ern.reacttonativeevent1";
     NSString* data = @"reacteventdata";
    __weak __block XCTestExpectation* expectation = [self createExpectationWithDescription:@"waitforreacteventtocomplete"];
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];

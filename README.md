@@ -19,22 +19,38 @@ Here is a non-exhaustive list of a few reasons to use this library as the low le
 - Offers type safety on native side while communicating to JS side.
 - More than a bridge, it can be used as a message hub that allows react native apps / native modules intercommunication
 
-Read more about bridge [HERE](https://electrode.gitbooks.io/electrode-native/content/platform-parts/bridge.html#leveraging-the-bridge-with-apis)
+Read more about bridge [HERE](https://electrode.gitbooks.io/electrode-native/content/platform-parts/bridge.html)
+
+### React Native Version Compatibility
+
+| React Native Version | Bridge Version |
+| ------------- | -----|
+| v0.42->v0.47 | v1.5.0+ |
+| v0.48+ | v1.5.9+ |
 
 ### Getting Started
 
 Follow the steps below to start contributing to the bridge code.
 
-```
+```bash
 $ cd <workspace>
 $ git clone https://github.com/electrode-io/react-native-electrode-bridge.git
 $ cd react-native-electrode-bridge
-$ yarn install
-$ yarn add react-native@0.48.3
+```
+
+Followed by
+
+```bash
+$ yarn add react-native
+```
+
+OR
+
+```bash
+$ npm install react-native
 ```
 
 Now depending on which part of the bridge(Android|iOS|JS) you are working on open the code in respective IDEs.
-
 
 # How to use Electrode Native Bridge
 
@@ -315,7 +331,7 @@ It would be nice at some point to see adapters for a specific frameworks being r
 
 ## iOS
 
-First step is to install `ElectrodeReactNativeBridge` as dependency through your preferred way. 
+First step is to install `ElectrodeReactNativeBridge` as dependency through your preferred way.
 Next step is to import `ElectrodeReactNativeBridge.h` into your app
 
 ```objectivec
@@ -340,7 +356,7 @@ Sends a request through the bridge.
 - `request` : A request instance created by `ElectrodeBridgeRequest` class
 
 - `completionHandler` : An block that takes an `id _Nullable data` and an `id<ElectrodeFailureMessage> _Nullable message` to notify its listener on completion of a request. When the request failed, a failure message must be send back; Otherwise, the request is assumed to be successful. In the case of success, `data` associated with the request could be pass back to the listener(optional).
- 
+
 
 To make it easier to construct a request and send it via bridge the `ElectrodeRequestProcessor` class can be used
 
@@ -428,13 +444,13 @@ To make is easier to construct a request handler and register it to the bridge a
 Example usage :
 
 ```swift
-let requestHandlerProcessor = ElectrodeRequestHandlerProcessor(requestName: "<your request name>", 
-                                                               reqClass: <YourRequestParamClass>.self, 
-                                                               respClass: <ExpectedResponseClass>.self, 
+let requestHandlerProcessor = ElectrodeRequestHandlerProcessor(requestName: "<your request name>",
+                                                               reqClass: <YourRequestParamClass>.self,
+                                                               respClass: <ExpectedResponseClass>.self,
                                                                requestCompletionHandler: { data, responseCompletionHandler in
                                                                     // data is of type <ExpectedResponseClass>
                                                                     // responseCompletionHandler is a block of ElectrodeBridgeRequestCompletionHandler
-                                                               
+
                                                                })
 requestHandlerProcessor.execute()
 
@@ -455,8 +471,8 @@ requestHandlerProcessor.execute()
 
 Example usage :
 ```swift
-let listenerProcessor = EventListenerProcessor(eventName: "<YourEventName>", 
-                                               eventPayloadClass: <PayloadClass>.self, 
+let listenerProcessor = EventListenerProcessor(eventName: "<YourEventName>",
+                                               eventPayloadClass: <PayloadClass>.self,
                                                eventListener: { payload in
                                                   // the payload emitted with the event
                                                })

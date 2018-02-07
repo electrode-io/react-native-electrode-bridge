@@ -47,7 +47,7 @@ public class Person: ElectrodeObject, Bridgeable {
             name = dictionary["name"] as! String
         }
 
-        if let generatedCompleteAddress = try? NSObject.generateObject(data: dictionary["addresses"], classType: Array<Any>.self, itemType: CompleteAddress.self),
+        if let generatedCompleteAddress = try? NSObject.generateObject(data: dictionary["addresses"] ?? "", classType: Array<Any>.self, itemType: CompleteAddress.self),
             let completeAddressList = generatedCompleteAddress as? [CompleteAddress] {
             addresses = completeAddressList
         }

@@ -371,4 +371,8 @@
     XCTAssertTrue([constantsExported isEqualToDictionary:constantsConcatenate]);
 }
 
+@synthesize code;
+
+@synthesize message;
+
 @end

@@ -45,7 +45,6 @@
 
 -(void)testPrimitiveTypeAsData {
     NSString* messageName = @"com.walmart.ern.requestmessage";
-    NSDictionary* messageData = @{@"test" : @"requestMessage"};
     NSString* messageId = [ElectrodeBridgeMessage UUID];
     ElectrodeMessageType messageType = ElectrodeMessageTypeRequest;
     NSDictionary* data = @{

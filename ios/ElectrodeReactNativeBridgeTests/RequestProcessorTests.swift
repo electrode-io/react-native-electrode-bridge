@@ -29,10 +29,10 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         let asyncExpectation = expectation(description: "testSampleRequestNativeToNativeFailure")
 
         personAPI?.request.getUserName(responseCompletionHandler: { data, failureMessage in
-            if let data = data {
+            if let _ = data {
                 XCTFail()
             } else {
-                guard let failure = failureMessage else {
+                guard let _ = failureMessage else {
                     XCTFail()
                     return
                 }
@@ -113,7 +113,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         let expectedStatus = Status(log: false, member: true)
         let statusDict = expectedStatus.toDictionary()
 
-        let expectedResponseWithoutId = [
+        let _ = [
             kElectrodeBridgeMessageName: PersonAPI.kRequestGetStatus,
             kElectrodeBridgeMessageType: kElectrodeBridgeMessageResponse,
             kElectrodeBridgeMessageData: statusDict,
@@ -198,7 +198,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         let requestPayload = [
             "name": person.name,
             "hiredMonth": person.hiredMonth,
-            "age": person.age,
+            "age": person.age!,
         ] as [AnyHashable: Any]
         let requestDict = [
             kElectrodeBridgeMessageId: UUID().uuidString,
@@ -266,10 +266,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
 
         let mockJSResponseListner = SwiftMockJSEeventListener(jSBlock: { result in
             XCTAssertNotNil(result)
-            guard let responseDict = result as? [AnyHashable: Any] else {
-                XCTFail()
-                return
-            }
+            let responseDict = result
             XCTAssertEqual(responseDict[kElectrodeBridgeMessageType] as! String, kElectrodeBridgeMessageResponse)
             XCTAssertEqual(responseDict[kElectrodeBridgeMessageData] as! Int, expectedAge)
 
@@ -314,7 +311,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
         personAPI?.request.registerUpdatePersonRequestHandler(handler: { any, responseCompletionHandler in
             XCTAssertNotNil(any)
             XCTAssertNotNil(responseCompletionHandler)
-            guard let updateRequestData = any as? UpdatePersonRequestData else {
+            guard let _ = any as? UpdatePersonRequestData else {
                 XCTFail()
                 return
             }
@@ -346,7 +343,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertNotNil(any)
             XCTAssertNotNil(responseCompletionHandler)
 
-            guard let statusList = any as? [Status] else {
+            guard (any as? [Status]) != nil else {
                 XCTFail()
                 return
             }

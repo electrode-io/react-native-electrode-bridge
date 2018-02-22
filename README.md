@@ -217,14 +217,14 @@ Example usage :
 
 ```java
 
-new RequestProcessor<>("my.request.name", <input data>, <ExpectedResponse>.class, new ElectrodeBridgeResponseListener<ExpetedObjectType>() {
+new RequestProcessor<>("my.request.name", <input data>, <ExpectedResponse>.class, new ElectrodeBridgeResponseListener<ExpectedObjectType>() {
             @Override
             public void onFailure(@NonNull FailureMessage failureMessage) {
               //Handle failure
             }
 
             @Override
-            public void onSuccess(@Nullable ExpetedObjectType responseData) {
+            public void onSuccess(@Nullable ExpectedObjectType responseData) {
               // Do whatever you need to do with the response
             }
         }).execute();
@@ -362,34 +362,19 @@ To make it easier to construct a request and send it via bridge the `ElectrodeRe
 
 Example usage :
 
-```java
-
-new RequestProcessor<>("my.request.name", <input data>, <ExpectedResponse>.class, new ElectrodeBridgeResponseListener<ExpetedObjectType>() {
-            @Override
-            public void onFailure(@NonNull FailureMessage failureMessage) {
-              //Handle failure
-            }
-
-            @Override
-            public void onSuccess(@Nullable ExpetedObjectType responseData) {
-              // Do whatever you need to do with the response
-            }
-        }).execute();
-```
-
-
 ```swift
-let requestProcessor = ElectrodeRequestProcessor<TReq, TResp, TItem>(requestName: "my.request.name",
-                                                                                  requestPayload: <request data>,
-                                                                                  respClass: <ExpectedResponseObjectType>.self,
-                                                                                  responseItemType: <ItemObjectType>.self,//only needed if response is an array. e.g. for [Person], it will be Person.self
-                                                                                  responseCompletionHandler: responseCompletionHandler: { any, failureMessage in
-                                                                                     if let failure = failureMessage {
-                                                                                     // handle failure
-                                                                                     } else {
-                                                                                     // handle success
-                                                                                     }
-                                                                                  })
+let requestProcessor = ElectrodeRequestProcessor<TReq, TResp, TItem>(
+    requestName: "my.request.name",
+    requestPayload: <request data>,
+    respClass: <ExpectedResponseObjectType>.self,
+    responseItemType: <ItemObjectType>.self, //only needed if response is an array. e.g. for [Person], it will be Person.self
+    responseCompletionHandler: responseCompletionHandler: { any, failureMessage in
+        if let failure = failureMessage {
+            // handle failure
+        } else {
+            // handle success
+        }
+     })
 requestProcessor.execute()
 ```
 The `ElectrodeRequestProcessor` takes care of generating a `ElectrodeBridgeRequest` and sending it over to the `ElectrodeBridge`
@@ -426,8 +411,7 @@ eventProcessor.execute()
 
 ```objectivec
 + (void)registerRequestHanlderWithName:(NSString *)name
-              requestCompletionHandler:
-                  (ElectrodeBridgeRequestCompletionHandler)completion;
+              requestCompletionHandler:(ElectrodeBridgeRequestCompletionHandler)completion;
 ```
 
 Registers a handler that can handle a specific request `name`.
@@ -444,14 +428,14 @@ To make is easier to construct a request handler and register it to the bridge a
 Example usage :
 
 ```swift
-let requestHandlerProcessor = ElectrodeRequestHandlerProcessor(requestName: "<your request name>",
-                                                               reqClass: <YourRequestParamClass>.self,
-                                                               respClass: <ExpectedResponseClass>.self,
-                                                               requestCompletionHandler: { data, responseCompletionHandler in
-                                                                    // data is of type <ExpectedResponseClass>
-                                                                    // responseCompletionHandler is a block of ElectrodeBridgeRequestCompletionHandler
-
-                                                               })
+let requestHandlerProcessor = ElectrodeRequestHandlerProcessor(
+    requestName: "<your request name>",
+    reqClass: <YourRequestParamClass>.self,
+    respClass: <ExpectedResponseClass>.self,
+    requestCompletionHandler: { data, responseCompletionHandler in
+        // data is of type <ExpectedResponseClass>
+        // responseCompletionHandler is a block of ElectrodeBridgeRequestCompletionHandler
+    })
 requestHandlerProcessor.execute()
 
 ```
@@ -471,11 +455,12 @@ requestHandlerProcessor.execute()
 
 Example usage :
 ```swift
-let listenerProcessor = EventListenerProcessor(eventName: "<YourEventName>",
-                                               eventPayloadClass: <PayloadClass>.self,
-                                               eventListener: { payload in
-                                                  // the payload emitted with the event
-                                               })
+let listenerProcessor = EventListenerProcessor(
+    eventName: "<YourEventName>",
+    eventPayloadClass: <PayloadClass>.self,
+    eventListener: { payload in
+        // the payload emitted with the event
+    })
 listenerProcessor.execute()
 
 ```

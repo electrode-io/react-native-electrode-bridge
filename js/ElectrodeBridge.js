@@ -162,7 +162,7 @@ class ElectrodeBridge extends EventEmitter {
     uuid /*:string */ ) /*:EventEmitter*/ {
     const event = this.eventListenerUUIDRef.get(uuid)
     if(event) {
-      this.eventListenerUUIDRef.remove(uuid)
+      this.eventListenerUUIDRef.delete(uuid)
       return this.removeListener(event.name, event.handler)
     }
   }

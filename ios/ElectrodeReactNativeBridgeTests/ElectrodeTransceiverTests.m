@@ -56,7 +56,7 @@
 - (void)waitForExpectationToFullFillOrTimeOut {
     [self waitForExpectationsWithTimeout:10.0 handler:^(NSError * _Nullable error) {
         if (error) {
-            NSLog(@"Test timedout");
+            XCTFail(@"timed out");
         }
     }];
 }
@@ -192,9 +192,12 @@
     NSString* const name = @"sendRequest";
     NSString* emptyRequestData = @"";
     ElectrodeBridgeRequest *request = [ElectrodeBridgeRequest createRequestWithName:name data:emptyRequestData];
-    [nativeBridge registerRequestCompletionHandlerWithName:name completionHandler:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
+    NSUUID *uuid = [NSUUID UUID];
+
+    [nativeBridge registerRequestCompletionHandlerWithName:name uuid:uuid completion:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
         block(data, nil);
     }];
+    
     [nativeBridge sendRequest:request completionHandler:^(id  _Nullable data, id<ElectrodeFailureMessage>  _Nullable message) {
         XCTAssertEqual(data, emptyRequestData, @"error");
         [expectation fulfill];
@@ -209,9 +212,13 @@
     NSString* emptyRequestData = @"";
     id<ElectrodeReactBridge> reactBridge = [self getReactBridge];
     id<ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
-    [nativeBridge registerRequestCompletionHandlerWithName:name completionHandler:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
+    NSUUID *uuid = [NSUUID UUID];
+    
+    [nativeBridge registerRequestCompletionHandlerWithName:name uuid:uuid completion:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
         block(data, nil);
+        
     }];
+    
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithjSBlock:^(NSDictionary * _Nonnull result) {
         XCTAssertEqual([result valueForKey:kElectrodeBridgeMessageData], emptyRequestData);
         [expectation fulfill];
@@ -228,8 +235,11 @@
     id <ElectrodeReactBridge> reactBridge = [self getReactBridge];
     NSArray* testArray = @[@"apple", @"mango", @"orange"];
     NSString* const name = @"sendRequest";
-    [nativeBridge registerRequestCompletionHandlerWithName:name completionHandler:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
+    NSUUID *uuid = [NSUUID UUID];
+
+    [nativeBridge registerRequestCompletionHandlerWithName:name uuid:uuid completion:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
         block(data, nil);
+
     }];
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithjSBlock:^(NSDictionary * _Nonnull result) {
         XCTAssertEqual([result valueForKey:kElectrodeBridgeMessageData], testArray);
@@ -285,12 +295,15 @@
     NSString* testEventName = @"com.walmart.ern.nativetonativeevent";
     NSString* data = @"nativeeventdata";
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
-    [nativeBridge addEventListenerWithName:testEventName eventListener:^(id _Nullable payLoad) {
+    NSUUID *uuid = [NSUUID UUID];
+    
+    [nativeBridge registerEventListenerWithName:testEventName uuid:uuid listener:^(id  _Nullable payLoad) {
         NSLog(@"Event result = %@", payLoad);
         XCTAssertEqual(payLoad, data, @"Failure, received a different event!!");
         [expectation fulfill];
         expectation = nil;
     }];
+    
     //then dispatch an event to the native
     [nativeBridge sendEvent:event];
     [self waitForExpectationToFullFillOrTimeOut];
@@ -304,7 +317,8 @@
    __weak __block XCTestExpectation* expectation = [self createExpectationWithDescription:@"waitforreacteventtocomplete"];
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
     XCTAssertNotNil(event, @"event instance is nil");
-    [nativeBridge addEventListenerWithName:testEventName eventListener:^(id _Nullable payLoad) {
+    NSUUID *uuid = [NSUUID UUID];
+    [nativeBridge registerEventListenerWithName:testEventName uuid:uuid listener:^(id  _Nullable payLoad) {
         XCTAssertEqual(payLoad, data, @"Failure, received a different event!!");
         [expectation fulfill];
         expectation = nil;
@@ -330,7 +344,9 @@
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
     XCTAssertNotNil(event, @"event instance is nil");
 
-    [nativeBridge addEventListenerWithName:testEventName eventListener:^(id _Nullable payLoad) {
+    
+    NSUUID *uuid = [NSUUID UUID];
+    [nativeBridge registerEventListenerWithName:testEventName uuid:uuid listener:^(id  _Nullable payLoad) {
         XCTAssertEqual([[data objectForKey:@"array"] firstObject], [[payLoad objectForKey:@"array"] firstObject]);
         XCTAssertEqual([data objectForKey:@"string"] , [payLoad objectForKey:@"string"]);
         XCTAssertEqual([data objectForKey:@"integer"] , [payLoad objectForKey:@"integer"]);

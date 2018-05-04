@@ -138,7 +138,7 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
   }
 }
 
-+ (NSUUID *)registerRequestHanlderWithName:(NSString *)name
++ (NSUUID *)registerRequestHandlerWithName:(NSString *)name
                   requestCompletionHandler:
 (ElectrodeBridgeRequestCompletionHandler)completion {
     NSUUID *uuid = [NSUUID UUID];
@@ -161,7 +161,7 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
     [electrodeNativeBridge unregisterRequestHandlerWithUUID:uuid];
 }
 
-+ (NSUUID *)addEventListnerWithName:(NSString *)name
++ (NSUUID *)addEventListenerWithName:(NSString *)name
                    eventListner:(ElectrodeBridgeEventListener)eventListner {
   NSUUID *eventListenerUUID = [NSUUID UUID];
   if (!isReactNativeReady) {
@@ -202,7 +202,7 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
   for (NSString *eventListnerName in queuedEventListenerRegistration) {
     ElectrodeBridgeEventListener eventListener =
         queuedEventListenerRegistration[eventListnerName];
-    [ElectrodeBridgeHolder addEventListnerWithName:eventListnerName
+    [ElectrodeBridgeHolder addEventListenerWithName:eventListnerName
                                       eventListner:eventListener];
   }
 

@@ -1,0 +1,19 @@
+require 'json'
+version = JSON.parse(File.read('package.json'))["version"]
+
+Pod::Spec.new do |s|
+
+  s.name           = "ElectrodeReactNativeBridge"
+  s.version        = version
+  s.summary      = "React Native Electrode Bridge"
+
+  s.authors      = { "Cody Garvin" => "cgarvin@walmartlabs.com" }
+  s.homepage     = "https://github.com/electrode-io/react-native-electrode-bridge"
+  s.license      = "MIT"
+  s.platform     = :ios, "8.0"
+
+  s.source       = { :git => "https://github.com/electrode-io/react-native-electrode-bridge" }
+  s.source_files  = "ios/ElectrodeReactNativeBridge/*.{h,m}"
+
+  s.dependency 'React'
+end

@@ -37,12 +37,12 @@ matrix:
       only:
       - master
   - language: objective-c
-    osx_image: xcode8.3
+    osx_image: xcode9.2
     install:
     - nvm install 8
     - rm -Rf "${TMPDIR}/jest_preprocess_cache"
     - brew install yarn --ignore-dependencies
-    - yarn add react-native@0.48.3
+    - yarn add react-native@0.55.3
     script:
     - ./scripts/objc-test-ios.sh;
     cache:

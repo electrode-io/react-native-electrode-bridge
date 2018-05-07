@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.authors      = { "Cody Garvin" => "cgarvin@walmartlabs.com" }
   s.homepage     = "https://github.com/electrode-io/react-native-electrode-bridge"
   s.license      = "MIT"
-  s.platform     = :ios, "8.0"
+  s.platform     = :ios, "9.0"
 
   s.source       = { :git => "https://github.com/electrode-io/react-native-electrode-bridge" }
   s.source_files  = "ios/ElectrodeReactNativeBridge/*.{h,m}"

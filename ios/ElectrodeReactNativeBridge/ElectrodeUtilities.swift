@@ -54,7 +54,7 @@ extension NSObject {
 
         for child in type.children {
             if child.label! == name {
-                let res = type(of: child.value)
+                let res = Swift.type(of: child.value)
                 let tmp = ElectrodeUtilities.isObjectiveCPrimitives(type: res)
                 return (!tmp) ? .Class(res) : .Struct
             }
@@ -62,7 +62,7 @@ extension NSObject {
         while let parent = type.superclassMirror {
             for child in parent.children {
                 if child.label! == name {
-                    let res = type(of: child.value)
+                    let res = Swift.type(of: child.value)
                     let tmp = ElectrodeUtilities.isObjectiveCPrimitives(type: res)
                     return (tmp) ? .Class(res) : .Struct
                 }
@@ -173,7 +173,7 @@ extension NSObject {
             return bridgeMessageReadyDictionary
         }
 
-        let type = type(of: validObject)
+        let type = Swift.type(of: validObject)
         if ElectrodeUtilities.isObjectiveCPrimitives(type: type) {
             return validObject
         }

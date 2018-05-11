@@ -16,10 +16,14 @@
 
 package com.walmartlabs.electrode.reactnative.bridge.util;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
 
+import com.facebook.react.bridge.WritableArray;
 import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
+import com.walmartlabs.electrode.reactnative.sample.model.Address;
 import com.walmartlabs.electrode.reactnative.sample.model.BirthYear;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Position;
@@ -29,6 +33,7 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class BridgeArgumentsTest extends TestCase {
 
@@ -307,6 +312,34 @@ public class BridgeArgumentsTest extends TestCase {
         int result[] = BridgeArguments.toIntArray(inputList);
 
         assertEquals(inputList.size(), result.length);
+    }
+
+
+    public void testModelParcelable() {
+        List<Address> addressList = new ArrayList<Address>() {{
+            add(new Address.Builder("1235 Walmart Ave", "94085").build());
+            add(new Address.Builder("1233 SanBruno Ave", "94075").build());
+        }};
+
+        List<String> namesList = new ArrayList<String>() {{
+            add("Name1");
+            add("Name2");
+        }};
+        List<Integer> agesList = new ArrayList<Integer>() {{
+            add(30);
+            add(40);
+        }};
+        final Person inputPerson = new Person.Builder("testName", 10).addresses(addressList).siblingsNames(namesList).siblingsAges(agesList).build();
+        Parcel personParcel  = Parcel.obtain();
+        inputPerson.writeToParcel(personParcel, inputPerson.describeContents());
+        personParcel.setDataPosition(0);
+
+        Person outPerson = Person.CREATOR.createFromParcel(personParcel);
+        assertNotNull(outPerson);
+        assertEquals(inputPerson.getAddressList().size(), outPerson.getAddressList().size());
+        assertEquals(inputPerson.getSiblingsAges().size(), outPerson.getSiblingsAges().size());
+        assertEquals(inputPerson.getSiblingsNames().size(), outPerson.getSiblingsNames().size());
+        assertEquals(inputPerson.getName(), outPerson.getName());
     }
 
 }

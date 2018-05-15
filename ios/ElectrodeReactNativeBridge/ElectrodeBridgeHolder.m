@@ -125,8 +125,8 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
   }
 }
 
-+ (void)removeEventListener: (NSUUID *)UUID {
-    [electrodeNativeBridge removeEventListnerWithUUID: UUID];
++ (nullable ElectrodeBridgeEventListener)removeEventListener: (NSUUID *)UUID {
+    return [electrodeNativeBridge removeEventListnerWithUUID: UUID];
 }
 
 + (void)sendRequest:(ElectrodeBridgeRequest *)request
@@ -157,8 +157,8 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
     return uuid;
 }
 
-+ (void)unregisterRequestHandlerWithUUID: (NSUUID *)uuid {
-    [electrodeNativeBridge unregisterRequestHandlerWithUUID:uuid];
++ (nullable ElectrodeBridgeRequestCompletionHandler)unregisterRequestHandlerWithUUID: (NSUUID *)uuid {
+    return [electrodeNativeBridge unregisterRequestHandlerWithUUID:uuid];
 }
 
 + (NSUUID *)addEventListenerWithName:(NSString *)name

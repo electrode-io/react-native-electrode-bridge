@@ -225,7 +225,7 @@ class ElectrodeBridge extends EventEmitter {
           const errorMessage = this._buildMessage(
             ELECTRODE_BRIDGE_RESPONSE_TYPE,
             message.name,
-            { id: messsage.id, error: ERROR_NO_REQUEST_HANDLER })
+            { id: message.id, error: ERROR_NO_REQUEST_HANDLER })
           return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
         }
 
@@ -241,7 +241,7 @@ class ElectrodeBridge extends EventEmitter {
           const errorMessage = this._buildMessage(
             ELECTRODE_BRIDGE_RESPONSE_TYPE,
             message.name,
-            { id: messsage.id, error });
+            { id: message.id, error });
           return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
         })
         break

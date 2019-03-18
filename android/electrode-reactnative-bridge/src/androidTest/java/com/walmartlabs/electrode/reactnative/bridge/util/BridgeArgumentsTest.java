@@ -16,11 +16,9 @@
 
 package com.walmartlabs.electrode.reactnative.bridge.util;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
 
-import com.facebook.react.bridge.WritableArray;
 import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 import com.walmartlabs.electrode.reactnative.sample.model.Address;
@@ -33,7 +31,6 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class BridgeArgumentsTest extends TestCase {
 

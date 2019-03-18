@@ -27,16 +27,24 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import static com.walmartlabs.electrode.reactnative.bridge.BridgeMessage.BRIDGE_MSG_DATA;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
 
+    @Test
     public void testRequestHandlerRegistrationUnRegistration() {
         ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
         final UUID uuid = UUID.randomUUID();
@@ -51,6 +59,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         assertNull(electrodeNativeBridge.getRequestHandlerId("sampleRequest"));
     }
 
+    @Test
     public void testEventListenerRegistrationUnRegistration() {
         ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
         final UUID uuid = UUID.randomUUID();
@@ -65,6 +74,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         assertNull(electrodeNativeBridge.getEventListenerId(eventListener));
     }
 
+    @Test
     public void testSendRequestForTimeOut() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         ElectrodeNativeBridge electrodeNativeBridge = ElectrodeBridgeTransceiver.instance();
@@ -86,6 +96,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testSendRequestWithEmptyRequestDataAndNonEmptyResponse() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "yay tests";
@@ -120,6 +131,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testSendRequestWithRequestDataAndEmptyResponse() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedInput = "expectedInput";
@@ -154,6 +166,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testSendRequestWithRequestDataAndEmptyResponseWithJSRequestHandler() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedInput = "expectedInput";
@@ -193,7 +206,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         removeMockEventListener(uuid);
     }
 
-
+    @Test
     public void testEmitEventWithSimpleDataFromNative() {
         final String TEST_EVENT_NAME = "testEmitEventWithData";
         final String TEST_EVENT_VALUE = "this is a test event";
@@ -226,6 +239,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEmitEventWithSimpleDataFromJS() {
         final String TEST_EVENT_NAME = "testEmitEventWithSimpleDataFromJS";
         final String TEST_EVENT_VALUE = "this is a test event";
@@ -250,6 +264,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEmitEventWithComplexDataFromNative() {
         final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromNative";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
@@ -288,6 +303,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEmitEventWithComplexDataFromJS() {
         final String TEST_EVENT_NAME = "testEmitEventWithComplexDataFromJS";
         final Person person = new Person.Builder("Richard Lemaire", 10).build();
@@ -320,6 +336,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
 
     }
 
+    @Test
     public void testGetEmptyArrayFromJsToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -353,6 +370,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testGetArrayFromJsToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String[] stringArray = {"one", "two", "three"};
@@ -398,6 +416,7 @@ public class ElectrodeBridgeTransceiverTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testConstantProviders() {
         assertTrue(getNativeBridge() instanceof ReactContextBaseJavaModule);
         assertNull(((ReactContextBaseJavaModule) getNativeBridge()).getConstants());

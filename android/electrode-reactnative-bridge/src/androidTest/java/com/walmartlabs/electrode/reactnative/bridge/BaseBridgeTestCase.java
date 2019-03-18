@@ -21,7 +21,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.test.InstrumentationTestCase;
+import android.support.test.InstrumentationRegistry;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
@@ -34,29 +34,38 @@ import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
+import org.junit.Before;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class BaseBridgeTestCase extends InstrumentationTestCase {
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
+
+public class BaseBridgeTestCase {
 
     private static final int REQUEST_TIMEOUT_SECONDS = 30;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         Logger.overrideLogLevel(Logger.LogLevel.DEBUG);
         initBridge();
         ElectrodeBridgeTransceiver.instance().debug_ClearRequestHandlerRegistrar();
         ((EventRegistrarImpl) mockEventRegistrar).reset();
     }
 
+    private Instrumentation getInstrumentation() {
+        return InstrumentationRegistry.getInstrumentation();
+    }
+
     private void initBridge() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final ElectrodeBridgePackage mockElectrodePackage = new MockElectrodePackage();
-        final Instrumentation instrumentation = this.getInstrumentation();
+        final Instrumentation instrumentation = getInstrumentation();
         // Fixes : com.facebook.react.bridge.AssertionException: Expected to run on UI thread!
         // react-native version : 0.45
         runOnUiThread(new Runnable() {

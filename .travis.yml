@@ -15,8 +15,8 @@ matrix:
     - yarn add react-native@0.52.1
     android:
       components:
-      - build-tools-27.0.2
-      - android-27
+      - build-tools-28.0.3
+      - android-28
       - android-22
       - extra-android-m2repository
       - extra-google-google_play_services

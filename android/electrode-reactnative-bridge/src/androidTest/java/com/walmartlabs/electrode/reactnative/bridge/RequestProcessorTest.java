@@ -34,6 +34,8 @@ import com.walmartlabs.electrode.reactnative.sample.model.Address;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,9 +44,17 @@ import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nonnull;
 
 import static com.walmartlabs.electrode.reactnative.sample.api.PersonApi.Requests.REQUEST_GET_AGE;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNotSame;
+import static junit.framework.TestCase.assertSame;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 public class RequestProcessorTest extends BaseBridgeTestCase {
 
+    @Test
     public void testSampleRequestNativeToNativeFailure() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         PersonApi.requests().getUserName(new ElectrodeBridgeResponseListener<String>() {
@@ -65,6 +75,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testSampleRequestNativeToJSSuccess() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String expectedResult = "Richard Mercille";
@@ -100,6 +111,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
     }
 
 
+    @Test
     public void testRegisterGetStatusRequestHandlerNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Status result = new Status.Builder(true).log(true).build();
@@ -133,6 +145,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testGetStatusRequestHandlerNativeToJSSuccess() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Person actualPerson = new Person.Builder("John", 05).age(10).build();
@@ -181,6 +194,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         removeMockEventListener(uuid);
     }
 
+    @Test
     public void testGetStatusRequestHandlerJSToNativeSuccess() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Person person = new Person.Builder("John", 05).build();
@@ -220,6 +234,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
 
     }
 
+    @Test
     public void testPrimitiveTypesForRequestAndResponseNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         PersonApi.requests().registerGetAgeRequestHandler(new ElectrodeBridgeRequestHandler<String, Integer>() {
@@ -250,6 +265,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testIntegerForResponseNativeToJS() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -282,6 +298,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testIntegerForResponseJSToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -316,6 +333,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testGetPersonRequestSentFromJsWithEmptyDataInRequest() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -340,7 +358,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-
+    @Test
     public void testRequestsWithMultipleParamsNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final String firstName = "Tom";
@@ -376,6 +394,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testRequestsWithMultipleParamsJSToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final String firstName = "Tom";
@@ -419,6 +438,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         removeMockEventListener(uuid);
     }
 
+    @Test
     public void testRequestsWithMultipleParamsNativeToJS() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final String firstName = "Tom";
@@ -459,7 +479,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         removeMockEventListener(uuid);
     }
 
-
+    @Test
     public void testRequestsWithComplexObjectListNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Status status = new Status.Builder(true).log(false).build();
@@ -512,6 +532,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testRequestsWithComplexObjectListNativeToJS() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final Status status = new Status.Builder(true).log(false).build();
@@ -566,6 +587,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         removeMockEventListener(uuid);
     }
 
+    @Test
     public void testRequestsWithComplexObjectListJSToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final Status status = new Status.Builder(true).log(false).build();
@@ -625,6 +647,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
     }
 
 
+    @Test
     public void testRequestsWithPrimitiveListNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final List<String> namesList = new ArrayList<String>() {{
@@ -669,6 +692,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testRequestsWithPrimitiveListNativeToJS() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final List<String> namesList = new ArrayList<String>() {{
@@ -714,6 +738,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testRequestsWithPrimitiveListJSToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
 
@@ -759,7 +784,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-
+    @Test
     public void testRequestHandlerReceivingIntegerInputJSToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String requestName = "testRequestHandlerReceivingIntegerInput";
@@ -792,7 +817,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
-
+    @Test
     public void testRequestHandlerReceivingBooleanInputJSToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String requestName = "testRequestHandlerReceivingBooleanInput";
@@ -825,6 +850,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEmptyRequestAndResponseWithNativeHandler() {
         final CountDownLatch countDownLatch = new CountDownLatch(3);
         final String requestName = "testEmptyRequestAndResponseRequestWithNativeHandler";
@@ -867,6 +893,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEmptyRequestAndResponseRequestWithJsHandler() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String requestName = "testEmptyRequestAndResponseRequestWithJsHandler";
@@ -897,6 +924,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testConcurrentRequestsWithNativeHandlerNativeToNative() {
         final int TOTAL_REQUEST_COUNT = 10;
         final CountDownLatch countDownLatch = new CountDownLatch(TOTAL_REQUEST_COUNT * 2);
@@ -935,6 +963,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testConcurrentRequestsWithNativeHandlerJsToNative() {
         final int TOTAL_REQUEST_COUNT = 10;
         final CountDownLatch countDownLatch = new CountDownLatch(TOTAL_REQUEST_COUNT * 2);
@@ -974,6 +1003,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEmptyRequestAndResponseRequestWithJsHandlerNativeToJs() {
         final int TOTAL_REQUEST_COUNT = 10;
         final CountDownLatch countDownLatch = new CountDownLatch(2);
@@ -1012,6 +1042,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testListInsideModelsNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String requestName = "testListInsideModels";
@@ -1057,6 +1088,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testListInsideModelsNativeToJS() {
         final CountDownLatch countDownLatch = new CountDownLatch(2);
         final String requestName = "testListInsideModels";
@@ -1109,6 +1141,7 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testRequestAndResponseWithNativeHandlerFor() {
         final CountDownLatch countDownLatch = new CountDownLatch(4);
         final String requestName = "testEmptyRequestAndResponseRequestWithNativeHandler";

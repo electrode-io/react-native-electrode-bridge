@@ -22,10 +22,16 @@ import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Position;
 
+import org.junit.Test;
+
 import java.util.concurrent.CountDownLatch;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 
 public class EventProcessorTest extends BaseBridgeTestCase {
 
+    @Test
     public void testEventsForModelObjectNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Position position = new Position.Builder(98.89).lng(89.99).build();
@@ -45,6 +51,7 @@ public class EventProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
     public void testEventsForModelPrimitiveWrapperNativeToNative() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final String personName = "chris";

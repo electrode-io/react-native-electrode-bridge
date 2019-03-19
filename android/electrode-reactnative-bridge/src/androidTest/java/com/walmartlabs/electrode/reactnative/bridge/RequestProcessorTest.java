@@ -1196,4 +1196,50 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
+    public void testRequestHandlerRemoval() {
+        final CountDownLatch countDownLatch = new CountDownLatch(3);
+        final String requestName = "testRequestHandlerRemoval";
+
+        RequestHandlerHandle requestHandle = new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertSame(None.NONE, payload);
+                responseListener.onSuccess(null);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+
+        new RequestProcessor<None, None>(requestName, null, None.class, new ElectrodeBridgeResponseListener<None>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+
+            @Override
+            public void onSuccess(@Nullable None responseData) {
+                assertSame(None.NONE, responseData);
+                countDownLatch.countDown();
+            }
+        }).execute();
+
+        requestHandle.unregister();
+
+        new RequestProcessor<None, None>(requestName, null, None.class, new ElectrodeBridgeResponseListener<None>() {
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                failureMessage.getMessage();
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onSuccess(@Nullable None responseData) {
+                fail();
+            }
+        }).execute();
+
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
 }

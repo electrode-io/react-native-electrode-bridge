@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandler;
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
 import com.walmartlabs.electrode.reactnative.bridge.None;
+import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerHandle;
 import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerProcessor;
 import com.walmartlabs.electrode.reactnative.bridge.RequestProcessor;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
@@ -42,33 +43,33 @@ final class PersonRequests implements PersonApi.Requests {
     }
 
     @Override
-    public void registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler) {
-        new RequestHandlerProcessor<>(REQUEST_GET_PERSON, None.class, Person.class, handler).execute();
+    public RequestHandlerHandle registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler) {
+        return new RequestHandlerProcessor<>(REQUEST_GET_PERSON, None.class, Person.class, handler).execute();
     }
 
     @Override
-    public void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler) {
-        new RequestHandlerProcessor<>(REQUEST_GET_STATUS, Person.class, Status.class, handler).execute();
+    public RequestHandlerHandle registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler) {
+        return new RequestHandlerProcessor<>(REQUEST_GET_STATUS, Person.class, Status.class, handler).execute();
     }
 
     @Override
-    public void registerGetAgeRequestHandler(@NonNull ElectrodeBridgeRequestHandler<String, Integer> handler) {
-        new RequestHandlerProcessor<>(REQUEST_GET_AGE, String.class, Integer.class, handler).execute();
+    public RequestHandlerHandle registerGetAgeRequestHandler(@NonNull ElectrodeBridgeRequestHandler<String, Integer> handler) {
+        return new RequestHandlerProcessor<>(REQUEST_GET_AGE, String.class, Integer.class, handler).execute();
     }
 
     @Override
-    public void registerUpdatePersonRequestHandler(@NonNull ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler) {
-        new RequestHandlerProcessor<>(REQUEST_POST_PERSON_UPDATE, UpdatePersonRequestData.class, Person.class, handler).execute();
+    public RequestHandlerHandle registerUpdatePersonRequestHandler(@NonNull ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler) {
+        return new RequestHandlerProcessor<>(REQUEST_POST_PERSON_UPDATE, UpdatePersonRequestData.class, Person.class, handler).execute();
     }
 
     @Override
-    public void registerFindPersonsByStatus(@NonNull ElectrodeBridgeRequestHandler<List<Status>, List<Person>> handler) {
-        new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_BY_STATUS, (Class) Status.class, (Class) Person.class, handler).execute();
+    public RequestHandlerHandle registerFindPersonsByStatus(@NonNull ElectrodeBridgeRequestHandler<List<Status>, List<Person>> handler) {
+        return new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_BY_STATUS, (Class) Status.class, (Class) Person.class, handler).execute();
     }
 
     @Override
-    public void registerFindPersonsAgeByName(@NonNull ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler) {
-        new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_AGE_BY_NAME, (Class) String.class, (Class) Integer.class, handler).execute();
+    public RequestHandlerHandle registerFindPersonsAgeByName(@NonNull ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler) {
+        return new RequestHandlerProcessor<>(REQUEST_FIND_PERSONS_AGE_BY_NAME, (Class) String.class, (Class) Integer.class, handler).execute();
     }
 
     @Override

@@ -1242,4 +1242,48 @@ public class RequestProcessorTest extends BaseBridgeTestCase {
         waitForCountDownToFinishOrFail(countDownLatch);
     }
 
+    @Test
+    public void testRequestHandlerRemovalWithApi() {
+        final CountDownLatch countDownLatch = new CountDownLatch(3);
+        final int RESULT_AGE = 10;
+
+        RequestHandlerHandle handlerHandle = PersonApi.requests().registerGetAgeRequestHandler(new ElectrodeBridgeRequestHandler<String, Integer>() {
+            @Override
+            public void onRequest(@Nullable String payload, @NonNull ElectrodeBridgeResponseListener<Integer> responseListener) {
+                responseListener.onSuccess(RESULT_AGE);
+                countDownLatch.countDown();
+            }
+        });
+
+        PersonApi.requests().getAge("user", new ElectrodeBridgeResponseListener<Integer>() {
+            @Override
+            public void onSuccess(@Nullable Integer responseData) {
+                assertNotNull(responseData);
+                assertEquals(RESULT_AGE, responseData.intValue());
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                fail();
+            }
+        });
+
+        handlerHandle.unregister();
+
+        PersonApi.requests().getAge("user", new ElectrodeBridgeResponseListener<Integer>() {
+            @Override
+            public void onSuccess(@Nullable Integer responseData) {
+                fail();
+            }
+
+            @Override
+            public void onFailure(@NonNull FailureMessage failureMessage) {
+                assertNotNull(failureMessage);
+                countDownLatch.countDown();
+            }
+        });
+        waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
 }

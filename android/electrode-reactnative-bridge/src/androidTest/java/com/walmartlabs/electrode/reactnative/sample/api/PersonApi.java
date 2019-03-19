@@ -23,6 +23,7 @@ import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeRequestHandle
 import com.walmartlabs.electrode.reactnative.bridge.ElectrodeBridgeResponseListener;
 import com.walmartlabs.electrode.reactnative.bridge.FailureMessage;
 import com.walmartlabs.electrode.reactnative.bridge.None;
+import com.walmartlabs.electrode.reactnative.bridge.RequestHandlerHandle;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;
 
@@ -102,22 +103,22 @@ public final class PersonApi {
          *
          * @param handler {@link ElectrodeBridgeRequestHandler}
          */
-        void registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler);
+        RequestHandlerHandle registerGetPersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<None, Person> handler);
 
         /**
          * Registers a handler  that returns the user status when {@link #getStatus(Person, ElectrodeBridgeResponseListener)} is invoked through client(Native or JS side).
          *
          * @param handler {@link ElectrodeBridgeRequestHandler}
          */
-        void registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler);
+        RequestHandlerHandle registerGetStatusRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<Person, Status> handler);
 
-        void registerGetAgeRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<String, Integer> handler);
+        RequestHandlerHandle registerGetAgeRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<String, Integer> handler);
 
-        void registerUpdatePersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler);
+        RequestHandlerHandle registerUpdatePersonRequestHandler(@NonNull final ElectrodeBridgeRequestHandler<UpdatePersonRequestData, Person> handler);
 
-        void registerFindPersonsByStatus(@NonNull final ElectrodeBridgeRequestHandler<List<Status>, List<Person>> handler);
+        RequestHandlerHandle registerFindPersonsByStatus(@NonNull final ElectrodeBridgeRequestHandler<List<Status>, List<Person>> handler);
 
-        void registerFindPersonsAgeByName(@NonNull final ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler);
+        RequestHandlerHandle registerFindPersonsAgeByName(@NonNull final ElectrodeBridgeRequestHandler<List<String>, List<Integer>> handler);
 
 
         /**

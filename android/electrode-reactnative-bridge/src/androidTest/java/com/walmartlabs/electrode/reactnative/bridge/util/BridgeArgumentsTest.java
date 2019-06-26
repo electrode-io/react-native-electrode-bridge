@@ -327,7 +327,7 @@ public class BridgeArgumentsTest extends TestCase {
             add(40);
         }};
         final Person inputPerson = new Person.Builder("testName", 10).addresses(addressList).siblingsNames(namesList).siblingsAges(agesList).build();
-        Parcel personParcel  = Parcel.obtain();
+        Parcel personParcel = Parcel.obtain();
         inputPerson.writeToParcel(personParcel, inputPerson.describeContents());
         personParcel.setDataPosition(0);
 
@@ -337,6 +337,31 @@ public class BridgeArgumentsTest extends TestCase {
         assertEquals(inputPerson.getSiblingsAges().size(), outPerson.getSiblingsAges().size());
         assertEquals(inputPerson.getSiblingsNames().size(), outPerson.getSiblingsNames().size());
         assertEquals(inputPerson.getName(), outPerson.getName());
+    }
+
+
+    public void testNullList() {
+        final Person inputPerson = new Person.Builder("testName", 10).addresses(null).siblingsNames(null).siblingsAges(null).build();
+        Parcel personParcel = Parcel.obtain();
+        inputPerson.writeToParcel(personParcel, inputPerson.describeContents());
+        personParcel.setDataPosition(0);
+
+        Person outPerson = Person.CREATOR.createFromParcel(personParcel);
+        assertNotNull(outPerson);
+        assertEquals(0, outPerson.getAddressList().size());
+        assertEquals(0, outPerson.getSiblingsAges().size());
+        assertEquals(0, outPerson.getSiblingsNames().size());
+        assertEquals(inputPerson.getName(), outPerson.getName());
+    }
+
+    public void testNullListItem() {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", "John");
+        bundle.putInt("month", 1);
+        bundle.putString("addressList", null);
+
+        Person person = new Person(bundle);
+        assertNotNull(person);
     }
 
 }

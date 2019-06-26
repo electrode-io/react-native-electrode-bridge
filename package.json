@@ -1,6 +1,6 @@
 {
   "name": "react-native-electrode-bridge",
-  "version": "1.5.17",
+  "version": "1.5.19",
   "description": "Low level communication bridge between reaact native js and native",
   "repository": {
     "type": "git",

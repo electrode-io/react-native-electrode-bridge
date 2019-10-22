@@ -30,27 +30,7 @@ Read more about bridge [HERE](https://electrode.gitbooks.io/electrode-native/con
 
 ### Getting Started
 
-Follow the steps below to start contributing to the bridge code.
-
-```bash
-$ cd <workspace>
-$ git clone https://github.com/electrode-io/react-native-electrode-bridge.git
-$ cd react-native-electrode-bridge
-```
-
-Followed by
-
-```bash
-$ yarn add react-native
-```
-
-OR
-
-```bash
-$ npm install react-native
-```
-
-Now depending on which part of the bridge(Android|iOS|JS) you are working on open the code in respective IDEs.
+Depending on which part of the bridge(Android|iOS|JS) you are working on open the code in respective IDEs.
 
 # Bridge message types
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2017 WalmartLabs
- 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -197,7 +197,7 @@
     [nativeBridge registerRequestCompletionHandlerWithName:name uuid:uuid completion:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
         block(data, nil);
     }];
-    
+
     [nativeBridge sendRequest:request completionHandler:^(id  _Nullable data, id<ElectrodeFailureMessage>  _Nullable message) {
         XCTAssertEqual(data, emptyRequestData, @"error");
         [expectation fulfill];
@@ -213,12 +213,12 @@
     id<ElectrodeReactBridge> reactBridge = [self getReactBridge];
     id<ElectrodeNativeBridge> nativeBridge = [self getNativeBridge];
     NSUUID *uuid = [NSUUID UUID];
-    
+
     [nativeBridge registerRequestCompletionHandlerWithName:name uuid:uuid completion:^(id  _Nullable data, ElectrodeBridgeResponseCompletionHandler  _Nonnull block) {
         block(data, nil);
-        
+
     }];
-    
+
     [self addMockEventListener:[[MockJSEeventListener alloc] initWithjSBlock:^(NSDictionary * _Nonnull result) {
         XCTAssertEqual([result valueForKey:kElectrodeBridgeMessageData], emptyRequestData);
         [expectation fulfill];
@@ -296,14 +296,14 @@
     NSString* data = @"nativeeventdata";
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
     NSUUID *uuid = [NSUUID UUID];
-    
+
     [nativeBridge registerEventListenerWithName:testEventName uuid:uuid listener:^(id  _Nullable payLoad) {
         NSLog(@"Event result = %@", payLoad);
         XCTAssertEqual(payLoad, data, @"Failure, received a different event!!");
         [expectation fulfill];
         expectation = nil;
     }];
-    
+
     //then dispatch an event to the native
     [nativeBridge sendEvent:event];
     [self waitForExpectationToFullFillOrTimeOut];
@@ -344,7 +344,7 @@
     ElectrodeBridgeEvent* event = [ElectrodeBridgeEvent createEventWithName:testEventName data:data];
     XCTAssertNotNil(event, @"event instance is nil");
 
-    
+
     NSUUID *uuid = [NSUUID UUID];
     [nativeBridge registerEventListenerWithName:testEventName uuid:uuid listener:^(id  _Nullable payLoad) {
         XCTAssertEqual([[data objectForKey:@"array"] firstObject], [[payLoad objectForKey:@"array"] firstObject]);

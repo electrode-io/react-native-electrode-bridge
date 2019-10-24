@@ -1,12 +1,12 @@
 /*
  * Copyright 2017 WalmartLabs
- 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,7 +91,7 @@
     NSArray *returnFiles = nil;
     NSURL *bundle = [[NSBundle bundleForClass:self.class] bundleURL];
     NSError *error = nil;
-    
+
     NSArray *files =
     [[NSFileManager defaultManager] contentsOfDirectoryAtURL:bundle
                                   includingPropertiesForKeys:nil
@@ -169,7 +169,7 @@
     if (self = [super init]) {
         _myMockListenerStore = [[NSMutableDictionary alloc] init];
     }
-    
+
     return self;
 }
 RCT_EXPORT_MODULE();
@@ -188,7 +188,7 @@ RCT_EXPORT_MODULE();
 {
     NSLog(@"Trying to emit messgae to JS, mock JS implemenation here.");
     MockJSEeventListener* registeredListener = [self.myMockListenerStore objectForKey:bridgeMessage.name];
-    
+
     if(registeredListener) {
         switch (bridgeMessage.type) {
             case ElectrodeMessageTypeEvent:
@@ -220,7 +220,7 @@ RCT_EXPORT_MODULE();
                         }
                     });
                 }
-                
+
                 break;
             case ElectrodeMessageTypeResponse:
                 if(!registeredListener.jSCallBackBlock)

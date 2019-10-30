@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import "ElectrodeBridgeEvent.h"
 #import "ElectrodeBridgeFailureMessage.h"
 #import "ElectrodeBridgeRequest.h"
-#import "ElectrodeBridgeEvent.h"
+#import <Foundation/Foundation.h>
 
 @class ElectrodeBridgeTransceiver;
 NS_ASSUME_NONNULL_BEGIN
@@ -82,16 +82,20 @@ typedef void (^ElectrodeBridgeEventListener)(id _Nullable eventPayload);
  * @param uuid uuid of the request handler
  * @param completion call back to be issued for a given request.
  */
-- (void) registerRequestCompletionHandlerWithName:(NSString *)name
-                                             uuid: (NSUUID *) uuid
-                                       completion: (ElectrodeBridgeRequestCompletionHandler) completion;
+- (void)
+    registerRequestCompletionHandlerWithName:(NSString *)name
+                                        uuid:(NSUUID *)uuid
+                                  completion:
+                                      (ElectrodeBridgeRequestCompletionHandler)
+                                          completion;
 
 /**
  * Unregister a request handler
  * @param uuid returned when register a request handler
  */
 
-- (nullable ElectrodeBridgeRequestCompletionHandler)unregisterRequestHandlerWithUUID: (NSUUID *)uuid;
+- (nullable ElectrodeBridgeRequestCompletionHandler)
+    unregisterRequestHandlerWithUUID:(NSUUID *)uuid;
 
 /**
  * Sends an event with payload to all the event listeners
@@ -106,15 +110,17 @@ typedef void (^ElectrodeBridgeEventListener)(id _Nullable eventPayload);
  * @param uuid of the event listener.
  */
 
-- (void) registerEventListenerWithName: (NSString *_Nonnull)name
-                                  uuid: (NSUUID * _Nonnull)uuid
-                              listener: (ElectrodeBridgeEventListener _Nonnull)eventListener;
+- (void)registerEventListenerWithName:(NSString *_Nonnull)name
+                                 uuid:(NSUUID *_Nonnull)uuid
+                             listener:(ElectrodeBridgeEventListener _Nonnull)
+                                          eventListener;
 
 /**
  * Remove an event listener
  * @param uuid returned when listner is added.
  */
-- (nullable ElectrodeBridgeEventListener)removeEventListnerWithUUID: (NSUUID *) uuid;
+- (nullable ElectrodeBridgeEventListener)removeEventListnerWithUUID:
+    (NSUUID *)uuid;
 
 - (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider;
 

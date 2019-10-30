@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import "ElectrodeRequestRegistrar.h"
-#import "ElectrodeBridgeRequest.h"
 #import "ElectrodeBridgeProtocols.h"
+#import "ElectrodeBridgeRequest.h"
+#import "ElectrodeRequestRegistrar.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeRequestDispatcher : NSObject
 
-@property(nonatomic, strong, readonly) ElectrodeRequestRegistrar *requestRegistrar;
+@property(nonatomic, strong, readonly)
+    ElectrodeRequestRegistrar *requestRegistrar;
 
-- (instancetype)initWithRequestRegistrar:(ElectrodeRequestRegistrar *)requestRegistrar;
+- (instancetype)initWithRequestRegistrar:
+    (ElectrodeRequestRegistrar *)requestRegistrar;
 - (void)dispatchRequest:(ElectrodeBridgeRequest *)bridgeRequest
       completionHandler:(ElectrodeBridgeResponseCompletionHandler)completion;
 - (BOOL)canHandlerRequestWithName:(NSString *)name;

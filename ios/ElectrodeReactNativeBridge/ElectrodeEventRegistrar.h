@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "ElectrodeBridgeProtocols.h"
+#import <Foundation/Foundation.h>
 
 @interface ElectrodeEventRegistrar : NSObject
 
@@ -26,9 +26,10 @@
  @param eventListener The event listener that will respond to a given event.
  @param uuid The uuid of the listener
  */
-- (void) registerEventListener:(ElectrodeBridgeEventListener _Nonnull)eventListener
-                          name: (NSString *_Nonnull)name
-                          uuid: (NSUUID * _Nonnull)uuid;
+- (void)registerEventListener:
+            (ElectrodeBridgeEventListener _Nonnull)eventListener
+                         name:(NSString *_Nonnull)name
+                         uuid:(NSUUID *_Nonnull)uuid;
 
 /**
  Remove an event listener by a given UUID. It is possible to have multiple event
@@ -36,7 +37,8 @@
 
  @param eventListenerUUID The UUID of the event listener.
  */
-- (nullable ElectrodeBridgeEventListener)unregisterEventListener:(NSUUID *_Nonnull)eventListenerUUID;
+- (nullable ElectrodeBridgeEventListener)unregisterEventListener:
+    (NSUUID *_Nonnull)eventListenerUUID;
 
 /**
  Grabs all of the event listeners of a given name.

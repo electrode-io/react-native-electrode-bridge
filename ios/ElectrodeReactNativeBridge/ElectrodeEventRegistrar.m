@@ -24,9 +24,10 @@
 @end
 
 @implementation ElectrodeEventRegistrar
-- (void) registerEventListener:(ElectrodeBridgeEventListener _Nonnull)eventListener
-                          name: (NSString *_Nonnull)name
-                          uuid: (NSUUID * _Nonnull)uuid {
+- (void)registerEventListener:
+            (ElectrodeBridgeEventListener _Nonnull)eventListener
+                         name:(NSString *_Nonnull)name
+                         uuid:(NSUUID *_Nonnull)uuid {
   @synchronized(self) {
     if ([self.eventListenersByEventName objectForKey:name]) {
       NSMutableArray *eventListenerArray =
@@ -43,11 +44,11 @@
   }
 }
 
-- (nullable ElectrodeBridgeEventListener) unregisterEventListener:(NSUUID *_Nonnull)eventListenerUUID {
-    ElectrodeBridgeEventListener eventListener;
-    @synchronized(self) {
-    eventListener =
-        [self.eventListenerByUUID objectForKey:eventListenerUUID];
+- (nullable ElectrodeBridgeEventListener)unregisterEventListener:
+    (NSUUID *_Nonnull)eventListenerUUID {
+  ElectrodeBridgeEventListener eventListener;
+  @synchronized(self) {
+    eventListener = [self.eventListenerByUUID objectForKey:eventListenerUUID];
     [self.eventListenerByUUID removeObjectForKey:eventListenerUUID];
 
     if (eventListener) {
@@ -62,7 +63,7 @@
       }
     }
   }
-    return eventListener;
+  return eventListener;
 }
 
 - (NSArray<ElectrodeBridgeEventListener> *_Nullable)getEventListnersForName:

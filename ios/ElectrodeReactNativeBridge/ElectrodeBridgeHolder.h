@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "ElectrodeBridgeEvent.h"
-#import "ElectrodeBridgeRequest.h"
-
 #import "ElectrodeBridgeProtocols.h"
+#import "ElectrodeBridgeRequest.h"
+#import <Foundation/Foundation.h>
 
 @class ElectrodeBridgeTransceiver;
 @protocol ElectrodeBridgeRequestHandler
@@ -32,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Handles queuing every method calls until react native is ready.
  */
 
-extern NSString * const ElectrodeBridgeDidStartObservingNotification;
+extern NSString *const ElectrodeBridgeDidStartObservingNotification;
 
 @interface ElectrodeBridgeHolder : NSObject
 
@@ -42,16 +41,16 @@ extern NSString * const ElectrodeBridgeDidStartObservingNotification;
     completionHandler:(ElectrodeBridgeResponseCompletionHandler)completion;
 
 + (NSUUID *)registerRequestHandlerWithName:(NSString *)name
-              requestCompletionHandler:
-                  (ElectrodeBridgeRequestCompletionHandler)completion;
+                  requestCompletionHandler:
+                      (ElectrodeBridgeRequestCompletionHandler)completion;
 
-+ (nullable ElectrodeBridgeRequestCompletionHandler)unregisterRequestHandlerWithUUID: (NSUUID *)uuid;
-
++ (nullable ElectrodeBridgeRequestCompletionHandler)
+    unregisterRequestHandlerWithUUID:(NSUUID *)uuid;
 
 + (NSUUID *)addEventListenerWithName:(NSString *)name
-                   eventListner:(ElectrodeBridgeEventListener)eventListner;
+                        eventListner:(ElectrodeBridgeEventListener)eventListner;
 
-+ (nullable ElectrodeBridgeEventListener)removeEventListener: (NSUUID *)UUID;
++ (nullable ElectrodeBridgeEventListener)removeEventListener:(NSUUID *)UUID;
 
 + (void)setBridge:(ElectrodeBridgeTransceiver *)bridge;
 + (void)addConstantsProvider:(id<ConstantsProvider>)constantsProvider;

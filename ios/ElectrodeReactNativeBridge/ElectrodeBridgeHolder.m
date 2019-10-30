@@ -14,50 +14,51 @@
  * limitations under the License.
  */
 
-#import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeHolder.h"
+#import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeTransceiver.h"
 #import "ElectrodeLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-NSString * const ElectrodeBridgeDidStartObservingNotification = @"ElectrodeBridgeDidStartObservingNotification";
+NSString *const ElectrodeBridgeDidStartObservingNotification =
+    @"ElectrodeBridgeDidStartObservingNotification";
 
-@interface ElectrodeQueuedEventListener: NSObject
-@property (nonatomic, strong) NSUUID *uuid;
-@property (copy) ElectrodeBridgeEventListener listener;
-- (instancetype) initWithUUID: (NSUUID *) uuid
-                     listener: (ElectrodeBridgeEventListener) listener;
+@interface ElectrodeQueuedEventListener : NSObject
+@property(nonatomic, strong) NSUUID *uuid;
+@property(copy) ElectrodeBridgeEventListener listener;
+- (instancetype)initWithUUID:(NSUUID *)uuid
+                    listener:(ElectrodeBridgeEventListener)listener;
 @end
 
 @implementation ElectrodeQueuedEventListener
-- (instancetype) initWithUUID: (NSUUID *) uuid
-                     listener: (ElectrodeBridgeEventListener) listener {
-    if (self = [super init]) {
-        _uuid = uuid;
-        _listener = listener;
-    }
+- (instancetype)initWithUUID:(NSUUID *)uuid
+                    listener:(ElectrodeBridgeEventListener)listener {
+  if (self = [super init]) {
+    _uuid = uuid;
+    _listener = listener;
+  }
 
-    return self;
+  return self;
 }
 @end
 
-@interface ElectrodeQueuedRequestHandler: NSObject
-@property (nonatomic, strong) NSUUID *uuid;
-@property (copy) ElectrodeBridgeRequestCompletionHandler handler;
-- (instancetype) initWithUUID: (NSUUID *) uuid
-                     handler: (ElectrodeBridgeRequestCompletionHandler) handler;
+@interface ElectrodeQueuedRequestHandler : NSObject
+@property(nonatomic, strong) NSUUID *uuid;
+@property(copy) ElectrodeBridgeRequestCompletionHandler handler;
+- (instancetype)initWithUUID:(NSUUID *)uuid
+                     handler:(ElectrodeBridgeRequestCompletionHandler)handler;
 @end
 
 @implementation ElectrodeQueuedRequestHandler
-- (instancetype) initWithUUID: (NSUUID *) uuid
-                     handler: (ElectrodeBridgeRequestCompletionHandler) handler {
-    if (self = [super init]) {
-        _uuid = uuid;
-        _handler = handler;
-    }
+- (instancetype)initWithUUID:(NSUUID *)uuid
+                     handler:(ElectrodeBridgeRequestCompletionHandler)handler {
+  if (self = [super init]) {
+    _uuid = uuid;
+    _handler = handler;
+  }
 
-    return self;
+  return self;
 }
 @end
 @implementation ElectrodeBridgeHolder
@@ -127,8 +128,8 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
   }
 }
 
-+ (nullable ElectrodeBridgeEventListener)removeEventListener: (NSUUID *)UUID {
-    return [electrodeNativeBridge removeEventListnerWithUUID: UUID];
++ (nullable ElectrodeBridgeEventListener)removeEventListener:(NSUUID *)UUID {
+  return [electrodeNativeBridge removeEventListnerWithUUID:UUID];
 }
 
 + (void)sendRequest:(ElectrodeBridgeRequest *)request
@@ -142,39 +143,46 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
 
 + (NSUUID *)registerRequestHandlerWithName:(NSString *)name
                   requestCompletionHandler:
-(ElectrodeBridgeRequestCompletionHandler)completion {
-    NSUUID *uuid = [NSUUID UUID];
-    if (!isReactNativeReady) {
-        ElectrodeQueuedRequestHandler *handler = [[ElectrodeQueuedRequestHandler alloc] initWithUUID:uuid handler:completion];
-        [queuedRequestHandlerRegistration setObject:handler forKey:name];
-        ERNDebug(@"queuedRequestHandlerRegistration when react is not ready %@",
-                 queuedRequestHandlerRegistration);
-    } else {
-        ERNDebug(@"BridgeHolderNew: registering request handler with name %@",
-                 name);
-        [electrodeNativeBridge registerRequestCompletionHandlerWithName:name
-                                                                   uuid:uuid
-                                                             completion:completion];
-    }
-    return uuid;
+                      (ElectrodeBridgeRequestCompletionHandler)completion {
+  NSUUID *uuid = [NSUUID UUID];
+  if (!isReactNativeReady) {
+    ElectrodeQueuedRequestHandler *handler =
+        [[ElectrodeQueuedRequestHandler alloc] initWithUUID:uuid
+                                                    handler:completion];
+    [queuedRequestHandlerRegistration setObject:handler forKey:name];
+    ERNDebug(@"queuedRequestHandlerRegistration when react is not ready %@",
+             queuedRequestHandlerRegistration);
+  } else {
+    ERNDebug(@"BridgeHolderNew: registering request handler with name %@",
+             name);
+    [electrodeNativeBridge registerRequestCompletionHandlerWithName:name
+                                                               uuid:uuid
+                                                         completion:completion];
+  }
+  return uuid;
 }
 
-+ (nullable ElectrodeBridgeRequestCompletionHandler)unregisterRequestHandlerWithUUID: (NSUUID *)uuid {
-    return [electrodeNativeBridge unregisterRequestHandlerWithUUID:uuid];
++ (nullable ElectrodeBridgeRequestCompletionHandler)
+    unregisterRequestHandlerWithUUID:(NSUUID *)uuid {
+  return [electrodeNativeBridge unregisterRequestHandlerWithUUID:uuid];
 }
 
 + (NSUUID *)addEventListenerWithName:(NSString *)name
-                   eventListner:(ElectrodeBridgeEventListener)eventListner {
+                        eventListner:
+                            (ElectrodeBridgeEventListener)eventListner {
   NSUUID *eventListenerUUID = [NSUUID UUID];
   if (!isReactNativeReady) {
-      ElectrodeQueuedEventListener *listener = [[ElectrodeQueuedEventListener alloc] initWithUUID:eventListenerUUID
-                                                                                         listener:eventListner];
+    ElectrodeQueuedEventListener *listener =
+        [[ElectrodeQueuedEventListener alloc] initWithUUID:eventListenerUUID
+                                                  listener:eventListner];
     [queuedEventListenerRegistration setObject:listener forKey:name];
   } else {
-      [electrodeNativeBridge registerEventListenerWithName:name uuid:eventListenerUUID listener:eventListner];
+    [electrodeNativeBridge registerEventListenerWithName:name
+                                                    uuid:eventListenerUUID
+                                                listener:eventListner];
   }
 
-    return eventListenerUUID;
+  return eventListenerUUID;
 }
 
 + (BOOL)isReactNativeReady {
@@ -187,27 +195,31 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
            queuedRequestHandlerRegistration);
 
   for (NSString *handlerName in queuedRequestHandlerRegistration) {
-      ERNDebug(@"Registering queued request handler %@", handlerName);
+    ERNDebug(@"Registering queued request handler %@", handlerName);
 
-      ElectrodeQueuedRequestHandler *handleObj = queuedRequestHandlerRegistration[handlerName];
-      NSUUID *uuid = [handleObj uuid];
-      ElectrodeBridgeRequestCompletionHandler completion = [handleObj handler];
-      [electrodeNativeBridge registerRequestCompletionHandlerWithName:handlerName
-                                                                 uuid:uuid
-                                                           completion:completion];
+    ElectrodeQueuedRequestHandler *handleObj =
+        queuedRequestHandlerRegistration[handlerName];
+    NSUUID *uuid = [handleObj uuid];
+    ElectrodeBridgeRequestCompletionHandler completion = [handleObj handler];
+    [electrodeNativeBridge registerRequestCompletionHandlerWithName:handlerName
+                                                               uuid:uuid
+                                                         completion:completion];
   }
 
   [queuedRequestHandlerRegistration removeAllObjects];
 }
 
 + (void)registerQueuedEventListeners {
-    for (NSString *eventListnerName in queuedEventListenerRegistration) {
-        ElectrodeQueuedEventListener *handleObj = queuedEventListenerRegistration[eventListnerName];
-        NSUUID *uuid = [handleObj uuid];
-        [electrodeNativeBridge registerEventListenerWithName:eventListnerName uuid:uuid listener:[handleObj listener]];
-    }
+  for (NSString *eventListnerName in queuedEventListenerRegistration) {
+    ElectrodeQueuedEventListener *handleObj =
+        queuedEventListenerRegistration[eventListnerName];
+    NSUUID *uuid = [handleObj uuid];
+    [electrodeNativeBridge registerEventListenerWithName:eventListnerName
+                                                    uuid:uuid
+                                                listener:[handleObj listener]];
+  }
 
-    [queuedEventListenerRegistration removeAllObjects];
+  [queuedEventListenerRegistration removeAllObjects];
 }
 
 + (void)sendQueuedRequests {

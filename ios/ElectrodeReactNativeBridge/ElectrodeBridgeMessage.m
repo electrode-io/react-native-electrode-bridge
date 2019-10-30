@@ -15,8 +15,8 @@
  */
 
 #import "ElectrodeBridgeMessage.h"
-#import <ElectrodeReactNativeBridge/ElectrodeReactNativeBridge-Swift.h>
 #import "ElectrodeLogger.h"
+#import <ElectrodeReactNativeBridge/ElectrodeReactNativeBridge-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

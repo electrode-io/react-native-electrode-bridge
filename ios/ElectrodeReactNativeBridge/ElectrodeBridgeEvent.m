@@ -31,8 +31,9 @@
 }
 
 - (instancetype)initWithName:(NSString *)name data:(id)data {
-  if (self =
-          [super initWithName:name type:ElectrodeMessageTypeEvent data:data]) {
+  if (self = [super initWithName:name
+                            type:ElectrodeMessageTypeEvent
+                            data:data]) {
     return self;
   }
   ERNDebug(@"%@ : unable to create with data %@",

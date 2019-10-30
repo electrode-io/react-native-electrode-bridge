@@ -31,9 +31,10 @@ extern NSString *const kElectrodeBridgeResponseUnknownErrorCode;
 
 + (nullable instancetype)createResponseWithData:(NSDictionary *)data;
 + (nullable instancetype)
-createResponseForRequest:(ElectrodeBridgeRequest *)request
-        withResponseData:(nullable NSDictionary *)data
-      withFailureMessage:(nullable id<ElectrodeFailureMessage>)failureMessage;
+    createResponseForRequest:(ElectrodeBridgeRequest *)request
+            withResponseData:(nullable NSDictionary *)data
+          withFailureMessage:
+              (nullable id<ElectrodeFailureMessage>)failureMessage;
 @end
 
 NS_ASSUME_NONNULL_END

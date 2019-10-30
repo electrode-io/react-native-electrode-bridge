@@ -1,57 +1,36 @@
-matrix:
-  include:
-  - language: android
-    os: linux
-    jdk: oraclejdk8
-    node_js: false
-    before_install:
-    - nvm install 8
-    - node --version
-    - travis_retry curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key
-      add -
-    - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    - travis_retry sudo apt-get update -qq
-    - travis_retry sudo apt-get install -y -qq yarn
-    - yarn add react-native@0.52.1
-    android:
-      components:
-      - build-tools-28.0.3
-      - android-28
-      - android-22
-      - extra-android-m2repository
-      - extra-google-google_play_services
-      - extra-google-m2repository
-      - addon-google_apis-google-16
-      - sys-img-armeabi-v7a-android-22
-      licenses:
-      - android-sdk-license-.+
-    before_script:
-    - android list target
-    - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-    - emulator -avd test -no-skin -no-audio -no-window &
-    - android-wait-for-emulator
-    - adb shell input keyevent 82 &
-    script:
-    - cd android && ./gradlew connectedAndroidTest
-    branches:
-      only:
-      - master
-  - language: objective-c
-    osx_image: xcode9.2
-    install:
-    - nvm install 8
-    - rm -Rf "${TMPDIR}/jest_preprocess_cache"
-    - brew install yarn --ignore-dependencies
-    - yarn add react-native@0.55.3
-    script:
-    - ./scripts/objc-test-ios.sh;
-    cache:
-    - yarn
-    matrix:
-    - fast_finish: true
-    branches:
-      only:
-      - master
+before_cache: rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  yarn: true
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+branches:
+  only:
+    - master
 notifications:
   slack:
     secure: kghdW8usCFeiGjeA5RdS9Zv+S8J6+8KOZ10tpWXrd5X5pvbcO8kvOJWAhOeLbxpz3vwZJjceYzoGBaEYPShlWTxpoGvtLY7MrnActZkPbLTTxSJE7J4BcvG95rs8+u1gtkxmq1GykPU4POdCKXYZuUKg/xF3awtNuzyVwy43GRd4H/ScB5a/b3Jbg2Hab4mQ6+r4I3rfQOwmkcLSv/eEB2VewtqMy4nMZ5WkR2NvzVVeXvGFfGyqxctkY7joz/lEVHYjQ80l6BgWmk4nSsjwXzjMxT75PtVJA5ZflICAHLhrWoNOh27CqEfcxGgxJaVvebUKOYlqNum0Ct6RQd/mGoUQturY2wa+aApK4IClJ0FCviSF22ZMoPhQsqMxHrllYAOZOH7vZoiEZr9zekEUN/E4KyLxvTtu04cG4dqKrvTImg1RtHdAa5OmDfnr1C/MtCYuMsKfbNnGXN82sEyy3USmB5TZ2/pI+HFMSTC2phWW8Ia5Jc5b0oIr7z0xoObkXqhOTM5uqH+L3bGGx7f7SwYBds1yT5UNU9Ty3FpQ1JG8QBwtkCObMEgEI9196eybOyD6jofodoj+kjjxX17luJ25fKqkJE9M+650pfycOyhouswkGqiKf52Z+5iaSrJK2Z5ORdm8VvHA2oLfozPQQ1qI123j7xHYIKRlqHp//Sc=
+before_install:
+  - nvm install 11.0.0
+  - npm i -g yarn
+install: yarn
+jobs:
+  include:
+    - language: android
+      android:
+        components:
+          - build-tools-28.0.3
+          - android-28
+          - android-22
+          - sys-img-armeabi-v7a-android-22
+        licenses:
+          - android-sdk-license-.+
+      before_script:
+        - echo no | android create avd -f -n test -t android-22 -b armeabi-v7a
+        - emulator -avd test -no-audio -no-window &
+        - android-wait-for-emulator
+        - adb shell input keyevent 82 &
+      script: cd android && TERM=dumb ./gradlew connectedCheck
+    - language: objective-c
+      osx_image: xcode9.3
+      script: cd ios && xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone 6,OS=10.3.1" test | xcpretty

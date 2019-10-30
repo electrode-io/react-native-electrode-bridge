@@ -21,7 +21,7 @@ open class ElectrodeObject: NSObject {
         super.init()
     }
 
-    public override init() {
+    override public init() {
         super.init()
     }
 }

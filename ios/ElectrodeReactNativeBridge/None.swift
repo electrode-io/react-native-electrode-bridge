@@ -21,6 +21,5 @@ public class None: NSObject, Bridgeable {
         return NSDictionary()
     }
 
-    public init(emptyData _: Data?) {
-    }
+    public init(emptyData _: Data?) {}
 }

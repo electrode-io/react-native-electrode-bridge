@@ -38,7 +38,8 @@ public class Person: ElectrodeObject, Bridgeable {
 
     public required init(dictionary: [AnyHashable: Any]) {
         if let name = dictionary["name"] as? String,
-            let hiredMonth = dictionary["hiredMonth"] as? Int {
+           let hiredMonth = dictionary["hiredMonth"] as? Int
+        {
             self.name = name
             self.hiredMonth = hiredMonth
         } else {
@@ -47,8 +48,9 @@ public class Person: ElectrodeObject, Bridgeable {
             name = dictionary["name"] as! String
         }
 
-        if let generatedCompleteAddress = try? NSObject.generateObject(data: dictionary["addresses"], classType: Array<Any>.self, itemType: CompleteAddress.self),
-            let completeAddressList = generatedCompleteAddress as? [CompleteAddress] {
+        if let generatedCompleteAddress = try? NSObject.generateObject(data: dictionary["addresses"], classType: [Any].self, itemType: CompleteAddress.self),
+           let completeAddressList = generatedCompleteAddress as? [CompleteAddress]
+        {
             addresses = completeAddressList
         }
 
@@ -84,29 +86,30 @@ public class Person: ElectrodeObject, Bridgeable {
 
     public func toDictionary() -> NSDictionary {
         var dict = [
-            "name": self.name,
-            "hiredMonth": self.hiredMonth,
+            "name": name,
+            "hiredMonth": hiredMonth,
         ] as [AnyHashable: Any]
 
-        if let nonNullAge = self.age {
+        if let nonNullAge = age {
             dict["age"] = nonNullAge
         }
 
-        if let nonNullPosition = self.position {
+        if let nonNullPosition = position {
             dict["position"] = nonNullPosition.toDictionary()
         }
 
-        if let nonNullStatus = self.status {
+        if let nonNullStatus = status {
             dict["status"] = nonNullStatus.toDictionary()
         }
 
-        if let nonnullBirthYear = self.birthYear {
+        if let nonnullBirthYear = birthYear {
             dict["birthYear"] = nonnullBirthYear.toDictionary()
         }
 
-        if let nonNullAddresses = self.addresses {
+        if let nonNullAddresses = addresses {
             dict["addresses"] = nonNullAddresses.map { address in
-                address.toDictionary() }
+                address.toDictionary()
+            }
         }
 
         return dict as NSDictionary

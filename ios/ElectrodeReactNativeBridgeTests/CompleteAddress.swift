@@ -33,9 +33,10 @@ public class CompleteAddress: ElectrodeObject, Bridgeable {
 
     public required init(dictionary: [AnyHashable: Any]) {
         if let validStreetOne = dictionary["streetOne"] as? String,
-            let validZipcode = dictionary["zipcode"] as? String,
-            let validState = dictionary["state"] as? String,
-            let validCity = dictionary["city"] as? String {
+           let validZipcode = dictionary["zipcode"] as? String,
+           let validState = dictionary["state"] as? String,
+           let validCity = dictionary["city"] as? String
+        {
             streetOne = validStreetOne
             zipcode = validZipcode
             state = validState
@@ -53,9 +54,9 @@ public class CompleteAddress: ElectrodeObject, Bridgeable {
     }
 
     public func toDictionary() -> NSDictionary {
-        var dict = ["streetOne": self.streetOne, "zipcode": self.zipcode, "state": self.state, "city": self.city]
+        var dict = ["streetOne": streetOne, "zipcode": zipcode, "state": state, "city": city]
 
-        if let nonNullStreetTwo = self.streetTwo {
+        if let nonNullStreetTwo = streetTwo {
             dict["streetTwo"] = nonNullStreetTwo
         }
 

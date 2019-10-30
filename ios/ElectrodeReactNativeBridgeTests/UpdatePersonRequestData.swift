@@ -30,7 +30,8 @@ public class UpdatePersonRequestData: ElectrodeObject, Bridgeable {
 
     public required init(dictionary: [AnyHashable: Any]) {
         if let firstName = dictionary["firstName"] as? String,
-            let lastName = dictionary["lastName"] as? String {
+           let lastName = dictionary["lastName"] as? String
+        {
             self.firstName = firstName
             self.lastName = lastName
         } else {
@@ -52,7 +53,7 @@ public class UpdatePersonRequestData: ElectrodeObject, Bridgeable {
         dict["firstName"] = firstName
         dict["lastName"] = lastName
 
-        if let validStatus = self.status {
+        if let validStatus = status {
             dict["status"] = validStatus.toDictionary()
         }
 

@@ -56,5 +56,4 @@ class MyOwnPetEvents: PetAPI.Events {
     }
 }
 
-class MyOwnPetAPI: PetAPI {
-}
+class MyOwnPetAPI: PetAPI {}

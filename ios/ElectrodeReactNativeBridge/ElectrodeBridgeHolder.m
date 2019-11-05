@@ -83,10 +83,10 @@ static NSMutableArray<id<ConstantsProvider>> *queuedConstantsProvider;
   [ElectrodeBridgeTransceiver
       registerReactNativeReadyListener:^(
           ElectrodeBridgeTransceiver *_Nonnull transceiver) {
-        isReactNativeReady = YES;
         electrodeNativeBridge = transceiver;
         [ElectrodeBridgeHolder registerQueuedEventListeners];
         [ElectrodeBridgeHolder registerQueuedRequestHandlers];
+        isReactNativeReady = YES;
         [ElectrodeBridgeHolder sendQueuedEvents];
         [ElectrodeBridgeHolder sendQueuedRequests];
         [ElectrodeBridgeHolder addQueuedConstantsProvider];

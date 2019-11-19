@@ -4,10 +4,11 @@ import {
   DeviceEventEmitter,
   NativeEventEmitter,
   NativeModules,
-  Platform
-} from 'react-native'
-import uuid from 'uuid'
-var EventEmitter = require('events')
+  Platform,
+} from 'react-native';
+import uuid from 'uuid';
+
+var EventEmitter = require('events');
 
 //=====================================================
 // Sample message format
@@ -19,7 +20,7 @@ var EventEmitter = require('events')
 //   "data": "a string"
 // }
 //
-// "type", "id"" and "name are" mandatory. They'll be
+// "type", "id" and "name" are mandatory. They'll be
 // present in any message
 //
 // "data" is optional. It is the payload associated
@@ -32,44 +33,46 @@ var EventEmitter = require('events')
 // specified. "error" and "data" are mutually exclusive
 //=====================================================
 
-const MAX_LISTENERS = 100
+const MAX_LISTENERS = 100;
 
 // All messages (requests/responses/events) coming from the native side
 // will be transmitted as events with the following event name
-const ELECTRODE_BRIDGE_MESSAGE_EVENT_NAME = 'electrode.bridge.message'
+const ELECTRODE_BRIDGE_MESSAGE_EVENT_NAME = 'electrode.bridge.message';
 
 // The different message types
-const ELECTRODE_BRIDGE_REQUEST_TYPE = 'req'
-const ELECTRODE_BRIDGE_RESPONSE_TYPE = 'rsp'
-const ELECTRODE_BRIDGE_EVENT_TYPE = 'event'
+const ELECTRODE_BRIDGE_REQUEST_TYPE = 'req';
+const ELECTRODE_BRIDGE_RESPONSE_TYPE = 'rsp';
+const ELECTRODE_BRIDGE_EVENT_TYPE = 'event';
 
-const DEFAULT_REQUEST_TIMEOUT_IN_MS = 5000
+const DEFAULT_REQUEST_TIMEOUT_IN_MS = 5000;
 
 const ERROR_REQUEST_TIMEOUT = {
   code: 'EREQUESTIMEOUT',
-  message: 'Request timeout'
-}
+  message: 'Request timeout',
+};
 
 const ERROR_NO_REQUEST_HANDLER = {
   code: 'ENOHANDLER',
-  message: 'No registered request handler'
-}
+  message: 'No registered request handler',
+};
 
 class ElectrodeBridge extends EventEmitter {
   constructor() {
-    super()
+    super();
 
-    let eventEmitter = (Platform.OS === 'ios')
-      ? new NativeEventEmitter(NativeModules.ElectrodeBridge)
-      : DeviceEventEmitter
+    let eventEmitter =
+      Platform.OS === 'ios'
+        ? new NativeEventEmitter(NativeModules.ElectrodeBridge)
+        : DeviceEventEmitter;
 
     eventEmitter.addListener(
       ELECTRODE_BRIDGE_MESSAGE_EVENT_NAME,
-      this._onMessageFromNative.bind(this))
+      this._onMessageFromNative.bind(this),
+    );
 
-    this.requestHandlerByRequestName = new Map()
-    this.pendingResponseCallbackById = new Map()
-    this.eventListenerUUIDRef = new Map()
+    this.requestHandlerByRequestName = new Map();
+    this.pendingResponseCallbackById = new Map();
+    this.eventListenerUUIDRef = new Map();
   }
 
   //============================================================================
@@ -83,13 +86,12 @@ class ElectrodeBridge extends EventEmitter {
    * @param {Object} obj - Options
    * @param {Object} obj.data - The data attached to this event [DEFAULT : {}]
    */
-  emitEvent(
-    name /*: string */ , {
-      data
-    } = {} /*: Object */ ) {
-      const eventMessage = this._buildMessage(ELECTRODE_BRIDGE_EVENT_TYPE, name, { data })
-      NativeModules.ElectrodeBridge.sendMessage(eventMessage)
-      this.emit(name, data)
+  emitEvent(name /*: string */, {data} = {} /*: Object */) {
+    const eventMessage = this._buildMessage(ELECTRODE_BRIDGE_EVENT_TYPE, name, {
+      data,
+    });
+    NativeModules.ElectrodeBridge.sendMessage(eventMessage);
+    this.emit(name, data);
   }
 
   /**
@@ -101,25 +103,28 @@ class ElectrodeBridge extends EventEmitter {
    * @param {number} obj.timeout - The timeout of the request in ms [DEFAULT:5000]
    */
   sendRequest(
-    name /*: string */ , {
-      data,
-      timeout = DEFAULT_REQUEST_TIMEOUT_IN_MS
-    } = {} /*: Object */ ) /*: Promise<*> */ {
-    let requestPromise
+    name /*: string */,
+    {data, timeout = DEFAULT_REQUEST_TIMEOUT_IN_MS} = {} /*: Object */,
+  ) /*: Promise<*> */ {
+    let requestPromise;
 
     if (this.requestHandlerByRequestName.has(name)) {
-      requestPromise = this.requestHandlerByRequestName.get(name)(data)
+      requestPromise = this.requestHandlerByRequestName.get(name)(data);
     } else {
-      let requestMessage = this._buildMessage(ELECTRODE_BRIDGE_REQUEST_TYPE, name, { data })
-      requestPromise = this._waitForResponse(requestMessage.id)
-      NativeModules.ElectrodeBridge.sendMessage(requestMessage)
+      let requestMessage = this._buildMessage(
+        ELECTRODE_BRIDGE_REQUEST_TYPE,
+        name,
+        {data},
+      );
+      requestPromise = this._waitForResponse(requestMessage.id);
+      NativeModules.ElectrodeBridge.sendMessage(requestMessage);
     }
 
     const timeoutPromise = new Promise((resolve, reject) => {
-      setTimeout(reject, timeout, ERROR_REQUEST_TIMEOUT)
-    })
+      setTimeout(reject, timeout, ERROR_REQUEST_TIMEOUT);
+    });
 
-    return Promise.race([requestPromise, timeoutPromise])
+    return Promise.race([requestPromise, timeoutPromise]);
   }
 
   /**
@@ -128,14 +133,14 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} name - The name of the request associated to the handler
    * @param {Function} handler - The handler promise
    */
-  registerRequestHandler(
-    name /*: string */ ,
-    handler /*: Promise<*> */ ) {
+  registerRequestHandler(name /*: string */, handler /*: Promise<*> */) {
     if (this.requestHandlerByRequestName.has(name)) {
-      throw new Error(`A handler is already registered for request name ${name}`)
+      throw new Error(
+        `A handler is already registered for request name ${name}`,
+      );
     }
 
-    this.requestHandlerByRequestName.set(name, handler)
+    this.requestHandlerByRequestName.set(name, handler);
   }
 
   /**
@@ -144,14 +149,12 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} name - The name of the event
    * @param {Function} handler - A function to handle incoming events having this name
    */
-  registerEventListener(
-    name /*:string */ ,
-    handler /*:Function*/ ) /*:string */ {
-    this.addListener(name, handler)
-    let event = { name , handler}
-    let eventUUID = uuid.v4()
-    this.eventListenerUUIDRef.set(eventUUID, event)
-    return eventUUID
+  registerEventListener(name /*:string */, handler /*:Function*/) /*:string */ {
+    this.addListener(name, handler);
+    let event = {name, handler};
+    let eventUUID = uuid.v4();
+    this.eventListenerUUIDRef.set(eventUUID, event);
+    return eventUUID;
   }
 
   /**
@@ -159,12 +162,11 @@ class ElectrodeBridge extends EventEmitter {
    *
    * @param {string} name - UUID of the event
    */
-  removeEventListener(
-    uuid /*:string */ ) /*:EventEmitter*/ {
-    const event = this.eventListenerUUIDRef.get(uuid)
-    if(event) {
-      this.eventListenerUUIDRef.delete(uuid)
-      return this.removeListener(event.name, event.handler)
+  removeEventListener(uuid /*:string */) /*:EventEmitter*/ {
+    const event = this.eventListenerUUIDRef.get(uuid);
+    if (event) {
+      this.eventListenerUUIDRef.delete(uuid);
+      return this.removeListener(event.name, event.handler);
     }
   }
 
@@ -182,20 +184,16 @@ class ElectrodeBridge extends EventEmitter {
    * @param {Object} obj.error - The error attached to this message
    * @param {string} obj.id - The id of this message
    */
-  _buildMessage(type, name, {
-      data,
-      error,
-      id = uuid.v4()
-    } = {}) {
-    let message = { type, name, id }
+  _buildMessage(type, name, {data, error, id = uuid.v4()} = {}) {
+    let message = {type, name, id};
     //Check only if data is null or undefined. 0, false are valid values
-    if ((data !== undefined) && (data !== null)) {
-      message.data = data
+    if (data !== undefined && data !== null) {
+      message.data = data;
     } else if (error) {
-      message.error = error
+      message.error = error;
     }
 
-    return message
+    return message;
   }
 
   /**
@@ -208,12 +206,12 @@ class ElectrodeBridge extends EventEmitter {
     return new Promise((resolve, reject) => {
       this.pendingResponseCallbackById.set(requestId, (data, error) => {
         if (error) {
-        reject(error)
+          reject(error);
         } else {
-        resolve(data)
+          resolve(data);
         }
-      })
-    })
+      });
+    });
   }
 
   /**
@@ -226,40 +224,46 @@ class ElectrodeBridge extends EventEmitter {
           const errorMessage = this._buildMessage(
             ELECTRODE_BRIDGE_RESPONSE_TYPE,
             message.name,
-            { id: message.id, error: ERROR_NO_REQUEST_HANDLER })
-          return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
+            {id: message.id, error: ERROR_NO_REQUEST_HANDLER},
+          );
+          return NativeModules.ElectrodeBridge.sendMessage(errorMessage);
         }
 
-        this.requestHandlerByRequestName.get(message.name)(message.data)
-        .then((data) => {
-          const responseMessage = this._buildMessage(
-            ELECTRODE_BRIDGE_RESPONSE_TYPE,
-            message.name,
-            { id: message.id, data })
-          return NativeModules.ElectrodeBridge.sendMessage(responseMessage)
-        })
-        .catch((error) => {
-          const errorMessage = this._buildMessage(
-            ELECTRODE_BRIDGE_RESPONSE_TYPE,
-            message.name,
-            { id: message.id, error });
-          return NativeModules.ElectrodeBridge.sendMessage(errorMessage)
-        })
-        break
+        this.requestHandlerByRequestName
+          .get(message.name)(message.data)
+          .then((data) => {
+            const responseMessage = this._buildMessage(
+              ELECTRODE_BRIDGE_RESPONSE_TYPE,
+              message.name,
+              {id: message.id, data},
+            );
+            return NativeModules.ElectrodeBridge.sendMessage(responseMessage);
+          })
+          .catch((error) => {
+            const errorMessage = this._buildMessage(
+              ELECTRODE_BRIDGE_RESPONSE_TYPE,
+              message.name,
+              {id: message.id, error},
+            );
+            return NativeModules.ElectrodeBridge.sendMessage(errorMessage);
+          });
+        break;
 
       case ELECTRODE_BRIDGE_RESPONSE_TYPE:
         if (this.pendingResponseCallbackById.has(message.id)) {
-          this.pendingResponseCallbackById.get(message.id)(message.data, message.error)
-          this.pendingResponseCallbackById.delete(message.id)
+          this.pendingResponseCallbackById.get(message.id)(
+            message.data,
+            message.error,
+          );
+          this.pendingResponseCallbackById.delete(message.id);
         }
-        break
+        break;
 
       case ELECTRODE_BRIDGE_EVENT_TYPE:
-        this.emitEvent(message.name, message.data ? { data: message.data } : {})
-        break
+        this.emitEvent(message.name, message.data ? {data: message.data} : {});
+        break;
     }
   }
-
 
   /**
    * Dispatch a request originating from the JS side
@@ -269,13 +273,14 @@ class ElectrodeBridge extends EventEmitter {
    * @param {Object} data - The data associated to the request
    */
   _dispatchJsOriginatingRequest(
-    name /* : string */ ,
-    id /*: string */ ,
-    data /*: Object */ ) {
+    name /* : string */,
+    id /*: string */,
+    data /*: Object */,
+  ) {
     if (!this.requestHandlerByRequestName.has(name)) {
-      throw ERROR_NO_REQUEST_HANDLER
+      throw ERROR_NO_REQUEST_HANDLER;
     }
-    return this.requestHandlerByRequestName.get(name)(data)
+    return this.requestHandlerByRequestName.get(name)(data);
   }
 
   /**
@@ -284,15 +289,15 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} requestId - The id of the request associated to this response
    * @param {Object} data - The response data
    */
-  _sendSuccessResponseToNative(
-    requestId /*: string */ ,
-    data /*: Object*/ ) {
+  _sendSuccessResponseToNative(requestId /*: string */, data /*: Object*/) {
     NativeModules.ElectrodeBridge.dispatchEvent(
       ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME,
-      uuid.v4(), {
+      uuid.v4(),
+      {
         requestId,
-        data
-      })
+        data,
+      },
+    );
   }
 
   /**
@@ -301,24 +306,24 @@ class ElectrodeBridge extends EventEmitter {
    * @param {string} requestId - The id of the request associated to this response
    * @param {Object} error - The response error
    */
-  _sendErrorResponseToNative(
-    requestId /*: string */ ,
-    error) {
+  _sendErrorResponseToNative(requestId /*: string */, error) {
     NativeModules.ElectrodeBridge.dispatchEvent(
       ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME,
-      uuid.v4(), {
+      uuid.v4(),
+      {
         requestId,
-        error
-      })
+        error,
+      },
+    );
   }
 }
 
 export const DispatchMode = {
   NATIVE: 0,
   JS: 1,
-  GLOBAL: 2
+  GLOBAL: 2,
 };
 
-const electrodeBridge = new ElectrodeBridge()
-electrodeBridge.setMaxListeners(MAX_LISTENERS)
-export { electrodeBridge }
+const electrodeBridge = new ElectrodeBridge();
+electrodeBridge.setMaxListeners(MAX_LISTENERS);
+export {electrodeBridge};

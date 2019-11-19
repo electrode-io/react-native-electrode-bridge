@@ -32,5 +32,5 @@ jobs:
         - adb shell input keyevent 82 &
       script: cd android && TERM=dumb ./gradlew connectedCheck
     - language: objective-c
-      osx_image: xcode9.3
-      script: cd ios && xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone 6,OS=10.3.1" test | xcpretty
+      osx_image: xcode10.3
+      script: cd ios && xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone 8,OS=10.3.1" test | xcpretty

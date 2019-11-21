@@ -19,12 +19,11 @@ package com.walmartlabs.electrode.reactnative.sample.model;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
-
-import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
 
 public class Position implements Parcelable, Bridgeable {
 
@@ -88,7 +87,7 @@ public class Position implements Parcelable, Bridgeable {
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
         bundle.putDouble("lat", lat);
-        if(lng != null) {
+        if (lng != null) {
             bundle.putDouble("lng", lng);
         }
         return bundle;

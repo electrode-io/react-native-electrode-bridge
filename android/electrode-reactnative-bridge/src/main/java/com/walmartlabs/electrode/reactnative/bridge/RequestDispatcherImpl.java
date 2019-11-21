@@ -16,7 +16,7 @@
 
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
@@ -46,7 +46,7 @@ class RequestDispatcherImpl implements RequestDispatcher {
             responseListener.onFailure(failureMessage);
             return;
         }
-        requestHandler.onRequest(bridgeRequest,responseListener);
+        requestHandler.onRequest(bridgeRequest, responseListener);
     }
 
 

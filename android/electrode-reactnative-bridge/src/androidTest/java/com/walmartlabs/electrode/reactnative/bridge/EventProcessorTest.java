@@ -16,7 +16,7 @@
 
 package com.walmartlabs.electrode.reactnative.bridge;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.sample.api.PersonApi;
 import com.walmartlabs.electrode.reactnative.sample.model.Person;

@@ -17,7 +17,8 @@
 package com.walmartlabs.electrode.reactnative.bridge.helpers;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
@@ -25,7 +26,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
-import com.walmartlabs.electrode.reactnative.bridge.BridgeMessage;
 
 import javax.annotation.Nullable;
 
@@ -137,7 +137,7 @@ public class ArgumentsEx {
                     break;
                 case Array: {
                     ReadableArray readableArray = readableMap.getArray(key);
-                    if(readableArray.size() > 0) {
+                    if (readableArray.size() > 0) {
                         switch (readableArray.getType(0)) {
                             case String:
                                 bundle.putStringArray(key, ArgumentsEx.toStringArray(readableArray));

@@ -210,8 +210,7 @@ RCT_EXPORT_METHOD(sendMessage : (NSDictionary *)bridgeMessage) {
 
 - (void)emitMessage:(ElectrodeBridgeMessage *_Nonnull)bridgeMessage {
   ERNDebug(@"Sending bridgeMessage(%@) to JS", bridgeMessage);
-  [self sendEventWithName:@"electrode.bridge.message"
-                     body:[bridgeMessage toDictionary]];
+  [sharedInstance sendEventWithName:@"electrode.bridge.message" body:[bridgeMessage toDictionary]];
 }
 
 - (void)notifyReactNativeEventListenerWithEvent:(ElectrodeBridgeEvent *)event {

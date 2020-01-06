@@ -17,6 +17,7 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.UUID;
 
@@ -66,7 +67,7 @@ public interface ElectrodeNativeBridge {
      * @param name
      * @return {@link UUID} of the request handler
      */
-    @NonNull
+    @Nullable
     UUID getRequestHandlerId(@NonNull String name);
 
     /**

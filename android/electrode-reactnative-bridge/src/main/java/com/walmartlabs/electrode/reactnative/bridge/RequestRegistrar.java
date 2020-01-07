@@ -59,6 +59,6 @@ public interface RequestRegistrar<T> {
      * @param name
      * @return {@link UUID} of the request handler
      */
-    @NonNull
+    @Nullable
     UUID getRequestHandlerId(@NonNull String name);
 }

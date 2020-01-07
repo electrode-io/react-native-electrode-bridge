@@ -146,7 +146,7 @@ class ElectrodeBridgeTransceiver extends ReactContextBaseJavaModule implements E
         sConstantsProviders.add(constantsProvider);
     }
 
-    @NonNull
+    @Nullable
     @Override
     public UUID getRequestHandlerId(@NonNull String name) {
         return sRequestRegistrar.getRequestHandlerId(name);

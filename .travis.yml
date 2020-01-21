@@ -11,7 +11,7 @@ notifications:
   slack:
     secure: kghdW8usCFeiGjeA5RdS9Zv+S8J6+8KOZ10tpWXrd5X5pvbcO8kvOJWAhOeLbxpz3vwZJjceYzoGBaEYPShlWTxpoGvtLY7MrnActZkPbLTTxSJE7J4BcvG95rs8+u1gtkxmq1GykPU4POdCKXYZuUKg/xF3awtNuzyVwy43GRd4H/ScB5a/b3Jbg2Hab4mQ6+r4I3rfQOwmkcLSv/eEB2VewtqMy4nMZ5WkR2NvzVVeXvGFfGyqxctkY7joz/lEVHYjQ80l6BgWmk4nSsjwXzjMxT75PtVJA5ZflICAHLhrWoNOh27CqEfcxGgxJaVvebUKOYlqNum0Ct6RQd/mGoUQturY2wa+aApK4IClJ0FCviSF22ZMoPhQsqMxHrllYAOZOH7vZoiEZr9zekEUN/E4KyLxvTtu04cG4dqKrvTImg1RtHdAa5OmDfnr1C/MtCYuMsKfbNnGXN82sEyy3USmB5TZ2/pI+HFMSTC2phWW8Ia5Jc5b0oIr7z0xoObkXqhOTM5uqH+L3bGGx7f7SwYBds1yT5UNU9Ty3FpQ1JG8QBwtkCObMEgEI9196eybOyD6jofodoj+kjjxX17luJ25fKqkJE9M+650pfycOyhouswkGqiKf52Z+5iaSrJK2Z5ORdm8VvHA2oLfozPQQ1qI123j7xHYIKRlqHp//Sc=
 before_install:
-  - nvm install 11.0.0
+  - nvm install 12.0.0
   - npm i -g yarn
 install: yarn
 jobs:
@@ -32,5 +32,6 @@ jobs:
         - adb shell input keyevent 82 &
       script: cd android && TERM=dumb ./gradlew connectedCheck
     - language: objective-c
-      osx_image: xcode10.3
-      script: cd ios && xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone X,OS=11.4" test | xcpretty && exit ${PIPESTATUS[0]}
+      osx_image: xcode11.3
+      before_script: cd ios/
+      script: xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone X,OS=11.4" test | xcpretty && exit ${PIPESTATUS[0]}

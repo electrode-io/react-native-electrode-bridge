@@ -165,20 +165,28 @@ public final class ElectrodeBridgeHolder {
             ElectrodeBridgeEventListener<ElectrodeBridgeEvent> eventListener = null;
             synchronized (mQueuedEventListenersRegistration) {
                 String key = null;
+                boolean shouldRemove = false;
                 for (Map.Entry<String, List<EventListenerPlaceholder>> entry : mQueuedEventListenersRegistration.entrySet()) {
                     List<EventListenerPlaceholder> placeholderList = entry.getValue();
+                    EventListenerPlaceholder matchingPlaceHolder = null;
                     for (EventListenerPlaceholder placeholder : placeholderList) {
                         if (eventListenerUuid == placeholder.getUUID()) {
                             key = entry.getKey();
                             eventListener = placeholder.getEventListener();
-                            placeholderList.remove(placeholder);
+                            matchingPlaceHolder = placeholder;
                             break;
                         }
                     }
-                    if (placeholderList.size() == 0) {
-                        mQueuedEventListenersRegistration.remove(key);
+                    if (matchingPlaceHolder != null) {
+                        placeholderList.remove(matchingPlaceHolder);
+                        if (placeholderList.size() == 0) {
+                            shouldRemove = true;
+                        }
                         break;
                     }
+                }
+                if (shouldRemove) {
+                    mQueuedEventListenersRegistration.remove(key);
                 }
             }
             return eventListener;
@@ -197,11 +205,16 @@ public final class ElectrodeBridgeHolder {
         if (!isReactNativeReady) {
             ElectrodeBridgeRequestHandler<ElectrodeBridgeRequest, Object> requestHandler = null;
             synchronized (mQueuedRequestHandlersRegistration) {
+                String eventName = null;
                 for (Map.Entry<String, RequestHandlerPlaceholder> entry : mQueuedRequestHandlersRegistration.entrySet()) {
                     if (entry.getValue().getUUID() == requestHandlerUuid) {
+                        eventName = entry.getKey();
                         requestHandler = entry.getValue().getRequestHandler();
-                        mQueuedRequestHandlersRegistration.remove(entry.getKey());
+                        break;
                     }
+                }
+                if (eventName != null) {
+                    mQueuedRequestHandlersRegistration.remove(eventName);
                 }
             }
             return requestHandler;

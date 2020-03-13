@@ -1,6 +1,6 @@
 # react-native-electrode-bridge
 
-![travis ci](https://travis-ci.org/electrode-io/react-native-electrode-bridge.svg?branch=master)
+[![ci][1]][2]
 
 This project is essentially a React Native library, consisting of a JavaScript module and an associated Android and iOS Native modules.
 
@@ -443,3 +443,6 @@ listenerProcessor.execute()
 ```
 
 Note: Multiple event listeners can be registered for the same event.
+
+[1]: https://github.com/electrode-io/react-native-electrode-bridge/workflows/ci/badge.svg
+[2]: https://github.com/electrode-io/react-native-electrode-bridge/actions

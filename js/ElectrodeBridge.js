@@ -32,6 +32,7 @@ var EventEmitter = require('events')
 // specified. "error" and "data" are mutually exclusive
 //=====================================================
 
+const MAX_LISTENERS = 100
 
 // All messages (requests/responses/events) coming from the native side
 // will be transmitted as events with the following event name
@@ -318,4 +319,6 @@ export const DispatchMode = {
   GLOBAL: 2
 };
 
-export const electrodeBridge = new ElectrodeBridge()
+const electrodeBridge = new ElectrodeBridge()
+electrodeBridge.setMaxListeners(MAX_LISTENERS)
+export electrodeBridge

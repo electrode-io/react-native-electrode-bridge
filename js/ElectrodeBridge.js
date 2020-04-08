@@ -321,4 +321,4 @@ export const DispatchMode = {
 
 const electrodeBridge = new ElectrodeBridge()
 electrodeBridge.setMaxListeners(MAX_LISTENERS)
-export electrodeBridge
+export { electrodeBridge }

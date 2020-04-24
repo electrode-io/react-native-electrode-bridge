@@ -9,7 +9,7 @@
   "main": "js/ElectrodeBridge.js",
   "dependencies": {
     "events": "^1.1.1",
-    "uuid": "^3.0.0"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

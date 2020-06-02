@@ -34,4 +34,4 @@ jobs:
       - run: yarn
       - name: Run iOS tests
         working-directory: ./ios
-        run: xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone 8,OS=13.3" test
+        run: xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone 8,OS=13.4.1" test

@@ -7,18 +7,18 @@ This project is essentially a React Native library, consisting of a JavaScript m
 ## Features
 
 It is built on top of the React Native built-in bridging constructs (to communicate between JavaScript and native code).
-It and offers a clean bi-directional communication API, exposing methods to send events and/or requests from/to any side of the bridge (JS/Native).
-It offers more options and flexibility to communicate between the JS/Native side that is not offered out of the box by react native. Ultimately it can help with integrating react native applications into existing native code bases.
-It might be used as one of the basic building block of react native apps and native modules.
+It offers a clean bi-directional communication API, exposing methods to send events and/or requests from/to any side of the bridge (JS/Native).
+It provides more options and flexibility to communicate between the JS/Native side that is not provided out of the box by React Native. Ultimately, it can help with integrating React Native applications into existing native code bases.
+It might be used as one of the basic building blocks of React Native apps and native modules.
 
-Here is a non-exhaustive list of a few reasons to use this library as the low level communication bridge instead of the built-in react native constructs:
+Here is a non-exhaustive list of a few reasons why to use this library as the low level communication bridge instead of the built-in React Native constructs:
 
-- Isolates the host application from react native library types and specifics (vanilla Java/Android/Swift implementation)
+- Isolates the host application from React Native library types and specifics (Vanilla Java/Android/Swift implementation)
 - Messages can be sent either to the other side of the bridge or on the same side (or both)
 - Request timeout supported
-- Offer an easy way to send requests from Native to JS side.
+- Offers an easy way to send requests from Native to JS side.
 - Offers type safety on native side while communicating to JS side.
-- More than a bridge, it can be used as a message hub that allows react native apps / native modules intercommunication
+- More than a bridge, it can be used as a message hub that allows React Native apps / native modules intercommunication
 
 Read more about bridge [HERE](https://electrode.gitbooks.io/electrode-native/content/platform-parts/bridge.html)
 

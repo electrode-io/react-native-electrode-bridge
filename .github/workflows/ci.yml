@@ -36,6 +36,10 @@ jobs:
         with:
           node-version: '16'
       - run: yarn --frozen-lockfile
+      - uses: gradle/gradle-build-action@v2
+      - name: Create Gradle Wrapper scripts
+        working-directory: ./android
+        run: gradle wrapper --gradle-version 5.4.1
       - name: Run Android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:

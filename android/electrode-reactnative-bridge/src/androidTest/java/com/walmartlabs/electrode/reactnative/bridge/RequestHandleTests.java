@@ -10,8 +10,10 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertSame;
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 public class RequestHandleTests extends BaseBridgeTestCase {
@@ -184,5 +186,46 @@ public class RequestHandleTests extends BaseBridgeTestCase {
         });
 
         waitForCountDownToFinishOrFail(countDownLatch);
+    }
+
+    @Test
+    public void testRequestHandlerIsRegisteredOnUnregister() {
+        final String requestName = "testRequestHandlerRemoval";
+
+        RequestHandlerHandle requestHandle = new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertSame(None.NONE, payload);
+                responseListener.onSuccess(null);
+            }
+        }).execute();
+        assertTrue(requestHandle.isRegistered());
+        requestHandle.unregister();
+        assertFalse(requestHandle.isRegistered());
+    }
+
+    @Test
+    public void testRequestHandlerIsRegisteredOnReRegister() {
+        final String requestName = "testRequestHandlerRemoval";
+
+        RequestHandlerHandle requestHandle = new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertSame(None.NONE, payload);
+                responseListener.onSuccess(null);
+            }
+        }).execute();
+        assertTrue(requestHandle.isRegistered());
+        RequestHandlerHandle newRequestHandle = new RequestHandlerProcessor<>(requestName, None.class, None.class, new ElectrodeBridgeRequestHandler<None, None>() {
+            @Override
+            public void onRequest(@Nullable None payload, @NonNull ElectrodeBridgeResponseListener<None> responseListener) {
+                assertSame(None.NONE, payload);
+                responseListener.onSuccess(null);
+            }
+        }).execute();
+        //Ensure a new request handler registration removes the old one
+        assertFalse(requestHandle.isRegistered());
+
+        assertTrue(newRequestHandle.isRegistered());
     }
 }

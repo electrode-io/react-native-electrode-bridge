@@ -90,6 +90,11 @@ public class RequestHandlerProcessor<TReq, TResp> implements RequestHandlerHandl
     }
 
     @Override
+    public boolean isRegistered() {
+        return ElectrodeBridgeHolder.isRegistered(id);
+    }
+
+    @Override
     public boolean unregister() {
         Logger.d(TAG, "Removing registered request handler %s with id %s", handler, id);
         ElectrodeBridgeHolder.unregisterRequestHandler(id);

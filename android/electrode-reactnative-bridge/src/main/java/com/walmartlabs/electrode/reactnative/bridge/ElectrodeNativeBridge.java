@@ -62,6 +62,14 @@ public interface ElectrodeNativeBridge {
     UUID getRequestHandlerId(@NonNull String name);
 
     /**
+     * Validates if the request handler associated with the id is still in registered state.
+     *
+     * @param requestHandlerUuid requestHandlerId
+     * @return true | false
+     */
+    boolean isRegistered(@NonNull UUID requestHandlerUuid);
+
+    /**
      * Sends an event with some data to the all the even listeners.
      *
      * @param event {@link ElectrodeBridgeEvent} to emit

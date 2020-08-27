@@ -93,6 +93,11 @@ public class RequestRegistrarImpl<T> implements RequestRegistrar<T> {
         return null;
     }
 
+    @Override
+    public boolean isRegistered(@NonNull UUID requestHandlerUuid) {
+        return mRequestNameByUUID.containsKey(requestHandlerUuid);
+    }
+
     private void removeOldUuidMapping(@NonNull String name) {
         UUID oldUuid = getRequestHandlerId(name);
         if (oldUuid != null) {

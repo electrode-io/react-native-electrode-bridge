@@ -1,5 +1,8 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+    branches: '*'
+  pull_request:
 jobs:
   build:
     strategy:
@@ -18,13 +21,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: yarn
+      - run: yarn --frozen-lockfile
   test-android:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - run: yarn
+      - run: yarn --frozen-lockfile
       - name: Run Android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -36,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - run: yarn
+      - run: yarn --frozen-lockfile
       - name: Run iOS tests
         working-directory: ./ios
         run: xcodebuild -project "ElectrodeReactNativeBridge.xcodeproj" -scheme "ElectrodeReactNativeBridgeTests" -destination "platform=iOS Simulator,name=iPhone 8" test

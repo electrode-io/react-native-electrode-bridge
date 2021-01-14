@@ -145,7 +145,6 @@ electrodeBridge.registerRequestHandler(
 electrodeBridge.registerEventListener(
   name: String,
   handler: Function): void
-}
 ```
 
 Registers an event listener that will be invoked whenever an event of the specific `type` is received by the bridge.

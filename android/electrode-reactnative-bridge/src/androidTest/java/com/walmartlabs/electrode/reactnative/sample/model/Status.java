@@ -19,12 +19,11 @@ package com.walmartlabs.electrode.reactnative.sample.model;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
-
-import static com.walmartlabs.electrode.reactnative.bridge.util.BridgeArguments.getNumberValue;
 
 public class Status implements Parcelable, Bridgeable {
 
@@ -97,7 +96,7 @@ public class Status implements Parcelable, Bridgeable {
     @NonNull
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        if(log != null) {
+        if (log != null) {
             bundle.putBoolean("log", log);
         }
         bundle.putBoolean("member", member);

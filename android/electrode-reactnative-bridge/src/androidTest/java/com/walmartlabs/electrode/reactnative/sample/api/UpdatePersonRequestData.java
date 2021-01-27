@@ -17,8 +17,9 @@
 package com.walmartlabs.electrode.reactnative.sample.api;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.walmartlabs.electrode.reactnative.bridge.Bridgeable;
 import com.walmartlabs.electrode.reactnative.sample.model.Status;

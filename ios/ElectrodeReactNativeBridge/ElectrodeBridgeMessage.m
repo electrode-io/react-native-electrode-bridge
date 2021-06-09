@@ -15,7 +15,11 @@
  */
 
 #import "ElectrodeBridgeMessage.h"
+#if __has_include(<ElectrodeReactNativeBridge/ElectrodeReactNativeBridge-Swift.h>)
 #import <ElectrodeReactNativeBridge/ElectrodeReactNativeBridge-Swift.h>
+#else
+#import <ElectrodeReactNativeBridge-Swift.h>
+#endif
 #import "ElectrodeLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN

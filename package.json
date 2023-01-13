@@ -4,6 +4,7 @@
   "description": "Low level communication bridge between React Native js and native",
   "main": "js/ElectrodeBridge.js",
   "scripts": {
+    "build": "flow check",
     "format": "prettier --write .",
     "lint": "eslint ."
   },
@@ -21,6 +22,7 @@
     "@react-native-community/eslint-config": "^2.0.0",
     "babel-jest": "^24.8.0",
     "eslint": "^7.0.0",
+    "flow-bin": "^0.92.0",
     "jest": "^24.8.0",
     "metro-react-native-babel-preset": "^0.55.0",
     "react": "16.8.3",

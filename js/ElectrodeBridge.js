@@ -291,7 +291,7 @@ class ElectrodeBridge extends EventEmitter {
    */
   _sendSuccessResponseToNative(requestId /*: string */, data /*: Object*/) {
     NativeModules.ElectrodeBridge.dispatchEvent(
-      ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME,
+      ELECTRODE_BRIDGE_EVENT_TYPE,
       uuid.v4(),
       {
         requestId,
@@ -308,7 +308,7 @@ class ElectrodeBridge extends EventEmitter {
    */
   _sendErrorResponseToNative(requestId /*: string */, error) {
     NativeModules.ElectrodeBridge.dispatchEvent(
-      ELECTRODE_BRIDGE_RESPONSE_EVENT_NAME,
+      ELECTRODE_BRIDGE_EVENT_TYPE,
       uuid.v4(),
       {
         requestId,

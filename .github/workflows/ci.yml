@@ -27,6 +27,7 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: yarn prettier --check .
       - run: yarn lint
+      - run: yarn build
   test-android:
     runs-on: macos-latest
     steps:

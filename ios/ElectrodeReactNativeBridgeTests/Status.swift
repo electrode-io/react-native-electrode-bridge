@@ -29,7 +29,8 @@ public class Status: ElectrodeObject, Bridgeable {
 
     public required init(dictionary: [AnyHashable: Any]) {
         if let log = dictionary["log"] as? Bool,
-            let member = dictionary["member"] as? Bool {
+           let member = dictionary["member"] as? Bool
+        {
             self.log = log
             self.member = member
         } else {
@@ -41,6 +42,6 @@ public class Status: ElectrodeObject, Bridgeable {
     }
 
     public func toDictionary() -> NSDictionary {
-        return ["log": self.log, "member": self.member] as NSDictionary
+        return ["log": log, "member": member] as NSDictionary
     }
 }

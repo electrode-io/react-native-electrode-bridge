@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "ElectrodeBridgeProtocols.h"
 #import "ElectrodeBridgeRequest.h"
 #import "ElectrodeBridgeResponse.h"
+#import <Foundation/Foundation.h>
+
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeBridgeTransaction : NSObject
 
 @property(nonatomic, readonly, strong) ElectrodeBridgeRequest *request;
-@property(nonatomic, readonly, copy, nullable) ElectrodeBridgeResponseCompletionHandler completion;
+@property(nonatomic, readonly, copy, nullable)
+    ElectrodeBridgeResponseCompletionHandler completion;
 // Note: response can be set
 @property(nonatomic, readwrite, strong, nullable)
     ElectrodeBridgeResponse *response;
 
 - (instancetype)initWithRequest:(ElectrodeBridgeRequest *)request
-              completionHandler:(ElectrodeBridgeResponseCompletionHandler _Nullable)completion;
+              completionHandler:
+                  (ElectrodeBridgeResponseCompletionHandler _Nullable)
+                      completion;
 - (NSString *)transactionId;
 - (BOOL)isJsInitiated;
 

@@ -26,8 +26,8 @@ public class PersonAPI {
     static let kRequestPostPersonUpdate = "kRequestPostPersonUpdate"
     static let kRequestFindPersonsByStatus = "kRequestFindPersonsByStatus"
     static let kRequestFindPersonsByName = "kRequestFindPersonsByName"
-    lazy var event: Events = { PersonEvents() }()
-    lazy var request: Requests = { PersonRequests() }()
+    lazy var event: Events = PersonEvents()
+    lazy var request: Requests = PersonRequests()
 
     public class Events {
         func addPersonAddedEventListenr(eventListener _: @escaping ElectrodeBridgeEventListener) {
@@ -42,8 +42,7 @@ public class PersonAPI {
             assertionFailure("need override")
         }
 
-        func emitEventPersonNameUpdated(updatedName _: String) {
-        }
+        func emitEventPersonNameUpdated(updatedName _: String) {}
     }
 
     public class Requests {
@@ -112,17 +111,20 @@ public class PersonAPI {
         }
 
         func updatePersonPost(updatePersonRequestData _: UpdatePersonRequestData,
-                              responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
+                              responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler)
+        {
             assertionFailure("need override")
         }
 
         func findPersonsByStatus(statusList _: [Status],
-                                 responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
+                                 responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler)
+        {
             assertionFailure("need override")
         }
 
         func findPersonByAge(names _: [String],
-                             responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler) {
+                             responseCompletionHandler _: @escaping ElectrodeBridgeResponseCompletionHandler)
+        {
             assertionFailure("need override")
         }
     }

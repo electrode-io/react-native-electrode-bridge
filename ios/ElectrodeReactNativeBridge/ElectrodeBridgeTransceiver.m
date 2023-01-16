@@ -15,14 +15,14 @@
  */
 
 #import "ElectrodeBridgeTransceiver.h"
+#import "ElectrodeBridgeHolder.h"
+#import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeBridgeTransceiver_Internal.h"
 #import "ElectrodeEventDispatcher.h"
-#import "ElectrodeRequestDispatcher.h"
-#import "ElectrodeBridgeTransaction.h"
 #import "ElectrodeEventRegistrar.h"
-#import "ElectrodeRequestRegistrar.h"
 #import "ElectrodeLogger.h"
-#import "ElectrodeBridgeHolder.h"
+#import "ElectrodeRequestDispatcher.h"
+#import "ElectrodeRequestRegistrar.h"
 
 #if __has_include(<React/RCTLog.h>)
 #import <React/RCTLog.h>
@@ -40,8 +40,8 @@
 #import "React/RCTBridge.h" // Required when used as a Pod in a Swift project
 #endif
 
-#import "ElectrodeBridgeMessage.h"
 #import "ElectrodeBridgeEvent.h"
+#import "ElectrodeBridgeMessage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,8 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) NSString *name;
 @property(nonatomic, strong) ElectrodeEventDispatcher *eventDispatcher;
 @property(nonatomic, strong) ElectrodeRequestDispatcher *requestDispatcher;
-@property(nonatomic, copy) NSMutableDictionary<NSString *, ElectrodeBridgeTransaction *> *pendingTransaction;
-@property(nonatomic, assign) dispatch_queue_t syncQueue; // this is used to make sure access to
+@property(nonatomic, copy)
+    NSMutableDictionary<NSString *, ElectrodeBridgeTransaction *>
+        *pendingTransaction;
+@property(nonatomic, assign)
+    dispatch_queue_t syncQueue; // this is used to make sure access to
                                 // pendingTransaction is thread safe.
 
 @end
@@ -125,16 +128,21 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
   [self handleRequest:request completionHandler:completion];
 }
 
-- (void) registerRequestCompletionHandlerWithName:(NSString *)name
-                                             uuid: (NSUUID *) uuid
-                                       completion: (ElectrodeBridgeRequestCompletionHandler) completion {
-    [self.requestDispatcher.requestRegistrar registerRequestCompletionHandlerWithName:name
-                                                                                 uuid:uuid completion:completion];
+- (void)
+    registerRequestCompletionHandlerWithName:(NSString *)name
+                                        uuid:(NSUUID *)uuid
+                                  completion:
+                                      (ElectrodeBridgeRequestCompletionHandler)
+                                          completion {
+  [self.requestDispatcher.requestRegistrar
+      registerRequestCompletionHandlerWithName:name
+                                          uuid:uuid
+                                    completion:completion];
 }
 
-
-- (nullable ElectrodeBridgeRequestCompletionHandler) unregisterRequestHandlerWithUUID:(NSUUID *)uuid {
-    return [requestRegistrar unregisterRequestHandler:uuid];
+- (nullable ElectrodeBridgeRequestCompletionHandler)
+    unregisterRequestHandlerWithUUID:(NSUUID *)uuid {
+  return [requestRegistrar unregisterRequestHandler:uuid];
 }
 
 - (void)resetRegistrar {
@@ -148,17 +156,21 @@ RCT_EXPORT_MODULE(ElectrodeBridge);
   [self notifyReactNativeEventListenerWithEvent:event];
 }
 
-- (void) registerEventListenerWithName: (NSString *_Nonnull)name
-                                  uuid: (NSUUID * _Nonnull)uuid
-                              listener: (ElectrodeBridgeEventListener _Nonnull)eventListener {
+- (void)registerEventListenerWithName:(NSString *_Nonnull)name
+                                 uuid:(NSUUID *_Nonnull)uuid
+                             listener:(ElectrodeBridgeEventListener _Nonnull)
+                                          eventListener {
   ERNDebug(@"%@, Adding eventListener %@ for event %@",
            NSStringFromClass([self class]), eventListener, name);
   [self.eventDispatcher.eventRegistrar registerEventListener:eventListener
-                                                          name:name uuid:uuid];
+                                                        name:name
+                                                        uuid:uuid];
 }
-- (nullable ElectrodeBridgeEventListener)removeEventListnerWithUUID: (NSUUID *) uuid {
-    ERNDebug(@"Removing event listener with NNUUID with string %@", uuid.UUIDString);
-    return [eventRegistrar unregisterEventListener:uuid];
+- (nullable ElectrodeBridgeEventListener)removeEventListnerWithUUID:
+    (NSUUID *)uuid {
+  ERNDebug(@"Removing event listener with NNUUID with string %@",
+           uuid.UUIDString);
+  return [eventRegistrar unregisterEventListener:uuid];
 }
 #pragma ElectrodeReactBridge
 
@@ -211,7 +223,8 @@ RCT_EXPORT_METHOD(sendMessage : (NSDictionary *)bridgeMessage) {
 
 - (void)emitMessage:(ElectrodeBridgeMessage *_Nonnull)bridgeMessage {
   ERNDebug(@"Sending bridgeMessage(%@) to JS", bridgeMessage);
-  [sharedInstance sendEventWithName:@"electrode.bridge.message" body:[bridgeMessage toDictionary]];
+  [sharedInstance sendEventWithName:@"electrode.bridge.message"
+                               body:[bridgeMessage toDictionary]];
 }
 
 - (void)notifyReactNativeEventListenerWithEvent:(ElectrodeBridgeEvent *)event {
@@ -255,9 +268,9 @@ RCT_EXPORT_METHOD(sendMessage : (NSDictionary *)bridgeMessage) {
 }
 
 - (ElectrodeBridgeTransaction *)
-createTransactionWithRequest:(ElectrodeBridgeRequest *)request
-           completionHandler:
-               (ElectrodeBridgeResponseCompletionHandler)completion {
+    createTransactionWithRequest:(ElectrodeBridgeRequest *)request
+               completionHandler:
+                   (ElectrodeBridgeResponseCompletionHandler)completion {
   ElectrodeBridgeTransaction *transaction =
       [[ElectrodeBridgeTransaction alloc] initWithRequest:request
                                         completionHandler:completion];
@@ -377,18 +390,18 @@ createTransactionWithRequest:(ElectrodeBridgeRequest *)request
                          @"always be set for a local transaction"];
     } else {
       if (response.failureMessage != nil) {
-          ERNDebug(@"Completing transaction by issuing a failure call back to "
-                   @"local response listener");
-          ElectrodeBridgeFailureMessage *failureMessage = response.failureMessage;
-          dispatch_async(dispatch_get_main_queue(), ^{
-              transaction.completion(nil, failureMessage);
-          });
+        ERNDebug(@"Completing transaction by issuing a failure call back to "
+                 @"local response listener");
+        ElectrodeBridgeFailureMessage *failureMessage = response.failureMessage;
+        dispatch_async(dispatch_get_main_queue(), ^{
+          transaction.completion(nil, failureMessage);
+        });
       } else {
-          ERNDebug(@"Completing transaction by issuing a success call back to "
-                   @"local response listener");
-          dispatch_async(dispatch_get_main_queue(), ^{
-              transaction.completion(response.data, nil);
-          });
+        ERNDebug(@"Completing transaction by issuing a success call back to "
+                 @"local response listener");
+        dispatch_async(dispatch_get_main_queue(), ^{
+          transaction.completion(response.data, nil);
+        });
       }
     }
   }
@@ -439,7 +452,9 @@ createTransactionWithRequest:(ElectrodeBridgeRequest *)request
 }
 
 - (void)startObserving {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ElectrodeBridgeDidStartObservingNotification object:self];
+  [[NSNotificationCenter defaultCenter]
+      postNotificationName:ElectrodeBridgeDidStartObservingNotification
+                    object:self];
 }
 
 @end

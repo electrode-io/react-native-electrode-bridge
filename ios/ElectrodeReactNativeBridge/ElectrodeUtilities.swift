@@ -46,18 +46,16 @@ public enum GenerateObjectError: Error {
 }
 
 extension NSObject {
-
     // Returns the property type
     func getTypeOfProperty(_ name: String) -> Property<Any>? {
-
-        var type: Mirror = Mirror(reflecting: self)
+        var type = Mirror(reflecting: self)
 
         for child in type.children {
             if child.label! == name {
                 #if swift(>=4.0)
-                let res = Swift.type(of: child.value)
+                    let res = Swift.type(of: child.value)
                 #else
-                let res = type(of: child.value)
+                    let res = type(of: child.value)
                 #endif
                 let tmp = ElectrodeUtilities.isObjectiveCPrimitives(type: res)
                 return (!tmp) ? .Class(res) : .Struct
@@ -67,9 +65,9 @@ extension NSObject {
             for child in parent.children {
                 if child.label! == name {
                     #if swift(>=4.0)
-                    let res = Swift.type(of: child.value)
+                        let res = Swift.type(of: child.value)
                     #else
-                    let res = type(of: child.value)
+                        let res = type(of: child.value)
                     #endif
                     let tmp = ElectrodeUtilities.isObjectiveCPrimitives(type: res)
                     return (tmp) ? .Class(res) : .Struct
@@ -81,7 +79,7 @@ extension NSObject {
     }
 
     func toNSDictionary() -> NSDictionary {
-        let type: Mirror = Mirror(reflecting: self)
+        let type = Mirror(reflecting: self)
         var res = [AnyHashable: Any]()
         for case let (label, value) in type.children {
             res[label!] = value
@@ -103,7 +101,7 @@ extension NSObject {
     public static func generateObject(data: Any, classType: Any.Type, itemType: Any.Type? = nil) throws -> Any {
         var res: Any
         // check to see if the type already matches. so no need to serialize or deserialize
-        if type(of: data) == classType && !(data is Array<Any>) {
+        if type(of: data) == classType, !(data is [Any]) {
             return data
         }
 
@@ -117,9 +115,9 @@ extension NSObject {
                 assertionFailure("failed here")
                 return NSString()
             }
-        } else if data is Array<Any> {
-            if let arrayData = data as? Array<Any> {
-                var tmpRes = Array<AnyObject>()
+        } else if data is [Any] {
+            if let arrayData = data as? [Any] {
+                var tmpRes = [AnyObject]()
                 guard let validItemType = itemType else { throw GenerateObjectError.emptyArrayItemType }
                 for item in arrayData {
                     var obj: AnyObject
@@ -142,15 +140,13 @@ extension NSObject {
 }
 
 @objc class ElectrodeUtilities: NSObject {
-
     static func isObjectiveCPrimitives(type: Any.Type) -> Bool {
-        return (objectiveCPrimitives.contains(where: { (aClass) -> Bool in
+        return (objectiveCPrimitives.contains(where: { aClass -> Bool in
             aClass == type
         }))
     }
 
     static func convertObjectToBridgeMessageData(object: Any?) -> Any? {
-
         if let objectArray = object as? NSArray {
             let converted = ElectrodeUtilities.convertArrayToDictionary(object: objectArray)
             return converted
@@ -160,7 +156,7 @@ extension NSObject {
         return convertedData
     }
 
-    private static func convertArrayToDictionary(object: NSArray) -> Array<Any?> {
+    private static func convertArrayToDictionary(object: NSArray) -> [Any?] {
         var res = [Any?]()
         for item in object {
             if let itemArray = item as? NSArray {
@@ -181,9 +177,9 @@ extension NSObject {
             return bridgeMessageReadyDictionary
         }
         #if swift(>=4.0)
-        let type = Swift.type(of: validObject)
+            let type = Swift.type(of: validObject)
         #else
-        let type = type(of: validObject)
+            let type = type(of: validObject)
         #endif
         if ElectrodeUtilities.isObjectiveCPrimitives(type: type) {
             return validObject

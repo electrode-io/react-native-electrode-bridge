@@ -26,7 +26,7 @@ public class Position: ElectrodeObject, Bridgeable {
         super.init()
     }
 
-    public override init() {
+    override public init() {
         lat = 0
         lng = 0
         super.init()
@@ -34,7 +34,8 @@ public class Position: ElectrodeObject, Bridgeable {
 
     public required init(dictionary: [AnyHashable: Any]) {
         if let lat = dictionary["lat"] as? Double,
-            let lng = dictionary["lng"] as? Double {
+           let lng = dictionary["lng"] as? Double
+        {
             self.lat = lat
             self.lng = lng
         } else {
@@ -47,6 +48,6 @@ public class Position: ElectrodeObject, Bridgeable {
     }
 
     public func toDictionary() -> NSDictionary {
-        return ["lat": self.lat, "lgn": self.lng] as NSDictionary
+        return ["lat": lat, "lgn": lng] as NSDictionary
     }
 }

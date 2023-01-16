@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import "ElectrodeEventRegistrar.h"
 #import "ElectrodeBridgeEvent.h"
+#import "ElectrodeEventRegistrar.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, strong, readonly) ElectrodeEventRegistrar *eventRegistrar;
 
-- (instancetype)initWithEventRegistrar:(ElectrodeEventRegistrar *)eventRegistrar;
+- (instancetype)initWithEventRegistrar:
+    (ElectrodeEventRegistrar *)eventRegistrar;
 - (void)dispatchEvent:(ElectrodeBridgeEvent *)bridgeEvent;
 
 @end

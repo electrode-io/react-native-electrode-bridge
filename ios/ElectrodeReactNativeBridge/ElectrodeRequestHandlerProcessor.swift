@@ -28,7 +28,8 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
                 reqClass: TReq.Type,
                 reqItemType: Any.Type? = nil,
                 respClass: TResp.Type,
-                requestCompletionHandler: @escaping ElectrodeBridgeRequestCompletionHandler) {
+                requestCompletionHandler: @escaping ElectrodeBridgeRequestCompletionHandler)
+    {
         tag = String(describing: type(of: self))
         self.requestName = requestName
         self.reqClass = reqClass
@@ -50,7 +51,7 @@ public class ElectrodeRequestHandlerProcessor<TReq, TResp>: NSObject, Processor 
                     request = nil
                 }
             }
-            //this is passed back to Native side.
+            // this is passed back to Native side.
             self.requestCompletionHandler(request, responseCompletion)
         }
         return uuid

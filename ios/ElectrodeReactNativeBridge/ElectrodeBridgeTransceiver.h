@@ -38,12 +38,15 @@
  * react native side.
  */
 NS_ASSUME_NONNULL_BEGIN
-@interface ElectrodeBridgeTransceiver : RCTEventEmitter <ElectrodeNativeBridge, ElectrodeReactBridge>
+@interface ElectrodeBridgeTransceiver
+    : RCTEventEmitter <ElectrodeNativeBridge, ElectrodeReactBridge>
 
 @property(nonatomic, copy, readonly, nonnull) NSString *name;
 + (instancetype)sharedInstance;
-+ (void)registerReactNativeReadyListener:(ElectrodeBridgeReactNativeReadyListner _Nonnull)reactNativeReadyListner;
-+ (void)registerReactTransceiverReadyListner:(ElectrodeBridgeReactNativeReadyListner _Nonnull)reactNativeReadyListner;
++ (void)registerReactNativeReadyListener:
+    (ElectrodeBridgeReactNativeReadyListner _Nonnull)reactNativeReadyListner;
++ (void)registerReactTransceiverReadyListner:
+    (ElectrodeBridgeReactNativeReadyListner _Nonnull)reactNativeReadyListner;
 - (void)onReactNativeInitialized;
 - (void)onTransceiverModuleInitialized;
 @end

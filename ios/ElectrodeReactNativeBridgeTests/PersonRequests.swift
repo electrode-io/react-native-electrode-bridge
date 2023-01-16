@@ -38,7 +38,7 @@ class PersonRequests: PersonAPI.Requests {
     }
 
     override func registerFindPersonsByStatus(handler: @escaping ElectrodeBridgeRequestCompletionHandler) {
-        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestFindPersonsByStatus, reqClass: Array<Any>.self, reqItemType: Status.self, respClass: Person.self, requestCompletionHandler: handler)
+        let requestHandler = ElectrodeRequestHandlerProcessor(requestName: PersonAPI.kRequestFindPersonsByStatus, reqClass: [Any].self, reqItemType: Status.self, respClass: Person.self, requestCompletionHandler: handler)
         requestHandler.execute()
     }
 
@@ -57,7 +57,8 @@ class PersonRequests: PersonAPI.Requests {
     }
 
     override func getStatus(person: Person,
-                            responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+                            responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
+    {
         let requestProcessor = ElectrodeRequestProcessor<Person, Status, Any>(requestName: PersonAPI.kRequestGetStatus,
                                                                               requestPayload: person,
                                                                               respClass: Status.self,
@@ -85,7 +86,8 @@ class PersonRequests: PersonAPI.Requests {
     }
 
     override func updatePersonPost(updatePersonRequestData: UpdatePersonRequestData,
-                                   responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+                                   responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
+    {
         let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Person, Any>(requestName: PersonAPI.kRequestPostPersonUpdate,
                                                                                   requestPayload: updatePersonRequestData,
                                                                                   respClass: Person.self,
@@ -95,22 +97,24 @@ class PersonRequests: PersonAPI.Requests {
     }
 
     override func findPersonsByStatus(statusList: [Status],
-                                      responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
-        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Array<Any>, Any>(requestName: PersonAPI.kRequestFindPersonsByStatus,
-                                                                                      requestPayload: statusList,
-                                                                                      respClass: Array<Any>.self,
-                                                                                      responseItemType: Person.self,
-                                                                                      responseCompletionHandler: responseCompletionHandler)
+                                      responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
+    {
+        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, [Any], Any>(requestName: PersonAPI.kRequestFindPersonsByStatus,
+                                                                                 requestPayload: statusList,
+                                                                                 respClass: [Any].self,
+                                                                                 responseItemType: Person.self,
+                                                                                 responseCompletionHandler: responseCompletionHandler)
         requestProcessor.execute()
     }
 
     override func findPersonByAge(names: [String],
-                                  responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
-        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, Array<Any>, Any>(requestName: PersonAPI.kRequestFindPersonsByName,
-                                                                                      requestPayload: names,
-                                                                                      respClass: Array<Any>.self,
-                                                                                      responseItemType: Int.self,
-                                                                                      responseCompletionHandler: responseCompletionHandler)
+                                  responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
+    {
+        let requestProcessor = ElectrodeRequestProcessor<Bridgeable, [Any], Any>(requestName: PersonAPI.kRequestFindPersonsByName,
+                                                                                 requestPayload: names,
+                                                                                 respClass: [Any].self,
+                                                                                 responseItemType: Int.self,
+                                                                                 responseCompletionHandler: responseCompletionHandler)
         requestProcessor.execute()
     }
 }

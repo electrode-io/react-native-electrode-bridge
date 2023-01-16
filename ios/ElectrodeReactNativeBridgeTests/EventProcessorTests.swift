@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import XCTest
 @testable import ElectrodeReactNativeBridge
+import XCTest
 
 class EventProcessorTests: ElectrodeBridgeBaseTests {
-
     func testEventsForModelObjectNativeToNative() {
         let asyncExpectation = expectation(description: "testEventsForModelObjectNativeToNative")
 

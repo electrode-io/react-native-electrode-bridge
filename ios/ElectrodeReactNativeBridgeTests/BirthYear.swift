@@ -26,7 +26,7 @@ public class BirthYear: ElectrodeObject, Bridgeable {
         super.init()
     }
 
-    public override init() {
+    override public init() {
         month = 0
         year = 0
         super.init()
@@ -34,7 +34,8 @@ public class BirthYear: ElectrodeObject, Bridgeable {
 
     public required init(dictionary: [AnyHashable: Any]) {
         if let month = dictionary["month"] as? Int,
-            let year = dictionary["year"] as? Int {
+           let year = dictionary["year"] as? Int
+        {
             self.month = month
             self.year = year
         } else {
@@ -46,6 +47,6 @@ public class BirthYear: ElectrodeObject, Bridgeable {
     }
 
     public func toDictionary() -> NSDictionary {
-        return ["month": self.month, "year": self.year] as NSDictionary
+        return ["month": month, "year": year] as NSDictionary
     }
 }

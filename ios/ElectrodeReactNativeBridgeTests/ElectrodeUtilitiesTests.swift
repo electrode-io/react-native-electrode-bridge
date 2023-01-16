@@ -19,7 +19,6 @@ import XCTest
 @testable import ElectrodeReactNativeBridge
 
 class ElectrodeUtilitiesTests: XCTestCase {
-
     func testGenerateObjectWithIntInput() {
         let primitiveData = 2
         let returnType = type(of: primitiveData)
@@ -72,7 +71,7 @@ class ElectrodeUtilitiesTests: XCTestCase {
 
     func testGenerateObjectWithArrayOfPrimitivesAsInput() {
         let strArray = ["a", "b"]
-        let returnType = Array<Any>.self
+        let returnType = [Any].self
         let itemType = String.self
         let arrayPrimitivesGen = try? NSObject.generateObject(data: strArray, classType: returnType, itemType: itemType)
         guard let res = arrayPrimitivesGen as? [String] else {
@@ -86,7 +85,7 @@ class ElectrodeUtilitiesTests: XCTestCase {
 
     func testGenerateObjectWithArrayOfComplexObjectAsInput() {
         let addressArray = [["street": "a", "zipcode": "94086"], ["street": "b", "zipcode": "94087"]]
-        let returnType = Array<Any>.self
+        let returnType = [Any].self
         let itemType = Address.self
         let arrayAddressGen = try? NSObject.generateObject(data: addressArray, classType: returnType, itemType: itemType)
         guard let res = arrayAddressGen as? [Address] else {
@@ -157,7 +156,8 @@ class ElectrodeUtilitiesTests: XCTestCase {
 
     required init(dictionary: [AnyHashable: Any]) {
         if let street = dictionary["street"] as? String,
-            let zipcode = dictionary["zipcode"] as? String {
+           let zipcode = dictionary["zipcode"] as? String
+        {
             self.street = street
             self.zipcode = zipcode
         } else {

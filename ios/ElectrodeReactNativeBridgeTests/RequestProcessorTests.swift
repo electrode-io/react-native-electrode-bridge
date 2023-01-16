@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import XCTest
 @testable import ElectrodeReactNativeBridge
+import XCTest
 
 class RequestProcessorTests: ElectrodeBridgeBaseTests {
     var personAPI: PersonAPI?
@@ -193,8 +193,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
             XCTAssertEqual(returnedPerson.hiredMonth, person.hiredMonth)
             XCTAssertEqual(returnedPerson.age, person.age)
             responseCompletionHandler(resultStatus, nil)
-        }
-        )
+        })
         let requestPayload = [
             "name": person.name,
             "hiredMonth": person.hiredMonth,
@@ -369,6 +368,7 @@ class RequestProcessorTests: ElectrodeBridgeBaseTests {
 }
 
 // MARK: Helper
+
 class SwiftMockJSEeventListener: MockJSEeventListener {
     override init(responseBlock: @escaping responseBlock) {
         super.init(responseBlock: responseBlock)

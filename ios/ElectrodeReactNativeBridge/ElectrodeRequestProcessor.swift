@@ -31,7 +31,8 @@ public class ElectrodeRequestProcessor<TReq, TResp, TItem>: NSObject {
                 requestPayload: Any?,
                 respClass: TResp.Type,
                 responseItemType: Any.Type?,
-                responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler) {
+                responseCompletionHandler: @escaping ElectrodeBridgeResponseCompletionHandler)
+    {
         tag = String(describing: type(of: self))
         self.requestName = requestName
         self.requestPayload = requestPayload

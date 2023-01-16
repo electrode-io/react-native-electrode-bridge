@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "ElectrodeBridgeProtocols.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 @interface ElectrodeRequestRegistrar : NSObject
@@ -27,9 +27,12 @@ NS_ASSUME_NONNULL_BEGIN
  @param name The name of the event in reverse url format.
  @param completion The request handler that will parse and process a request.
  */
-- (void) registerRequestCompletionHandlerWithName:(NSString *)name
-                                             uuid: (NSUUID *) uuid
-                                       completion: (ElectrodeBridgeRequestCompletionHandler) completion;
+- (void)
+    registerRequestCompletionHandlerWithName:(NSString *)name
+                                        uuid:(NSUUID *)uuid
+                                  completion:
+                                      (ElectrodeBridgeRequestCompletionHandler)
+                                          completion;
 
 /**
  * Unregisters a request handler
@@ -38,7 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
  * registerRequestHandler
  * call
  */
-- (nullable ElectrodeBridgeRequestCompletionHandler)unregisterRequestHandler:(NSUUID *)uuid;
+- (nullable ElectrodeBridgeRequestCompletionHandler)unregisterRequestHandler:
+    (NSUUID *)uuid;
 
 /**
  Grabs a given request handler for a request name.

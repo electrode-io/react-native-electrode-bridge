@@ -10,22 +10,22 @@ jobs:
         node: ['16']
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
-          - node: '12'
-            os: ubuntu-latest
           - node: '14'
+            os: ubuntu-latest
+          - node: '18'
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - run: yarn --frozen-lockfile
   test-android:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
       - run: yarn --frozen-lockfile
@@ -38,13 +38,13 @@ jobs:
   test-ios:
     runs-on: macos-10.15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '12.0'
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
       - run: yarn --frozen-lockfile
       - name: Run iOS tests
         working-directory: ./ios

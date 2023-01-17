@@ -16,11 +16,17 @@ jobs:
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
+      - if: runner.os == 'Windows'
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - run: yarn --frozen-lockfile
+      - run: yarn prettier --check .
+      - run: yarn lint
   test-android:
     runs-on: macos-latest
     steps:

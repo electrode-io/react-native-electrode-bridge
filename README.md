@@ -25,9 +25,9 @@ Read more about bridge [HERE](https://electrode.gitbooks.io/electrode-native/con
 ## Compatibility
 
 | React Native Version | Bridge Version |
-| ------------- | -----|
-| v0.42->v0.47 | v1.5.0+ |
-| v0.48+ | v1.5.9+ |
+| -------------------- | -------------- |
+| v0.42->v0.47         | v1.5.0+        |
+| v0.48+               | v1.5.9+        |
 
 ## Getting Started
 
@@ -41,18 +41,18 @@ Communication through the Electrode Native bridge is based on message exchanges 
   A Request message is used to request data from a receiver or to request an action to be performed by a receiver. A Request message always results in an associated response message that can contain either the requested data or indicate the result of an action. A Request message can optionally contain a payload. For any given Request message type, there can be only one associated receiver. The receiver handles the request and issues a response message. From a developer perspective, a Request message can be thought as being a method call.
 
 - `Response`\
-A Response message is the result of a single Request message. A Response message can optionally contain a payload. From a developer perspective, a Response message can be thought as the return value of a method. The value can be of a specific type or not (void).
+  A Response message is the result of a single Request message. A Response message can optionally contain a payload. From a developer perspective, a Response message can be thought as the return value of a method. The value can be of a specific type or not (void).
 
 - `Event`\
-An Event message is a "fire and forget" message. The sender of the Event message does not expect a response --so the receiver is known as a listener. Unlike a Request message, an Event message can be received by multiple listeners. All registered listeners (on the JavaScript side and native side) for a specific event message type will receive the Event message.
+  An Event message is a "fire and forget" message. The sender of the Event message does not expect a response --so the receiver is known as a listener. Unlike a Request message, an Event message can be received by multiple listeners. All registered listeners (on the JavaScript side and native side) for a specific event message type will receive the Event message.
 
 ### JavaScript
 
 ```javascript
-import { electrodeBridge } from 'react-native-electrode-bridge';
+import {electrodeBridge} from 'react-native-electrode-bridge';
 ```
 
-Once you import the module, you can interact with the ```electrodeBridge``` instance through a few API methods:
+Once you import the module, you can interact with the `electrodeBridge` instance through a few API methods:
 
 #### electrodeBridge.sendRequest
 
@@ -72,8 +72,8 @@ Mandatory:
 
 Optional:
 
-- `data`: An object to include as the data payload of the request *(Default: {})*
-- `timeout`: A timeout in milliseconds, after which, if no response was received, the returned promise will be rejected with error code `EREQUESTIMEOUT`. *(Default: 5000)*
+- `data`: An object to include as the data payload of the request _(Default: {})_
+- `timeout`: A timeout in milliseconds, after which, if no response was received, the returned promise will be rejected with error code `EREQUESTIMEOUT`. _(Default: 5000)_
 
 Example:
 
@@ -104,12 +104,12 @@ Mandatory:
 
 Optional:
 
-- `data`: An object to include as the data payload of the event *(Default: {})*
+- `data`: An object to include as the data payload of the event _(Default: {})_
 
 Example:
 
 ```javascript
-electrodeBridge.emitEvent("myapp.some.event");
+electrodeBridge.emitEvent('myapp.some.event');
 ```
 
 #### electrodeBridge.registerRequestHandler
@@ -132,11 +132,11 @@ Example:
 
 ```javascript
 electrodeBridge.registerRequestHandler(
-  "myapp.awesomerequest",
+  'myapp.awesomerequest',
   (requestData) => {
-    return Promise.resolve({ hello: "World"});
-  }
-)
+    return Promise.resolve({hello: 'World'});
+  },
+);
 ```
 
 #### electrodeBridge.registerEventListener
@@ -157,12 +157,9 @@ Mandatory:
 Example:
 
 ```javascript
-electrodeBridge.registerEventListener(
-  "myapp.coolevent",
-  (eventData) => {
-    // Do whatever you need to do
-  }
-)
+electrodeBridge.registerEventListener('myapp.coolevent', (eventData) => {
+  // Do whatever you need to do
+});
 ```
 
 ### Android
@@ -220,7 +217,7 @@ The `RequestProcessor` takes care of generating a `ElectrodeBridgeRequest` and s
 
 In case of a request not expecting any `ElectrodeBridgeRequest` use `None` as the type.
 
-`<input data>`:  can be null.
+`<input data>`: can be null.
 
 #### ElectrodeBridge.emitEvent
 

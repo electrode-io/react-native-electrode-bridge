@@ -131,12 +131,9 @@ Mandatory:
 Example:
 
 ```javascript
-electrodeBridge.registerRequestHandler(
-  'myapp.awesomerequest',
-  (requestData) => {
-    return Promise.resolve({hello: 'World'});
-  },
-);
+electrodeBridge.registerRequestHandler('myapp.awesomerequest', requestData => {
+  return Promise.resolve({hello: 'World'});
+});
 ```
 
 #### electrodeBridge.registerEventListener
@@ -157,7 +154,7 @@ Mandatory:
 Example:
 
 ```javascript
-electrodeBridge.registerEventListener('myapp.coolevent', (eventData) => {
+electrodeBridge.registerEventListener('myapp.coolevent', eventData => {
   // Do whatever you need to do
 });
 ```

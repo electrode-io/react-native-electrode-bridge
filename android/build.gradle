@@ -9,10 +9,10 @@ buildscript {
     if (project == rootProject) {
         repositories {
             google()
-            jcenter()
+            mavenCentral()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:3.2.1'
+            classpath 'com.android.tools.build:gradle:4.2.2'
         }
     }
 }
@@ -20,11 +20,11 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         ndk {
@@ -46,30 +46,26 @@ android {
     }
 }
 
-def REACT_NATIVE_VERSION = new groovy.json.JsonSlurper().parse(new File("$rootDir/../node_modules/react-native/package.json")).version
-configurations.all {
-    resolutionStrategy {
-        // Remove this override in 0.65+, as a proper fix is included in react-native itself.
-        force "com.facebook.react:react-native:" + REACT_NATIVE_VERSION
-    }
-}
-
 repositories {
-    google()
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
         url "$rootDir/../node_modules/react-native/android"
     }
-    jcenter()
+    maven {
+        // Android JSC is installed from npm
+        url("$rootDir/../node_modules/jsc-android/dist")
+    }
+    mavenCentral()
+    google()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    androidTestImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    //noinspection GradleDynamicVersion
+    androidTestImplementation 'org.webkit:android-jsc:+'  // From node_modules
+    androidTestImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

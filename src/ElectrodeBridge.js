@@ -71,7 +71,9 @@ class ElectrodeBridge extends EventEmitter {
         : DeviceEventEmitter;
 
     eventEmitter.addListener(
+      // $FlowFixMe
       ELECTRODE_BRIDGE_MESSAGE_EVENT_NAME,
+      // $FlowFixMe
       this._onMessageFromNative.bind(this),
     );
 
@@ -91,6 +93,7 @@ class ElectrodeBridge extends EventEmitter {
    * @param {Object} obj - Options
    * @param {Object} obj.data - The data attached to this event [DEFAULT : {}]
    */
+  // $FlowFixMe
   emitEvent(name /*: string */, {data} /*: {data: Object} */ = {}) {
     const eventMessage = this._buildMessage(ELECTRODE_BRIDGE_EVENT_TYPE, name, {
       data,
@@ -200,11 +203,7 @@ class ElectrodeBridge extends EventEmitter {
   _buildMessage(
     type,
     name,
-    {
-      data,
-      error,
-      id = uuid.v4(),
-    } /*: {
+    {data, error, id = uuid.v4()} /*: {
       data?: Object|string|number,
       error?: Object,
       id?: string,
@@ -256,7 +255,7 @@ class ElectrodeBridge extends EventEmitter {
         }
 
         handler(message.data)
-          .then((data) => {
+          .then(data => {
             const responseMessage = this._buildMessage(
               ELECTRODE_BRIDGE_RESPONSE_TYPE,
               message.name,
@@ -264,7 +263,7 @@ class ElectrodeBridge extends EventEmitter {
             );
             return NativeModules.ElectrodeBridge.sendMessage(responseMessage);
           })
-          .catch((error) => {
+          .catch(error => {
             const errorMessage = this._buildMessage(
               ELECTRODE_BRIDGE_RESPONSE_TYPE,
               message.name,
@@ -283,6 +282,7 @@ class ElectrodeBridge extends EventEmitter {
         break;
 
       case ELECTRODE_BRIDGE_EVENT_TYPE:
+        // $FlowFixMe
         this.emitEvent(message.name, message.data ? {data: message.data} : {});
         break;
     }
@@ -348,6 +348,7 @@ export const DispatchMode = {
   GLOBAL: 2,
 };
 
+// $FlowFixMe
 const electrodeBridge = new ElectrodeBridge();
 electrodeBridge.setMaxListeners(MAX_LISTENERS);
 export {electrodeBridge};

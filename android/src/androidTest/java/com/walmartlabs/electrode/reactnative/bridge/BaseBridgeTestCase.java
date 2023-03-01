@@ -33,6 +33,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
+import com.facebook.soloader.SoLoader;
 import com.walmartlabs.electrode.reactnative.bridge.helpers.Logger;
 
 import org.junit.Before;
@@ -54,6 +55,7 @@ public class BaseBridgeTestCase {
     @Before
     public void setUp() throws Exception {
         Logger.overrideLogLevel(Logger.LogLevel.DEBUG);
+        SoLoader.init(InstrumentationRegistry.getInstrumentation().getContext(), /* native exopackage */ false);
         initBridge();
         ElectrodeBridgeTransceiver.instance().debug_ClearRequestHandlerRegistrar();
         ((EventRegistrarImpl) mockEventRegistrar).reset();
@@ -104,8 +106,9 @@ public class BaseBridgeTestCase {
 
     private class MockElectrodePackage extends ElectrodeBridgePackage {
 
+        @NonNull
         @Override
-        public List<NativeModule> createNativeModules(final ReactApplicationContext reactContext) {
+        public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
             List<NativeModule> modules = new ArrayList<>();
             this.electrodeBridgeTransceiver = ElectrodeBridgeTransceiver.create(getReactContextWrapper(reactContext));
             modules.add(electrodeBridgeTransceiver);

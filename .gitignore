@@ -39,5 +39,8 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# VSCode
-.vscode
+# Bundle artifact
+*.jsbundle
+
+# CocoaPods
+/ios/Pods/

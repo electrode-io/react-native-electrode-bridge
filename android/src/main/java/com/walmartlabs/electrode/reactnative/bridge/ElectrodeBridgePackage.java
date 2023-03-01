@@ -17,11 +17,12 @@
 package com.walmartlabs.electrode.reactnative.bridge;
 
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.common.annotations.VisibleForTesting;
 import com.facebook.react.uimanager.ViewManager;
+
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,25 +33,18 @@ public class ElectrodeBridgePackage implements ReactPackage {
     @VisibleForTesting
     ElectrodeBridgeTransceiver electrodeBridgeTransceiver;
 
+    @NonNull
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
         this.electrodeBridgeTransceiver = ElectrodeBridgeTransceiver.create(reactContext);
         modules.add(electrodeBridgeTransceiver);
         return modules;
     }
 
-    // Do not annotate the method with @Override
-    // We want to provide backward compatibility starting react-native version 0.42
-    // Breaking change in react-native version 0.47 : Android Remove unused createJSModules calls
-    // Find more information here : https://github.com/facebook/react-native/releases/tag/v0.47.2
-    // https://github.com/facebook/react-native/commit/ce6fb337a146e6f261f2afb564aa19363774a7a8
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-        return Collections.emptyList();
-    }
-
+    @NonNull
     @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
         return Collections.emptyList();
     }
 
